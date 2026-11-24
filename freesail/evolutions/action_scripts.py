@@ -100,9 +100,9 @@ class _QuartersScript(PhasedScript):
 class ClearForActionScript(_QuartersScript):
     """Clear for action: the cabin bulkheads down and the furniture struck below, the
     galley fire out, the decks wetted and sanded and the match tubs and shot garlands
-    filled, the boats hoisted out to tow astern; then the drum beats to quarters. Phases
-    `bulkheads`, `galley`, `decks`, `boats`, `quarters`, their seconds shares of the
-    ship's clearing time (`clear_seconds`), the beat its own."""
+    filled, the boats secured where they lie (`_boats_cleared_words`); then the drum beats to
+    quarters. Phases `bulkheads`, `galley`, `decks`, `boats`, `quarters`, their seconds shares
+    of the ship's clearing time (`clear_seconds`), the beat its own."""
 
     DEFAULTS = {"quarters": 90.0}
     SHARES = {"bulkheads": 0.35, "galley": 0.1, "decks": 0.35, "boats": 0.2}
@@ -131,13 +131,42 @@ class ClearForActionScript(_QuartersScript):
             self.note("The decks wetted and sanded; the match tubs and the shot garlands filled.")
         elif name == "boats":
             self.ship.extra["cleared"] = True
-            self.note("The boats are out and towing astern; the ship is clear.")
+            self.note(_boats_cleared_words(self.ship))
         elif name == "quarters":
             self._beat()
 
     def words(self) -> dict[str, Any]:
         q = _quarters(self.ship)
         return {"quarters": " ".join(q.describe()[:2]) if q is not None else ""}
+
+
+def _boats_cleared_words(ship: Ship) -> str:
+    """The boats' line as the ship is cleared, by where her boats are: griped fast on the booms
+    (Falconer 1780, 'Gripes': the lashings that secure the boats on deck at sea), or towing
+    astern on their painters where her file tows them (a boat's `towed`), and the ship clear.
+    No boat is hoisted out by clearing for action, and none was: the line said "The boats are
+    out and towing astern" of every ship, her boats on the booms all the while, where a shot
+    may stave them (`combat.hits`). A ship with no boats is clear."""
+    boats = list(getattr(getattr(ship, "spec", None), "boats", None) or [])
+    towed = [b for b in boats if getattr(b, "towed", False)]
+    booms = [b for b in boats if not getattr(b, "towed", False)]
+    said: list[str] = []
+    if booms:
+        said.append(
+            f"{booms[0].name} griped fast on the booms"
+            if len(booms) == 1
+            else "the boats griped fast on the booms"
+        )
+    if towed:
+        said.append(
+            f"{towed[0].name} towing astern on her painter"
+            if len(towed) == 1
+            else "the boats towing astern on their painters"
+        )
+    if not said:
+        return "The ship is clear."
+    head = "; ".join(said)
+    return f"{head[:1].upper()}{head[1:]}; the ship is clear."
 
 
 def _crews_present_share(ship: Ship) -> float:

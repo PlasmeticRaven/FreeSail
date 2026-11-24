@@ -375,6 +375,38 @@ class _Warning:
     many: str | None  # the same for several; None: this warning is never grouped
 
 
+# The key a part's last dire warning is kept under in `StrainState.last_warning_s`, beside its
+# last warning of any kind (`warning_due`).
+DIRE_WARNING = "dire:"
+
+
+def warning_due(st: StrainState, key: str, dire: bool) -> bool:
+    """Whether a part's warning is said now, and if it is, counted as said: one a part in
+    `WARNING_INTERVAL_S`, as ever, except that a dire warning (the part loaded past
+    `CARRY_AWAY_RATIO`, where it may carry away) is said though a lesser one was within the
+    interval, and is itself said once in it, whatever was said between. Before, a part warned as
+    working and then loaded to where it would carry away said nothing more until the ten minutes
+    were out, and could carry away unwarned. The lesser warnings keep their own count: a dire one
+    said in the interval of a lesser does not move when the next lesser is due. `key` is the
+    part's (or its cause's, a cable's) as the caller counts it; no figure of load or strain is
+    read here but `dire`."""
+    now = st.elapsed_s
+    last = st.last_warning_s.get(key)
+    due = last is None or now - last >= WARNING_INTERVAL_S
+    if dire:
+        last_dire = st.last_warning_s.get(DIRE_WARNING + key)
+        if last_dire is not None and now - last_dire < WARNING_INTERVAL_S:
+            return False  # said dire within the interval: once
+        st.last_warning_s[DIRE_WARNING + key] = now
+        if due:
+            st.last_warning_s[key] = now
+        return True
+    if not due:
+        return False
+    st.last_warning_s[key] = now
+    return True
+
+
 def _warn(
     ship: Ship,
     st: StrainState,
@@ -383,16 +415,15 @@ def _warn(
     out: list[_Warning] | None = None,
     pressed: tuple[str, str] | None = None,
 ) -> None:
-    # one warning a part in ten minutes; where a whole lateen presses it (`LATEEN_PRESSED`),
-    # one a part and its cause, and its plain strain counted as said with it (package 90)
+    # one warning a part in ten minutes, and the dire one said whatever lesser one was before
+    # it (`warning_due`); where a whole lateen presses it (`LATEEN_PRESSED`), one a part and its
+    # cause, and its plain strain counted as said with it (package 90)
     key = part.id if pressed is None else f"{pressed[0]}:{part.id}"
-    last = st.last_warning_s.get(key)
-    if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
+    dire = ratio > CARRY_AWAY_RATIO
+    if not warning_due(st, key, dire):
         return
-    st.last_warning_s[key] = st.elapsed_s
     if pressed is not None:
         st.last_warning_s[part.id] = st.elapsed_s
-    dire = ratio > CARRY_AWAY_RATIO
     many: str | None
     if isinstance(part, Spar) and pressed is not None:
         one, many = _pressed_words(ship, pressed, dire)

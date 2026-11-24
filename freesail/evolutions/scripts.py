@@ -52,6 +52,7 @@ from typing import TYPE_CHECKING, Any
 
 from freesail import units
 from freesail.evolutions import trim as yard_trim
+from freesail.physics import hull as hull_params
 from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode, LineState, Sail, SailState, Spar, sync_catharpins
@@ -3942,7 +3943,7 @@ def _hove_to_no_longer(
     after: list[tuple[str, str, str]] = []
     for sl in dip:
         try:
-            line = forced_round.start(ship, "dip_settee", sl.id)
+            line = forced_round.start(ship, "dip_settee", sl.id, say_wait=False)
         except OrderError as e:
             why = str(e).strip().rstrip(".")
             why = why[:1].lower() + why[1:]
@@ -3972,7 +3973,7 @@ def _hove_to_no_longer(
     shift_waiting: list[Sail] = []
     for sl in shift:
         try:
-            line = forced_round.start(ship, "change_lateen", sl.id)
+            line = forced_round.start(ship, "change_lateen", sl.id, say_wait=False)
         except OrderError as e:
             why = str(e).strip().rstrip(".")
             why = why[:1].lower() + why[1:]
@@ -4814,7 +4815,22 @@ class FillAwayScript(Script):
                 self.swing = None
                 return
             end_lying_to(self.ship)
+            self._watch_her_way()
             self.finish()
+
+    def _watch_her_way(self) -> None:
+        """Filled away, her way watched until she has it, or for `FILLED_WATCH_S`
+        (`watch_filled_away`): the line at the end says "Filled away" only of a ship with
+        headway, and one with none yet is said to be braced full and told of when she gathers
+        it; one filled with way on her that then loses it and goes astern is told of then. A
+        mark in `ship.extra` while it is watched, gone when it is said or the watch is out."""
+        ship = self.ship
+        ahead = ship.dyn.u >= units.knots_to_ms(WAY_ON_KN)
+        ship.extra[FILLED_WATCH] = {
+            "t": 0.0,
+            "ahead": ahead,
+            "tack": _tack_name(self.sign),
+        }
 
     def _pay_off(self, dt: float, wind: Wind, factor: float, rel: float) -> None:
         """Full and gathering way, she pays off to the course ordered: her yards and
@@ -4835,6 +4851,7 @@ class FillAwayScript(Script):
         if self.last_trim:
             if self.swing is None:
                 end_lying_to(ship)
+                self._watch_her_way()
                 self.finish()
             return
         ch = close_hauled_true_angle(ship)
@@ -4903,12 +4920,25 @@ class FillAwayScript(Script):
             course_words = f"steering {course}"
         # package 90, A2: braced full, and the braces manned, by her rig (`braces_manned`);
         # with no braces worked she is not said to be braced ("braced full and" before it)
+        worked = braces_worked(self.ship)
+        watch = self.ship.extra.get(FILLED_WATCH)
+        if isinstance(watch, dict) and not watch.get("ahead"):
+            # no headway on her yet: braced full, or her helm righted, and not "Filled away",
+            # which is said when she gathers way (`watch_filled_away`); before, it was said
+            # with sternway on her, the lugger and the bilander lying to as they had lain
+            filled = "Braced full" if worked else "Her sheets drawn"
+            yet = "; she has no headway on her yet"
+            braced = ""
+        else:
+            filled, yet = "Filled away", ""
+            braced = "braced full and " if worked else ""
         return {
             "new_course": course,
             "filled_tack": _tack_name(self.sign),
-            "course_words": course_words,
+            "course_words": course_words + yet,
             "braces": braces_manned(self.ship),
-            "braced_full": "braced full and " if braces_worked(self.ship) else "",
+            "braced_full": braced,
+            "filled": filled,
         }
 
     def data(self) -> dict[str, Any]:
@@ -7074,6 +7104,77 @@ BOX_OFF_AFTER_S = 120.0
 # and by; judgement, the sternway at which the keel's grip astern begins to act
 # (`hull.STERNWAY_YAW_FROM_KN`), below which she is only losing her way.
 IN_IRONS_KN = 1.0
+
+
+# A ship filled away is watched for her way so long (`watch_filled_away`): JUDGEMENT, the
+# minutes a ship braced full from lying to takes to gather way and steer, with room.
+FILLED_WATCH_S = 600.0
+# Way on her, knots through the water: the aback line's "way to lose" (`physics.hull`).
+WAY_ON_KN = hull_params.WAY_ON_KN
+# The mark of the watch in `ship.extra`: {"t": seconds since she was filled, "ahead": whether
+# she had headway then, "tack": the tack she was filled on}.
+FILLED_WATCH = "filled_away_watch"
+
+
+def watch_filled_away(ship: Ship, runner: Any, dt: float = 1.0) -> None:
+    """Her way after she is filled away, said once (`FillAwayScript._watch_her_way`): braced
+    full with no headway on her yet, "She gathers headway; filled away on the larboard tack."
+    when she has it, or, ten minutes on and none, that she has not; filled away with way on
+    her, a line if she then loses it and makes sternway, the wind's angle on her bow with it.
+    Before, "Filled away ..." was said at the brace, with sternway on her or with way she lost
+    again, and nothing after: the cutter, after `lie a-try` and `fill away` in a moderate
+    breeze, went astern for an hour on that line. The watch ends, unsaid, when she heaves to
+    or a whole-ship manoeuvre begins; it reads her way and says it, and touches nothing."""
+    watch = ship.extra.get(FILLED_WATCH)
+    if not isinstance(watch, dict):
+        return
+    if "hove_to" in ship.extra or any(
+        not i.waiting and i.evo.id in HELM_MANOEUVRES and i.evo.id != "fill_away"
+        for i in getattr(runner, "instances", [])
+    ):
+        ship.extra.pop(FILLED_WATCH, None)
+        return
+    watch["t"] = float(watch.get("t", 0.0)) + dt
+    u_kn = units.ms_to_knots(ship.dyn.u)
+    tack = str(watch.get("tack") or "")
+    if not watch.get("ahead"):
+        if u_kn >= WAY_ON_KN:
+            ship.extra.pop(FILLED_WATCH, None)
+            ship.note(
+                "notable", "ship.way", f"She gathers headway; filled away on the {tack} tack."
+            )
+        elif watch["t"] >= FILLED_WATCH_S:
+            ship.extra.pop(FILLED_WATCH, None)
+            ship.note(
+                "notable",
+                "ship.way",
+                _no_way_words(ship, u_kn, "Braced full ten minutes, she has gathered no headway"),
+            )
+        return
+    if u_kn <= -WAY_ON_KN:
+        ship.extra.pop(FILLED_WATCH, None)
+        ship.note(
+            "notable", "ship.way", _no_way_words(ship, u_kn, "Filled away, she has lost her way")
+        )
+    elif watch["t"] >= FILLED_WATCH_S:
+        ship.extra.pop(FILLED_WATCH, None)
+
+
+def _no_way_words(ship: Ship, u_kn: float, what: str) -> str:
+    """'Filled away, she has lost her way and makes a knot of sternway, the wind 39° on the
+    larboard bow.'"""
+    from freesail.crew.model import number_words  # local import: the words' one home
+
+    rel = units.wrap_pi(estimated_wind_from(ship) - ship.dyn.heading)
+    side = "starboard" if rel >= 0 else "larboard"
+    deg = int(round(abs(units.rad_to_deg(rel))))
+    if u_kn <= -WAY_ON_KN:
+        knots = max(1, int(round(-u_kn)))
+        way = "a knot of sternway" if knots == 1 else f"{number_words(knots)} knots of sternway"
+        doing = f"makes {way}"
+    else:
+        doing = "lies without way"
+    return f"{what} and {doing}, the wind {deg}° on the {side} bow."
 
 
 def keep_full_and_by(ship: Ship, runner: Any, dt: float = 1.0) -> None:
@@ -9535,6 +9636,15 @@ def _plain_sail_topsails(ship: Ship) -> list[Sail]:
     return tops if plain is None else [sl for sl in tops if sl.id in plain]
 
 
+def _cast_hoisted_words(ship: Ship) -> str:
+    """The sails a fore-and-after's cast hoists, in words: the topsail of her plain sail and her
+    mainsail on its boom, "the topsail and the mainsail", or either alone; "" for neither."""
+    names = (["the topsail"] if _plain_sail_topsails(ship) else []) + (
+        ["the mainsail"] if _boom_mainsails(ship) else []
+    )
+    return " and ".join(names)
+
+
 def _boom_mainsails(ship: Ship) -> list[Sail]:
     """A fore-and-after's gaff sails on a boom (the mainsail she gets under way under),
     set or not; nothing on a ship with yards on two masts (her spanker is set last). Yards
@@ -9678,9 +9788,30 @@ UNDER_WAY_START_WORDS_LUGGER = (
 )
 
 
+UNDER_WAY_START_WORDS_ON_DECK = (
+    "All hands up anchor! Pass the messenger, ship the bars; the sails to be got ready for "
+    "hoisting on deck, no hand aloft."
+)
+
+
 def under_way_start_words(ship: Ship) -> str:
-    """The order's first line, by her rig (package 68)."""
-    return UNDER_WAY_START_WORDS_LUGGER if _lugs_all(ship) else UNDER_WAY_START_WORDS
+    """The order's first line, by her rig (package 68), and by what her cast looses aloft: a
+    fore-and-after with nothing of her plain sail furled aloft (the smack, whose topsail is not
+    of it: `_plain_sail_topsails`) sends no ready-men aloft, as the lugger sends none."""
+    if _lugs_all(ship):
+        return UNDER_WAY_START_WORDS_LUGGER
+    if not _cast_looses_aloft(ship):
+        return UNDER_WAY_START_WORDS_ON_DECK
+    return UNDER_WAY_START_WORDS
+
+
+def _cast_looses_aloft(ship: Ship) -> bool:
+    """Whether getting under way looses a sail aloft: a topsail of her plain sail, or a settee
+    furled on its yard (`GetUnderWayScript._begin_loose`); a ship with yards on two masts always
+    (her plain sail's topsails)."""
+    if len(_masts_with_yards(ship)) >= 2:
+        return True
+    return bool(_plain_sail_topsails(ship)) or any(sl.settee for sl in after_gaff_sails_all(ship))
 
 
 class GetUnderWayScript(_AnchorScript):
@@ -9836,10 +9967,20 @@ class GetUnderWayScript(_AnchorScript):
         self.sails_words = (
             "under " + " and ".join(names + ["the jib"]) if names else "under the jib"
         )
-        self.note(
-            "Pawl the capstan; stopper the cable. Stations for loosing sail! Lay aloft, "
-            "sail-loosers! Man the topsail sheets and halliards."
-        )
+        if loosed:
+            self.note(
+                "Pawl the capstan; stopper the cable. Stations for loosing sail! Lay aloft, "
+                "sail-loosers! Man the topsail sheets and halliards."
+            )
+        else:
+            # nothing of her plain sail furled aloft (the smack, her topsail not of it): her
+            # canvas is made ready on deck, and no sail-loosers go aloft (before, this line was
+            # said of her, and "Hoist away the topsail" after it, her topsail furled throughout)
+            self.note(
+                "Pawl the capstan; stopper the cable. Stations for making sail! Cast off the "
+                f"gaskets of {_cast_hoisted_words(ship) or 'the jib'}; the halliards manned on "
+                "deck."
+            )
 
     def tick(self, dt: float, wind: Wind, factor: float) -> None:
         from freesail.ship.parts import AnchorState
@@ -9916,11 +10057,21 @@ class GetUnderWayScript(_AnchorScript):
                     # her by the bow, it swings her stern and not her head: the schooner
                     # and the cutter were so sheered the wrong way at the breakout, and
                     # cast on the wrong tack or hung till the timeout.
-                    self.note(
-                        "Let fall! Sheet home! Hoist away the topsail and the mainsail, the "
-                        f"main boom steadied over to {_lee_name(self.sign)}. Man the bars; "
-                        "heave round!"
+                    # the sails her cast hoists, by her plain sail: "the topsail and the
+                    # mainsail" of the cutter, as it was; "the mainsail" of the smack, whose
+                    # topsail stays furled (`_plain_sail_topsails`); "Let fall! Sheet home!"
+                    # only of a sail loosed aloft
+                    hoisted = _cast_hoisted_words(ship)
+                    aloft = "Let fall! Sheet home! " if _plain_sail_topsails(ship) else ""
+                    boom = f"main boom steadied over to {_lee_name(self.sign)}"
+                    hoist = (
+                        f"Hoist away {hoisted}, the {boom}. "
+                        if hoisted
+                        else f"The {boom}. "
+                        if _boom_mainsails(ship)
+                        else ""
                     )
+                    self.note(f"{aloft}{hoist}Man the bars; heave round!")
                 else:
                     self.swing = YardSwing(yards, targets, self.timing_value("brace_s", 60.0))
                     # her after and head lists braced up and abox, each named by its class as
