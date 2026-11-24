@@ -2675,3 +2675,56 @@ Both run again on this commit's hash with its tiers.
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 3d3841f2. Its code is 0040fda's: the fast tier is 0040fda's run, and the slow is 40a532e's, which runs the same slow tests on the same code but two entries' comments. The eighteen in gales and A2's harness run again on this hash. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the eight are this section's commit on `…/pkg-90-lateen`, pushed, its tiers running.
+
+## The lateen hulls' list, its second pass (nudge 76): on `…/pkg-90-lateen2`, items 1 to 4 built and pinned, item 5 waiting for package 127 (2026-11-24)
+
+**The branch:** `…/pkg-90-lateen2`, cut from `…/pkg-90` at **b35aaaba** (the list of eight merged on the trunk at da356b76, by 111b1b5), as the coordinating session asks.
+- `…/pkg-90` is still at b35aaaba, and the trunk at 41d1d1bc. Packages 125 to 127 have not landed, so there is nothing more to merge before this hash, and **no line was resolved by hand.**
+- The work is one commit of code and tests, **5a467fe**, and this one of the notes and report.
+- Its files:
+  - `freesail/physics/strain.py` (the widened words);
+  - `freesail/orders/navigation.py` (the bow's line);
+  - `freesail/combat/hits.py` (the engine track's file, A3's);
+  - `freesail/world/boats.py` and `dealings.py`;
+  - `tests/test_lateen_whole.py` and `tests/test_boat_towed.py`.
+
+**The equations are read, not changed:** no load, ratio, factor, rate, timing or draw moves. The measures, old beside new, are in `docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list, its second pass".
+
+1. **"Take it in" is not named on the bad hand:** it eases nothing for two minutes and more (the xebec in 50 kn, her main yard at 1.57 to 1.60 for 169 s). The dire line names only what eases at once.
+   - Old "shift it or take it in"; new "shift the mainsail".
+   - Proof: `test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning_names`. The shift eases at once and is named; the take-in holds the yard over 1.5 for two minutes and is not named. It is the old pin moved, old beside new.
+2. **The reliefs are orders she takes word for word.** They were "shift it" and "shift them", which she refused ("There is no such part as the them"). Now they are "shift the mainsail", "shift the mizen or box her off", and in the bow's line "shift the foresail and the mizen and the mainsail".
+   - **A lateen warned while its own shift waits for hands** is told so, and what the hands are at: "...: its shift waits its turn, the hands shifting the mainsail.", the xebec's mizen at 1.65 behind her foresail's and mainsail's shifts. Before, "shift it or take it in".
+   - Proof: `test_a_lateen_whose_shift_waits_for_hands_is_told_so_not_to_shift_it`. The old words' pins moved, old beside new: five tests, eight cases (the bow watch's line, the bow's line, the gale's bad hand, the breeze's aback, and the four reliefs aback).
+3. **A boat towed astern stove by a shot is cut adrift,** in tow no longer, her drag gone, and her reading says so: "The boat is stove by a shot as she tows astern; she fills, and her painter is cut.". The draw is as it was, and a boat on the booms is stove there as before.
+   - Proof: `test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms`, through `hits._deck_hit` itself.
+4. **The three pins:**
+   - the hunt scenario (aback to the bad hand to aback, never without a cause between: warned at 601, 611 and 641 s), `test_a_cause_that_turns_to_another_and_back_is_warned_for_each_time_it_comes`;
+   - boxing off not offered hove to, `test_hove_to_she_is_not_offered_boxing_off`;
+   - the towed boat's line at its two figures and her hull speed, `test_a_boat_towed_too_fast_is_said_at_her_hull_speed_and_again_only_under_nine_tenths`.
+5. **The dire step within one cause waits for package 127's rule,** as the lead asks; not built here. It does not hold items 1 to 4.
+
+**Each pin fails with its mend undone**, run so, seven faults:
+- the reset only from no cause;
+- the box offered hove to;
+- the re-arming at eight tenths;
+- the stove words as before;
+- the stove boat kept in tow;
+- the waiting shift unsaid;
+- the take-in named again.
+
+The lens (`test_lateen_whole`, `test_boat_towed`, `test_knowledge`, `test_strain`, the combat and action files, `test_probes_90`, `test_rig_words`, `test_settee`, `test_evolutions`, `test_lateen`): 727 passed.
+
+**For the lead, beyond this row:**
+- "shift the lateens" wants a `lateens` group in a lateen hull's own file, as "the jibs" is (`groups:`, the generator's).
+- A list with commas is the order parser's, for every order on every ship.
+- The runner's in-turn line, "Shifting the fore lateen, main lateen and mizzen lateen: not hands enough for all at once; the watch takes the sails in turn.", names the parts where the warnings name the sails, and is every ship's line. It is left as it is.
+
+**Checked on this commit:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against b35aaaba's code, which is 111b1b5's: its fast tier is the l72t run of 111b1b5 and its slow likewise. The eighteen in gales and A2's harness run on it too, since `strain.py` moves. The results follow in a section of their own; the commit after this one touches this report alone.
+
+**For the coordinating session:** the branch to watch is **`…/pkg-90-lateen2`**, this section's commit, pushed, its tiers running.
