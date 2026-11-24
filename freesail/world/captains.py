@@ -204,6 +204,47 @@ CAPTAIN_ON_DECK_STATES: frozenset[str] = frozenset(
 # module, which reads no truth (see `tests/test_captains.py`).
 FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")
 
+# A spar carried away is shifted for a spare by the game's own captain in this order of its
+# class, what keeps her manageable first: the bowsprit and the lower masts that stay the
+# rest, the jib-boom for her head sails, the topmasts for her topsails, the gaff and the boom
+# of her after sail, the yards (the lowest first, by the spar they stand on), then the light
+# spars (JUDGEMENT, after Luce 1884, ch. XXXI Carrying Away Masts and Spars: the wreck cleared
+# first, "then proceed to send aloft a new topmast", the topgallant mast's "as convenient").
+SPAR_MEND_ORDER: tuple[str, ...] = (
+    "bowsprit",
+    "mast",
+    "jib_boom",
+    "topmast",
+    "gaff",
+    "boom",
+    "sprit",
+    "lateen_yard",
+    "lug_yard",
+    "yard",
+    "topgallant_mast",
+    "flying_jib_boom",
+    "royal_mast",
+    "studdingsail_boom",
+)
+# No spar is shifted within this many seconds of a shot come aboard (JUDGEMENT: ten minutes,
+# as the repairs' own interval: the work is begun out of action, never under fire).
+SPAR_WORK_QUIET_S = 600
+# The work in hand that leaves no hands to spare for a spar's.
+SPAR_WORK_BUSY = frozenset(
+    {
+        "plug_shot_hole",
+        "set_up_rigging",
+        "reeve_line",
+        "fish_spar",
+        "clear_wreck",
+        "shift_spar",
+        "jury_mast",
+        "repair_wheel",
+        "relieving_tackles",
+        "bend_sail",
+    }
+)
+
 # The class of a hull by what the tops make out of her, for the cruiser's judgement of a
 # superior force (`overmatched`): a frigate over a brig over a schooner or a cutter
 # (judgement on the catalogue's hierarchy of size, spec M5 §25; the guns are M7's).
@@ -3120,7 +3161,13 @@ class Captain(Judgement):
                 self.give("shift the jib for the storm jib", why="to lie to in a gale")
                 self._business["lie_to_storm_lug"] = True  # hove to when the storm jib is set
                 return
-            self.give("lie a-try")
+            if self._topsail_to_lie_under():
+                self.give("lie a-try")
+            else:
+                # no topsail set to lie a-try under (the smack's, furled in her plain sail):
+                # `lie a-try` would be refused and leave her sailing on in the gale, so she
+                # heaves to under the canvas she has, as a fore-and-aft vessel lies to
+                self.give("heave to", why="no topsail set to lie a-try under")
             return
         sailing_states = ("on passage", "beating", "running for shelter")
         if old == "hove to for weather" and state in sailing_states:
@@ -3457,6 +3504,24 @@ class Captain(Judgement):
             and self.legs[self.leg_i].kind != "out"
         ):
             self._shape_leg(why="she has way again")
+
+    def _topsail_to_lie_under(self) -> bool:
+        """Whether `lie a-try` is the gale's order for her: False only where she has the
+        topsail it keeps and it is furled or unbent (the smack's, under her plain sail),
+        which the order refuses (`scripts.LieATryScript.check`: "The topsail is not set")
+        and leaves her sailing on. A topsail in hand (lowered for its reefs) is set again
+        before the order begins, and a ship with no such topsail has the order's own
+        refusal, as before."""
+        ship = self.world.ship
+        try:
+            from freesail.evolutions.scripts import _topsails_on, yards_to_back
+            from freesail.ship.parts import SailState
+
+            kept = _topsails_on(ship, yards_to_back(ship))
+        except (AttributeError, KeyError, TypeError, ValueError, ImportError):
+            return True  # as before: the order says what it cannot do
+        stowed = (SailState.FURLED, SailState.UNBENT)
+        return not kept or any(s.state not in stowed for s in kept)
 
     def _lugger_storm_lug(self) -> bool:
         """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no
@@ -4747,11 +4812,111 @@ class Captain(Judgement):
             # the wheel in its turn, after the leak and the rigging and out of action
             # (package 116, card 5): she steers by the tackles meanwhile, the slower
             wanted.append((helm_words(ship)["mend"], "steering by the relieving tackles"))
+        if not wanted and not in_action:
+            # a spar carried away, last: its wreck cleared and the spar shifted for a spare of
+            # its class, or a jury mast stepped for a lower mast, the most wanted first; only
+            # with nothing else in hand and no shot come aboard of late (the owner's note 4
+            # of gate M7: the Renard sailed three hours with her topgallant mast gone)
+            spar_work = self._spar_work(ship, tick, in_hand, runner)
+            if spar_work is not None:
+                wanted.append(spar_work)
         if not wanted:
             return
         self._business["repairs_tick"] = tick
         text, why = wanted[0]
         self.give(text, why=why)
+
+    def _spar_work(
+        self, ship: Any, tick: int, in_hand: set[str], runner: Any
+    ) -> tuple[str, str] | None:
+        """The next work on a spar carried away, as (the order, why), or None: never under
+        fire (a shot come aboard within `SPAR_WORK_QUIET_S`) and only with hands to spare (no
+        repair and no all-hands work in hand). The wreck is cleared first, the spar's
+        and every spar's that went with it (`clear_wreck.yaml`: a wreck hanging drags and
+        tears the sails); then each spar cleared and standing on what stands is shifted for
+        a spare of its class from the booms (`shift_spar.yaml`), a lower mast stepped again
+        as a jury mast from a spare topmast (`jury_mast.yaml`), in `SPAR_MEND_ORDER`, what
+        keeps her manageable first; and the sails the wreck took bent again to the spar
+        that stands. A spar she has no spare for is left as it is."""
+        from freesail.evolutions.repair_scripts import _name
+        from freesail.evolutions.scripts import wreck_root, wrecks
+        from freesail.ship import parts
+        from freesail.ship.parts import SailState, Spar
+
+        if in_hand & SPAR_WORK_BUSY or any(
+            getattr(inst, "all_hands", False) for inst in getattr(runner, "instances", []) or []
+        ):
+            return None
+        # read, never made: `damage_of` would put a damage record on a ship that has none
+        keeper = (getattr(ship, "extra", {}) or {}).get("damage")
+        came = (getattr(keeper, "struck_by", {}) or {}).values()
+        struck = max((int(t) for t in came), default=None)
+        if struck is not None and tick - struck < SPAR_WORK_QUIET_S:
+            return None
+        spars = getattr(ship, "spars", {}) or {}
+        order = {sid: i for i, sid in enumerate(spars)}
+
+        def rank(sp: Any) -> tuple[int, int, int]:
+            known = sp.cls in SPAR_MEND_ORDER
+            cls = SPAR_MEND_ORDER.index(sp.cls) if known else len(SPAR_MEND_ORDER)
+            return (cls, len(ship.spar_chain(sp)), order.get(sp.id, 0))
+
+        business = self._business
+        hanging = sorted((w for w in wrecks(ship) if isinstance(w, Spar)), key=rank)
+        if hanging:
+            wreck = hanging[0]
+            # the sails that stood on it, bent again when it stands (the clearing sends a
+            # whole sail down to the sail room)
+            took = [
+                sail.id
+                for sail in ship.sails.values()
+                if sail.state is not SailState.UNBENT
+                and sail.state is not SailState.BLOWN_OUT
+                and wreck_root(ship, sail) is wreck
+            ]
+            bend = list(business.get("bend_again") or [])
+            business["bend_again"] = bend + [x for x in took if x not in bend]
+            name = _name(ship, wreck.id)
+            return f"clear away the wreck of the {name}", f"the {name} carried away"
+        # a head sail the wreck took is bent again as soon as its spar stands: it keeps her
+        # manageable before any other spar is shifted; the rest when all are shifted
+        heads = set((getattr(ship, "groups", {}) or {}).get("headsails", []) or [])
+        bend_now = self._bend_again(ship, lambda sid: sid in heads)
+        if bend_now is not None:
+            return bend_now
+        booms = parts.booms(ship)
+        for sp in sorted((x for x in spars.values() if x.wrecked and x.sent_down), key=rank):
+            if wreck_root(ship, sp) is not sp:
+                continue  # it went with another, shifted first
+            parent = ship.parent_of(sp)
+            if parent is not None and (parent.wrecked or parent.sent_down):
+                continue
+            name = _name(ship, sp.id)
+            if sp.cls == "mast":
+                if booms.have("topmast") > 0:
+                    return "rig a jury mast", f"the {name} carried away"
+                continue
+            if booms.have(sp.cls) > 0:
+                return f"shift the {name}", f"the {name} carried away"
+        return self._bend_again(ship, lambda sid: True)
+
+    def _bend_again(self, ship: Any, which: Any) -> tuple[str, str] | None:
+        """`bend the <sail>` for the first sail the wreck took (`_business["bend_again"]`,
+        in the order they stood) that `which` admits and whose spars all stand again; a
+        sail no longer in the sail room is struck from the list."""
+        from freesail.evolutions.scripts import gone_spar
+        from freesail.ship.parts import SailState
+
+        wanting = self._business.get("bend_again") or []
+        for sid in list(wanting):
+            sail = ship.sails.get(sid)
+            if sail is None or sail.state is not SailState.UNBENT:
+                wanting.remove(sid)
+                continue
+            if which(sid) and gone_spar(ship, sail) is None:
+                wanting.remove(sid)
+                return f"bend the {self._sail_name(sid)}", "its spar shifted for a spare"
+        return None
 
     def _helm_first(self, ship: Any, tick: int) -> bool:
         """The wheel shot away: the relieving tackles before everything, whatever the
