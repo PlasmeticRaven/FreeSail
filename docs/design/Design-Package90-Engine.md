@@ -1443,8 +1443,14 @@ the bad hand (`lateen_pressed`, under `strain.LATEEN_PRESSED`, for each substep 
 `_warn` counts the ten minutes' rate against the part and its cause, so a lateen coming aback or
 onto the bad hand is warned for as it comes, whatever was said before, in words that say why and
 what eases it: "Main lateen yard bending like a whip, the mainsail lying on the mast; she will
-carry it away: let fly its sheet or shift it." (aback, "..., the mainsail aback against the mast:
-let fly its sheet, shift it or box her off."). Before, the one warning a part in ten minutes let a
+carry it away: shift it or take it in." (aback, "..., the mainsail aback against the mast; ...:
+shift it or box her off.", "box her off" only where she has head yards to brace abox and is not hove
+to). *Corrected 2026-11-24 (the lead's nudge 60, item 3; `strain.pressed_reliefs`):* the words name
+only orders she will take that are measured to bring the load down. A shift halves the yard's and
+mast's load within a second; boxing off does the same, aback; a take-in on the bad hand brings it
+down within 152 to 170 s, where with no order it never falls. The sheet let fly is no longer named:
+on the bad hand it raises the load (the xebec in 40 kn, her main yard 0.93 to 1.11), and aback it
+eases it no more than doing nothing. Before, the one warning a part in ten minutes let a
 yard warned on the good hand carry away on the bad hand unwarned (the xebec probe in 57 kn), and
 "if sail is not shortened" pointed the wrong way of a lateen whose taking in the game holds while
 it is aback. No committed sail is a whole lateen, so their warnings keep the rule as it was (the

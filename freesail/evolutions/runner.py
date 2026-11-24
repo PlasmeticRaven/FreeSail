@@ -108,6 +108,7 @@ from freesail.evolutions.scripts import (
     _world_of,
     helm_lost,
     helm_words,
+    is_whole_lateen,
     keep_full_and_by,
     keep_lying_to,
     lateen_party,
@@ -467,6 +468,13 @@ class Runner:
                 words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
                 ship.note("notable", "evolution.waiting", words, sid)
                 inst.lateen_wait_said = True
+            elif not handed and isinstance(subject, Sail) and is_whole_lateen(subject):
+                # an order to a whole lateen waiting its turn behind other work is said at the
+                # order, as behind work handed on (the lead's nudge 60, item 2: `take in the
+                # mainsail` behind `shift the mainsail` waited over two minutes with only
+                # "Order: take in the mainsail." said). Of every other sail the reply alone says
+                # it, as on the trunk
+                ship.note("notable", "evolution.waiting", words, sid)
             return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
