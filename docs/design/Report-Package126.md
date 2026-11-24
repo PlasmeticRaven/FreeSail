@@ -235,9 +235,64 @@ close-hauled, and drifts at under two knots. A ship with her topsail set lies a-
 
 **Truth.** 7-778.
 
-## 5. The pins moved, the differences served, and the tiers
+## 5. The pins moved, and the differences served
 
-(Filled in at the build's hash: §5 of the build report.)
+**No pin moved** (`docs/dev/TuningNotes.md`, "Package 126"). The tiers on the build's hash are in
+the build report.
+
+**Today's ships, old beside new.** I ran the trunk at 41d1d1bc and this branch merged with it, in
+the same orders at seed 7, under the game's own captain:
+
+- every ship file (the thirteen ships and the five boats);
+- four cases: a gale abeam and a gale close-hauled (bound for Falmouth from 48 40 N 5 05 W, the
+  wind rising from 20 to 35 knots over an hour and held two and a half more), a cruise off the
+  Lizard (12 knots pinned, three hours), and a June passage off Falmouth under a high with the
+  systems' weather (six hours);
+- in every run, the whole log and the ship's end state compared.
+
+| Case | Same | Differs |
+|---|---|---|
+| gale abeam | 17 of 18 | the smack: she heaves to at the gale's line, the order said with its reason, and drifts at under two knots, where `lie a-try` was refused and she sailed on at 7 to 9 knots |
+| gale close-hauled | 17 of 18 | the smack, the same |
+| cruise | 18 of 18 | none |
+| June off Falmouth | none of 18 | the fog's coming and going (§2), on every file |
+
+In the June fog runs:
+
+- **The five boats** differ in the weather's lines alone; their end states are the same.
+- **The thirteen ships** under way differ in the fog's lines and in what hangs on its minutes: the
+  captain's fog signals ceased when it clears ("ceasing the fog signals (the weather clear)"), the
+  courses shaped and the allowances for the tide at the next minute, the log hove, the trims. From
+  there their positions differ by a few cables at the end of the six hours; one, the bilander, is
+  on passage at the end where she was beating.
+
+***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
+seat): it differs by the spar work.
+
+- **The Renard, struck,** clears the wreck of her square-sail yard (6,780), shifts it for her spare
+  yard (7,380) and bends her square sail again (8,160). These are lines of her own log; a player
+  learns them only as the lookout sees her.
+- **The Sherbourne** chases her to take possession, and from 7,140 the chase's lines differ as the
+  Renard drifts otherwise (one order of `heave to` refused at 7,140 in place of the one at 6,900; the
+  chase's bearings). The log ends at 620 lines where it ended at 629, and the Sherbourne's spars at
+  the end are the same three carried away.
+
+**What a player or a model's seat is served that differs** (every such line, by kind):
+
+- **The fog's lines** (§2): `weather.change` "A fog is settling in." and `weather.fog` "The fog is
+  thickening.", "The fog has shut in thick.", "The fog seems to be clearing." and "The fog is
+  thinning."
+- **The weather's words through a fog:** the sky's ("The sky hazy.", "The sky thick.") and the
+  hour's ("Hazy, fog; ..."), and the reading of the visibility ("a few miles", "a mile").
+- **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
+  and the captain's orders that hang on them.
+- **The captain's orders of spar work** ("clearing away the wreck of the ...", "shifting the ...",
+  "rigging a jury mast", "bending the ..."), and their evolutions' lines.
+- **The smack's gale order:** "heaving to (no topsail set to lie a-try under)", where it was a
+  refusal of `lie a-try`.
+- **The harbour's page and state:** the end's button and words, and `games` in the state.
+
+Nothing else moved.
 
 ## 6. Found and not mended
 
