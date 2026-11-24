@@ -1600,11 +1600,14 @@ def sails_listed(ship: Ship, sails: list) -> str:
 
 
 def heave_to_in_hand(ship: Ship) -> bool:
-    """Whether she is coming to: a heave-to or a lie a-try given and not done (package 90, the
-    lead's nudge 77, item 3: `box her off` was taken then, and did nothing)."""
+    """Whether she is coming to: a heave-to or a lie a-try begun and not done (package 90, the
+    lead's nudge 77, item 3: `box her off` was taken then, and failed once she was hove to). One
+    given and still waiting to begin is not: it may yet fail its own check, as the merchant
+    brig's lie a-try does with her main topsail not set, and a box behind it is wanted then."""
     runner = ship.extra.get("evolutions")
     return any(
-        i.evo.id in ("heave_to", "lie_a_try") for i in getattr(runner, "instances", []) or []
+        i.evo.id in ("heave_to", "lie_a_try") and not i.waiting
+        for i in getattr(runner, "instances", []) or []
     )
 
 

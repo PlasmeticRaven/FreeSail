@@ -2786,3 +2786,74 @@ The lens (the lateen, boat, knowledge, strain, combat, action, grammar, orders, 
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 86fa56d3's code, which is b88f3bc's: its tiers are the l76t runs of b88f3bc. The eighteen in gales and A2's harness run on it too. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the branch is **`…/pkg-90-lateen3`**, this section's commit, pushed, its tiers running. Item 2 waits for package 127.
+
+## The third pass's changes on ships in the game, declared (nudge 79): old beside new on every committed ship, by a player's orders (2026-11-24)
+
+**The lead's word (nudge 79):** the third pass comes whole, after package 127, as one hash. Until 127 lands, this declaration is the work.
+- Two of its mends reach today's ships: the kedge refused with her boat lost, and the box refused while she comes to.
+- A third follows from the first: `clear for action` with her boat lost.
+
+Each is declared here as a change on ships in the game, with every other difference a player or a seat is served.
+
+**Mended while measuring, before any hash:** the commit after 5b122eb (its tiers run, and kept as the record of 5b122eb).
+- **The box's refusal now counts only a heave-to or lie a-try already begun.** One given and still waiting may fail its own check, and a box behind it is wanted then. Measured on the merchant brig, whose `lie a-try` waits behind her sail and fails 114 s on with her main topsail not set: her box was carried out on the old side, and was refused at the order by 5b122eb. It is carried out again now.
+- **Where she has no head yards, the refusal gives that reason**, as the box itself would. The lugger: "She has no head yards to brace abox.", not "She is heaving to".
+- **The boat lost is named as her file names her**, as the orders refused say it: "the launch lost", not "the boat lost".
+
+**How measured** (`n77/declare.py` in the session's scratch). Every committed ship file was run, old the trunk's code at 86fa56d3, new this branch. Each case:
+- **kedge:** at anchor in Carrick Road (the ports' tests' start), `cut the boat adrift`, then `lay out a kedge`, 900 s;
+- **box:** at sea in 15 kn, plain sail set and settled 600 s, `heave to`, then at once `box her off`, 900 s;
+- **try:** the same with `lie a-try` first;
+- **clear:** at sea as above, `cut the boat adrift`, then `clear for action`, 1,200 s.
+
+Every reply and every line after the first order is compared.
+
+**1. A lost boat lays out no kedge.** 13 ships moved, every one with a boat. The five boats' own files carry no boat to lose and cannot anchor there, the same both sides.
+
+| A player's orders | Before | Now |
+|---|---|---|
+| `cut the boat adrift`, then `lay out a kedge` (the frigate) | "Order: lay out a kedge."; "Hoist out the launch; the kedge and a hawser into her."; 695 s, "The launch away with the kedge over her stern, paying out the hawser toward SW by S."; 775 s, "The kedge let go from the launch ninety fathoms to the SW by S.": the boat cut adrift laid it out | "Order not carried out ('lay out a kedge'): the launch is lost: cut adrift on the 10th" |
+| the same, the other twelve | each as the frigate's, by her own boat's name (the bilander's and the hermaphrodite brig's long-boat, the cutter's boat, ...) | each refused so, by her boat's name |
+
+**2. A box given while she comes to is refused at the order.**
+- `heave to` then `box her off` moved on 9 ships: the brig, the cutter, the frigate, the hermaphrodite brig, the lugger, the razee, the 74, the 64 and the smack.
+- `lie a-try` then `box her off` moved on 4: the hermaphrodite brig, the razee, the 74 and the 64.
+- On the rest (9 for the heave-to, 14 for the lie a-try) the two sides are the same: her heave-to or lie a-try is refused, or waits to begin, and the box behind it is taken and carried out, or refused, as before.
+
+| A player's orders | Before | Now |
+|---|---|---|
+| `heave to`, then `box her off` (the frigate) | "Order: box her off."; 172 s, "Could not box her off: She is hove to; fill away first, or wear." | "Order not carried out ('box her off'): She is heaving to; she will not box off while she comes to." |
+| the same, the lugger | "Order: box her off."; 82 s, "Could not box her off: She has no head yards to brace abox." | "Order not carried out ('box her off'): She has no head yards to brace abox." |
+| `lie a-try`, then `box her off` (the 74) | "Order: box her off."; 280 s, "Could not box her off: She is hove to; fill away first, or wear." | refused at the order as above; and **one line more:** "Piped down; the starboard watch has the deck." at 280 s, as she lies a-try with no box waiting on her hands |
+
+Of the box cases that moved, the box did nothing on any of them on the old side: each was taken and failed later. Nothing she does moves but that.
+
+**3. `clear for action` with her boat lost.** 13 ships moved, on the one line of the boats:
+
+| | Before | Now |
+|---|---|---|
+| the bilander (one boat) | "The boats are out and towing astern; the ship is clear." | "The ship is clear; the long-boat is lost." |
+| the brig (her launch lost, others left) | the same | "The rest of her boats are out and towing astern, the launch lost; the ship is clear." |
+| the other eleven | the same | each as the brig's, by her boat's name |
+
+Every tick is the same; the line alone moves. That the line says the boats towing astern of boats left on the booms is the trunk's, older, and the lead's.
+
+**Every other difference a player or a seat is served:** none on a committed ship.
+- The catalogue of evolutions a seat is served (`agents/tools._evolution_text`): all 113 entries byte for byte.
+- No data file moves.
+- The rest of the third pass is keyed to a whole lateen or a towed boat, which no committed file has:
+  - the strain's words;
+  - the bow's and the stern's lines;
+  - a `shift` order reading a list with commas, on a hull with a whole lateen alone;
+  - a towed boat stove and lost.
+- The eighteen in gales and A2's harness run on the hash with its tiers, as on every hash.
+
+**Pinned** (each run against its fault):
+- `test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge` (the frigate);
+- `test_on_a_committed_ship_clearing_for_action_with_her_boat_lost` (the brig);
+- `test_on_a_committed_ship_boxing_off_while_she_comes_to_is_refused_at_the_order` (the frigate, the lugger and the 74);
+- `test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out` (the merchant brig).
+
+**The tiers of 5b122eb** run now and are kept as its record. The hash sent comes after 127, merged through `…/pkg-90`, with item 2 by 127's rule, and is tiered whole on its own exact hash.
+
+**For the coordinating session:** the declaration is this section's commit on `…/pkg-90-lateen3`, pushed. Item 2 waits for 127, which I am told of when it is on `…/pkg-90`.

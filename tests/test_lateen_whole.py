@@ -3456,3 +3456,65 @@ def test_the_bows_list_in_her_sails_order_is_taken_as_said(xebec):
     r = world.submit("shift the foresail, the mainsail and the mizen")
     assert r.kind == "order.accepted", r.text
     assert r.text == "Order: shift the foresail, the mainsail and the mizen."
+
+
+def _at_sea(path: str):
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, path, sc)
+    world.submit("set plain sail")
+    world.run(600)
+    return world
+
+
+@pytest.mark.parametrize(
+    ("path", "first", "reply"),
+    [
+        (
+            "data/ships/frigate-36.yaml",
+            "heave to",
+            "She is heaving to; she will not box off while she comes to.",
+        ),
+        ("data/ships/lugger.yaml", "heave to", "She has no head yards to brace abox."),
+        (
+            "data/ships/seventy-four.yaml",
+            "lie a-try",
+            "She is heaving to; she will not box off while she comes to.",
+        ),
+    ],
+)
+def test_on_a_committed_ship_boxing_off_while_she_comes_to_is_refused_at_the_order(
+    path, first, reply
+):
+    """Nudge 79, the declaration: on every committed ship that heaves to, `box her off` given
+    while she comes to was taken, waited, and failed once she was hove to ("Could not box her
+    off: She is hove to; fill away first, or wear.", the frigate 172 s on; the lugger "She has no
+    head yards to brace abox."). Now it is refused at the order, with the lugger's own reason."""
+    world = _at_sea(path)
+    assert world.submit(first).kind == "order.accepted"
+    world.run(1)
+    r = world.submit("box her off")
+    assert r.kind == "order.rejected" and r.text.endswith(reply), r.text
+
+
+def test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out():
+    """Nudge 79, the declaration: a heave-to or lie a-try given and still waiting to begin is not
+    `heave_to_in_hand`, for it may fail its own check, and a box behind it is wanted then. The
+    merchant brig, her main topsail not yet set: `lie a-try` taken, waiting behind her sail, and
+    failed 114 s on ("Could not bring her to: The main topsail is not set; ..."); the box behind
+    it carried out, "Boxed her off; braced sharp up on the starboard tack, full and by.", as
+    before."""
+    world = _at_sea("data/ships/merchant-brig.yaml")
+    n0 = len(world.log.all())
+    assert world.submit("lie a-try").kind == "order.accepted"
+    world.run(1)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(300)
+    kinds = [e.kind for e in _after(world, n0)]
+    assert "ship.boxed_off" in kinds and "evolution.failed" in kinds

@@ -439,9 +439,13 @@ class Runner:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
         if evo.id == "box_off" and heave_to_in_hand(ship):
-            # coming to, she does not box off: taken behind the heave-to, it waited and did
-            # nothing (package 90, the lead's nudge 77, item 3); refused at the order, as the
-            # script refuses it when it would begin
+            # coming to, she does not box off: taken behind the heave-to, it waited and failed
+            # once she was hove to (package 90, the lead's nudge 77, item 3); refused at the
+            # order, with the reason it would have failed for where she has no head yards
+            from freesail.evolutions.scripts import head_and_after_yards
+
+            if not head_and_after_yards(ship)[0]:
+                raise OrderError("She has no head yards to brace abox.")
             raise OrderError("She is heaving to; she will not box off while she comes to.")
         blockers = [
             other

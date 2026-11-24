@@ -535,3 +535,46 @@ def test_of_two_boats_towed_each_is_in_tow_and_one_stove_leaves_the_other(tmp_pa
     assert len(w.ship.extra["boat_in_tow"]) == 1
     assert not w.dealings.boat.lost
     assert w.readings.words("boat") == "the boat towing astern on her painter"
+
+
+# ---------------------------------------------------------------------------
+# The third pass's changes on ships in the game (the lead's nudge 79): declared and pinned
+# ---------------------------------------------------------------------------
+
+
+def test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge(tmp_path):
+    """Nudge 79, the declaration: on every committed ship with a boat, `lay out a kedge` with her
+    boat lost was taken, and the boat cut adrift hoisted out and laid it out (the frigate's launch:
+    "Hoist out the launch; the kedge and a hawser into her.", the kedge let go 775 s on). Now it
+    is refused at the order, as a lost boat is sent on no errand."""
+    w = at_anchor_in(CARRICK_ROAD)
+    assert w.submit("cut the boat adrift").kind != "order.rejected"
+    w.run(1)
+    r = w.submit("lay out a kedge")
+    assert r.kind == "order.rejected"
+    assert r.text.startswith("Order not carried out ('lay out a kedge'): the launch is lost: ")
+
+
+def test_on_a_committed_ship_clearing_for_action_with_her_boat_lost(tmp_path):
+    """Nudge 79, the declaration: `clear for action` said "The boats are out and towing astern;
+    the ship is clear." with her boat cut adrift. Now the boat lost is said, by her name."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+    )
+    w = make_world(7, "data/ships/brig.yaml", sc)
+    w.submit("set plain sail")
+    w.run(600)
+    w.submit("cut the boat adrift")
+    w.run(1)
+    n0 = len(w.log.all())
+    w.submit("clear for action")
+    w.run(1200)
+    said = [e.text for e in w.log.all()[n0:] if "the ship is clear" in e.text.lower()]
+    assert said == [
+        "The rest of her boats are out and towing astern, the launch lost; the ship is clear."
+    ]

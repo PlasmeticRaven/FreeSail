@@ -380,7 +380,8 @@ def _boats_cleared_words(ship: Any) -> str:
     boats = getattr(getattr(ship, "spec", None), "boats", None) or []
     dealings = getattr(_world_of(ship), "dealings", None)
     if dealings is not None and dealings.boat.lost:
-        name = dealings.boat.boat_name or "her boat"
+        spec = dealings.boat_spec()  # her name in her file, as the orders refused say it
+        name = (spec.name if spec is not None else "") or dealings.boat.boat_name or "her boat"
         if len(boats) <= 1:
             return f"The ship is clear; {name} is lost."
         return f"The rest of her boats are out and towing astern, {name} lost; the ship is clear."
