@@ -39858,7 +39858,13 @@ Built by the engine track's builder; to be passed by an independent reader (the 
 
 ## Package 127: words and waits on today's ships (2026-11-24)
 
-Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words (`docs/design/Report-Package127.md`); items 4 and 5, the cutter's going astern after filling away, and taking up the smack's waiting topsail would change what a ship does and wait for the lead's word. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-786, in `tests/test_words_and_waits.py`.
+Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words and item 4 in what she does, at the lead's ruling (`docs/design/Report-Package127.md`); item 5 is not pursued, and the cutter's going astern after filling away is carried forward. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-787, in `tests/test_words_and_waits.py`.
+
+**What she does, moved (item 4, ruled in):** a `take in` or `furl` given while the setting of its sail is in hand or waiting belays that setting (`verbs._countermand_the_set`). The brig in 40 kn, `set plain sail`, then `take in all sail`:
+- 300 s on. Old: the main topsail, the fore and main topgallants and the spanker set after it (635 s to 1013 s) and standing at the end. New: their setting is belayed in one notable line, the fore topsail is taken in from where it hung, and nothing is set at the end.
+- 30 s on. Old: refused, "Nothing done: ... already furled", and every sail then set. New: the order is the belay, as its reply and its line, and nothing is set.
+
+**Severities (the lead's ruling):** every turn-wait is routine (`runner.TURN_WAIT_SEVERITY`), the lateen's and the handed-on yards' included; those two were notable before.
 
 **One new figure, JUDGEMENT:** `scripts.FILLED_WATCH_S` = 600 s, how long a ship filled away is watched for her way (the minutes a ship braced full from lying to takes to gather way and steer, with room). Her way is read against `physics.hull.WAY_ON_KN` (0.5 kn, the aback line's "way to lose"), not a new figure.
 

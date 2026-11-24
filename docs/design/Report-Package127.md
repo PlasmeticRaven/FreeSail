@@ -1,8 +1,8 @@
 # Package 127: words and waits on today's ships
 
-The design and report of package 127, the eight faults of `docs/dev/CarriedForward-M7.md`, section 4 (items 1, 3, 4, 5, 7, 8, 9 and 13), in what the log said, or failed to say, on ships already in the game. The log is the game: a line untrue, or a wait unsaid, is a fault of the game. Each was reproduced on a committed ship by a player's orders (seed 7, a steady wind from the north unless said), its cause found, and mended at the cause where the mend changes only what is said. Where a mend would change what a ship does, it is held for the lead's word.
+The design and report of package 127, the eight faults of `docs/dev/CarriedForward-M7.md`, section 4 (items 1, 3, 4, 5, 7, 8, 9 and 13), in what the log said, or failed to say, on ships already in the game. The log is the game: a line untrue, or a wait unsaid, is a fault of the game. Each was reproduced on a committed ship by a player's orders (seed 7, a steady wind from the north unless said), its cause found, and mended at the cause where the mend changes only what is said. Where a mend would change what a ship does, it was held for the lead's word. The lead ruled item 4 in, and item 5 and the cutter's sternway out.
 
-New truths 7-780 to 7-786 are in `tests/test_words_and_waits.py`, a file of their own so that the three builders of the mending step do not meet in `tests/test_known_truths.py`. Each fails on the trunk (112ff81) and passes with its mend. 7-787 and 7-788 are kept for items 4 and 5, if the lead rules them in.
+New truths 7-780 to 7-787 are in `tests/test_words_and_waits.py`, a file of their own so that the three builders of the mending step do not meet in `tests/test_known_truths.py`. Each fails on the trunk (112ff81) and passes with its mend. 7-788 is unused: item 5 is not pursued, at the lead's ruling.
 
 ## Item 1: a wait behind other work, said in the log
 
@@ -20,25 +20,25 @@ New truths 7-780 to 7-786 are in `tests/test_words_and_waits.py`, a file of thei
 
 **Mend, in words.** "Filled away" is said only of a ship with headway. With none, it is "Braced full on the larboard tack; ...; she has no headway on her yet." ("Her sheets drawn ..." where she works no braces), and then, once, "She gathers headway; filled away on the larboard tack." when she has it. If ten minutes pass with none, a line says she has not. A ship filled away with way on her that then loses it and makes sternway is told so once: "Filled away, she has lost her way and makes a knot of sternway, the wind 38° on the larboard bow." The watch is `scripts.watch_filled_away`, run by the runner each tick. Its mark is in `ship.extra` while it watches, and it ends unsaid when she heaves to or a manoeuvre begins. It reads her way and touches nothing. The completion line keeps its kind, `ship.filled_away`, which the captain reads. `FILLED_WATCH_S` (600 s) is JUDGEMENT.
 
-**Held.** The cutter's hour astern is what she does: the heading helm holds 29° of rudder the wrong way for sternway. That is not mended here.
+**Carried forward, not this package's** (the lead's ruling): the cutter's hour astern is what she does, every ship's helm kept as for headway while she makes sternway. The case: the cutter, seed 7, 15 kn from north, heading 60, `set plain sail`, 600 s, `set the topsail`, 600 s, `lie a-try`, 900 s, `fill away`. Filled at +1 s with 2.2 kn of way, the helm on a heading for ENE (68°). Her head sags from 57° to 45° off the wind by +120 s with 35° of rudder, her way falling to 1.2 kn. By +300 s she makes 1.04 kn of sternway, 38° off the wind, the rudder at −29° (the heading helm's sign for headway, which with sternway holds her head up). She stays so, 1.15 kn astern, 39° off, −29° of rudder, from +600 s to the end of the hour and beyond. No sail is backed, and the lifting and aback lines do not fire: she has no headway to lift, and some sail draws.
 
-## Item 4: plain-sail work sets a topsail in a gale after `take in all sail` (held)
+## Item 4: a take-in countermands the setting of its sail (built at the lead's ruling; changes what she does)
 
-**Seen.** The brig in 40 kn: `set plain sail`, then `take in all sail` 300 s on. The main topsail, the topgallants and the spanker are set after it and stand in the gale. Given 30 s on, the whole order is refused, "Nothing done: ... already furled", and every sail is then set.
+**Seen.** The brig in 40 kn: `set plain sail`, then `take in all sail` 300 s on. The main topsail, the topsails' topgallants and the spanker were set after it (635 s to 1013 s) and stood in the gale. Given 30 s on, the whole order was refused, "Nothing done: ... already furled", and every sail was then set.
 
-**Cause.** `verbs._sail_check` refuses a take-in or furl of a furled sail, "already furled", while its set is in hand or waiting. Nothing belays the set.
+**Cause.** `verbs._sail_check` refuses a take-in or furl of a furled sail, "already furled", while its set is in hand or waiting. Nothing belays the set, which goes on, and a sail being loosed is taken in only after its set is finished.
 
-**Proposed, not built.** The take-in belays the set (`Runner.belay`, said "Belayed setting the main topsail"). It changes what the ship does, so it waits for the lead's word.
+**Mend** (`verbs._countermand_the_set`). A `take in` or a `furl` given while the setting of its sail is in hand or waiting belays that setting first, by the captain's own belay (`Runner.belay`). It is said once, in the belay's words: "Belayed setting the fore topsail (the fore topsail left loosed and hanging from the yard), setting the main topsail (not begun, it was waiting for hands), ...". A sail the belay leaves furled is done. One left loosed or half set is taken in from where it is. Where the order then has nothing left to start, the belay is the order's own line and reply (`work.belayed`). Otherwise the belay is a line of its own beside the order's.
 
-## Item 5: a ship hung in stays cancels the player's take-in (not reproduced; held)
+**Old beside new**, the brig in 40 kn:
+- At 300 s, before: main topsail, fore and main topgallants and spanker set and standing at the end. Now: one belay line; the fore topsail is taken in from where it hung; nothing set at the end.
+- At 30 s, before: the order was refused and every sail set. Now: the reply and the line are the belay; nothing set.
 
-**Tried.** Ten ships at 8, 15 and 25 kn, with 0.3 to 4 kn of way, and a take-in given in the tack. Every hang came round, and every miss fell off with the helm on a heading. The helm's box-off, forced, waits behind a take-in (now said, by item 1) and does not cancel it.
+**The other way round is unmoved.** A `set the main topsail` given while `take in the main topsail` is in hand is refused, "The main topsail is already set.", and the take-in goes on to its end. The sail ends in its gear, as the take-in said. Nothing is set against an order, so this is not the same fault. The refusal's words are half true while the sail is coming in, and are listed, not mended. It is truth 7-787.
 
-**Candidates.**
-- The game's captain (`captains._aback_with_no_way`), which belays every piece of work waiting for hands when she is aback with no way.
-- A take-in whose sail a box-off hauls up, failing its next step's check, the box-off then setting the sail again.
+## Item 5: a ship hung in stays cancels the player's take-in (not pursued, at the lead's ruling)
 
-Either mend changes what a ship does, so both are held.
+I tried ten ships (brig, frigate, cutter, smack, lugger, merchant brig, bilander, hermaphrodite brig, privateer schooner and topsail schooner) at 8, 15 and 25 kn, from 0.3 to 4 kn of way. In each tack I gave `take in` the mainsail, the spanker, the main topsail or the main topgallant. Every hang came round "Tacked", and every miss fell off on the old tack with the helm on a heading, so the helm's own box-off never fired. Forced (full and by with the wind shifted onto her bow), the box-off waits behind a take-in already in hand and does not cancel it; that wait is now said, by item 1. One given during the box-off is carried out after "Boxed her off". The one road found that cancels waiting work is the game's captain recovering a ship aback with no way (`captains._aback_with_no_way`), which belays every piece of work waiting for hands. An untriggered candidate is a take-in whose sail a box-off hauls up, failing its next step's check, with the box-off then setting the sail again. Nothing is built; the captain's rule is left as it is.
 
 ## Item 7: the dire strain warning held back by a lesser one
 
@@ -46,7 +46,7 @@ Either mend changes what a ship does, so both are held.
 
 **Cause.** One warning a part in ten minutes, counting every warning alike.
 
-**Mend, one rule for both** (`strain.warning_due`). The lesser warnings keep their count, one in ten minutes, on the ticks they had. A dire warning is said whatever lesser one was within the ten minutes, and is itself said once in ten minutes. The dire count is kept on the strain state beside `last_warning_s`, not in it. The jib's dire line now comes at 2707 s. No figure of load, strain or damage is read but the ratio's "dire", and none moves. The captain's head-sail rule reads only the lesser "bolt-ropes" lines, which are unmoved.
+**Mend, one rule for both** (`strain.warning_due`). The old count is kept exactly: one warning a part in ten minutes, moved by every warning the old rule would have said. So every lesser line falls on the tick it fell on before. That matters because the game's captain takes in a head sail on the lesser "bolt-ropes" lines (`captains._head_sails_straining`), and it was the reader's finding on the first build, where a dire line said early let the next lesser line come early too. A dire warning is said whatever lesser one was within the ten minutes, and is itself said once in ten minutes. The dire count is kept on the strain state beside `last_warning_s`, not in it. The jib's dire line now comes at 2707 s. Held over its dire line for an hour, a part says it six times, once in each ten minutes. The dire lines the old rule said fall on its ticks, or up to ten minutes before them where a dire one was said earlier; the added ones are those it held back. No figure of load, strain or damage is read but the ratio's "dire", and none moves.
 
 ## Item 8: the smack's cast
 
@@ -66,7 +66,7 @@ Her topsail, not of her plain sail, stayed furled throughout.
 
 The cutter's words, and every ship's that looses a topsail, are as they were.
 
-**Seen and not mended.** The smack's fore staysail, of her plain sail, is still furled after the cast.
+**Seen and not mended: the smack's fore staysail.** Her cast is meant to make her plain sail. `_plain_sail_topsails` in `freesail/evolutions/scripts.py` (lines 9630 to 9631: "getting under way makes her plain sail"), and the record of the ships' package in `docs/dev/M7-WorkPackages.md` (line 6096: "the cast makes a ship's plain sail"), both say so. Her plain sail is the mainsail, the fore staysail and the jib (`data/ships/smack.yaml`, lines 534 to 537). The cast hoists the jib alone ("Man the jib halliards!", "hoist away the jib"), so her fore staysail stays furled after it. This is a gap between the cast and her plain sail; nothing is mended.
 
 ## Item 9: a `set the topsail` waiting for hands
 
@@ -83,6 +83,34 @@ The cutter's words, and every ship's that looses a topsail, are as they were.
 **Seen.** "The boats are out and towing astern; the ship is clear." on every ship. No boat moves: they stay on the booms, where a shot may stave them (`combat.hits`).
 
 **Mend.** "The boats griped fast on the booms; the ship is clear." (Falconer 1780, 'Gripes': the lashings that secure the boats on deck at sea). It says "The boat ..." of one, "towing astern on her painter" of a boat her file tows, and "The ship is clear." of a ship with none.
+
+## Item 1: the callers that say their own wait
+
+Each caller below passes `say_wait=False`, because it writes the wait as a line of its own:
+- `orders/fight.py`, `_start` (`beat to quarters` and the fight's whole-ship work): its reply is the `evolution.queued` line carrying the words, logged by the World. The reply and the log say it once between them.
+- `orders/damage.py`, `_start` (the damage orders): the same.
+- `evolutions/scripts.py`, the forced-round dip of a settee and shift of a lateen (`dip_settee`, `change_lateen`): their `after` lines log the words as `evolution.queued`.
+- `orders/ground_tackle.py`, the anchor's orders: "The weigh waits for the anchor: ..." where it applies, else the runner's words, once.
+
+Every other caller lets the runner say it. Wherever the order's own line is written, it drops words the runner said (`verbs.unsaid`). A wait that ends says nothing more than the work's own first line.
+
+## Severity of every new or moved line
+
+- Every turn-wait is routine: behind any work ("'X' will follow 'Y', which the hands are still at."), behind the yards a belay handed on, a whole lateen aback ("The mainsail is aback against the mast; it will not come in till she pays off."), and ground tackle's fallback. Before, the two said were notable; they are now one rule (`runner.TURN_WAIT_SEVERITY`). A routine line eases no compressed passage and wakes no seat. The weigh's "waits for the anchor" line keeps its notable.
+- "Braced full ... she has no headway on her yet." and "Filled away ..." are notable, as the line always was (`ship.filled_away`).
+- "She gathers headway; filled away ..." is routine.
+- "Filled away, she has lost her way and makes ... of sternway ..." and "Braced full ten minutes, she has gathered no headway ..." are notable (`ship.way`).
+- The dire strain warning is notable, as every strain warning is.
+- The waiting line of a watch too few keeps the hands-wait's severity: notable for an order given singly, routine within a group after its first.
+- The cast's and the clearing's lines are routine, as their lines were (`evolution.step`, `evolution.started`).
+- The countermanding belay (`work.belayed`) is notable, as every belay by order is (`NOTABLE_ORDER_KINDS`).
+
+## Saves
+
+A save written in these windows differs from the trunk's; every one loads either way, each read having a default:
+- after a ship's first dire warning: `StrainState.last_dire_s`;
+- for up to 600 s after a fill-away: `ship.extra["filled_away_watch"]`;
+- between an order that queued work and the next tick: the runner's `wait_said`.
 
 ## Moved pins
 

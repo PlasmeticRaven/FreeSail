@@ -477,7 +477,7 @@ class Runner:
                 f"'{self._describe(first)}', which the hands are still at."
             )
             said = False
-            if handed:
+            if handed and say_wait:
                 # behind the yards a belay handed on (they hold the ship as the manoeuvre
                 # did): said here, at the order, since a whole-ship order's line is the
                 # runner's started line and this one would go unsaid (the lead's nudge 51,

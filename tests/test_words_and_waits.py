@@ -105,6 +105,22 @@ def test_truth_7_780_a_whole_ship_order_queued_behind_a_manoeuvre_says_so_in_the
     ]
 
 
+def test_truth_7_780_an_anchor_order_behind_a_manoeuvre_says_its_wait_once():
+    """The brig: `wear ship`, then `come to an anchor` while she wears: no line on the trunk;
+    now the runner's line, once, routine (ground tackle says its own words only of a weigh or
+    an unmoor waiting for her to be brought up)."""
+    w = _make(BRIG, heading=60.0)
+    w.submit("set plain sail")
+    w.run(700)
+    t0 = w.clock.tick
+    w.submit("wear ship")
+    assert w.submit("come to an anchor").kind in ("order.accepted", "evolution.started")
+    w.run(2)
+    waits = [e for e in w.log if e.tick >= t0 and e.kind == "evolution.waiting"]
+    waits = [e for e in waits if "will follow 'wear ship'" in e.text]
+    assert len(waits) == 1 and waits[0].severity.value == "routine"
+
+
 def test_truth_7_780_an_orders_own_line_does_not_say_the_wait_again():
     """`shorten sail` 30 s into `set plain sail` on the brig: the reefs wait behind the topsails
     being set, and some of its lines are not done. Its own line is written (it says what was
@@ -226,6 +242,32 @@ def test_truth_7_783_one_rule_counts_every_parts_warning_and_a_cables():
     assert due == [(0, True), (60, False), (100, True), (200, False), (600, True), (650, False)]
     st.elapsed_s = 700.0
     assert strain.warning_due(st, "cable:best_bower", True)  # ten minutes from the dire one
+
+
+def test_truth_7_783_no_lesser_warning_moves_and_only_dire_ones_are_added():
+    """A part's ratio in a run of every kind (lesser, dire for most of ten minutes, lesser
+    again, dire again), each second for two hours, through the old rule (one warning a part in
+    ten minutes, whatever it was) and through `warning_due`: every lesser line on the tick it
+    had, since the game's captain takes in a head sail on them; the dire lines the old rule
+    said, or one within ten minutes before it, and the dire ones it held back."""
+
+    def dire_at(t: int) -> bool:
+        return 100 <= t < 650 or 2000 <= t < 2050 or 4000 <= t < 6000
+
+    old, new = [], []
+    last = None
+    st = strain.StrainState()
+    for t in range(7200):
+        dire = dire_at(t)
+        if last is None or t - last >= strain.WARNING_INTERVAL_S:
+            last = t
+            old.append((t, dire))
+        st.elapsed_s = float(t)
+        if strain.warning_due(st, "jib", dire):
+            new.append((t, dire))
+    assert [x for x in new if not x[1]] == [x for x in old if not x[1]]
+    assert [t for t, d in old if d] == [600, 4200, 4800, 5400]
+    assert [t for t, d in new if d] == [100, 2000, 4000, 4600, 5200, 5800]
 
 
 def test_truth_7_783_a_part_held_over_its_dire_line_an_hour_says_so_once_in_ten_minutes():

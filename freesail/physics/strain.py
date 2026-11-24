@@ -391,25 +391,26 @@ def warning_due(st: StrainState, key: str, dire: bool) -> bool:
     `CARRY_AWAY_RATIO`, where it may carry away) is said though a lesser one was within the
     interval, and is itself said once in it, whatever was said between. Before, a part warned as
     working and then loaded to where it would carry away said nothing more until the ten minutes
-    were out, and could carry away unwarned. The lesser warnings keep their own count: a dire one
-    said in the interval of a lesser does not move when the next lesser is due. `key` is the
+    were out, and could carry away unwarned. The lesser warnings keep the old count exactly: every
+    warning the old rule would have said moves it, whether said now or not (a dire one held
+    because a dire one was said within the interval), so that no lesser line moves. `key` is the
     part's (or its cause's, a cable's) as the caller counts it; no figure of load or strain is
     read here but `dire`."""
     now = st.elapsed_s
     last = st.last_warning_s.get(key)
     due = last is None or now - last >= WARNING_INTERVAL_S
-    if dire:
-        said = _last_dire_s(st)
-        last_dire = said.get(key)
-        if last_dire is not None and now - last_dire < WARNING_INTERVAL_S:
-            return False  # said dire within the interval: once
-        said[key] = now
-        if due:
-            st.last_warning_s[key] = now
-        return True
-    if not due:
-        return False
-    st.last_warning_s[key] = now
+    if due:
+        # the old count, kept exactly: every warning the old rule said moves it, so that every
+        # lesser line falls on the tick it fell on before (the captain takes in a head sail on
+        # them, `captains._head_sails_straining`)
+        st.last_warning_s[key] = now
+    if not dire:
+        return due
+    said = _last_dire_s(st)
+    last_dire = said.get(key)
+    if last_dire is not None and now - last_dire < WARNING_INTERVAL_S:
+        return False  # said dire within the interval: once
+    said[key] = now
     return True
 
 
