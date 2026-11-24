@@ -12045,3 +12045,18 @@ Why I recommend joining: shortened for the weather she handles as she should, wh
 **Booked by me for the owner, not launched (package 125, "the moment of the haul"):** the after yards hauled a point on the bow when she comes round smartly and with the wind ahead when she is slack, by Luce's own two readings; with it the merchant brig and the bilander, who never come round in 900 s, and "Tacked" said of a ship that swung back. The ships of the line missing in 8 knots is noted and may well be true of them.
 
 **2026-11-24, 00:01 UTC (nudge 68): the Diana: the owner's word is "Join now".** Given to the lead directly, in his words: "Agreed on joining her now." So she is prepared for my gate as nudge 67 sets out: truth E a count across the winds in its two rows (plain sail as measured; under `shorten sail` in 20 and 25 knots, the shortening finished before the helm goes down), her truth's words saying plainly that she is slack in stays in a breeze under all plain sail; truth D as restated under (a) with `clr_x_m` 2.65, and the line owing her helm measured again with the haul's package; her rudder noted. Then her tiers on the exact hash and her report's list. If he has answered you too, it is one answer; record it beside this.
+
+**2026-11-24, 00:13 UTC (nudge 69): the Diana in 25 knots shortened: the stop was right; one probe, then the owner again.** Received at d5e43dba. The owner's "Join now" was given on my words "under the game's own `shorten sail` she tacks in both", and in 25 knots that is not so: I am telling him now that the ground has moved, and that the choice comes back to him when the probe is in. **Tell him the same in plain words; no choice is put to him yet.** Nothing is pinned or tiered meanwhile.
+
+What is found is more than a missed tack: shortened by the game in 25 knots, the jib in and the spanker left, she gripes past what her rudder holds (21 degrees of helm, the blade at its stop), comes up to 42 degrees off and lies there with a knot or two of way. Whether she may join so turns on whether her captain can cure it with an order the game already takes.
+
+**The probe (scratch copies; nothing filed, nothing tuned), in 25 knots from the three headings, after `shorten sail` has run to its end and she lies as you traced:**
+1. `brail up the spanker` (or `take in the spanker`, whichever she takes): does her helm come back, does she bear away and gather way, and does she then stay? Her helm, her way and her angle off at each step, and the tack's outcome.
+2. The same with the spanker taken in **before** `shorten sail` is given, and with a reef in it if she has one.
+3. `set the jib` again once shortened: is it refused, blown out, or does it hold and bring her head off?
+4. What the frigate-36 does under the same orders, for the measure.
+And one reading, not a probe: is the order in which `shorten sail` takes sails in a ship's own (her file's or her book's), or the engine's one rule for every ship? If it is hers to set, say what her book would say and its ground; if it is the engine's, it is not bent for her.
+
+**Then I rule on your three:** (1) and (2) wait on the probe; (3) her balance under shortening is the engine's if the order of shortening is, and is booked with package 125 either way. Her rudder stays as traced; I was wrong to say it was not a cause, and the record will say what it is the cause of.
+
+**Her truths over the five-second line:** they stay in the fast tier as nudge 34 holds; split by case as you propose so that each runs under the line where it can; do not mark a truth slow to pass a guard; if a guard still fails, name it and I rule.
