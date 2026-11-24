@@ -59,7 +59,7 @@ Found by the ships' session's builders and the lead's readers while gating packa
 - **Package 122:** the log read back as it was shown, and the captain's order given once (the owner, 20 November; low priority).
 - **Package 123:** the corsair, by rules, so that no model need be seated (decision 76); placed in the career milestone.
 - **Package 124:** a privateer's and a merchantman's own people (milestone 8).
-- **Package 125, booked by the lead and placed by the owner in the mending step ("The mending step may come next, with package 125 as well"); not launched: the moment of the haul.** The tack's script calls "mainsail haul" within a point of the wind for every ship; a ship that comes round slowly is turned back by it, and the same sentence of Luce gives the other moment, with the wind ahead. With it: a jib taken in by `shorten sail` where a ship cannot be held without it; a light ship not shortened in time by the game's own captain; item 2 and item 11 above. It changes how today's ships tack, and is gated as such.
+- **Package 125, booked by the lead and placed by the owner in the mending step ("The mending step may come next, with package 125 as well") and launched on 24 November with packages 126 and 127: the moment of the haul.** The tack's script calls "mainsail haul" within a point of the wind for every ship; a ship that comes round slowly is turned back by it, and the same sentence of Luce gives the other moment, with the wind ahead. With it: a jib taken in by `shorten sail` where a ship cannot be held without it; a light ship not shortened in time by the game's own captain; item 2 and item 11 above. It changes how today's ships tack, and is gated as such.
 
 ## 6. Package 90, the ships, in hand across the gate
 
@@ -81,7 +81,7 @@ Each was told to him when it was made and is in the records of its package.
 
 ## 8. Waiting on a decision of the owner's
 
-- The line between milestone 8's two gates, the lead's to propose; and the crew's morale and skill, a man's own or the company's.
+- (Settled 24 November: the line between milestone 8's two gates, and the crew's morale and skill; the proposal's decision 79.)
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
 - The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is to be placed against the milestones by the lead.
 - The chart's work, parked; its records say where it stopped.

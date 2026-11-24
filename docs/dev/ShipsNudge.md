@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 05:04 UTC (MILESTONE 7 IS CLOSED BY THE OWNER, WITH A LIST; nothing changes for package 90; the carried list is docs/dev/CarriedForward-M7.md; the list of eight is at my gate). Nudge number: 74.
+Latest note: 2026-11-24, 08:02 UTC (THREE BUILDERS LAUNCHING ON THE TRUNK BESIDE YOU: packages 125 (the moment of the haul), 126, 127; they touch scripts.py, strain.py's words, captains.py; merge the trunk before each hash; nothing asked of you; your list of eight is with my reader, the cloud green). Nudge number: 75.

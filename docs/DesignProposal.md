@@ -536,15 +536,15 @@ The first roadmap's words for milestones 0 to 8 are in version 0.2 (`docs/Design
 
 ### Milestone 8: the ship and her people (decision 75)
 
-Each with what the owner decides before it starts. **A gate in its middle and one at its end** (decision 79), the line between them the lead's to propose.
+Each with what the owner decides before it starts. **A gate in its middle and one at its end** (decision 79), on the line the lead proposed and the owner approved on 24 November: **to the middle gate, the ship fights and is kept** (the mending step; 77; 87; a privateer's and a merchantman's own people; package 122; the fight's known faults; package 90's ships); **to the end gate, her people and her handling** (the crew made true; 78b; the rest of package 60; the note on a ship made by a player; the boundary's structural work).
 
-- **First, the mending step** (decision 79): from the gate's list, a game ended from the harbour, fog that comes on and clears over a time, and the game's own captain replacing a spar carried away; the older faults on today's ships (`docs/dev/CarriedForward-M7.md`, section 4); and **package 125, the moment of the haul**. The test suite's package is planned beside it. *Each package proposed in a few lines and launched at his word.*
+- **First, the mending step** (decision 79): from the gate's list, a game ended from the harbour, fog that comes on and clears over a time, and the game's own captain replacing a spar carried away; the older faults on today's ships (`docs/dev/CarriedForward-M7.md`, section 4); and **package 125, the moment of the haul**. The test suite's package is planned beside it. *Packages 125, 126 (the harbour, the weather and the captain) and 127 (words and waits on today's ships) launched on 24 November at his word.*
 
 - **77, the fight's and damage control's evolutions**, "clear for action" made true, the chain pumps. *Approved 11 November; he says when it launches.*
 - **87, the warrant officers' stations**: gunner first, then surgeon, carpenter, sailmaker, boatswain, each one a person or a model may hold (the owner, 27 October). *Its brief, after 77; all five at once (decision 79).*
 - **78b, fine control of the sails, and the gybe by hand**: spilling the wind by vangs and sheets, a yard dropped with the sail still set, the gybe. *His list of 10 November, and whatever else is desirable, interesting or falls out of the work (decision 79).*
 - **The rest of package 60**: a ship left and taken up again; the two bodies of a ship. *The lead's design statement of the near and far ship, read first.*
-- **The crew made true**: skill aloft read, or the line struck; the fatigue of work aloft charged in full; morale per man, or the line struck. *Each, build or strike; and whether ordinary hands stay "numbers only" (decision 6). He has asked what a man's own morale and skill would cost and what a more general one would lose (24 November); the lead's answer is with him.*
+- **The crew made true**: skill aloft read, or the line struck; the fatigue of work aloft charged in full; morale per man, or the line struck. *Each, build or strike; and whether ordinary hands stay "numbers only" (decision 6). **Decided, 24 November (decision 79):** a man's own skill read in the work; the fatigue of work aloft charged in full, per man; morale the company's one figure, carried beyond the fight (victuals, hard driving, losses, prizes) and said in the log, with a man's own part drawn from it where an event calls for one; ordinary hands stay "numbers only".*
 - **A privateer's and a merchantman's own people** (found by package 121): a ship given a privateer's or a merchant's papers on a King's hull keeps the file's post-captain, the Navy's lieutenants and the marines. New ship files by the generator with the owners' complement and no marines, and people files with a courtesy captain, the owners' lieutenants and prize-masters, or a master and mates; the harbour offering them. *He says when it is booked and launched.*
 - **Package 122, the log read back as it was shown, and the captain's order given once**: a past line judged by where the player stood when it was said, not where he stands now; the game's own captain no longer ordering "fill away" twice. *Booked 20 November, low priority; launched at his word.*
 - **Package 90's ships** (the tartane, the polacre, the xebec, the corvette *Diana* and the three-decker), building now; released across the gate by the owner on 19 November. Their corsair fits are held for the corsair's package (decision 76).
@@ -1190,6 +1190,13 @@ After the base game: the steam expansion and the Americas (decision 54).
     And of the older gates left open or run in part, the same day: "Closing milestone 7 may
     also close the older gates." So gates 6a (with 6b), 6c and 7b are closed with milestone
     7; what 7b left unbuilt is placed against the milestones by the lead, for him.
+    And on the lead's proposals of that day: "1. 125, 126, and 127 are approved to launch on
+    Opus. 2. Your proposed split is approved. 3. I say we go with your recommended
+    implementation of the morale and skill system, I don't mind the time needed to make it
+    meaningful."
+    So packages 125, 126 and 127 are launched; milestone 8 is split as §11 now gives it; and
+    the crew is made true by a man's own skill and fatigue and the company's one morale,
+    carried beyond the fight, with ordinary hands still "numbers only" (decision 6 stands).
 
 ### Still open
 
@@ -1205,7 +1212,7 @@ At the proposal level (decision 66's open half is answered for 1792 to 1825 by d
 8. The words the consent brief gives the corsair's station (decision 76), which change only by the owner's own process. *The owner.*
 9. The six findings package 117 left to him (decision 70). *The owner.*
 10. What a player's ship sheet holds (decision 72). *A design note.*
-11. Per-man morale, skill aloft, "numbers only". *The owner, before the crew work; asked of the lead on 24 November and answered, his to settle.*
+11. *Answered by decision 79:* a man's own skill and fatigue; the company's one morale; ordinary hands "numbers only".
 12. *Answered by decision 79:* fine control is his list of 10 November and whatever else is desirable, interesting or falls out of the work.
 13. *Answered by decision 79:* multiplayer is struck.
 14. Ports made to mend and man a ship before more ports are added. *The owner.*
