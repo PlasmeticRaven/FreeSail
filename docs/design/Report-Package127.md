@@ -86,11 +86,13 @@ The cutter's words, and every ship's that looses a topsail, are as they were.
 
 ## Item 1: the callers that say their own wait
 
-Each caller below passes `say_wait=False`, because it writes the wait as a line of its own:
+These callers pass `say_wait=False`, because each writes the wait as a line of its own:
 - `orders/fight.py`, `_start` (`beat to quarters` and the fight's whole-ship work): its reply is the `evolution.queued` line carrying the words, logged by the World. The reply and the log say it once between them.
 - `orders/damage.py`, `_start` (the damage orders): the same.
 - `evolutions/scripts.py`, the forced-round dip of a settee and shift of a lateen (`dip_settee`, `change_lateen`): their `after` lines log the words as `evolution.queued`.
-- `orders/ground_tackle.py`, the anchor's orders: "The weigh waits for the anchor: ..." where it applies, else the runner's words, once.
+
+Two more say it in their own line and take the runner's note back out, rather than pass the keyword. That way stand-in runners in tests, which take the trunk's arguments alone, serve them as before:
+- `orders/ground_tackle.py`: "The weigh waits for the anchor: ..." where it applies, in place of the runner's words; elsewhere the runner's, once.
 - `orders/signals.py`, `_start_hoist`: the signal's own line (`signal.ordered`) carries the runner's words, its wait with them (the second reader's finding: said twice before this).
 
 Every other caller lets the runner say it. Wherever the order's own line is written, it drops words the runner said (`verbs.unsaid`). A wait that ends says nothing more than the work's own first line.

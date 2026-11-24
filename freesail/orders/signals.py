@@ -769,16 +769,21 @@ def _start_hoist(world: Any, locker: Any, hoist: Any, hoists: int, words: str) -
     hoist.breaks_out = S.NOT_YET
     hoist.complete_at = None if hoist.complete_at is None else S.NOT_YET
     try:
-        return runner.start(
+        text = runner.start(
             ship,
             "make_signal",
             None,
             {"hoists": int(hoists), "hoist_key": hoist.key, "words": words},
-            say_wait=False,  # the signal's own line carries the runner's words, its wait with them
         )
     except OrderError:
         locker.flying = [h for h in locker.flying if h is not hoist]
         raise
+    # the signal's own line carries the runner's words, its wait with them: the runner's line of
+    # the wait is not said again
+    notes = getattr(ship, "notes", None)
+    if isinstance(notes, list):
+        notes[:] = [n for n in notes if not (n[1] == "evolution.waiting" and n[2] == text)]
+    return text
 
 
 def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Result:

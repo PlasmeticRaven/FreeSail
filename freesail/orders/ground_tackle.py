@@ -374,10 +374,13 @@ def execute(ship: Any, order: Order) -> Result:
             f"'{verb}' takes nothing after it; '{remainder.strip()}' was not understood."
         )
     runner = verbs.runner_of(ship)
-    # its wait for the anchor said in its own words; any other wait behind work, the runner's
-    text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params, say_wait=False)
-    if not _waits_for_the_anchor(ship, runner, evo) and "will follow" in text:
-        ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", text, verbs.SHIP_SUBJECT)
+    # its wait for the anchor said in its own words, in place of the runner's; any other wait
+    # behind work, the runner's (`Runner.start`)
+    text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params)
+    if _waits_for_the_anchor(ship, runner, evo):
+        notes = getattr(ship, "notes", None)
+        if isinstance(notes, list):
+            notes[:] = [n for n in notes if not (n[1] == "evolution.waiting" and n[2] == text)]
     data = {
         "verb": verb,
         "level": 1,
