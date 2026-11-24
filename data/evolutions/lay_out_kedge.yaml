@@ -22,6 +22,9 @@
 #
 # A boat towed astern on her painter is hauled up alongside by it for the kedge and the hawser,
 # not hoisted out, and veered astern on it again when she is back, a minute each.
+#
+# In its words the game fills {boat_out} with "Hoist out {boat}"; for a boat towed astern,
+# with "Haul {boat} up alongside".
 id: lay_out_kedge
 verb: lay_out_kedge
 work: lay out the kedge
