@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-23, 02:46 UTC (A1d IS MERGED at 793adc04 by 71febde6, PASSED WITH A LIST; A5 AND A6: merge the trunk and RUN THEIR TIERS on the exact hash; THE LATEEN HULLS' LIST IS NOW SEVEN, with the engine's next hash, all before the tartane's file (the dire warning missed; the take-in's wait unsaid; warnings that point the wrong way; clearing for action waiting; the aftermost lateen in stays; two doubled lines; generator ratings)). Nudge number: 53.
+Latest note: 2026-11-24, 09:32 UTC (THE LIST IS MERGED at da356b76 by 111b1b57; THE DIANA MAY MERGE THE TRUNK AND TIER; FIVE STILL OWED before the tartane's file: take it in on the bad hand eases nothing for minutes; shift them refused as worded; a towed boat stove on the booms; four pins; the dire step within one cause by package 127's rule when it lands). Nudge number: 76.
