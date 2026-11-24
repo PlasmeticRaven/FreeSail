@@ -39921,7 +39921,7 @@ Eight faults of what the log said, or failed to say, on ships already in the gam
 
 Built by package 127's builder; each moved pin to be passed by a reader other than the builder (the build report names who).
 
-**The passages and trials, moved by words alone (the lead's ruling (a)).** Each run on today's trunk (41d1d1bc) and on this package, every world each test builds recorded. In every one, her end state is the same to the bit: her place, heading and way, every sail's state and reefs, every spar's state and condition. And no line the trunk said changes its severity. The difference is the lines added. "Fill-away" counts the "She gathers headway" lines added; each also has one line's words changed ("Her sheets drawn ... no headway on her yet" in place of "Filled away ..."). A `Shorten sail:` or `Make all sail:` line that carried a wait now carries none, since the wait is said in its own line.
+**The passages and trials, moved by words alone (the lead's ruling (a)).** Each run on today's trunk (41d1d1bc) and on this package, every world each test builds recorded. In every one, her end state is the same to the bit: her place, heading and way, every sail's state and reefs, every spar's state and condition. And no line the trunk said changes its severity. The difference is the lines added. "Fill-away" counts the "She gathers headway" lines added; each also has one line's words changed ("Braced full ...; she has no headway on her yet", or "Her sheets drawn ..." where she works no braces, in place of "Filled away ..."). A `Shorten sail:` or `Make all sail:` line that carried a wait now carries none, since the wait is said in its own line.
 
 | Test | Lines, old | Lines, new | Turn-waits | Fill-away | Dire warnings |
 |---|---|---|---|---|---|
@@ -39941,7 +39941,7 @@ Built by package 127's builder; each moved pin to be passed by a reader other th
 
 The digests are re-measured beside them, each with its old value in a comment.
 
-Truth 77 now pins, beside each digest, the passage's line count and her end state: the last tick, and her place to a millionth of a degree. A change of words alone then reads as words.
+Truth 77 now pins, beside each digest, the passage's line count and her end state: the last tick, her place to a millionth of a degree, her heading and her way. A change of words alone then reads as words.
 
 No cast or clearing line falls in these passages.
 
@@ -39949,7 +39949,7 @@ The first build of the turn-waits moved six older "not hands enough for all at o
 
 **The convoy's three truths (the lead's ruling (b)), moved by item 4, a change in what she does.** The scenario file is unchanged. The book's first `shorten sail`, a minute after `set plain sail`, now belays the topgallants still being set. Before, its take-in was refused as already furled, and they were set, worn for and taken in again. The commodore tacks at 1567 (was 1594) and stalls less.
 
-- **7-340, the recovery when aback with no way: re-measured.**
+- **7-340, the recovery when aback with no way: re-measured, and renamed `..._eases_the_after_sail_and_she_pays_off` (it said "and boxes her off").**
   - Unchanged: aback with no way at 1810.
   - The work avasted and the spanker taken in: 1800, now 1860.
   - The spanker in: 1959, now 2019.

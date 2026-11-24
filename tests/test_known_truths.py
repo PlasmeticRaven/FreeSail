@@ -4841,19 +4841,21 @@ def test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_name
     and the digests package 37m pinned (the constants' tests above).
 
     Package 127, at the lead's ruling: beside each digest her line count and her end state
-    (the tick and her position to a millionth of a degree), so that a change of words alone is
-    read as words: the digests moved with 66 and 79 lines of waits said (3096 to 3164 and 2242
-    to 2321 lines), her end state the same to the bit."""
+    (the tick, her position to a millionth of a degree, her heading and her way), so that a
+    change of words alone is read as words: the digests moved with 66 and 79 lines of waits
+    said (3096 to 3164 and 2242 to 2321 lines), her end state the same to the bit."""
     ends = {
-        "merchant": (GATE_5C_MERCHANT_LINES, 129600, (48.328859, -4.496049)),
-        "cruise": (GATE_5C_CRUISE_LINES, 172800, (48.687572, -5.580345)),
+        "merchant": (GATE_5C_MERCHANT_LINES, 129600, (48.328859, -4.496049), (5.833137, -0.088528)),
+        "cruise": (GATE_5C_CRUISE_LINES, 172800, (48.687572, -5.580345), (6.238577, 1.281860)),
     }
     for (world, _moments, _saved), digest, which in (
         (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST, "merchant"),
         (gate_5c_cruise, GATE_5C_CRUISE_DIGEST, "cruise"),
     ):
-        lines, tick, (lat, lon) = ends[which]
+        lines, tick, (lat, lon), (heading, way) = ends[which]
         assert len(world.log) == lines and world.clock.tick == tick, which
+        assert world.ship.dyn.heading == pytest.approx(heading, abs=1e-6), which
+        assert world.ship.dyn.u == pytest.approx(way, abs=1e-6), which  # her way, m/s
         assert world.position.lat_deg == pytest.approx(lat, abs=1e-6), which
         assert world.position.lon_deg == pytest.approx(lon, abs=1e-6), which
         cap = world.captain
@@ -9267,8 +9269,9 @@ def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort
     Package 127, at the lead's ruling: a take-in now countermands the setting of its sail
     (truth 7-787), so the commodore stalls less after her tack, and the schooner's path closes
     only to 2.13 miles, short of where she makes out the escort (about two miles: from
-    investigating she evades on being overmatched; the doctrine's `man_of_war_nm` is for her
-    on passage, beating or keeping station). She starts a cable nearer the commodore, her own
+    investigating she evades on being overmatched, measured: with the overmatched transitions
+    taken out she evades later and outside the band, with the man-of-war-near ones taken out
+    the same as with them). She starts a cable nearer the commodore, her own
     setup and not the scenario's, as tests/test_squadrons.py places a far vessel. Old: evading
     by 3600 at 1.98 miles, 21 miles off at 10800. New: evading from 2940 at 1.98 miles, 1.98 at
     3600, 17.9 miles off at 10800."""
@@ -15112,7 +15115,7 @@ def test_truth_7b_114_the_players_boat_pulls_ashore_at_falmouth_and_sails_back_u
 # ---------------------------------------------------------------------------
 
 
-def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off(
+def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_she_pays_off(
     monkeypatch,
 ):
     """Package 88, item 1 (package 86's finding, the convoy's stall): the commodore's brig in
@@ -15134,7 +15137,7 @@ def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxe
     2019; then, before, boxing her off at 1980, boxed off at 2110, the spanker set and the leg
     shaped at 2160, four knots at 2400; now she pays off on the spanker alone, way again and the
     spanker set at 2040, three knots at 2400. Where the spanker alone does not pay her off, the
-    box-off is truth 7-788's case."""
+    box-off is truth 7-788's case (this truth's name said "and boxes her off" before)."""
     from freesail.world import captains as C
 
     w = _scenario_world(CONVOY_SIX)
