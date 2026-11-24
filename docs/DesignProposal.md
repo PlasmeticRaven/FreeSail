@@ -525,8 +525,8 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 | M3b | (not in the first roadmap) | Brace limits, canvas, studding sails in the physics | Passed 27 Sep |
 | M4 | Standing orders, the watcher | As written, three gates | 4a–4c passed by 29 Sep |
 | M5 | A world | A far larger sea, ports by file, navigation, tides, anchoring | 5a–5c passed; 5c on 8 Oct |
-| M6 | Officers and captains | Stations, the wardroom, rules captains, the business, the regatta, the chart to the Azores | 6a (with 6b) open; 6c run in part |
-| M7b | The director | Ten parts; frozen open (decision 51) | Never run |
+| M6 | Officers and captains | Stations, the wardroom, rules captains, the business, the regatta, the chart to the Azores | 6a (with 6b) open and 6c run in part until 24 Nov; **closed with milestone 7** (decision 79) |
+| M7b | The director | Ten parts; frozen open (decision 51) | Never run; **closed with milestone 7** (decision 79) |
 | M7 | Powder | Combat, signals, squadrons, health, prizes, one world, more sea, five ships, the harbour, safety work | Cut and released as `gate-m7` (21 Nov); **closed, with a list, by the owner on 24 Nov** |
 | M7c | (new, decision 69e) | The data made true across 1792 to 1825 | Not begun |
 
@@ -1187,12 +1187,15 @@ After the base game: the steam expansion and the Americas (decision 54).
     economy is supply and demand, a career persists across saves, and the land is carried as
     far as the sea needs, by a design package; §8.3 is struck; the obscure seamanship of §9
     is all wanted and waits its turn, careening with the world and the career.
+    And of the older gates left open or run in part, the same day: "Closing milestone 7 may
+    also close the older gates." So gates 6a (with 6b), 6c and 7b are closed with milestone
+    7; what 7b left unbuilt is placed against the milestones by the lead, for him.
 
 ### Still open
 
 At the proposal level (decision 66's open half is answered for 1792 to 1825 by decision 69(a)):
 
-1. Whether gate m7 also closes 6a, 6c and 7b, and where 7b's unbuilt work goes (51's chart, 61, 69, 55). *The owner, with his verdict at the gate.*
+1. *Answered by decision 79:* gate M7 also closes 6a, 6c and 7b. **Where 7b's unbuilt work goes** (51's chart, 61, 69, 55) is still to be placed: the lead lists it against the milestones for him.
 2. *Answered by decision 79:* supply and demand, not the closed economy of decision 58.
 3. *Answered by decision 79:* a career persists across saves.
 4. The papers and start each calling gives a career. *Study 92.*

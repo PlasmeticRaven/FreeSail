@@ -83,4 +83,5 @@ Each was told to him when it was made and is in the records of its package.
 
 - The line between milestone 8's two gates, the lead's to propose; and the crew's morale and skill, a man's own or the company's.
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
+- The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is to be placed against the milestones by the lead.
 - The chart's work, parked; its records say where it stopped.
