@@ -1582,6 +1582,32 @@ def names_of_sails(ship: Ship, sails: list) -> str:
     return " and ".join(f"the {part_name(ship, sl.id)}" for sl in sails) if sails else "the sail"
 
 
+def sails_listed(ship: Ship, sails: list) -> str:
+    """'the foresail, the mainsail and the mizen': sails in their order from forward aft, by their
+    masts, said as a seaman lists them (package 90, the lead's nudge 77, item 5), the form a
+    whole lateen hull's `shift` order takes as said (`orders.grammar`); one or two as
+    `names_of_sails` says them."""
+    from freesail.evolutions.runner import part_name  # local import to avoid a cycle
+
+    def fore_to_aft(sl: Sail) -> float:
+        mast = ship.mast_of(sl)
+        return -float(getattr(mast, "x_m", 0.0) or 0.0)
+
+    names = [f"the {part_name(ship, sl.id)}" for sl in sorted(sails, key=fore_to_aft)]
+    if len(names) < 3:
+        return " and ".join(names) if names else "the sail"
+    return f"{', '.join(names[:-1])} and {names[-1]}"
+
+
+def heave_to_in_hand(ship: Ship) -> bool:
+    """Whether she is coming to: a heave-to or a lie a-try given and not done (package 90, the
+    lead's nudge 77, item 3: `box her off` was taken then, and did nothing)."""
+    runner = ship.extra.get("evolutions")
+    return any(
+        i.evo.id in ("heave_to", "lie_a_try") for i in getattr(runner, "instances", []) or []
+    )
+
+
 def driver_words(ship: Ship, drivers: list) -> str:
     """'the spanker' for the log while every driver is a gaff sail, as the words have
     always been; the sails by name otherwise (package 75: the mizen course, 'the mizen').
@@ -6963,6 +6989,13 @@ class BoxOffScript(BoxHaulScript):
     review). Gone round by the stern instead, a settee is hoisted on the other tack's lee, as in
     box-hauling (`_settee_at_come_to`)."""
 
+    def check(self, words: dict[str, Any]) -> str | None:
+        # coming to, she does not box off: the order was taken and did nothing (package 90, the
+        # lead's nudge 77, item 3); hove to, refused as box-hauling refuses it
+        if heave_to_in_hand(self.ship):
+            return "She is heaving to; she will not box off while she comes to."
+        return super().check(words)
+
     def _settee_at_box(self) -> tuple[SetteeChange, str, str]:
         """Only a settee on the weather side of the tack she is on is changed (package 75):
         lowered at the box and hoisted on that tack's lee, the old lee side being the side the
@@ -10585,6 +10618,11 @@ class LayOutKedgeScript(_AnchorScript):
             return "she carries no boat to lay it out with"
         if self.ports.boat.away:
             return f"{boat.name} is away"
+        if self.ports.boat.lost:
+            # a boat lost (swamped, cut adrift, or stove by a shot as she towed: the lead's
+            # nudge 77, item 1) lays out no kedge till the yard replaces her, as she is sent on
+            # no errand (`Dealings`) and manned by nobody (`boats.man_boat`)
+            return f"{boat.name} is lost: {self.ports.boat.lost_words or self.ports.boat.lost}"
         self.boat_name = boat.name
         if getattr(boat, "towed", False):
             self.towed = True

@@ -476,11 +476,32 @@ def pressed_reliefs(ship: Ship, cause: str, names: str) -> str:
     as worded ("There is no such part as the them")."""
     shift = f"shift {names}"
     if cause == "aback":
-        from freesail.evolutions.scripts import head_and_after_yards
+        from freesail.evolutions.scripts import head_and_after_yards, heave_to_in_hand
 
-        if head_and_after_yards(ship)[0] and "hove_to" not in ship.extra:
+        # not hove to, nor coming to: a box given then is refused (the lead's nudge 77, item 3)
+        if (
+            head_and_after_yards(ship)[0]
+            and "hove_to" not in ship.extra
+            and not heave_to_in_hand(ship)
+        ):
             return f"{shift} or box her off"
     return shift
+
+
+def _shift_held(ship: Ship, sail_id: str) -> str | None:
+    """'trimming the mainsail': the work given before it that holds this lateen (its trim, its
+    take-in), behind which a shift ordered now waits (package 90, the lead's nudge 77, item 3:
+    the tartane's shift waited three minutes behind her trims, told only to shift it); None
+    where nothing holds it but a shift of its own."""
+    runner = ship.extra.get("evolutions") if isinstance(ship.extra, dict) else None
+    held = [
+        i
+        for i in getattr(runner, "instances", []) or []
+        if i.subject_id == sail_id and i.evo.id != "change_lateen"
+    ]
+    if not held:
+        return None
+    return " and ".join(runner._doing(i) for i in held)
 
 
 def _shift_waiting(ship: Ship, sail_id: str) -> str | None:
@@ -511,6 +532,12 @@ def _pressed_words(ship: Ship, pressed: tuple[str, str, float], dire: bool) -> t
     cause, sail_id = pressed[0], pressed[1]
     sail = _name(ship, sail_id, False)
     ease = _shift_waiting(ship, sail_id) or pressed_reliefs(ship, cause, f"the {sail}")
+    held = None if ease.startswith("its shift") else _shift_held(ship, sail_id)
+    if held:
+        # the reliefs, but not at once: a shift and a box both wait behind the work holding the
+        # sail (the tartane's trims: her shift begun 182 s and her box 82 s after the order),
+        # said so, with what they wait behind
+        ease = f"{ease} when the hands are done {held}"
     if cause == "aback":
         how = f"the {sail} aback against the mast"
     else:

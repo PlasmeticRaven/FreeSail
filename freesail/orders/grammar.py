@@ -167,6 +167,19 @@ def _parse(ship: Ship, text: str, vocab: Vocabulary | None = None) -> Order:
     lateen_hull = whole_lateen_hull(ship)
     hidden = () if lateen_hull else LATEEN_ONLY_VERBS
     verb_phrase, verb = _match_verb(words, vocab, hidden)
+    if lateen_hull and verb == "shift" and len(segments) > 1:
+        # "shift the foresail, the mainsail and the mizen": a seaman's list, as the bow's line
+        # says it (`scripts.sails_listed`), is the "and" list a whole lateen hull's shift takes
+        # (package 90, the lead's nudge 77, item 5); a side after the comma stays the grammar's
+        # side, and no hull without a whole lateen reads a comma so
+        folded, kept = list(segments[0]), []
+        for seg in segments[1:]:
+            if kept or _side_of_word(seg[0], vocab) is not None:
+                kept.append(seg)
+            else:
+                folded += ["and", *seg]
+        segments = [folded, *kept]
+        words = segments[0]
     if verb in LATEEN_ONLY_VERBS and not _the_practice_said(
         ship, words[len(verb_phrase.split()) :], segments, vocab
     ):

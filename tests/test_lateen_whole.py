@@ -281,8 +281,10 @@ def test_the_stern_watch_says_a_lateen_left_on_its_mast_by_a_gybe(xebec):
     world.run(240)
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_stern"]
     assert [e.text for e in said] == [
-        "The wind has come across the stern to the larboard quarter: the foresail and the mizen "
-        "and the mainsail lie on their masts; shift them when you will."
+        "The wind has come across the stern to the larboard quarter: the foresail, the mainsail "
+        "and the mizen lie on their masts; shift the foresail, the mainsail and the mizen when "
+        "you will."  # was "the foresail and the mizen and the mainsail ...; shift them when you
+        # will.": the sails in their order, the order as she takes it (nudge 77, item 5)
     ]
     assert said[0].data["lateens"] == ["fore.lateen", "mizzen.lateen", "main.lateen"]
 
@@ -302,9 +304,10 @@ def test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through
     world.run(240)
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert [e.text for e in said] == [
-        "The wind has come round ahead to the larboard bow: the foresail and the mizen and the "
-        "mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."
-    ]  # was "...; shift them.", which she refused as worded (nudge 76, item 2)
+        "The wind has come round ahead to the larboard bow: the foresail, the mainsail and the "
+        "mizen are aback against their masts; shift the foresail, the mainsail and the mizen."
+    ]  # was "...; shift them.", which she refused as worded (nudge 76, item 2), then "the
+    # foresail and the mizen and the mainsail ...": in their order, a seaman's list (nudge 77)
 
 
 def test_the_bow_watch_says_a_luggers_lugs_left_on_their_masts_at_the_same_cause():
@@ -2899,7 +2902,7 @@ def test_the_bows_line_names_what_eases_a_lateen_aback_and_says_when_you_will_on
     (line,) = [e.text for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert line == (
         "The wind has come round ahead to the larboard bow: the mainsail is aback against the "
-        "mast; shift the mainsail; and the mizen lies on the mast; shift it when you will."
+        "mast; shift the mainsail; and the mizen lies on the mast; shift the mizen when you will."
     )  # was "...; let fly its sheet, shift it or box her off; and ..." (nudge 60, item 3), then
     # "...; shift it; and ...", which she refused as worded (nudge 76, item 2)
 
@@ -3369,3 +3372,87 @@ def test_a_lateen_whose_shift_waits_for_hands_is_told_so_not_to_shift_it(xebec_i
         "the mizen lying on the mast; she will carry them away: its shift waits its turn, the "
         "hands shifting the mainsail."
     ), [e.text for e in said]
+
+
+# ---------------------------------------------------------------------------
+# The lateen hulls' list, its third pass (the lead's nudge 77)
+# ---------------------------------------------------------------------------
+
+
+def _runner_of(*shifts):
+    """A runner of shift instances for `strain._shift_waiting`: (sail id, waiting) each."""
+    from types import SimpleNamespace
+
+    evo = SimpleNamespace(id="change_lateen")
+    return SimpleNamespace(
+        instances=[SimpleNamespace(evo=evo, subject_id=s, waiting=w) for s, w in shifts]
+    )
+
+
+def test_waits_its_turn_is_said_only_while_her_own_shift_waits_and_names_the_hands_shifting(
+    xebec_file,
+):
+    """Nudge 77, item 4: "its shift waits its turn" is not said while her own shift runs, and
+    the hands named are those shifting, not another shift waiting too."""
+    ship = load_ship(xebec_file)
+    ship.extra["evolutions"] = _runner_of(("mizzen.lateen", False))
+    assert strain._shift_waiting(ship, "mizzen.lateen") is None  # her own shift runs
+    ship.extra["evolutions"] = _runner_of(
+        ("main.lateen", False), ("fore.lateen", True), ("mizzen.lateen", True)
+    )
+    assert strain._shift_waiting(ship, "mizzen.lateen") == (
+        "its shift waits its turn, the hands shifting the mainsail"
+    )
+    ship.extra["evolutions"] = _runner_of(("fore.lateen", True), ("mizzen.lateen", True))
+    assert strain._shift_waiting(ship, "mizzen.lateen") == "its shift waits its turn"
+
+
+def test_a_relief_that_waits_behind_work_on_its_sail_is_said_to_wait(tmp_path_factory):
+    """Nudge 77, item 3: a relief named was not at once. The tartane in 40 kn, her lateens put
+    on the bad hand while her watch is still at her trims: her main yard warned at 1.51,
+    "... shift the mainsail or box her off when the hands are done trimming the mainsail.";
+    measured, a shift given then begun 182 s on and a box 82 s on, behind the trim."""
+    world = _from(_rated_and_settled(tartane_probe_doc(), tmp_path_factory, 40.0, 600))
+    n0 = len(world.log.all())
+    _on_the_bad_hand(world)
+    world.run(160)
+    said = [e.text for e in _warned(_after(world, n0), "main.lateen_yard")]
+    assert any(
+        s.endswith(
+            "shift the mainsail or box her off when the hands are done trimming the mainsail."
+        )
+        for s in said
+    ), said
+
+
+def test_coming_to_she_is_neither_offered_nor_given_boxing_off(polacre_in_40):
+    """Nudge 77, item 3: `box her off` was offered and taken while a heave-to was in hand, and
+    did nothing. Coming to, the words offer only the shift, and the box is refused at the
+    order (`scripts.heave_to_in_hand`)."""
+    world = _from(polacre_in_40)
+    ship = world.ship
+    _shift_the_wind(world, -8.0)
+    world.run(5)
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen or box her off"
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(2)
+    assert scripts.heave_to_in_hand(ship)
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen"
+    r = world.submit("box her off")
+    assert r.kind == "order.rejected" and "She is heaving to; she will not box off" in r.text
+
+
+def test_the_bows_list_in_her_sails_order_is_taken_as_said(xebec):
+    """Nudge 77, item 5: the bow's line names her sails from forward aft as a seaman lists three
+    things (`scripts.sails_listed`), and the order it gives is taken as said: "shift the
+    foresail, the mainsail and the mizen", where a list with commas was refused. A side after a
+    comma is the grammar's side as before."""
+    world = _from(xebec)
+    lateens = [world.ship.sails[i] for i in ("mizzen.lateen", "main.lateen", "fore.lateen")]
+    assert scripts.sails_listed(world.ship, lateens) == "the foresail, the mainsail and the mizen"
+    assert scripts.sails_listed(world.ship, lateens[:2]) == "the mainsail and the mizen"
+    _on_the_bad_hand(world)
+    world.run(5)
+    r = world.submit("shift the foresail, the mainsail and the mizen")
+    assert r.kind == "order.accepted", r.text
+    assert r.text == "Order: shift the foresail, the mainsail and the mizen."

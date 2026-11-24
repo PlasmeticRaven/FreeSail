@@ -131,7 +131,7 @@ class ClearForActionScript(_QuartersScript):
             self.note("The decks wetted and sanded; the match tubs and the shot garlands filled.")
         elif name == "boats":
             self.ship.extra["cleared"] = True
-            self.note("The boats are out and towing astern; the ship is clear.")
+            self.note(_boats_cleared_words(self.ship))
         elif name == "quarters":
             self._beat()
 
@@ -367,3 +367,21 @@ ACTION_SCRIPTS: dict[str, type[PhasedScript]] = {
     "make_signal": MakeSignalScript,
     "heave_mark": HeaveMarkScript,
 }
+
+
+def _boats_cleared_words(ship: Any) -> str:
+    """The boats' line as the ship is cleared: the boats out and towing astern, as ever; of a ship
+    whose boat is lost (swamped, cut adrift, or stove by a shot as she towed: package 90, the
+    lead's nudge 77, item 1), that boat not said out, and with no other the ship clear with none
+    said out. Every other ship's line is as it was (that it says the boats towing astern of
+    boats left on the booms is the trunk's, older, and the lead's)."""
+    from freesail.evolutions.scripts import _world_of
+
+    boats = getattr(getattr(ship, "spec", None), "boats", None) or []
+    dealings = getattr(_world_of(ship), "dealings", None)
+    if dealings is not None and dealings.boat.lost:
+        name = dealings.boat.boat_name or "her boat"
+        if len(boats) <= 1:
+            return f"The ship is clear; {name} is lost."
+        return f"The rest of her boats are out and towing astern, {name} lost; the ship is clear."
+    return "The boats are out and towing astern; the ship is clear."

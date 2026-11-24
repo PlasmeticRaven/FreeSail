@@ -106,6 +106,7 @@ from freesail.evolutions.scripts import (
     SCRIPTS,
     Script,
     _world_of,
+    heave_to_in_hand,
     helm_lost,
     helm_words,
     is_whole_lateen,
@@ -437,6 +438,11 @@ class Runner:
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
+        if evo.id == "box_off" and heave_to_in_hand(ship):
+            # coming to, she does not box off: taken behind the heave-to, it waited and did
+            # nothing (package 90, the lead's nudge 77, item 3); refused at the order, as the
+            # script refuses it when it would begin
+            raise OrderError("She is heaving to; she will not box off while she comes to.")
         blockers = [
             other
             for other in self.instances
