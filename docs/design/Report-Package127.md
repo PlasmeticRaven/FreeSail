@@ -99,6 +99,7 @@ Every other caller lets the runner say it. Wherever the order's own line is writ
 
 ## Severity of every new or moved line
 
+- A newly said turn-wait carries `turn_wait` in its data (`runner.TURN_WAIT`). It keeps it out of the World's memory of a recurring line's words, so that the lines about it keep the severity they had without it.
 - Every turn-wait is routine: behind any work ("'X' will follow 'Y', which the hands are still at."), behind the yards a belay handed on, a whole lateen aback ("The mainsail is aback against the mast; it will not come in till she pays off."), and ground tackle's fallback. Before, the two said were notable; they are now one rule (`runner.TURN_WAIT_SEVERITY`). A routine line eases no compressed passage and wakes no seat. The weigh's "waits for the anchor" line is routine too (notable before).
 - "Braced full ... she has no headway on her yet." and "Filled away ..." are notable, as the line always was (`ship.filled_away`).
 - "She gathers headway; filled away ..." is routine.
@@ -117,4 +118,21 @@ A save written in these windows differs from the trunk's; every one loads either
 
 ## Moved pins
 
-One pin moves by this package, by item 3's intent: `test_rig_words`'s lugger fill-away line, old beside new in `docs/dev/TuningNotes.md` under this package. The xebec probe's take-in behind `trim sails` (`test_lateen_whole`), first moved here, has been moved the same way on the trunk by the ships' package (its nudge 60, for every whole lateen waiting its turn), and the merge keeps the trunk's; its wait is now routine by this package's one rule, which the test does not pin.
+All of these are old beside new in `docs/dev/TuningNotes.md` under this package.
+
+- **One by item 3's intent:** `test_rig_words`, the lugger's fill-away line.
+- **The xebec probe's take-in behind `trim sails`** (`test_lateen_whole`) was first moved here. The trunk has since moved it the same way, and the merge keeps the trunk's.
+- **Fourteen recorded passages and captain's trials, by words alone:**
+  - their line counts and digests are re-measured;
+  - each end state is the same to the bit, and no line the trunk said changes its severity;
+  - the lines added are named by kind and count in the notes' table;
+  - truth 77 now pins the line count and end state beside each digest.
+- **The convoy's three truths, by item 4** (what she does). Each is given its cause back by its own setup, and the scenario file is unchanged:
+  - 7-340 is re-measured to the new day's recovery;
+  - its box-off is a case of its own, 7-788, by a one-point header;
+  - 7-152's straggler: the Friendship lies to five minutes;
+  - 7-153's evasion: the privateer starts a cable nearer.
+
+The new truths are:
+- 7-780 to 7-787, in `tests/test_words_and_waits.py`;
+- 7-788, beside 7-340 in `tests/test_known_truths.py`.

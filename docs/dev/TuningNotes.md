@@ -39920,3 +39920,40 @@ Eight faults of what the log said, or failed to say, on ships already in the gam
 - `tests/test_rig_words.py`, `test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_line`. Old, at 602 s: "Filled away on the starboard tack; steering WNW (292°)." New, the same tick: "Her sheets drawn on the starboard tack; steering WNW (292°); she has no headway on her yet." Reason: item 3, she had sternway on her then; "She gathers headway; filled away on the starboard tack." comes when she has it, after the minute the test runs. Every tick of what she does is as it was.
 
 Built by package 127's builder; each moved pin to be passed by a reader other than the builder (the build report names who).
+
+**The passages and trials, moved by words alone (the lead's ruling (a)).** Each run on today's trunk (41d1d1bc) and on this package, every world each test builds recorded. In every one, her end state is the same to the bit: her place, heading and way, every sail's state and reefs, every spar's state and condition. And no line the trunk said changes its severity. The difference is the lines added. "Fill-away" counts the "She gathers headway" lines added; each also has one line's words changed ("Her sheets drawn ... no headway on her yet" in place of "Filled away ..."). A `Shorten sail:` or `Make all sail:` line that carried a wait now carries none, since the wait is said in its own line.
+
+| Test | Lines, old | Lines, new | Turn-waits | Fill-away | Dire warnings |
+|---|---|---|---|---|---|
+| test_known_truths, the day under systems alone (`GATE_5A_DAY_*`) | 623 | 624 | 0 | 0 | 1 (56834) |
+| the passage for gate 5b (`GATE_5B_*`) | 731 | 746 | 15 | 0 | 0 |
+| the passage in thick weather (`GATE_5B_THICK_*`) | 469 | 475 | 6 | 0 | 0 |
+| the schooner with her octant (`GATE_5B_SCHOONER_*`) | 766 | 791 | 24 | 1 | 0 |
+| the merchant passage (`GATE_5C_MERCHANT_*`; truth 77) | 3096 | 3164 | 66 | 2 | 0 |
+| the naval cruise (`GATE_5C_CRUISE_*`; truth 77) | 2242 | 2321 | 79 | 0 | 0 |
+| the schooner on an intent (`GATE_6A_INTENT_*`) | 2079 | 2147 | 66 | 2 | 0 |
+| truth 78, the fake captain (`GATE_6A_FAKE_CAPTAIN_*`) | 3108 | 3176 | 66 | 2 | 0 |
+| test_captain_trials, the gale with sea room (`TRIAL_STATION_GALE_*`) | 1722 | 1772 | 49 | 1 | 0 |
+| the lee shore (`TRIAL_STATION_LEE_SHORE_LINES`; its digest not asserted) | 1561 | 1609 | 44 | 4 | 0 |
+| the station's stranger (`TRIAL_STATION_STRANGER_*`) | 788 | 816 | 28 | 0 | 0 |
+| the trade's stranger (`TRIAL_TRADE_STRANGER_*`) | 1594 | 1642 | 48 | 0 | 0 |
+| the trade in thick weather (`TRIAL_TRADE_THICK_*`) | 426 | 429 | 2 | 1 | 0 |
+
+The digests are re-measured beside them, each with its old value in a comment.
+
+Truth 77 now pins, beside each digest, the passage's line count and her end state: the last tick, and her place to a millionth of a degree. A change of words alone then reads as words.
+
+No cast or clearing line falls in these passages.
+
+The first build of the turn-waits moved six older "not hands enough for all at once" lines from routine to notable. A routine wait line between two of them reset the World's memory of the same words said again (`World.record`, `RECURRING_KINDS`). A newly said turn-wait is now marked (`runner.TURN_WAIT`) and left out of that memory.
+
+**The convoy's three truths (the lead's ruling (b)), moved by item 4, a change in what she does.** The scenario file is unchanged. The book's first `shorten sail`, a minute after `set plain sail`, now belays the topgallants still being set. Before, its take-in was refused as already furled, and they were set, worn for and taken in again. The commodore tacks at 1567 (was 1594) and stalls less.
+
+- **7-340, the recovery when aback with no way: re-measured.**
+  - Unchanged: aback with no way at 1810.
+  - The work avasted and the spanker taken in: 1800, now 1860.
+  - The spanker in: 1959, now 2019.
+  - After it, before: the box-off at 1980, boxed off at 2110, the spanker set at 2160. Now: way again and the spanker set at 2040, and three knots at 2400.
+- **7-788, new: the box-off where the spanker in has not paid her off.** The same day with a one-point header at 2000 (the wind from 45 to 56 degrees, her head at 90). Boxing her off at 2040, boxed off at 2208, way again at 2220, three knots by 2400. With the law off, sternway until 2671.
+- **7-152, the straggler: the Friendship lies to five minutes at the start** (a far plan's `lie_to`). Without it, there is no straggler in four hours. Old (2040, 2182, 2340, 6060) came from the commodore's stall. New: No. 20 ordered 1080, up 1638, answered 1800, her station regained 3840; every ship within the 165 m from 7200 (93 m at the most).
+- **7-153, the privateer: she starts a cable nearer the commodore.** In the new day her nearest approach is 2.13 miles, short of where she makes out the escort. Old: evading by 3600 at 1.98 miles, 21 miles off by 10800. New: evading from 2940 at 1.98 miles; pinned now that she takes it up within two miles, 17.9 miles off by 10800. A quarter mile nearer fails the band at 3600, and half a mile nearer never evades.

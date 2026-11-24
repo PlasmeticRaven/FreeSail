@@ -2546,11 +2546,14 @@ GATE_5A_SEA_TICKS = {
 # the fore topmast staysail taken in at once as loaded near its rating, the gale over the
 # storm line); the topgallants again two seconds later; nothing lost.
 # the well's order gone from the starter book, and its two held lines with it (2026-10-21)
-GATE_5A_DAY_LINES = 623  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
+# package 127: one dire warning added (623 before), the states unmoved
+GATE_5A_DAY_LINES = 624  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 1680cb1391720dd8; TuningNotes)
-GATE_5A_DAY_DIGEST = "0325e18ce782b58b"  # the trim's words (1680cb1391720dd8 before)
+# package 127, words alone, the states unmoved: was 0325e18ce782b58b
+# (the trim's words (1680cb1391720dd8 before))
+GATE_5A_DAY_DIGEST = "b08d96950c77baac"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2997,13 +3000,15 @@ GATE_5B_BROUGHT_UP_TICK = 59603  # brought up, the sails furled (package 57; 596
 GATE_5B_SAIL_SIGHTED_TICK = 55620  # "Sail ho! A sail right ahead" (package 57; 55500)
 GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 57; 57120)
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
-GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
+# package 127: 15 turn-waits (731 before), the states unmoved
+GATE_5B_LINES = 746  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
+# package 127, words alone, the states unmoved: was 2c38f76132521e4e
 GATE_5B_DIGEST = (
-    "2c38f76132521e4e"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
+    "e0a3484cbf47468c"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3061,7 +3066,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
 # the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
 # left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
-GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
+GATE_5B_SCHOONER_LINES = (
+    791  # 127: 24 turn-waits, 1 fill-away (766 before); the well (768 at 56, 763 at package 45)
+)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
@@ -3080,13 +3087,17 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # (28741, 30178 and 56925: "Hands to the after braces; heave to." and "Fill away; man the after
 # braces." before); three lines' words, the 766 lines, every tick and every kind the same
 # (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
-GATE_5B_SCHOONER_DIGEST = "0fef1c52128ce9b2"
+GATE_5B_SCHOONER_DIGEST = (
+    # package 127, words alone, the states unmoved: was 0fef1c52128ce9b2
+    "4a2f78b3ef48643f"
+)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
 # Black Head at 56081 gone), 475 → 478 lines (docs/dev/TuningNotes.md, package 37m).
 GATE_5B_THICK_TACKED_TICK = 54115  # put about off Black Head, full and by (54063 before 57)
-GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 at 45, 495 at 37p)
+# package 127: 6 turn-waits (469 before), the states unmoved
+GATE_5B_THICK_LINES = 475  # the well's order gone (2026-10-21; 471 at 57, 472 at 45, 495 at 37p)
 # package 75, B3.4, the lead's ruling 2 (the word by Luce 1884 p. 417): put about off Black Head
 # with both courses hauled up in the gear, the frigate hauls her after yards by "Main-topsail
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
@@ -3095,7 +3106,9 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
-GATE_5B_THICK_DIGEST = "f119ec763d2b442e"  # the trim's words (9ce8174ebc6948c6 at ruling 2)
+# package 127, words alone, the states unmoved: was f119ec763d2b442e
+# (the trim's words (9ce8174ebc6948c6 at ruling 2))
+GATE_5B_THICK_DIGEST = "ee9a1b540ba24e73"
 
 
 def the_landfall(log):
@@ -4160,7 +4173,9 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
+GATE_5C_CRUISE_LINES = (
+    2321  # 127: 79 turn-waits (2242 before); package 56, the glass (2225 at package 57)
+)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
@@ -4176,7 +4191,10 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # words (1e7f8ab24b84e6f7 at SW-4)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
-GATE_5C_CRUISE_DIGEST = "bdd6ce8a97a33140"
+GATE_5C_CRUISE_DIGEST = (
+    # package 127, words alone, the states unmoved: was bdd6ce8a97a33140
+    "499b097a46b814e8"
+)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4305,7 +4323,8 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
 # package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
 # before)
-GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 127: 66 turn-waits, 2 fill-away (3096 before), the states unmoved
+GATE_5C_MERCHANT_LINES = 3164  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4323,7 +4342,10 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # is not told to brace in after yards she has not as she wears (90475: "Stand by to wear ship.
 # Up helm; brace in the after yards." before); five lines' words, the 3,096 lines, every tick
 # and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
-GATE_5C_MERCHANT_DIGEST = "8259996fb122428e"
+GATE_5C_MERCHANT_DIGEST = (
+    # package 127, words alone, the states unmoved: was 8259996fb122428e
+    "b40d5d0e5adad124"
+)
 
 
 def _people(world) -> list[dict]:
@@ -4774,7 +4796,8 @@ GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
 GATE_6A_INTENT_SOLD_TICK = None
 # package 65, step 3: the boat away for the prices at 111619 is reported to the master below
 # a minute later (one line more, every tick the same)
-GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
+# package 127: 66 turn-waits, 2 fill-away (2079 before), the states unmoved
+GATE_6A_INTENT_LINES = 2147  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
@@ -4792,7 +4815,10 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # after yards she has not as she wears (88141: "... Up helm; brace in the after yards." before);
 # eleven lines' words, the 2,079 lines, every tick and every kind the same (5d3cbbc5f4d33b84
 # before; TuningNotes, "Package 90, A2")
-GATE_6A_INTENT_DIGEST = "7239b1a1ed45736f"
+GATE_6A_INTENT_DIGEST = (
+    # package 127, words alone, the states unmoved: was 7239b1a1ed45736f
+    "23dc6d0a2a8c5bbc"
+)
 
 
 @pytest.fixture(scope="module")
@@ -4812,11 +4838,24 @@ def test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_name
     floor is the game as it was)." Each has its captain named (the master of the
     schooner, the captain of the frigate, by the wardroom file's binding), with no intent,
     so that he stands aside and the book sails her: not one judgement under his actor,
-    and the digests package 37m pinned (the constants' tests above)."""
-    for (world, _moments, _saved), digest in (
-        (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST),
-        (gate_5c_cruise, GATE_5C_CRUISE_DIGEST),
+    and the digests package 37m pinned (the constants' tests above).
+
+    Package 127, at the lead's ruling: beside each digest her line count and her end state
+    (the tick and her position to a millionth of a degree), so that a change of words alone is
+    read as words: the digests moved with 66 and 79 lines of waits said (3096 to 3164 and 2242
+    to 2321 lines), her end state the same to the bit."""
+    ends = {
+        "merchant": (GATE_5C_MERCHANT_LINES, 129600, (48.328859, -4.496049)),
+        "cruise": (GATE_5C_CRUISE_LINES, 172800, (48.687572, -5.580345)),
+    }
+    for (world, _moments, _saved), digest, which in (
+        (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST, "merchant"),
+        (gate_5c_cruise, GATE_5C_CRUISE_DIGEST, "cruise"),
     ):
+        lines, tick, (lat, lon) = ends[which]
+        assert len(world.log) == lines and world.clock.tick == tick, which
+        assert world.position.lat_deg == pytest.approx(lat, abs=1e-6), which
+        assert world.position.lon_deg == pytest.approx(lon, abs=1e-6), which
         cap = world.captain
         assert cap is not None and cap.name and cap.intent is None
         assert not cap.active and not cap.commands and cap.books
@@ -4985,7 +5024,10 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # merchant passage's five lines as GATE_5C_MERCHANT_DIGEST's (17461, 18301, 89192, 90359 and
 # 90475), the 3,108 lines, every tick and every kind the same (f47f7bc0daabc950 before;
 # TuningNotes, "Package 90, A2")
-GATE_6A_FAKE_CAPTAIN_DIGEST = "50529f09d4de955e"
+GATE_6A_FAKE_CAPTAIN_DIGEST = (
+    # package 127, words alone, the states unmoved: was 50529f09d4de955e
+    "1789990b5ca1912b"
+)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
