@@ -400,6 +400,7 @@ _DESCRIPTION_WORDS = {
     "a ship-sloop": "corvette",
     "ship-sloop": "corvette",
     "a ship sloop": "corvette",
+    "ship sloop": "corvette",
 }
 
 

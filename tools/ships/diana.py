@@ -2301,7 +2301,7 @@ DESCRIPTION = (
 )
 
 ERA_NOTES = (
-    "The Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken by Spain at "
+    "Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken by Spain at "
     "Cartagena in September 1809 and kept as a corvette to 1832 (Winfield et al. 2023, p. 930; "
     "Roos 1957). 124 pies by 32 pies 6 pulgadas by 16, 540 toneladas 691 libras on her plan's "
     "table; 167 men. Hull and profile measured on the Spanish navy's plan of her of 1809-1810 "

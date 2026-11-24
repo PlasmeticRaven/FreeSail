@@ -509,7 +509,61 @@ def test_her_description_in_her_file_and_through_the_index(doc):
     assert row["file"] == HER and row["what"] == d["what"] and row["rig"] == "a ship"
     for words in ("a corvette", "corvette", "a ship-sloop", "ship-sloop", "a ship sloop"):
         assert S.description_key(words) == "corvette", words
+    # qualified by a nation (the lead's nudge 78: "a Spanish ship sloop" named none, where "a
+    # ship-sloop" and "a French corvette" did, her rows wanting the bare "ship sloop")
+    qualified = ("ship sloop", "a Spanish ship sloop", "a Spanish ship-sloop", "a French corvette")
+    for words in qualified:
+        assert S.description_key(words) == "corvette", words
     assert S.description_key("a sloop of war") == "brig-sloop"
+
+
+def _her_reading_world(nation: str):
+    from datetime import datetime
+
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    sc = Scenario(
+        start_time=datetime(1810, 6, 12, 10, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=14.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 49.5, "lon_deg": -5.5},
+        region="channel-west",
+        ports=["falmouth"],
+        nation=nation,
+    )
+    return make_world(7, HER, sc)
+
+
+def test_her_reading_names_her_once_and_her_class_with_one_article():
+    """The ship reading's first line, to the player and in every station's brief (the lead's
+    nudge 78): her era note's first clause, her name taken out, her rig after it. Old, her note
+    opening "The Diana, a light frigate", it read "Diana, a a light frigate of the Danish navy"."""
+    from freesail.api import readings as R
+
+    w = _her_reading_world("spain")
+    first = R.ship_words(w).split(" Her guns: ")[0]
+    assert first == (
+        "The ship: Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken "
+        "by Spain at Cartagena in September 1809 and kept as a corvette to 1832, ship-rigged; a "
+        "ship of the Spanish navy."
+    )
+    assert w.submit("the ship").text.startswith(first)
+
+
+def test_no_committed_ships_reading_holds_a_doubled_article():
+    """Every committed file's class words, as the ship reading serves them (the lead's nudge 78)."""
+    from freesail.api.readings import ship_class_words
+
+    doubled = re.compile(r"\b(a|an|the)\s+(a|an|the)\b", re.IGNORECASE)
+    files = sorted((ROOT / "data" / "ships").glob("*.yaml"))
+    assert len(files) == 19
+    for path in files:
+        spec = load_spec(path)
+        words = ship_class_words(spec, spec.name)
+        assert words and not doubled.search(words), (path.name, words)
 
 
 def test_her_rank_is_a_frigates_at_the_rigs_distance_and_the_brig_sloops_made_out():
@@ -664,6 +718,10 @@ def test_truth_7_664_she_goes_about_as_a_light_ship_does(wind_kn, heading):
     292.5 and 295 degrees: in 12 and 15 knots she stays every time, in three to four minutes; in 8
     knots she stays from 290 alone, in about six; in 20 and 25 knots she misses stays from every
     heading, falling off on the old tack. Stayed 7 of 15 (the frigate-36 15 of 15).
+
+    Put about before her sail is set and her way is on her (600 s after `set plain sail`, in the
+    game's default gusts, 2 to 3.5 knots of way) she stayed in none of nine in 12 and 15 knots,
+    where settled she stays in 11 of 12: the lead's reader's measure (nudge 78), said, not pinned.
 
     Her tack's band is her own, 180 to 330 s (the lead's ruling of nudge 32): the floor JUDGEMENT,
     a small ship quick in stays; the ceiling about half again her slowest tack as measured then
