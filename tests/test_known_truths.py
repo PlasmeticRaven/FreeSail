@@ -23522,15 +23522,18 @@ def test_truth_7_672_the_rules_captains_board_on_the_bad_hand_under_12_kn_is_und
 ):
     """The rules captain lies on the bad hand only by choice under 12 kn, for no more than a board
     of 1,800 s (truth of A1c's keys): so lying, each lateen yard and mast of the tartane and the
-    polacre probes stays under a fifth of its rating (measured: 0.12 and 0.10 the tartane's, 0.08
-    and 0.10 the polacre's), and under its rating a part loses nothing."""
+    polacre probes stays well under a fifth of its rating, under 0.15 (measured: 0.12 and 0.10
+    the tartane's, 0.08 and 0.10 the polacre's), and under its rating a part loses nothing.
+    The upper band holds `LATEEN_BAD_HAND_LOAD` (the lead's nudge 60, item 7): at 4.0 the
+    tartane's great yard reaches 0.19 and fails it, where under a fifth alone passed it; at 3.0
+    it reaches 0.145."""
     from rig_fixtures import polacre_probe_doc, tartane_probe_doc
 
     for doc_fn in (tartane_probe_doc, polacre_probe_doc):
         world, spars = _a1d_probe(doc_fn, 12.0, tmp_path)
         _a1d_on_the_bad_hand(world)
         peaks, aback = _a1d_peaks(world, spars, 1800)
-        assert max(peaks.values()) < 0.2 and aback == 0, (doc_fn.__name__, peaks)
+        assert max(peaks.values()) < 0.15 and aback == 0, (doc_fn.__name__, peaks)
         assert all(sp.condition == 100.0 for sp in spars)  # no wear under the rating
 
 

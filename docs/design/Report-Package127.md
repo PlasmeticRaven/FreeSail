@@ -114,6 +114,4 @@ A save written in these windows differs from the trunk's; every one loads either
 
 ## Moved pins
 
-Two pins move, both by a mend's own intent, old beside new in `docs/dev/TuningNotes.md` under this package:
-- `test_lateen_whole`'s take-in behind `trim sails` (item 1);
-- `test_rig_words`'s lugger fill-away line (item 3).
+One pin moves by this package, by item 3's intent: `test_rig_words`'s lugger fill-away line, old beside new in `docs/dev/TuningNotes.md` under this package. The xebec probe's take-in behind `trim sails` (`test_lateen_whole`), first moved here, has been moved the same way on the trunk by the ships' package (its nudge 60, for every whole lateen waiting its turn), and the merge keeps the trunk's; its wait is now routine by this package's one rule, which the test does not pin.

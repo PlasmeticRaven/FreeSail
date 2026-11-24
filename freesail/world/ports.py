@@ -1114,12 +1114,18 @@ class BoatState:
                 state.pop(key, None)
         return state
 
-    def words(self, towed: bool = False) -> str:
+    def words(self, towed: bool = False, too_fast: bool = False) -> str:
         """Her state in words; `towed`, a boat towed astern on her painter (package 90, A4),
-        is not at the booms when she is not away."""
+        is not at the booms when she is not away; `too_fast`, towed faster than her hull speed
+        (`world.boats.TOWED_TOO_FAST`; the lead's nudge 60, item 8)."""
         if self.lost:
             return f"{self.boat_name} lost: {self.lost_words or self.lost}; a new one is the yard's"
         if not self.away:
+            if towed and too_fast:
+                return (
+                    f"{self.boat_name} towing astern on her painter, sheering about and shipping "
+                    "water"
+                )
             if towed:
                 return f"{self.boat_name} towing astern on her painter"
             return f"{self.boat_name} at the booms"
