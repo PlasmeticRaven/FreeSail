@@ -9168,8 +9168,18 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     no answer; on the one clock she bluffs a reply, is judged an enemy, and the commodore
     closes the convoy round him first); at 7200 and after, every ship
     within 165 m of her station (the far station leg holds at the tolerance's edge, half a
-    cable, and the lookout's rounding adds the rest)."""
+    cable, and the lookout's rounding adds the rest).
+
+    Package 127, at the lead's ruling: a take-in now countermands the setting of its sail
+    (truth 7-787), so the commodore no longer lies aback eight minutes after her tack with her
+    topgallants half set, and the convoy keeps together with no straggler at all. The Friendship
+    is given a cause a convoy meets, five minutes lying to at the start (a far plan's `lie_to`
+    step, as tests/test_captive.py gives one), and the book's signal is shown as before. Old
+    (2040, 2182, 2340, 6060), from the commodore's stall; new (1080, 1638, 1800, 3840), from
+    her lying to; with no lie-to, no straggler and no No. 20 in four hours. Every ship within
+    the 165 m from 7200, as before (93 m at the most, measured)."""
     w = _scenario_world(CONVOY_SIX)
+    w.vessels.get("friendship").plan.insert(0, ("lie_to", 300.0))
     sq = w.squadrons.find("the Falmouth trade")
     assert sq is not None and sq.kind == "convoy" and sq.commander == "the ship"
     assert sq.members == [
@@ -9183,7 +9193,8 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     ]
     for m in sq.others():
         v = w.vessels.get(m)
-        assert v.under_orders_of == "the ship" and v.plan[0] == ("station", "trade"), m
+        leg = v.plan[1] if m == "friendship" else v.plan[0]
+        assert v.under_orders_of == "the ship" and leg == ("station", "trade"), m
     w.run(7200)
     ordered = [e for e in w.log if e.kind == "signal.ordered" and "No. 20" in e.text]
     made = [e for e in w.log if e.kind == "signal.made" and "No. 20" in e.text]
@@ -9193,7 +9204,8 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
     # package 88 (the recovery when aback, `captains.ABACK_RECOVER`): (2760, 2866, 3000, 6420)
     # before and with the switch off; 5280 for the last before 84's step 6 (the one clock)
-    assert when == (2040, 2182, 2340, 6060), when
+    # package 127: (2040, 2182, 2340, 6060) from the commodore's stall, before (4)
+    assert when == (1080, 1638, 1800, 3840), when
     worst = 0.0
     for _ in range(6):
         w.run(600)
@@ -9208,15 +9220,31 @@ def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort
     man of war of the King's within her doctrine's distance (data/captains/privateer.yaml,
     `man_of_war_nm`) she evades and stands away; no merchantman is cut out, since none is
     uncovered. At seed 7 she is investigating at 600, evading by 3600 at two miles from the
-    commodore, and twenty miles off by 10800."""
+    commodore, and twenty miles off by 10800.
+
+    Package 127, at the lead's ruling: a take-in now countermands the setting of its sail
+    (truth 7-787), so the commodore stalls less after her tack, and the schooner's path closes
+    only to 2.13 miles, short of where she makes out the escort (about two miles: from
+    investigating she evades on being overmatched; the doctrine's `man_of_war_nm` is for her
+    on passage, beating or keeping station). She starts a cable nearer the commodore, her own
+    setup and not the scenario's, as tests/test_squadrons.py places a far vessel. Old: evading
+    by 3600 at 1.98 miles, 21 miles off at 10800. New: evading from 2940 at 1.98 miles, 1.98 at
+    3600, 17.9 miles off at 10800."""
     w = _scenario_world(CONVOY_SIX)
-    from freesail.world.geo import bearing_and_distance
+    from freesail.world.geo import bearing_and_distance, destination
 
     pv = w.vessels.find("Vengeur")
     assert pv is not None and pv.nation == "france" and pv.brain is not None
+    toward, _ = bearing_and_distance(pv.position, w.position)
+    pv.position = destination(pv.position, toward, 0.1 * units.NAUTICAL_MILE)
     w.run(600)
     assert pv.brain.state == "investigating a stranger", pv.brain.state
-    w.run(3000)
+    took_up = None
+    for _ in range(50):
+        w.run(60)
+        if took_up is None and pv.brain.state == "evading":
+            took_up = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
+    assert took_up is not None and took_up <= 2.0, took_up  # she makes out the escort at two miles
     d_at_1h = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
     assert pv.brain.state == "evading" and 1.5 <= d_at_1h <= 3.0, (pv.brain.state, d_at_1h)
     w.run(7200)
