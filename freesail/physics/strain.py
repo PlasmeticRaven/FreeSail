@@ -435,10 +435,16 @@ def _warn(
     # cause, and its plain strain counted as said with it (package 90)
     key = part.id if pressed is None else f"{pressed[0]}:{part.id}"
     dire = ratio > CARRY_AWAY_RATIO
-    if not warning_due(st, key, dire):
-        return
     if pressed is not None:
+        # a whole lateen's cause keeps its own rule, one a part and its cause in ten minutes
+        # whatever it is (the lead's choice at nudge 56); no committed ship's part is pressed so
+        last = st.last_warning_s.get(key)
+        if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
+            return
+        st.last_warning_s[key] = st.elapsed_s
         st.last_warning_s[part.id] = st.elapsed_s
+    elif not warning_due(st, key, dire):
+        return
     many: str | None
     if isinstance(part, Spar) and pressed is not None:
         one, many = _pressed_words(ship, pressed, dire)
@@ -492,7 +498,6 @@ def _causes_come(st: StrainState, pressed: dict[str, tuple[str, str, float]]) ->
     for part_id, mark in pressed.items():
         if last.get(part_id) != mark[0]:
             st.last_warning_s.pop(f"{mark[0]}:{part_id}", None)
-            _last_dire_s(st).pop(f"{mark[0]}:{part_id}", None)  # its dire count afresh too
     st.pressed_by = {part_id: mark[0] for part_id, mark in pressed.items()}
 
 
