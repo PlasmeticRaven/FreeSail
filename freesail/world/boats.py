@@ -941,7 +941,9 @@ _TOWED_HULLS: dict[str, Any] = {}
 # towed does, she having no other way in the game to show it. JUDGEMENT on the words and the
 # re-arming (memory, unverified: a boat towed fast sheers about on her painter and ships water
 # over her bow or quarter, and ships hoisted theirs in before making sail at sea).
-TOWED_TOO_FAST = "boats.towed_too_fast"
+# (a key of `ship.extra` as `boat_in_tow` is, not a kind: a dotted name reads as a log's kind to
+# the reach's guard, `tests/test_knowledge.py`)
+TOWED_TOO_FAST = "boat_towed_too_fast"
 TOWED_TOO_FAST_REARM = 0.9
 TOWED_TOO_FAST_WORDS = (
     "{boat} towing too fast for her, sheering about astern on her painter and shipping water; "
