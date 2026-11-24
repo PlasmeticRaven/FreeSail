@@ -2728,3 +2728,24 @@ The lens (`test_lateen_whole`, `test_boat_towed`, `test_knowledge`, `test_strain
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against b35aaaba's code, which is 111b1b5's: its fast tier is the l72t run of 111b1b5 and its slow likewise. The eighteen in gales and A2's harness run on it too, since `strain.py` moves. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the branch to watch is **`…/pkg-90-lateen2`**, this section's commit, pushed, its tiers running.
+
+## The second pass tiered (nudge 76): b88f3bc test by test against b35aaaba; the eighteen in gales and A2's harness (2026-11-24)
+
+**The tiered hash is b88f3bc** on `…/pkg-90-lateen2`, the section above's commit. The commit after it, which writes these results, touches this report alone. All runs are from the tree's root on a worktree of its own, one after the other, each junit compared test by test by the test's id (the xdist group's `@...` stripped). b35aaaba's code is 111b1b5's (an empty diff), so its tiers are 111b1b5's runs.
+
+| Run | b88f3bc | Against b35aaaba |
+|---|---|---|
+| **Fast tier whole**, `--junitxml` | 9,005: 8,996 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 25 min 22 s) | 9,000 (8,991 passed, 8 skipped, 1 xfailed): **every one the same outcome**. **6 ids gone**, the pins moved with the words: the four reliefs aback, whose ids carried the old words, and the bad hand's two, renamed `..._eased_at_once_only_by_the_order_its_warning_names`. **11 new, all passed**: those six under their new ids, and the five new pins (`tests/test_lateen_whole.py` 3, `tests/test_boat_towed.py` 2). The 8 skipped and the 1 xfailed the same cases |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, **0 failed** (1 h 31 min 26 s) | 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at b35aaaba: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 270; all passed.
+
+**Nothing moves on today's ships:**
+- **The eighteen in gales:** 360 runs, **byte for byte 111b1b5's** (the trunk's), every event, tick, part sample and trace: 6,101 events and 1,766 strain warnings.
+- **A2's harness**, every committed ship: 270 runs, **byte for byte 111b1b5's**.
+
+No committed file has a whole lateen or a towed boat, and `combat/hits.py`'s draw is as it was.
+
+**`…/pkg-90` and the trunk:** `…/pkg-90` is still at b35aaaba. The trunk has moved to 7c1773e7 by one record of docs; packages 125 to 127 have not landed. There is nothing to merge before this hash. When package 127 lands, item 5 takes its rule on a hash of its own, with `…/pkg-90` merged first.
+
+**For the coordinating session:** the second pass's hash is **b88f3bc** on `…/pkg-90-lateen2`, pushed and tiered whole, fast and slow, with no failure. The commit after it touches this report alone. Item 5 waits for package 127.
