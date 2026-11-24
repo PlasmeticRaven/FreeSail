@@ -11,6 +11,8 @@ From his play of the gate (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.
 3. **Fog comes on and clears over a time**, and is said as it does ("the fog seems to be clearing", "a fog is settling in"), as far as the weather's simulation allows.
 4. **The game's own captain replaces a spar carried away.** In the first action the Renard sailed three hours with her main topgallant mast gone and never shifted it; the work exists for a player.
 
+**Placed by the owner the same day (the proposal's decision 79):** the first goes with the milestone of the player's first hours; the other three open milestone 8 as its mending step, with the older faults of section 4 and package 125, the test suite's package planned beside it.
+
 ## 2. Not played at the gate
 
 - **Step 9, a model commanding the other ship in a fight**, was not played on the gate's build. The owner passed it on an action he had fought on an earlier build, which ended before parole was built. The seat at war with a human's ship under the revised consent brief, through to a parole asked by a model, has therefore not been seen by him. A model captor still has no forms for parole or for landing prisoners.
@@ -57,7 +59,7 @@ Found by the ships' session's builders and the lead's readers while gating packa
 - **Package 122:** the log read back as it was shown, and the captain's order given once (the owner, 20 November; low priority).
 - **Package 123:** the corsair, by rules, so that no model need be seated (decision 76); placed in the career milestone.
 - **Package 124:** a privateer's and a merchantman's own people (milestone 8).
-- **Package 125, booked by the lead and waiting for the owner's word: the moment of the haul.** The tack's script calls "mainsail haul" within a point of the wind for every ship; a ship that comes round slowly is turned back by it, and the same sentence of Luce gives the other moment, with the wind ahead. With it: a jib taken in by `shorten sail` where a ship cannot be held without it; a light ship not shortened in time by the game's own captain; item 2 and item 11 above. It changes how today's ships tack, and is gated as such.
+- **Package 125, booked by the lead and placed by the owner in the mending step ("The mending step may come next, with package 125 as well"); not launched: the moment of the haul.** The tack's script calls "mainsail haul" within a point of the wind for every ship; a ship that comes round slowly is turned back by it, and the same sentence of Luce gives the other moment, with the wind ahead. With it: a jib taken in by `shorten sail` where a ship cannot be held without it; a light ship not shortened in time by the game's own captain; item 2 and item 11 above. It changes how today's ships tack, and is gated as such.
 
 ## 6. Package 90, the ships, in hand across the gate
 
@@ -79,6 +81,6 @@ Each was told to him when it was made and is in the records of its package.
 
 ## 8. Waiting on a decision of the owner's
 
-- The shape of milestone 8, from this page and the proposal's list.
+- The line between milestone 8's two gates, the lead's to propose; and the crew's morale and skill, a man's own or the company's.
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
 - The chart's work, parked; its records say where it stopped.
