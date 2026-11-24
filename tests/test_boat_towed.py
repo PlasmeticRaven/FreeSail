@@ -326,3 +326,81 @@ def test_the_boats_evolutions_marks_are_glossed_in_the_words_the_game_fills_them
         assert {m: words[m] for m in marks} == expected, (eid, towed)
         started = [e.text for e in w.log.all()[n0:] if e.kind == "evolution.started"]
         assert started == [evo.on_start.log.format_map({**words, **expected})], (eid, towed)
+
+
+# ---------------------------------------------------------------------------
+# The lateen hulls' list as it stands (the lead's nudge 60), item 8: the boat in tow
+# ---------------------------------------------------------------------------
+
+
+def test_a_boat_towed_faster_than_her_hull_speed_is_said_to_sheer_and_ship_water(tmp_path):
+    """Nudge 60, item 8: an hour running at up to 11.75 kn, the yawl's hull speed 5.4, and no
+    word; still "towing astern on her painter". Her drag past her hull speed is the wave term
+    carried on beyond its ground (`physics.integrate.TOW_WAKE_FACTOR`'s note), not changed; the
+    words say what a boat so towed does, once as she passes it (`boats.TOWED_TOO_FAST`), and the
+    reading with them. Measured, seed 7, the probe running in 45 kn under her mainsail: said at
+    6 s, once in the hour (her way at most 11.28 kn); the probe as filed, her boat on deck,
+    never."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=45.0,
+        gustiness=0.3,
+        variability=0.3,
+        ship_heading_deg=180.0,
+        ship_speed_kn=5.0,
+    )
+    said = {}
+    for towed in (True, False):
+        w = make_world(7, _probe(tmp_path, towed=towed), sc)
+        n0 = len(w.log.all())
+        w.submit("set the mainsail")
+        w.run(3600)
+        said[towed] = [e for e in w.log.all()[n0:] if e.kind == "boat.towed_too_fast"]
+        if towed:
+            assert w.readings.words("boat") == (
+                "the boat towing astern on her painter, sheering about and shipping water"
+            )
+    assert [e.text for e in said[True]] == [
+        "The boat towing too fast for her, sheering about astern on her painter and shipping "
+        "water; shorten sail to ease her."
+    ]
+    hull = load_ship("data/ships/boat-yawl-16.yaml").hull
+    assert said[True][0].data["knots"] > said[True][0].data["hull_speed_kn"]
+    assert said[True][0].data["hull_speed_kn"] == pytest.approx(
+        hull.hull_speed / 0.514444, abs=0.01
+    )
+    assert said[False] == []
+
+
+@pytest.mark.parametrize("u", [-1.5, 1.5])
+def test_making_sternway_her_boat_in_tow_drags_nothing(tmp_path, u):
+    """Nudge 60, item 8: no case held that she drags nothing making sternway (her painter slack:
+    `physics.integrate`, the way ahead alone). In a calm with no sail set and the same way put on
+    her, astern her way falls off tick for tick as the probe's with her boat on deck; ahead it
+    falls off faster, by the boat's drag."""
+    ways = {}
+    for towed in (True, False):
+        w = at_rest(50.0, -4.0, ship=_probe(tmp_path, towed=towed))
+        w.run(2)
+        assert ("boat_in_tow" in w.ship.extra) is towed
+        w.ship.dyn.u = u
+        seen = []
+        for _ in range(30):
+            w.tick()
+            seen.append(w.ship.dyn.u)
+        ways[towed] = seen
+    if u < 0:
+        assert ways[True] == ways[False]
+    else:
+        assert all(a < b for a, b in zip(ways[True], ways[False], strict=True))
+
+
+@pytest.mark.parametrize("eid", ["send_boat", "lay_out_kedge"])
+def test_a_towed_boats_two_timings_are_the_ports_figures(eid):
+    """Nudge 60, item 8: no case held `ports.BOAT_HAUL_ALONGSIDE_S` (nor its pair) against the
+    evolutions' timing, which the scripts read first (`scripts._boat_out_s`, `_boat_in_s`)."""
+    from freesail.world import ports
+
+    timing = load_directory()[eid].timing
+    assert timing["haul_alongside_s"] == ports.BOAT_HAUL_ALONGSIDE_S
+    assert timing["veer_astern_s"] == ports.BOAT_VEER_ASTERN_S

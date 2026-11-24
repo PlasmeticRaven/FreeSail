@@ -44,7 +44,12 @@ SUBSTEPS = 4  # per tick (spec §3.1)
 # along with her, so it meets her slower than the sea meets the ship; a wake fraction of about a
 # quarter so near the stern (memory, unverified: the wake measured behind ships' hulls) gives
 # (1 - 0.25) squared, about 0.6, for a drag that goes as the square of the speed. Never tuned to a
-# hull's band: her truths say they are measured with her boat in tow.
+# hull's band: her truths say they are measured with her boat in tow. Past the boat's own hull
+# speed the figure has no ground (the lead's nudge 60, item 8): `hull.resistance`'s wave term,
+# the fourth power of her speed over her hull speed, stands for the bow wave of a hull that
+# cannot climb it, and is carried on there unchecked (the yawl's 7.6 kN at 10.4 kn, about a fifth
+# of the ship's own resistance), where a boat so towed sheers about and ships water rather than
+# dragging so; `world.boats.TOWED_TOO_FAST` says so in words, and the figure is not changed.
 TOW_WAKE_FACTOR = 0.6
 
 

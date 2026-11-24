@@ -932,6 +932,22 @@ def hoist_in(world: Any, hull: Any) -> str:
 # (package 90, A4); held here and never pickled
 _TOWED_HULLS: dict[str, Any] = {}
 
+# A boat towed faster than her own hull speed (`Hull.hull_speed`, her file's): the ids of those
+# so towed now, in `ship.extra` under this key, said once as each passes it and again only after
+# she has fallen under `TOWED_TOO_FAST_REARM` of it (the lead's nudge 60, item 8: an hour at up
+# to 11.75 kn, the yawl's hull speed 5.4, and no word). Her drag past it is
+# `physics.integrate`'s, the hull's wave term carried on beyond the speed it stands for
+# (`TOW_WAKE_FACTOR`'s note): the figure has no ground there, and the words say what a boat so
+# towed does, she having no other way in the game to show it. JUDGEMENT on the words and the
+# re-arming (memory, unverified: a boat towed fast sheers about on her painter and ships water
+# over her bow or quarter, and ships hoisted theirs in before making sail at sea).
+TOWED_TOO_FAST = "boats.towed_too_fast"
+TOWED_TOO_FAST_REARM = 0.9
+TOWED_TOO_FAST_WORDS = (
+    "{boat} towing too fast for her, sheering about astern on her painter and shipping water; "
+    "shorten sail to ease her."
+)
+
 
 def keep_in_tow(ship: Any, state: Any) -> None:
     """The boats towed astern on their painters (package 90, A4; a boat's `towed`), their hulls
@@ -946,11 +962,44 @@ def keep_in_tow(ship: Any, state: Any) -> None:
     if not towed or not isinstance(extra, dict):
         return
     gone = str(state.boat_id) if (state.away or state.lost) else None
-    hulls = tuple(h for b in towed if b.id != gone and (h := _towed_hull(b)) is not None)
-    if hulls:
-        extra["boat_in_tow"] = hulls
+    in_tow = [(b, h) for b in towed if b.id != gone and (h := _towed_hull(b)) is not None]
+    if in_tow:
+        extra["boat_in_tow"] = tuple(h for _, h in in_tow)
     else:
         extra.pop("boat_in_tow", None)
+    _towed_too_fast(ship, extra, in_tow, state)
+
+
+def _towed_too_fast(ship: Any, extra: dict, in_tow: list, state: Any) -> None:
+    """Each boat in tow faster than her hull speed said once as she passes it (`TOWED_TOO_FAST`);
+    nothing of a boat away or lost, or of a ship making sternway (her painter slack)."""
+    dyn = getattr(ship, "dyn", None)
+    u = float(getattr(dyn, "u", 0.0) or 0.0)
+    fast = set(extra.get(TOWED_TOO_FAST) or ())
+    now = set()
+    for boat, hull in in_tow:
+        hull_speed = float(getattr(hull, "hull_speed", 0.0) or 0.0)
+        if hull_speed <= 0.0:
+            continue
+        if u > hull_speed or (boat.id in fast and u > TOWED_TOO_FAST_REARM * hull_speed):
+            now.add(boat.id)
+            if boat.id not in fast and hasattr(ship, "note"):
+                name = _cap(str(getattr(state, "boat_name", "") or "the boat"))
+                ship.note(
+                    "notable",
+                    "boat.towed_too_fast",
+                    TOWED_TOO_FAST_WORDS.format(boat=name),
+                    None,
+                    {
+                        "boat": boat.id,
+                        "knots": round(units.ms_to_knots(u), 2),
+                        "hull_speed_kn": round(units.ms_to_knots(hull_speed), 2),
+                    },
+                )
+    if now:
+        extra[TOWED_TOO_FAST] = tuple(sorted(now))
+    else:
+        extra.pop(TOWED_TOO_FAST, None)
 
 
 def _towed_hull(boat: Any) -> Any:
