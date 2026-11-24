@@ -403,6 +403,9 @@ class Harbour:
         self.doors: dict[str, Door] = {}
         self._ids = itertools.count(1)
         self.game: dict[str, Any] = {}  # what the harbour started, in words
+        # the games begun and ended from this harbour, counted: a page tells one game from
+        # the next by it (the stations' table keeps a row's choice of door within a game)
+        self.games = 0
         self._ports: list[dict[str, Any]] | None = None
         self._charts: dict[str, dict[str, Any]] = {}
         self._lock = threading.RLock()
@@ -1009,7 +1012,42 @@ class Harbour:
                 "plan": plan,
             }
             self.started = True
+            self.games += 1
         return {"lines": lines, "game": self.game_state()}
+
+    def end(self, lose_unsaved: bool = False) -> dict[str, Any]:
+        """The game in play ended, the harbour kept (the owner's note 2 of gate M7): the
+        doors of the models' stations closed as the harbour closes one (`stop_door`), the
+        clock stopped and the World let go for one with no game in it, as the harbour
+        begins with none; nothing saved is touched. Refused in words while what was played
+        since the last save would be lost, until the player says so (`lose_unsaved`)."""
+        from freesail.core.world import Scenario, World
+        from freesail.ui.console import DEFAULT_SEED
+
+        if not self.started:
+            raise HarbourError("No game is in play to end.", 409)
+        lost = self.driver.unsaved()
+        if lost and not lose_unsaved:
+            raise HarbourError(lost + " End it all the same, or save it first.", 409)
+        # the doors first, the locks not held: a door stopping asks the game to release its
+        # station, and the release saves the station's record as it always has
+        for door in list(self.doors.values()):
+            if door.running:
+                with contextlib.suppress(Exception):
+                    self.stop_door(door.id)
+        # the harbour's lock first, then the driver's, as at the start: a page that asks
+        # while a game ends finds the whole game or none
+        with self._lock, self.driver.lock:
+            self.driver.replace_world(
+                World(seed=DEFAULT_SEED, scenario=Scenario()),
+                compression=self.driver.compression,
+                pace=self.driver.pace.rule,
+            )
+            self.game = {}
+            self.started = False
+            self.games += 1
+            self.seat_doors, self._seat_world = {}, None
+        return {"lines": ["The game is ended."], "game": self.game_state()}
 
     def game_state(self) -> dict[str, Any]:
         from freesail.agents import director as director_mod
@@ -1038,6 +1076,7 @@ class Harbour:
                 ),
                 "director": brief.name if brief is not None else "",
                 "chosen": dict(self.game),
+                "games": self.games,
                 # the stations' table (package 96b, step 9): the other ships with a captain
                 # of their own, whose captain's station a door may ask for
                 "captains": self._captains(w) if self.started else [],
@@ -1089,6 +1128,8 @@ class Harbour:
         d = self.driver
         out: list[dict[str, Any]] = []
         with d.lock:
+            if not self.started:
+                return out  # no game: no station held, whatever the last game's desk kept
             if d.desk is not None:
                 # the desk lists, beside the stations held, the seats still in their consent
                 # conversation and the seats stopped (a consent declined, a door stopped
@@ -1883,6 +1924,10 @@ def harbour_routes(h: Harbour) -> APIRouter:
     @router.post("/api/harbour/start")
     def api_start(body: dict[str, Any]) -> JSONResponse:
         return call(h.start, body)
+
+    @router.post("/api/harbour/end")
+    def api_end(body: dict[str, Any]) -> JSONResponse:
+        return call(h.end, bool(body.get("lose_unsaved")))
 
     @router.get("/api/harbour/settings")
     def api_settings() -> JSONResponse:

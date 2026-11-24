@@ -1907,7 +1907,7 @@ class World:
         """The minute's weather lines: the sky and the weather when they change, the
         hour's line with the glass, and at the watch's change the glass's fall or rise
         since the watch before (spec M5 §5). No line names a front or a centre."""
-        from freesail.world.weather import WEATHER_LINES
+        from freesail.world.weather import FOG_LINES, VISIBILITY_NM, WEATHER_LINES
 
         self._observe_weather()
         t = self.clock.ship_time
@@ -1922,11 +1922,37 @@ class World:
             )
         if was is not None and now.weather != was.weather:
             text = WEATHER_LINES.get((was.weather, now.weather)) or WEATHER_LINES[now.weather]
+            if now.weather == "fog" and 0.0 < float(getattr(now, "fog", 0.0)) < 1.0:
+                text = FOG_LINES["settling"]  # it comes on by degrees
             self.record(
                 Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
                 "weather.change",
                 text,
                 data={"weather": now.weather, "was": was.weather, "visibility": now.visibility},
+            )
+        elif (
+            was is not None
+            and now.weather == "fog"
+            and now.visibility != was.visibility
+            and now.visibility in VISIBILITY_NM
+            and was.visibility in VISIBILITY_NM
+        ):
+            # the sight closing or opening in the fog, a step at a time
+            thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[was.visibility]
+            if thicker:
+                text = FOG_LINES["thick" if now.visibility == "a cable" else "thickening"]
+            else:
+                text = FOG_LINES["clearing" if was.visibility == "a cable" else "thinning"]
+            self.record(
+                Severity.NOTABLE if thicker else Severity.ROUTINE,
+                "weather.fog",
+                text,
+                data={
+                    "weather": now.weather,
+                    "visibility": now.visibility,
+                    "was": was.visibility,
+                    "fog": float(getattr(now, "fog", 0.0)),
+                },
             )
         self._last_conditions = now
         if t.minute != 0:
