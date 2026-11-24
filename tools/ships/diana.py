@@ -515,7 +515,12 @@ HULL_NOTES = {
     "JUDGEMENT). Her one deck, flush from end to end: the datum of every spar height and every "
     "sail's corners (D18 (a)).",
     "rudder": "The plan's blade under the line, 3.0 m2 (measured, Pages §5.5), its span from the "
-    "line to its heel on K, (-17.47, -3.90); 35 degrees and 3 deg/s the frigate-36's (judgement).",
+    "line to its heel on K, (-17.47, -3.90); 35 degrees and 3 deg/s the frigate-36's (judgement). "
+    "Traced from her plan, it is the least of any committed ship's against her lateral plane (the "
+    "ships of the line measured near a third more, the frigate-36 and the brig half again): the "
+    "cause of her griping when the game's shortening takes in her jib in a fresh breeze, and not "
+    "of her missed stays under all plain sail (her report's §13 and §14; the lead's nudges 67 to "
+    "70).",
 }
 
 # Each line's rung (Build-Ships.md §5.0 principles 3 and 4): her own plan for every line (Dia-D

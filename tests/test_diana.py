@@ -33,6 +33,7 @@ from freesail.crew.model import Watch
 from freesail.crew.muster import muster
 from freesail.evolutions.registry import load_directory
 from freesail.ship.loader import load_ship, load_spec
+from freesail.ship.parts import SailState
 from freesail.world import captains
 from freesail.world import ships as S
 from freesail.world.nations import load_nations
@@ -550,37 +551,39 @@ def test_truth_7_660_her_particulars_hold_her_sources(doc):
     assert tuple(doc["armament"]["fits"]) == FITS
 
 
-def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze():
+@pytest.mark.parametrize(("wind_kn", "off"), [(24.0, 124.0), (25.0, 118.0), (27.0, 112.0)])
+def test_truth_7_661_meyers_speed_with_the_wind_abaft_the_beam_in_a_fresh_breeze(wind_kn, off):
     """Package 90, her builder (Dia-D §14, truth B), drafted in `tests/test_diana.py`. Her captain
     of 1807, Meyer: 10 to 11 knots with the wind two or three points abaft the beam in a fresh
     breeze (Roos 1957 p. 94: Dia §6). With the wind 112 to 124 degrees off in 24 to 27 knots, under
     the sail her book carries in that wind (a King's ship's: plain sail below `shorten_sail_kn`,
     30), she makes 9.5 to 11.5 knots: measured 10.30 to 11.26 (10.28 to 11.29 with the frigate's
-    spanker scaled, before the owner's decision D-s2)."""
+    spanker scaled, before the owner's decision D-s2). A case a wind (the five-second line: the
+    lead's nudges 34 and 69; old: the three in one test)."""
     from tests.test_known_truths import knots, under_plain_sail
 
-    for wind_kn, off in ((24.0, 124.0), (25.0, 118.0), (27.0, 112.0)):
-        world = under_plain_sail(HER, 360.0 - off, wind_kn)
-        assert 9.5 <= knots(world) <= 11.5, (wind_kn, off, knots(world))
+    world = under_plain_sail(HER, 360.0 - off, wind_kn)
+    assert 9.5 <= knots(world) <= 11.5, (wind_kn, off, knots(world))
 
 
-def test_truth_7_662_she_is_stiff_as_her_captain_said():
+@pytest.mark.parametrize("off", [66.0, 90.0])
+def test_truth_7_662_she_is_stiff_as_her_captain_said(off):
     """Package 90, her builder (Dia-D §14, truth C), drafted in `tests/test_diana.py`. Close-hauled
     and abeam under plain sail in 22 knots she heels no more than 1.15 times the frigate-36 does
     (measured at her GM of 1.75: 8.17 against 7.34 degrees close-hauled, 1.11; 12.63 against
     11.30 abeam, 1.12; 8.10 and 12.61 with the frigate's spanker scaled, before the owner's
     decision D-s2), and her midship lee port stays open (it shuts at 18.5 degrees: truth
-    7-665)."""
+    7-665). A case a heading off the wind (old: the two in one test)."""
     from tests.test_known_truths import reading, under_plain_sail
 
-    for off in (66.0, 90.0):
-        hers = reading(under_plain_sail(HER, 360.0 - off, 22.0))["heel"]
-        frigates = reading(under_plain_sail(FRIGATE, 360.0 - off, 22.0))["heel"]
-        assert hers <= 1.15 * frigates, (off, hers, frigates)
-        assert hers < 18.5, off
+    hers = reading(under_plain_sail(HER, 360.0 - off, 22.0))["heel"]
+    frigates = reading(under_plain_sail(FRIGATE, 360.0 - off, 22.0))["heel"]
+    assert hers <= 1.15 * frigates, (off, hers, frigates)
+    assert hers < 18.5, off
 
 
-def test_truth_7_663_she_steers_well():
+@pytest.mark.parametrize("off", [66.0, 90.0])
+def test_truth_7_663_she_steers_well(off):
     """Package 90, her builder (Dia-D §14, truth D), drafted in `tests/test_diana.py`, restated as
     measured (the owner's decision D-s2; the lead's nudges 61 and 62). In 15 knots her helm
     close-hauled is within half a degree of amidships, and with the wind abeam she carries 1 to 3
@@ -589,42 +592,203 @@ def test_truth_7_663_she_steers_well():
     close-hauled, met at 0.82 and 2.02 with the frigate's spanker scaled (111 m2, `clr_x_m` 2.8).
     Why: the spanker her spars carry by her note's rule is 95 m2, and with it no `clr_x_m` gives
     her that weather helm close-hauled and her tacks too (her report's §10.1); the owner chose the
-    sail and her tacks."""
+    sail and her tacks. **Owed with package 125** (the moment of the haul, the lead's nudge 67):
+    her `clr_x_m` and her helm measured again, and truth D back to its first band if she then
+    holds it. A case a heading off the wind (old: the two in one test)."""
     from tests.test_known_truths import reading, under_plain_sail
 
-    close = reading(under_plain_sail(HER, 360.0 - 66.0, 15.0))["weather_helm"]
-    abeam = reading(under_plain_sail(HER, 360.0 - 90.0, 15.0))["weather_helm"]
-    assert abs(close) <= 0.5, close  # old: 0.5 <= close <= 3.0
-    assert 1.0 <= abeam <= 3.0, abeam
+    helm = reading(under_plain_sail(HER, 360.0 - off, 15.0))["weather_helm"]
+    if off == 66.0:
+        assert abs(helm) <= 0.5, helm  # old: 0.5 <= helm <= 3.0
+    else:
+        assert 1.0 <= helm <= 3.0, helm
 
 
-def test_truth_7_664_she_goes_about_as_a_small_ship_does():
-    """Package 90, her builder (Dia-D §14, truth E), drafted in `tests/test_diana.py`. She tacks
-    from 290, 292.5 and 295 degrees and wears, as truths 10 and 11 put the frigate about: tacked in
-    232, 235 and 238 s, losing 34, 44 and 56 m (measured with the spanker her spars carry, at her
-    `clr_x_m` of 2.65; 206, 215 and 216 s and 28, 42 and 46 m with the frigate's scaled, before the
-    owner's decision D-s2); she wears in 492 s (truth 11's 360 to 720). Her
-    tack's band is her own, 180 to 330 s (the lead's ruling of nudge 32): the floor JUDGEMENT, a
-    small ship quick in stays; the ceiling about half again her slowest tack as measured then (216
-    s), JUDGEMENT, so that the truth catches her going about as slowly as the frigate. Truth 10's
-    285 to 600 s is Luce's five to ten minutes for a frigate of 42 m, which spends most of hers
-    griping up on the new tack with too little way for her helm; her design asked her helm and
-    rudder tuned to it (Plan §8.4), and no figure of either within her sources brings her there,
-    her rudder kept as measured (the sweeps in docs/dev/TuningNotes.md, 'Package 90, the
-    Diana'). The ground each tack loses is recorded, not asserted."""
-    from tests.test_known_truths import close_hauled_on_starboard, until, wear
+# Truth E, her going about, as a count across the winds (the owner's word "Join now", Decisions
+# Part F, rows D-j and D-j3; the lead's nudges 67 and 70), measured at seed 7 by the truths' helpers
+# with the spanker her spars carry and her `clr_x_m` of 2.65: each case her tack's outcome from
+# 290, 292.5 and 295 degrees, and for a tack made its band in seconds. Under all plain sail: she
+# stays from every heading in 12 and 15 knots; in 8 she stays from 290 alone, slowly; in 20 and 25
+# she is slack in stays and misses from every heading (the tack script's haul a point on the bow,
+# the engine's and every ship's: package 125). Measured so on 36b4a3e (her report's §12, §13).
+TACK_PLAIN = {
+    (8.0, 290.0): ("ship.tacked", 300, 420),  # measured 351 s: slow in light airs
+    (8.0, 292.5): ("ship.missed_stays", 0, 900),
+    (8.0, 295.0): ("ship.missed_stays", 0, 900),
+    (12.0, 290.0): ("ship.tacked", 180, 330),  # 184 to 187 s
+    (12.0, 292.5): ("ship.tacked", 180, 330),
+    (12.0, 295.0): ("ship.tacked", 180, 330),
+    (15.0, 290.0): ("ship.tacked", 180, 330),  # 232 to 238 s
+    (15.0, 292.5): ("ship.tacked", 180, 330),
+    (15.0, 295.0): ("ship.tacked", 180, 330),
+    (20.0, 290.0): ("ship.missed_stays", 0, 900),
+    (20.0, 292.5): ("ship.missed_stays", 0, 900),
+    (20.0, 295.0): ("ship.missed_stays", 0, 900),
+    (25.0, 290.0): ("ship.missed_stays", 0, 900),
+    (25.0, 292.5): ("ship.missed_stays", 0, 900),
+    (25.0, 295.0): ("ship.missed_stays", 0, 900),
+}
+TACK_KINDS = ("ship.tacked", "ship.missed_stays", "evolution.failed")
 
-    for heading in (290.0, 292.5, 295.0):
-        world = close_hauled_on_starboard(HER, heading=heading)
-        world.submit("tack ship")
-        done, seconds = until(world, ("ship.tacked", "ship.missed_stays"), 900)
-        assert [e.kind for e in done] == ["ship.tacked"], heading
-        assert 180 <= seconds <= 330, (heading, seconds)
+
+def _idle(world, limit: int) -> None:
+    """Run her until no evolution of hers is under way (the runner holds none), trimmed every
+    two minutes, at most `limit` seconds."""
+    for i in range(limit):
+        runner = world.ship.extra.get("evolutions")
+        if not getattr(runner, "instances", None):
+            return
+        world.tick()
+        if i % 120 == 60:
+            world.submit("trim sails")
+
+
+def _shortened(wind_kn: float, heading: float):
+    """Plain sail set and braced up as the truths settle her, every evolution of it finished;
+    then the game's own `shorten sail`, run to its end before the helm is put down."""
+    from tests.test_known_truths import close_hauled_on_starboard
+
+    world = close_hauled_on_starboard(HER, knots_=wind_kn, heading=heading)
+    _idle(world, 900)
+    world.submit("shorten sail")
+    world.tick()
+    _idle(world, 1500)
+    return world
+
+
+@pytest.mark.parametrize(("wind_kn", "heading"), sorted(TACK_PLAIN))
+def test_truth_7_664_she_goes_about_as_a_light_ship_does(wind_kn, heading):
+    """Package 90, her builder (Dia-D §14, truth E), drafted in `tests/test_diana.py`, as a count
+    across the winds (the lead's nudge 67). **She goes about as a light ship does: under all plain
+    sail she stays in a working breeze, and in a fresh breeze she is slack in stays.** From 290,
+    292.5 and 295 degrees: in 12 and 15 knots she stays every time, in three to four minutes; in 8
+    knots she stays from 290 alone, in about six; in 20 and 25 knots she misses stays from every
+    heading, falling off on the old tack. Stayed 7 of 15 (the frigate-36 15 of 15).
+
+    Her tack's band is her own, 180 to 330 s (the lead's ruling of nudge 32): the floor JUDGEMENT,
+    a small ship quick in stays; the ceiling about half again her slowest tack as measured then
+    (216 s), JUDGEMENT. Truth 10's 285 to 600 s is Luce's five to ten minutes for a frigate of
+    42 m. The ground each tack loses is recorded, not asserted. Old: three tacks in 15 knots alone,
+    232, 235 and 238 s (206, 215 and 216 with the frigate's spanker scaled), and her wear, now its
+    own case below."""
+    from tests.test_known_truths import close_hauled_on_starboard, until
+
+    kind, low, high = TACK_PLAIN[(wind_kn, heading)]
+    world = close_hauled_on_starboard(HER, knots_=wind_kn, heading=heading)
+    world.submit("tack ship")
+    done, seconds = until(world, TACK_KINDS, 900)
+    assert [e.kind for e in done] == [kind], (wind_kn, heading, [e.text for e in done])
+    if kind == "ship.tacked":
+        assert low <= seconds <= high, (wind_kn, heading, seconds)
         assert world.ship.dyn.tack == "larboard"
+
+
+def test_truth_7_664_she_wears_in_truth_11s_band():
+    """Truth E's wear, its own case (old: in the one test with her tacks): from close-hauled in 15
+    knots she wears in 360 to 720 s, truth 11's band (measured 492 s)."""
+    from tests.test_known_truths import close_hauled_on_starboard, wear
+
     world = close_hauled_on_starboard(HER)
     seconds, _ = wear(world)
     assert 360 <= seconds <= 720, seconds
     assert world.ship.dyn.tack == "larboard"
+
+
+@pytest.mark.parametrize("heading", [290.0, 292.5, 295.0])
+def test_truth_7_664_shortened_in_20_knots_she_stays(heading):
+    """Truth E's shortened row, 20 knots (the lead's nudge 70): **shortened, she stays.** The
+    game's own `shorten sail` run to its end (her topgallants in and her topsails single-reefed;
+    in 20 knots her jib stays on her), then the helm put down: she stays from every heading, 3 of
+    3, within her band (measured 186 to 193 s)."""
+    from tests.test_known_truths import run, until
+
+    world = _shortened(20.0, heading)
+    assert world.ship.sails["jib"].state == SailState.SET
+    run(world, 60, trim_every=120)
+    world.submit("tack ship")
+    done, seconds = until(world, TACK_KINDS, 900)
+    assert [e.kind for e in done] == ["ship.tacked"], [e.text for e in done]
+    assert 180 <= seconds <= 330, seconds
+
+
+# 25 knots shortened and no more, as measured (the lead's nudge 70): from 290 she keeps her way and
+# stays; from 292.5 and 295 the game's shortening takes in her jib and she gripes past what her
+# rudder holds, comes up into the wind and lies there with a knot or two, and the tack is refused
+# for want of way (or missed). Her angle off the wind, her way and her weather helm in their bands.
+NOT_ABOUT = ("evolution.failed", "ship.missed_stays")  # refused for want of way, or missed
+SHORTENED_25 = {
+    290.0: {"off": (65.0, 75.0), "kn": (6.0, 9.0), "tack": ("ship.tacked",)},  # 235 s
+    292.5: {"off": (30.0, 62.0), "kn": (0.0, 2.5), "tack": NOT_ABOUT},
+    295.0: {"off": (30.0, 62.0), "kn": (0.0, 2.5), "tack": NOT_ABOUT},
+}
+
+
+@pytest.mark.parametrize("heading", sorted(SHORTENED_25))
+def test_truth_7_664_shortened_in_25_knots_she_gripes_without_her_jib(heading):
+    """Truth E's shortened row, 25 knots and no more (the lead's nudge 70): **in a fresh breeze,
+    shortened by the game's own order, she wants her jib.** `shorten sail` takes it in there (it
+    is loaded to three quarters of its rating, `orders/storm.py`), and with it in she gripes: her
+    weather helm past what her small rudder holds, she comes up into the wind and lies there with
+    a knot or two of way, and will not go about. Stayed 1 of 3, from 290, where her way held.
+    Measured with the shortening finished (her report's §14): from 292.5 and 295, 35 to 59
+    degrees off at 1.2 kn, the tack refused ("she has not way enough on her to stay"); her rudder,
+    traced from her plan and the least of any ship's, is the cause (with the frigate-36's ratio
+    she holds her course)."""
+    from tests.test_known_truths import knots, off_wind, run, until
+
+    band = SHORTENED_25[heading]
+    world = _shortened(25.0, heading)
+    assert world.ship.sails["jib"].state != SailState.SET  # taken in by the game's own order
+    run(world, 60, trim_every=120)
+    off, way = off_wind(world), knots(world)
+    assert band["off"][0] <= off <= band["off"][1], (heading, off)
+    assert band["kn"][0] <= way <= band["kn"][1], (heading, way)
+    world.submit("tack ship")
+    done, seconds = until(world, TACK_KINDS, 900)
+    assert [e.kind for e in done][:1] and done[0].kind in band["tack"], [e.text for e in done]
+    if done[0].kind == "ship.tacked":
+        assert 180 <= seconds <= 330, seconds
+
+
+@pytest.mark.parametrize("heading", [290.0, 292.5, 295.0])
+def test_truth_7_664_shortened_in_25_knots_with_her_jib_set_again_she_stays(heading):
+    """Truth E's shortened row, 25 knots with her jib (the lead's nudges 69 and 70): **set the jib
+    again and she bears away, gathers way and stays.** After the game's own shortening has taken it
+    in, `set the jib` is taken, the jib holds under its rating, she comes back to her course with
+    way (6.9 to 8.7 kn measured) and stays from every heading, 3 of 3, within her band (184 to 189
+    s); the jib loaded through the tack to under its rating (0.68 to 0.78 measured) and not blown
+    out."""
+    from tests.test_known_truths import knots, off_wind
+
+    world = _shortened(25.0, heading)
+    world.submit("set the jib")
+    world.tick()
+    _idle(world, 900)
+    jib = world.ship.sails["jib"]
+    assert jib.state == SailState.SET
+    held = 0
+    for _ in range(600):
+        world.tick()
+        held = held + 1 if knots(world) >= 4.0 and off_wind(world) >= 60.0 else 0
+        if held >= 60:
+            break
+    assert held >= 60, (off_wind(world), knots(world))
+    start = world.clock.tick
+    world.submit("tack ship")
+    peak = 0.0
+    done: list = []
+    for _ in range(900):
+        world.tick()
+        rating = jib.effective_cloth_rating_kn
+        if rating > 0.0:
+            peak = max(peak, jib.load_kn / rating)
+        done = [e for e in world.log if e.kind in TACK_KINDS and e.tick > start]
+        if done:
+            break
+    seconds = world.clock.tick - start
+    assert [e.kind for e in done] == ["ship.tacked"], [e.text for e in done]
+    assert 180 <= seconds <= 330, seconds
+    assert peak < 1.0 and jib.state == SailState.SET, (peak, jib.state)
 
 
 def test_truth_7_665_her_midship_lee_port():
