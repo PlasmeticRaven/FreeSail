@@ -121,6 +121,20 @@ def test_truth_7_780_an_anchor_order_behind_a_manoeuvre_says_its_wait_once():
     assert len(waits) == 1 and waits[0].severity.value == "routine"
 
 
+def test_truth_7_780_a_signal_queued_behind_a_manoeuvre_says_its_wait_once():
+    """The brig: `wear ship`, then `make the signal to tack`: the signal's own line carries the
+    wait ("'Make the signal' will follow 'wear ship', ..."), and no other line says it again."""
+    w = _make(BRIG, heading=60.0)
+    w.submit("set plain sail")
+    w.run(700)
+    t0 = w.clock.tick
+    w.submit("wear ship")
+    w.submit("make the signal to tack")
+    w.run(2)
+    said = [e for e in w.log if e.tick >= t0 and "'Make the signal' will follow" in e.text]
+    assert len(said) == 1 and said[0].kind == "signal.ordered"
+
+
 def test_truth_7_780_an_orders_own_line_does_not_say_the_wait_again():
     """`shorten sail` 30 s into `set plain sail` on the brig: the reefs wait behind the topsails
     being set, and some of its lines are not done. Its own line is written (it says what was
@@ -455,3 +469,11 @@ def test_truth_7_787_given_as_the_plain_sail_begins_the_belay_is_the_orders_line
     assert [x for x in lines if x[0] == "work.belayed"] == [("work.belayed", reply.text)]
     assert not [x for x in lines if x[0] in ("sail.set", "set after")]
     assert standing == []
+
+
+def test_truth_7_785_with_all_hands_up_the_line_never_says_it_waits_for_them():
+    """The watch too few is the watch's: with all hands called, the line is not the watch's, and
+    the runner reads none of it (`Runner._watch_too_few_for`)."""
+    w = _make(SMACK, heading=292.5, speed=5.0, start_time=datetime(1805, 6, 1, 9, 5))
+    runner = w.ship.extra["evolutions"]
+    assert runner._watch_too_few_for(None, SimpleNamespace(all_hands_called=True)) is None

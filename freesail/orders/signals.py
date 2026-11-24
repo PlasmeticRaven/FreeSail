@@ -774,6 +774,7 @@ def _start_hoist(world: Any, locker: Any, hoist: Any, hoists: int, words: str) -
             "make_signal",
             None,
             {"hoists": int(hoists), "hoist_key": hoist.key, "words": words},
+            say_wait=False,  # the signal's own line carries the runner's words, its wait with them
         )
     except OrderError:
         locker.flying = [h for h in locker.flying if h is not hoist]

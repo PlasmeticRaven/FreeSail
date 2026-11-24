@@ -39911,7 +39911,7 @@ Eight faults of what the log said, or failed to say, on ships already in the gam
 - 300 s on. Old: the main topsail, the fore and main topgallants and the spanker set after it (635 s to 1013 s) and standing at the end. New: their setting is belayed in one notable line, the fore topsail is taken in from where it hung, and nothing is set at the end.
 - 30 s on. Old: refused, "Nothing done: ... already furled", and every sail then set. New: the order is the belay, as its reply and its line, and nothing is set.
 
-**Severities (the lead's ruling):** every turn-wait is routine (`runner.TURN_WAIT_SEVERITY`), the lateen's and the handed-on yards' included; those two were notable before.
+**Severities (the lead's ruling):** every turn-wait is routine (`runner.TURN_WAIT_SEVERITY`), the lateen's, the handed-on yards' and the weigh's "waits for the anchor" included; those three were notable before.
 
 **One new figure, JUDGEMENT:** `scripts.FILLED_WATCH_S` = 600 s, how long a ship filled away is watched for her way (the minutes a ship braced full from lying to takes to gather way and steer, with room). Her way is read against `physics.hull.WAY_ON_KN` (0.5 kn, the aback line's "way to lose"), not a new figure.
 

@@ -46,7 +46,7 @@ I tried ten ships (brig, frigate, cutter, smack, lugger, merchant brig, bilander
 
 **Cause.** One warning a part in ten minutes, counting every warning alike.
 
-**Mend, one rule for both** (`strain.warning_due`). The old count is kept exactly: one warning a part in ten minutes, moved by every warning the old rule would have said. So every lesser line falls on the tick it fell on before. That matters because the game's captain takes in a head sail on the lesser "bolt-ropes" lines (`captains._head_sails_straining`), and it was the reader's finding on the first build, where a dire line said early let the next lesser line come early too. A dire warning is said whatever lesser one was within the ten minutes, and is itself said once in ten minutes. The dire count is kept on the strain state beside `last_warning_s`, not in it. The jib's dire line now comes at 2707 s. Held over its dire line for an hour, a part says it six times, once in each ten minutes. The dire lines the old rule said fall on its ticks, or up to ten minutes before them where a dire one was said earlier; the added ones are those it held back. No figure of load, strain or damage is read but the ratio's "dire", and none moves.
+**Mend, one rule for both** (`strain.warning_due`). The old count is kept exactly: one warning a part in ten minutes, moved by every warning the old rule would have said. So every lesser line falls on the tick it fell on before. That matters because the game's captain takes in a head sail on the lesser "bolt-ropes" lines (`captains._head_sails_straining`), and it was the reader's finding on the first build, where a dire line said early let the next lesser line come early too. A dire warning is said whatever lesser one was within the ten minutes, and is itself said once in ten minutes. The dire count is kept on the strain state beside `last_warning_s`, not in it. The jib's dire line now comes at 2707 s. Held over its dire line for an hour, a part says it six times, once in each ten minutes. No lesser line moves. A dire line the old rule said is said on its tick, or up to ten minutes earlier where it had been held back behind a lesser one: moved earlier, then, or added, never later and never lost. No figure of load, strain or damage is read but the ratio's "dire", and none moves.
 
 ## Item 8: the smack's cast
 
@@ -91,12 +91,13 @@ Each caller below passes `say_wait=False`, because it writes the wait as a line 
 - `orders/damage.py`, `_start` (the damage orders): the same.
 - `evolutions/scripts.py`, the forced-round dip of a settee and shift of a lateen (`dip_settee`, `change_lateen`): their `after` lines log the words as `evolution.queued`.
 - `orders/ground_tackle.py`, the anchor's orders: "The weigh waits for the anchor: ..." where it applies, else the runner's words, once.
+- `orders/signals.py`, `_start_hoist`: the signal's own line (`signal.ordered`) carries the runner's words, its wait with them (the second reader's finding: said twice before this).
 
 Every other caller lets the runner say it. Wherever the order's own line is written, it drops words the runner said (`verbs.unsaid`). A wait that ends says nothing more than the work's own first line.
 
 ## Severity of every new or moved line
 
-- Every turn-wait is routine: behind any work ("'X' will follow 'Y', which the hands are still at."), behind the yards a belay handed on, a whole lateen aback ("The mainsail is aback against the mast; it will not come in till she pays off."), and ground tackle's fallback. Before, the two said were notable; they are now one rule (`runner.TURN_WAIT_SEVERITY`). A routine line eases no compressed passage and wakes no seat. The weigh's "waits for the anchor" line keeps its notable.
+- Every turn-wait is routine: behind any work ("'X' will follow 'Y', which the hands are still at."), behind the yards a belay handed on, a whole lateen aback ("The mainsail is aback against the mast; it will not come in till she pays off."), and ground tackle's fallback. Before, the two said were notable; they are now one rule (`runner.TURN_WAIT_SEVERITY`). A routine line eases no compressed passage and wakes no seat. The weigh's "waits for the anchor" line is routine too (notable before).
 - "Braced full ... she has no headway on her yet." and "Filled away ..." are notable, as the line always was (`ship.filled_away`).
 - "She gathers headway; filled away ..." is routine.
 - "Filled away, she has lost her way and makes ... of sternway ..." and "Braced full ten minutes, she has gathered no headway ..." are notable (`ship.way`).

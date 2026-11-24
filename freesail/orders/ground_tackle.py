@@ -421,7 +421,7 @@ def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> bool:
         "moor": "she is mooring",
     }[ahead.evo.id]
     ship.note(
-        "notable",
+        TURN_WAIT_SEVERITY,  # a wait for its turn, as every one is (`runner.TURN_WAIT_SEVERITY`)
         "evolution.waiting",
         f"{what} waits for the anchor: {doing}, and it is begun as soon as she is brought up.",
         verbs.SHIP_SUBJECT,

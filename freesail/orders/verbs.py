@@ -440,6 +440,23 @@ def _sail_evolution(
         started.append({"evolution": evo, "subject": sail.id, "params": p})
     _settle_call(ship, call, bool(started))
 
+    if not started and countermanded:
+        # the setting belayed and nothing begun: the belay is the order's line, with what was not
+        # done, and its note (made when work was still to begin) is not said again
+        notes = getattr(ship, "notes", None)
+        if isinstance(notes, list):
+            notes[:] = [n for n in notes if not (n[1] == "work.belayed" and n[2] == belayed_words)]
+        not_done = " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "." if failed else ""
+        data = {
+            "verb": verb,
+            "level": 1,
+            "object": res.name,
+            "side": res.side,
+            "subjects": [b["subject"] for b in countermanded],
+            "belayed": countermanded,
+            "failed": failed,
+        }
+        return "work.belayed", belayed_words + not_done, data
     if not started:
         if len(failed) == 1:
             raise OrderError(failed[0][0].upper() + failed[0][1:].rstrip(".") + ".")
