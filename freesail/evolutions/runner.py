@@ -257,6 +257,10 @@ WAIT_SAID = "wait_said"
 # that samples on notable lines; a wait for its turn is neither danger nor news, and the work's
 # own first line says when it begins. A wait for hands keeps its severity (`_take_hands`).
 TURN_WAIT_SEVERITY = "routine"
+# The mark in a turn-wait's data, newly said by this package's rule: the World leaves such a line
+# out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
+# for all at once" said twice with a turn-wait between is routine the second time, as before.
+TURN_WAIT = "turn_wait"
 
 
 @dataclass
@@ -494,8 +498,10 @@ class Runner:
                 inst.lateen_wait_said = True
                 said = True
             elif say_wait and not said:
-                # behind any other work: said at the order, as the two above are, and once
-                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
+                # behind any other work: said at the order, as the two above are, and once;
+                # marked, so that the World's memory of the same words said again is not moved
+                # by it (`World.record`, `TURN_WAIT`)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, {TURN_WAIT: True})
                 said = True
             if said and say_wait:
                 self.__dict__[WAIT_SAID] = True

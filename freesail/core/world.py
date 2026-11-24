@@ -1299,7 +1299,10 @@ class World:
                 said = self._recurring_said = {}
             if sev is Severity.NOTABLE and said.get(kind) == text:
                 sev = Severity.ROUTINE  # the same words again: no news (package 58a)
-            said[kind] = text
+            if not (data or {}).get("turn_wait"):
+                # a wait behind other work (`runner.TURN_WAIT`), routine of itself, is no part
+                # of the memory: the lines about it keep the severity they had without it
+                said[kind] = text
         e = self.log.append(
             Event(
                 tick=self.clock.tick,
