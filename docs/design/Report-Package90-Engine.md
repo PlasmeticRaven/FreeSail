@@ -2857,3 +2857,17 @@ Every tick is the same; the line alone moves. That the line says the boats towin
 **The tiers of 5b122eb** run now and are kept as its record. The hash sent comes after 127, merged through `…/pkg-90`, with item 2 by 127's rule, and is tiered whole on its own exact hash.
 
 **For the coordinating session:** the declaration is this section's commit on `…/pkg-90-lateen3`, pushed. Item 2 waits for 127, which I am told of when it is on `…/pkg-90`.
+
+## The record of 5b122eb (nudges 77 and 79): its tiers, kept; not the hash to send (2026-11-24)
+
+5b122eb (the third pass as first reported) was tiered whole before the lead's word that the pass comes as one hash after package 127. Its tiers are kept here as its record. The hash sent comes after 127 and is tiered on its own.
+
+The runs are against 86fa56d3, whose code is b88f3bc's, so its runs are b88f3bc's:
+- **Fast tier whole:** 9,011: 9,002 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 17 min, the declaration's runs beside it).
+  - Every one the same outcome, none gone.
+  - **6 new, all passed**, the third pass's own: `tests/test_lateen_whole.py` 4 and `tests/test_boat_towed.py` 2.
+- **Slow tier whole:** 569: 558 passed, 11 xfailed, **0 failed** (1 h 20 min 48 s), every one the same outcome.
+- **The eighteen in gales:** 360 runs, byte for byte.
+- **A2's harness:** 270 runs, byte for byte.
+
+4ec821b, after it (the declaration and its three mends), is not tiered: its code moves again with 127's merge, and the tiers run on that hash.
