@@ -39579,6 +39579,58 @@ The ground report's rows 13 to 16 do not move: no `reef_pole` (13), and `tests/t
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
 
+## Package 90, A4: the boat in tow (2026-11-21)
+
+`docs/design/Plan-Package90.md` §6's A4, on `docs/design/Design-Package90-Engine.md` §3 ("her boat in tow") and the tartane's design (§5.4 item 8, §11: one boat, about 4.5 m, towed astern on passage), widened by the lead's ruling on the step's stop (nudge 36) to `world/boats.py`, `world/dealings.py` and `world/ports.py` for the towed boat alone, and to `physics/integrate.py` for her drag by the trawl's road. A boat's `towed` is stage 0's key (`schema.BoatSpec.towed`); no committed file carries it, so every changed line stands behind it and nothing of the eighteen files moves (measured below).
+
+### What it builds
+
+- **Her place and her words** (`world/boats.py`): a towed boat is hauled up alongside by her painter and manned at the gangway, not hoisted out, and back alongside she is veered astern on her painter again, not hoisted in: `man_boat` ("The boat hauled alongside and manned: her coxswain and 4 oarsmen in her, lying astern on her painter by ..."), `tow_with_boat` ("hauled alongside and manned for the tow"), `come_alongside` and `hoist_in` ("alongside and veered astern on her painter again"). Manned, she lies `TOWED_ASTERN_M` = 12 m dead astern, where a boat hoisted out is put 15 m off the lee quarter (JUDGEMENT: a short painter's length, two of her lengths and a little, so that she rides clear of the stern).
+- **The way rule** (`boats.way_on_her`, given the boat): a towed boat may be hauled alongside and manned with up to `HAUL_ALONGSIDE_WAY_MS` = 3 knots of way on the ship, against a hoisting out's 2 (JUDGEMENT: at more she sheers about and fills alongside; no period figure found); over it, "She has 3.4 knots of way on her; heave to or shorten sail before the boat is hauled alongside and manned."
+- **The hauling times** (`world/ports.py`): `BOAT_HAUL_ALONGSIDE_S` and `BOAT_VEER_ASTERN_S`, 60 s each, against the 300 s of `BOAT_HOIST_OUT_S` and `BOAT_HOIST_IN_S` (JUDGEMENT, no period time found: the painter hand over hand and the crew down into her, against the yard and stay tackles); `boat_out_s(boat)` and `boat_in_s(boat)` give either. Read by the sleeping hull's errand and the trip to another ship (`dealings.py`), and by the two errand scripts through their files' new `haul_alongside_s` and `veer_astern_s` (`send_boat.yaml`, `lay_out_kedge.yaml`), each stretched by the weather's factor as the hoisting is.
+- **The errands' words** (`dealings.py`, `scripts.py`, the two files): the boat's first phase "hauling alongside" and her last "alongside, veering astern" (`dealings.OUT_PHASES`; the keeper, `_boat_kept`, reads either first phase as never launched); "Away the boat's crew! Haul the boat up alongside.", "Haul the boat up alongside; the kedge and a hawser into her.", "The boat alongside from the shore and veered astern on her painter again.", "The boat veered astern on her painter again."; the files' log lines take `{boat_out}` and `{boat_back}`, which say "Hoist out the long-boat" and "hoisted in" of every boat on deck, as before. At home she is "the boat towing astern on her painter", not "at the booms" (`BoatState.words(towed)`).
+- **Her drag** (`physics/integrate.py`, beside the trawl's): while a boat is in tow, her own resistance at the ship's speed (`hull.resistance`, the boat's form from her own file, read and not changed) times `TOW_WAKE_FACTOR` = 0.6, on the way ahead alone (making sternway the painter is slack). JUDGEMENT on the factor: she rides a short painter astern in the ship's wake, water the ship drags along with her, so it meets her slower than the sea meets the ship; a wake fraction of about a quarter so near the stern (memory, unverified) gives (1 - 0.25) squared, about 0.6, for a drag that goes as the square of the speed. Never tuned to a band: a hull's truths say they are measured with her boat in tow, as she ordinarily sails. The key, `ship.extra["boat_in_tow"]` (her hulls, a tuple of `ship.parts.Hull`), is kept each tick by her dealings (`boats.keep_in_tow`) for a ship whose file tows a boat: there while the boat is in tow, gone while she is away (on an errand, manned, towing ahead) or lost, never given to a boat with no file of her own. Distinct from package 82's `tow`, which is the boat towing the ship.
+
+### Measured
+
+The tartane probe (`cutter.yaml` rigged as a tartane; her 15-ft boat on the 16-ft yawl's file), seed 7.
+
+At anchor in Carrick Road (the times from the order):
+
+| Work | Her boat on deck | Her boat in tow |
+|---|---|---|
+| `send the boat ashore`: out and away | 283 s (hoisted out) | 56 s (hauled alongside) |
+| back alongside to home | 290 s (hoisted in) | 58 s (veered astern) |
+| the whole errand | 5,040 s | 4,581 s |
+| `lay out a kedge to the NE` (her hands short): out | 412 s | 82 s |
+| back | 413 s | 83 s |
+| the kedge laid out and her boat home | 1,399 s | 739 s |
+
+Her way with her boat in tow (plain sail trimmed every two minutes after five, the mean of the last 600 s of 2,400; the wind from 0°):
+
+| Wind, her head | Boat on deck | Boat in tow | The boat's drag | The probe's own resistance |
+|---|---|---|---|---|
+| 8 kn, 270° (beam) | 4.34 kn | 4.25 kn | 122 N | 2,633 N |
+| 15 kn, 270° (beam) | 7.23 kn | 7.00 kn | 905 N | 8,855 N |
+| 25 kn, 270° (beam) | 9.52 kn | 9.14 kn | 3,737 N | 21,725 N |
+| 15 kn, 315° (close-hauled) | 3.71 kn | 3.66 kn | 79 N | 1,919 N |
+| 15 kn, 225° (broad) | 6.29 kn | 6.13 kn | 485 N | 6,169 N |
+
+So she loses 1 to 4 per cent of her way, the most on a fast reach, where the yawl is far past her own hull speed (5.4 kn) and the form's wave term rises steeply.
+
+**The eighteen files**: every committed file's boat work at A5-A6 (effbaed) and at A4, by a harness in the session's scratch (at anchor in Carrick Road, the boat words, `send the boat ashore` to its end and `lay out a kedge to the NE` to its end; at rest in a calm, `go to the boat`, `come alongside`; `tow her with the boat to the NE` and `the boat alongside`; `go to the boat` with 2.5 knots of way): every event of every hull, the trace each minute and the checkpoint's digest the same (the report).
+
+### Pins moved, old beside new
+
+None. New: `tests/test_boat_towed.py`.
+
+### Not built, for the lead
+
+- `world/movement.py`'s person in the boat at the ship's side (package 109, `_in_the_boat_at_the_side`) reads her first phase as "hoisting out" alone: a person in a towed boat while she is hauled alongside cannot belay her from the boat. The mend is one line there (`dealings.OUT_PHASES`); not in the step's files, so not edited.
+- `combat/hits.py`'s "stove on the booms by a shot" is said of any boat; a towed boat is not on the booms. Not in the step's files.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
 ## Package 90, A1a and A1b's second pass: what befalls the yard, the belay, and the words (the lead's nudge 46, 2026-11-21)
 
 On `…/pkg-90-a1ab`, cut from the package's A1a-A1b merge, 0d5d2c56 (A2 and A3 under it, no A1c). Each of the lead's eight items mended with a proof in `tests/test_lateen_whole.py` ("The second pass"), and each proof shown to fail when its mend is undone (the session's scratch, `n46/mutate.py`: fourteen mutations, each failing its pins). Old is 0d5d2c56 unless said.
@@ -39722,5 +39774,84 @@ On `…/pkg-90-a1d`, cut from A1d's hash e2d6b926 with `…/pkg-90` merged in at
 ### Not built, for the lead
 
 - A whole-ship order made to wait is said by no line, on any ship: `_ship_evolution` (`orders/verbs.py`) returns the runner's "will follow" line as `evolution.started`, whose text the world drops. Mended at its cause it moves today's ships' lines: a stop.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the lateen hulls' list: the take-in's wait, the bow's line, clearing for action, the mizen in stays, the foresail named once (the lead's nudge 53, 2026-11-23)
+
+On `…/pkg-90-lateen`, cut from A5 and A6's hash 50bb169. Five of the list's seven are built here, each with a proof in `tests/test_lateen_whole.py` ("The lateen hulls' list"), and each proof fails with its mend undone. Measured on the probes settled as the tests settle them (seed 7, the starboard tack) unless said; "old" is 50bb169. Every change is on the lateens' road: no committed ship file carries a whole lateen, and no committed ship's line, tick or trace moves.
+
+### The mends
+
+1. **The take-in's wait, said** (item 2; `Runner.start` and `_start_waiting`). A take-in of a whole lateen aback in a strong wind (over `LATEEN_TACK_KN`) says "The mainsail is aback against the mast; it will not come in till she pays off." at the order whatever work is before it, and, where its lateen comes aback while it waits its turn, once when its turn comes (`Instance.lateen_wait_said`; a save from before loads with it unsaid).
+   - The xebec in 25 kn, the wind eight points ahead, `trim sails` and then `take in the mainsail`: old, "Order: take in the mainsail." and no line for the 69 s it waited; new, the line at the order, begun 69 s on as before.
+   - The wind four points ahead and then four more, the take-in behind the trim: old, no line; new, the line once, begun 66 s on.
+2. **The bow's line names what eases a lateen aback** (item 3, its second half; `orders.navigation._aback_against_the_mast`): "the mainsail is aback against the mast; let fly its sheet, shift it or box her off" (JUDGEMENT on the words). The three reliefs are the lead's: the sheet let fly, the yard shifted, the ship paid off. The last is said as "box her off", which recovers her on the tack the wind is on and shifts the yard as it goes (A1b); "bear away" on that tack would keep it aback. A lateen aback and one on the bad hand are said each in its own words, so "when you will" is said once (item 6, its second line).
+   - The xebec, the wind eight points through her bow: old "... are aback against their masts; shift them when you will."; new "... are aback against their masts; let fly their sheets, shift them or box her off.".
+3. **Clearing for action beside the work handed on** (item 4; `Runner._in_the_way` and `_yards_spare_their_hands`). Work a belayed manoeuvre handed on holds the ship against a manoeuvre alone: work that is no manoeuvre and shares nothing with it but the ship begins, or is answered, as with the manoeuvre belayed and nothing handed on. All-hands work that is no manoeuvre, begun while that work holds every hand the manoeuvre had, takes the hands beyond the yards' parties (`lateen_party`, the hands the change's seconds reckon with), so the yards are finished in their time.
+   - The polacre, a tack belayed in its change, `clear for action`: old "'Clear for action' will follow 'shift the foresail and the mizen', which the hands are still at.", begun 182 s on, with "Piped down; the starboard watch has the deck." between; new, begun at once, "Only 102 hands to clear for action; the rest are shifting the foresail and the mizen.", the yards keeping 7 and 4 and shifted as before, no pipe down.
+   - `let go the anchor` there, at sea: old, taken, waited behind the yards and failed at its turn, "no bottom here to anchor in"; new, refused at once in those words, as the trunk refuses it.
+   - A manoeuvre still waits behind the yards (nudge 51's proofs pass).
+4. **The aftermost lateen in stays, hauled to windward again** (item 5; `TackScript._hang`). A1d eased it on the old lee, reasoning that a whole lateen cannot be hauled over its mast as a boom is (JUDGEMENT, no source). Measured, the ease cost her stays and bought nothing, so it is put back: hauled to windward with the booms, held aback against its mast at the stern, the line "the mizen hauled over to windward", naming no boom (the boomless words, as the mizen course's and the settee's).
+   - 1,536 tacks of the three probes, 64 seeds a set (gusts and shifts as the scenario's defaults, plain sail trimmed and settled 600 s, then `tack ship`, 900 s), each from one checkpoint both ways: a beam reach in 16 kn; close-hauled and a point free in 12, 16 and 20 kn; close-hauled in 25 kn.
+   - The tartane and the xebec never hang in stays: every tack the same, tick for tick.
+   - The polacre hangs in 22: once in 12 kn, twice in 20 and 19 times in 25. Eased, all 22 miss stays and fall off on the old tack; hauled, all 22 come round. In 900 s, seed 24 in 12 kn: 421 m to leeward eased, 205 m to windward hauled; seed 36 in 20 kn: 790 m against 496 m; in 25 kn seeds 4 and 36: 1,032 and 1,070 m to leeward against 686 and 635 m to windward.
+   - Her mizen's yard peaks at 0.03 to 0.17 of its rating either way, her mizen mast at 0.02 to 0.12.
+   - Her 4 misses of 64 close-hauled in 16 kn are the same both ways, none hung: nudge 51's "fell off on the old tack". From a beam reach 4 of 64 are refused, "She is not close-hauled; bring her by the wind before going about.", both ways, the tack file's own precondition.
+5. **The foresail named once** (item 6, its first line; `TackScript`, at "let go and haul"): a lateen drawn with the head sheets is named there alone.
+   - The polacre, `tack ship and leave the lateens`, her jibs furled: old "Draw the foresail; trim aft its sheet; draw the lateens on their masts."; new "...; draw the mizen on the mast.". With her jibs: old "Draw jib; trim aft the head sheets; draw the lateens on their masts."; new "...; draw the mizen on the mast.".
+
+### Not built, for the lead
+
+- **Item 1, the dire warning missed, and item 3's "if sail is not shortened"**: both are `physics/strain.py`'s (`_warn`: one warning a part in `WARNING_INTERVAL_S`, and its words by the part's kind), and the plan's §7.1 row says "`physics/strain.py` is not touched": a stop. Proposed at the cause: `physics/sails.py`'s `_apply_loads`, where the two factors are applied, marks a whole lateen's yard and mast with their cause as it begins (aback, or the bad hand); `_warn` says a part whose cause is new whatever the interval, in words that name the cause and its relief ("..., aback against its mast; let fly the sheet, shift the yard or box her off"). A part with no such cause keeps the rule and the words as they are, so no committed ship moves.
+- **Item 7, the probes' ratings**: the probe files are `tests/rig_fixtures.py`'s, stage 0's. A lateen hull's own file is the generator's and carries its ratings; her gate's measure of her own yards against the bands is her builder's (`tests/test_tartane.py` and the rest). Asked: what the engine's part is.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, the lateen hulls' list: the strain's line, items 1 and 3 (the lead's nudge 55, 2026-11-23)
+
+On `…/pkg-90-a4`, A4's hash with the list. The lead widened the row narrowly for these two items: `physics/strain.py` for the warning's words and what the ten minutes' rate is counted against, and no figure of load, strain or damage. Proofs in `tests/test_lateen_whole.py` ("The strain's line"), each failing with its mend undone. "Old" is `…/pkg-90` at d83a9b26.
+
+### The mend
+
+- **The cause, marked where it is made** (`physics/sails.py`): `lateen_pressed(sail, d)` says what presses a whole lateen on its mast, "aback" (held aback by its sheet) or "bad hand" (against its mast on the bad hand). A1d's `lateen_load_factor` now reads its factor from it, the same figures. `_apply_loads` marks each spar of the lateen's chain with the cause under `strain.LATEEN_PRESSED` in `ship.extra`, beside its load. `_reset_loads` clears the mark with the loads each substep, so it always says what pressed this substep's load.
+- **The rate counted against the part and its cause** (`physics/strain.py`, `_warn`): a pressed part's warning is keyed `"<cause>:<part>"` in `StrainState.last_warning_s`, as the anchor's cable is keyed `"cable:<id>"`. So a lateen coming aback or onto the bad hand is warned for as it comes, whatever was said before (item 1). Within a cause it is one warning a part in ten minutes, as ever, and a warning in a cause stamps the part's own key too, so its plain strain is not said again inside the ten minutes.
+- **The words** (`_pressed_words`; JUDGEMENT on the words, in the anchor's form, the reliefs the lead's) name the cause and what eases it, in place of "if sail is not shortened" (item 3):
+  - aback, "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.";
+  - over 1.5 on the bad hand, "Main lateen yard bending like a whip, the mainsail lying on the mast; she will carry it away: let fly its sheet or shift it.";
+  - grouped as before, "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; ...".
+  The bad hand's reliefs leave out "box her off": paying off leaves the yard where it is.
+- No committed sail is a whole lateen (`trim.keeps_its_side`), so no part of a committed ship is ever marked. Their warnings take the old road line for line: the key is the part, the words are the old ones.
+
+### Measured
+
+- **Item 1, the xebec probe in 57 kn** (`n55/item1.py` in the session's scratch: seed 7, her lateens' yards and masts rated by the generator as truths 7-670 to 7-672 rate them, plain sail trimmed, steady wind, the lateens put on the bad hand at 600 s):
+  - Old: "working under the press of sail." for the mizzen mast and yard at 252 s, the fore yard at 442 and the main at 451. Then nothing until the mizzen yard carried away at 756 s and the fore yard at 805; the main yard "bending like a whip; she will carry it away if sail is not shortened." at 1,051, and carried away at 1,156.
+  - New: at 601 s, the mizzen mast and yard at 1.88, the fore yard at 1.63 and the main at 1.68, each "bending like a whip(s), the ... lying on the mast; she will carry it (them) away: let fly its sheet or shift it.". The losses fall at 756, 805 and 1,156 s as before: no load and no draw moved.
+- **Item 3, the xebec in 25 kn, the wind eight points through her bow** (the probe's own ratings, as the lead's reader had her):
+  - old, at +1 s, "Main lateen yard working under the press of sail." (1.11);
+  - new, the same tick and ratio, "Main lateen yard working under the press of sail, the mainsail aback against the mast: let fly its sheet, shift it or box her off.";
+  - once in the ten minutes.
+- **The bands, generator-rated, the xebec:**
+  - aback in 33, 35 and 37 kn: every lateen yard warned at +1 s, in 37 kn "bending like a whip" (1.61 to 1.62);
+  - on the bad hand in 45, 49 and 52 kn: every lateen yard warned at +1 s. In 52 kn the mizzen mast carried away at +154 s after its dire warning at +1.
+  - Nothing carried away unwarned in any of them.
+- **What the rule still does, said for the lead:** within one cause the older rule stands. A yard first warned "working" in its cause that rises past 1.5 inside the ten minutes is warned "bending like a whip" only when they are out, as any spar of a committed ship is in a rising wind. In 52 kn on the bad hand the main yard was warned at 1.31 at +1 s and "bending like a whip" at +601, nothing lost between. Counting the rate against the dire step too, for pressed parts alone, would be inside the widening's words; it is not built, because the lead named the cause as the mend.
+- **The eighteen in gales, old beside new** (the engine's report, nudge 55): 360 runs, the same in every event, tick, part sample and trace.
+
+### Item 7, the ratings (the lead's reading agreed)
+
+The probes stay as stage 0 wrote them (`tests/rig_fixtures.py`). Truths 7-670, 7-671 and 7-672 (`tests/test_known_truths.py`, `_a1d_probe`) re-rate the probes' lateen yards and masts by the generator's rule before they measure: a lower yard for its own sail, a lower mast for every sail on it (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`). The proofs above (`_rated_by_the_generator`) do the same. Why: the lead's bands (aback from about 28 and 35 kn, the bad hand from about 40 and 49) are figures for spars rated as every committed hull's are, by the generator, and the probes were filed by hand for other ends. Filed against the generator's rule:
+- the tartane probe's great yard 44.1 kN against 59.5, and the xebec's main yard 56.0 against 77.3: below it, so as filed the tartane's great yard strains aback from about 23 kn and risks it from about 29 (the lead's reader);
+- the polacre's and the xebec's fore yards 56.0 against 61.1, below it; the tartane's mizzen yard 11.0 against 11.2, about it;
+- the polacre's and the xebec's mizzen yards 56.0 against 21.7, and every lateen mast, above it: the generator's rating 0.27 to 0.63 of the filed.
+
+A hull's own file carries the generator's ratings; her builder measures her own yards against A1d's bands at her gate.
+
+Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 90, with A4's hash: the pole evolutions' marks glossed where they are served (the lead's nudge 56, 2026-11-23)
+
+The catalogue (`agents/tools.py`, `_evolution_text`) glosses `{sail}` alone. `take_in_pole` and `furl_pole` (A6) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`, which `scripts.pole_words` fills by the yard below. Each file's served notes now end with a paragraph that glosses them in the words the game fills them with, the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" ...; where no square yard is crossed below it, with "down to the hounds" ...". No line of code; what she does and says does not move. `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`, so a word changed in one place and not the other fails it; it fails with the gloss undone.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).

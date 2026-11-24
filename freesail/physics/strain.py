@@ -98,6 +98,15 @@ CARRY_AWAY_RATIO = 1.5  # above this the part may carry away at any substep
 CARRY_AWAY_COEFFICIENT = 0.002  # p per substep = this * (ratio - CARRY_AWAY_RATIO)^2
 BLOW_OUT_RATIO = 1.8  # a set sail blows out for certain above this of its effective rating
 WARNING_INTERVAL_S = 600.0  # one strain.warning per part per ten minutes
+# What presses a whole lateen's spars on its mast, beside their loads (package 90, the lateen
+# hulls' list, items 1 and 3; the lead's widening of nudge 55): `physics/sails.py` writes it
+# in `ship.extra` under this key where A1d's factors are applied, as {spar id: (cause, the
+# lateen's sail id)}, the cause "aback" or "bad hand", for each substep as its loads. Such a
+# part's warning is counted against the part and its cause, so a lateen coming aback or onto
+# the bad hand is warned for as it comes, whatever was said before, in words that name the
+# cause and what eases it. No committed sail is a whole lateen: no committed ship's part is
+# ever pressed so, and their warnings keep the rule as it was.
+LATEEN_PRESSED = "strain.lateen_pressed"
 SUBSTEP_S = 0.25  # the physics substep (spec §3.1); the probability is per substep
 
 # A flogging sail (sheet parted): a fifth of the cloth works, as a flat plate,
@@ -202,6 +211,7 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     motion = ship.extra.get("motion")
     seaway = motion.load_factor if motion is not None else 1.0
     warnings: list[_Warning] = []
+    pressed = ship.extra.get(LATEEN_PRESSED)  # package 90: None on every committed ship
     for part, kind in _parts_by_kind(ship):  # insertion order: deterministic
         # `_out_of_action`, with each part's class looked up once per ship (package 29's
         # profile: three hundred parts a tick)
@@ -226,7 +236,7 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
         if _fails(part, ratio, dt, stream):
             _carry_away(ship, st, part, ratio)
         else:
-            _warn(ship, st, part, ratio, warnings)
+            _warn(ship, st, part, ratio, warnings, pressed.get(part.id) if pressed else None)
     _log_warnings(ship, warnings)
 
 
@@ -366,15 +376,27 @@ class _Warning:
 
 
 def _warn(
-    ship: Ship, st: StrainState, part: Part, ratio: float, out: list[_Warning] | None = None
+    ship: Ship,
+    st: StrainState,
+    part: Part,
+    ratio: float,
+    out: list[_Warning] | None = None,
+    pressed: tuple[str, str] | None = None,
 ) -> None:
-    last = st.last_warning_s.get(part.id)
+    # one warning a part in ten minutes; where a whole lateen presses it (`LATEEN_PRESSED`),
+    # one a part and its cause, and its plain strain counted as said with it (package 90)
+    key = part.id if pressed is None else f"{pressed[0]}:{part.id}"
+    last = st.last_warning_s.get(key)
     if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
         return
-    st.last_warning_s[part.id] = st.elapsed_s
+    st.last_warning_s[key] = st.elapsed_s
+    if pressed is not None:
+        st.last_warning_s[part.id] = st.elapsed_s
     dire = ratio > CARRY_AWAY_RATIO
     many: str | None
-    if isinstance(part, Spar):
+    if isinstance(part, Spar) and pressed is not None:
+        one, many = _pressed_words(ship, pressed, dire)
+    elif isinstance(part, Spar):
         if dire:
             one = "bending like a whip; she will carry it away if sail is not shortened."
             many = "bending like whips; she will carry them away if sail is not shortened."
@@ -412,6 +434,31 @@ def _warn(
         _log_warnings(ship, [warning])
     else:
         out.append(warning)
+
+
+def _pressed_words(ship: Ship, pressed: tuple[str, str], dire: bool) -> tuple[str, str]:
+    """A spar's warning where a whole lateen presses it on its mast: the cause, and what eases
+    it in place of "if sail is not shortened", which the game itself does not do while it is
+    aback (package 90, the lateen hulls' list, item 3; JUDGEMENT on the words, in the anchor's
+    form; the reliefs the lead's, nudge 53). Held aback: its sheet let fly, its yard shifted
+    round the mast or the ship boxed off, as the bow's line says (`orders/navigation.py`); on
+    the bad hand, its sheet let fly or its yard shifted, for paying off leaves it there."""
+    cause, sail_id = pressed
+    sail = _name(ship, sail_id, False)
+    if cause == "aback":
+        how, ease = (
+            f"the {sail} aback against the mast",
+            "let fly its sheet, shift it or box her off",
+        )
+    else:
+        how, ease = f"the {sail} lying on the mast", "let fly its sheet or shift it"
+    if dire:
+        return (
+            f"bending like a whip, {how}; she will carry it away: {ease}.",
+            f"bending like whips, {how}; she will carry them away: {ease}.",
+        )
+    words = f"working under the press of sail, {how}: {ease}."
+    return words, words
 
 
 def _log_warnings(ship: Ship, warnings: list[_Warning]) -> None:

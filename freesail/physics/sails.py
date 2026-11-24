@@ -94,9 +94,10 @@ import yaml
 
 from freesail import units
 from freesail.evolutions import trim as yard_trim
-from freesail.physics.strain import (  # package 22: the worn-canvas luff term
+from freesail.physics.strain import (  # package 22: the worn-canvas luff term; package 90
     FLOGGING_DRAG_COEFFICIENT,
     FLOGGING_LOAD_MULTIPLIER,
+    LATEEN_PRESSED,
     baggy_luff,
 )
 from freesail.ship.parts import Line, LineState, Sail, SailState, Spar, flying_down
@@ -702,16 +703,27 @@ def _carried_over_abaft_the_beam(ship: Ship, sail: Sail, lee: float) -> None:
             ln.held_side = yard_trim.side_name(lee)
 
 
+def lateen_pressed(sail: Sail, d: _Drawing | None) -> str | None:
+    """What presses a whole lateen on its mast (package 90, A1d): "aback", held aback (its sheet
+    holding its cloth on the weather side, the wind on its outer face); "bad hand", lying
+    against its mast on the bad hand; else None, and None for every other sail."""
+    if d is None or not yard_trim.keeps_its_side(sail):
+        return None
+    if d.held:
+        return "aback"
+    if against_the_mast(sail, d.side_sign):
+        return "bad hand"
+    return None
+
+
 def lateen_load_factor(sail: Sail, d: _Drawing | None) -> float:
     """What a whole lateen's pull on its yard and mast is multiplied by (package 90, A1d):
-    `LATEEN_ABACK_LOAD` held aback (its sheet holding its cloth on the weather side, the wind
-    on its outer face), `LATEEN_BAD_HAND_LOAD` lying against its mast on the bad hand, else 1;
-    1 for every other sail."""
-    if d is None or not yard_trim.keeps_its_side(sail):
-        return 1.0
-    if d.held:
+    `LATEEN_ABACK_LOAD` held aback, `LATEEN_BAD_HAND_LOAD` lying against its mast on the bad
+    hand (`lateen_pressed`), else 1; 1 for every other sail."""
+    pressed = lateen_pressed(sail, d)
+    if pressed == "aback":
         return LATEEN_ABACK_LOAD
-    if against_the_mast(sail, d.side_sign):
+    if pressed == "bad hand":
         return LATEEN_BAD_HAND_LOAD
     return 1.0
 
@@ -1491,6 +1503,7 @@ def _shadows(
 def _reset_loads(ship: Ship) -> None:
     for part in ship.parts.values():
         part.load_kn = 0.0
+    ship.extra.pop(LATEEN_PRESSED, None)  # its causes go with its loads (package 90)
 
 
 @dataclass(frozen=True)
@@ -1564,6 +1577,13 @@ def _apply_loads(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None = N
     on_spars = force_kn * lateen_load_factor(sail, d)  # package 90, A1d: the spars alone
     for spar in path.spars:
         spar.load_kn += on_spars
+    pressed = lateen_pressed(sail, d)
+    if pressed is not None:
+        # the cause beside the load, for the strain's warning (package 90, the lateen hulls'
+        # list, items 1 and 3): no figure, and never on a committed ship
+        marks = ship.extra.setdefault(LATEEN_PRESSED, {})
+        for spar in path.spars:
+            marks[spar.id] = (pressed, sail.id)
     if d is not None and d.side_sign != 0.0:
         # a fore-and-aft sail: its working sheet carries the pull, a sheet let fly nothing
         if d.working_sheet is not None:

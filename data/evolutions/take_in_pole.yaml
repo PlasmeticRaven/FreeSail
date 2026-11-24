@@ -5,6 +5,10 @@
 # hoisted again to set the sail. Where no square yard is crossed below it, as over a lateen, the
 # yard comes down to the hounds and the sail is clewed up there. Furling it is a separate
 # evolution (furl_pole).
+#
+# In its words the game fills {pole_lowered} with "down onto the yard below" and {pole_hanging}
+# with "lowered on the yard below"; where no square yard is crossed below it, with "down to the
+# hounds" and "lowered to the hounds".
 
 # Build notes (not served by the library's catalogue):
 # Package 90, A6: docs/design/Design-Ship-Polacre.md §5.1, decision 7; the ground report's §2.4.
