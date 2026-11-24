@@ -924,22 +924,24 @@ def _lies_on_the_mast(ship: Any, lateens: list[Any]) -> str:
 
 
 def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
-    """'the mainsail is aback against the mast; let fly its sheet, shift it or box her off': a whole
-    lateen held aback by the wind come round ahead onto its cloth (package 90, A1d;
-    Design-Package90-Engine.md §2.4.3a, JUDGEMENT on the words). The line names what relieves it
-    (the lead's nudge 53, item 3: aback, it presses its yard and its mast, from about 28 knots over
-    their ratings, and the sheet let fly eased the yard from 0.86 of its rating to 0.08 at once):
-    the sheet let fly, the yard shifted, or her head boxed off on the tack the wind is on, which
-    shifts it (A1b); not "bear away", which on that tack keeps it aback. Before, "shift it when
-    you will", said of yards at 1.2 to 1.7 of their ratings."""
+    """'the mainsail is aback against the mast; shift it or box her off': a whole lateen held
+    aback by the wind come round ahead onto its cloth (package 90, A1d;
+    Design-Package90-Engine.md §2.4.3a, JUDGEMENT on the words). The line names what is measured
+    to relieve it, in the orders she will take, as the strain's warning does
+    (`strain.pressed_reliefs`; the lead's nudge 60, item 3): the yard shifted, or her head boxed
+    off where she has head yards to brace abox, which shifts it (A1b); not the sheet let fly,
+    which eases it no more than doing nothing, nor "bear away", which on that tack keeps it
+    aback. Before nudge 60, "let fly its sheet, shift it or box her off", the box offered to the
+    xebec, which refuses it; before nudge 53, "shift it when you will", said of yards at 1.2 to
+    1.7 of their ratings."""
     from freesail.evolutions.scripts import names_of_sails
+    from freesail.physics.strain import pressed_reliefs
 
     one = len(lateens) == 1
     names = names_of_sails(ship, lateens)
     return (
         f"{names} {'is aback against the mast' if one else 'are aback against their masts'}; "
-        f"let fly {'its sheet' if one else 'their sheets'}, shift {'it' if one else 'them'} or "
-        "box her off"
+        f"{pressed_reliefs(ship, 'aback', one)}"
     )
 
 

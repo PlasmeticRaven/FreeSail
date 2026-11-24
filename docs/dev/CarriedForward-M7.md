@@ -53,6 +53,9 @@ Found by the ships' session's builders and the lead's readers while gating packa
 11. The merchant brig and the bilander never complete a tack within fifteen minutes, in any wind, under plain sail or shortened.
 12. Under the game's own captain, `lie a-try` ordered with the wind abeam is not taken.
 13. `clear for action` says "The boats are out and towing astern" of a boat at the booms.
+14. The helm is kept as for headway while she makes sternway: the cutter, after `lie a-try` and `fill away`, sags to 39 degrees off the wind with 29 degrees of rudder the wrong way and goes astern at a knot for an hour (found by package 127's builder, 24 November; every ship's helm; package 127 makes the log say it and mends nothing of it).
+
+Of these, package 127 (launched 24 November) takes 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed.
 
 ## 5. Booked by the owner or the lead, not launched
 
@@ -63,7 +66,7 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 ## 6. Package 90, the ships, in hand across the gate
 
-Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. At the lead's gate as milestone 7 closes: the lateen hulls' list of eight. Then the corvette *Diana*, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a breeze under all plain sail, who wants her jib; her helm and her tacks are measured again when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
+Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. The lateen hulls' list of eight was merged on 24 November with five things of it still owed before the tartane's file. Then the corvette *Diana*, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a breeze under all plain sail, who wants her jib; her helm and her tacks are measured again when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
 
 **The rule the lead set, the owner's to overturn:** lateen and tow steps join the trunk when today's ships are proven unmoved; every fault that reaches only a lateen hull or a boat in tow is owed in full, and proven, before any lateen hull's file joins.
 

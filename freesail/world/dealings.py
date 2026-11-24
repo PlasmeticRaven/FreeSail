@@ -2200,7 +2200,7 @@ class Dealings:
             else:
                 doing = "going back"
             bits.append(f"the pilot {port.pilot.craft} {doing}")
-        bits.append(self.boat.words(self._towed()))
+        bits.append(self.boat.words(self._towed(), self._towed_too_fast()))
         # practice and resupply (between packages 72 and 73): the hoy with her powder, while
         # its job is in hand at this port, and only then, so that the reading is otherwise
         # what it was
@@ -2748,6 +2748,14 @@ class Dealings:
         boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
         boat = next((b for b in boats if b.id == self.boat.boat_id), None) or self.boat_spec()
         return bool(getattr(boat, "towed", False))
+
+    def _towed_too_fast(self) -> bool:
+        """Whether her boat in tow is towed faster than her hull speed (package 90, the lead's
+        nudge 60, item 8; `world.boats.TOWED_TOO_FAST`)."""
+        from freesail.world.boats import TOWED_TOO_FAST
+
+        extra = getattr(self.world.ship, "extra", None)
+        return bool(isinstance(extra, dict) and extra.get(TOWED_TOO_FAST))
 
     def _back_aboard(self) -> str:
         """'hoisted in', or of a towed boat 'veered astern on her painter again' (package 90,
@@ -3675,7 +3683,7 @@ class Dealings:
         if not self.boat.away:
             self.boat.boat_name = boat.name
         return {
-            "words": self.boat.words(self._towed()),
+            "words": self.boat.words(self._towed(), self._towed_too_fast()),
             "away": self.boat.away,
             "errand": self.boat.errand,
             "phase": self.boat.phase,

@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 08:02 UTC (THREE BUILDERS LAUNCHING ON THE TRUNK BESIDE YOU: packages 125 (the moment of the haul), 126, 127; they touch scripts.py, strain.py's words, captains.py; merge the trunk before each hash; nothing asked of you; your list of eight is with my reader, the cloud green). Nudge number: 75.
+Latest note: 2026-11-24, 09:32 UTC (THE LIST IS MERGED at da356b76 by 111b1b57; THE DIANA MAY MERGE THE TRUNK AND TIER; FIVE STILL OWED before the tartane's file: take it in on the bad hand eases nothing for minutes; shift them refused as worded; a towed boat stove on the booms; four pins; the dire step within one cause by package 127's rule when it lands). Nudge number: 76.
