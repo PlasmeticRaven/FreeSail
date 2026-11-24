@@ -2200,7 +2200,7 @@ class Dealings:
             else:
                 doing = "going back"
             bits.append(f"the pilot {port.pilot.craft} {doing}")
-        bits.append(self.boat.words(self._towed(), self._towed_too_fast()))
+        bits.append(self._boat_words())
         # practice and resupply (between packages 72 and 73): the hoy with her powder, while
         # its job is in hand at this port, and only then, so that the reading is otherwise
         # what it was
@@ -2748,6 +2748,20 @@ class Dealings:
         boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
         boat = next((b for b in boats if b.id == self.boat.boat_id), None) or self.boat_spec()
         return bool(getattr(boat, "towed", False))
+
+    def _boat_words(self) -> str:
+        """Her boat's state in words (`BoatState.words`): a boat towed astern stove by a shot and
+        cut adrift (package 90, the lead's nudge 76, item 3; `combat.hits`) is said so, not
+        "towing astern on her painter"."""
+        towed = self._towed()
+        if towed and not self.boat.away and not self.boat.lost:
+            extra = getattr(self.world.ship, "extra", None)
+            stove = set(extra.get("boats_stove") or ()) if isinstance(extra, dict) else set()
+            boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
+            in_tow = [b for b in boats if getattr(b, "towed", False)]
+            if in_tow and all(b.id in stove for b in in_tow):
+                return f"{self.boat.boat_name} stove by a shot and cut adrift"
+        return self.boat.words(towed, self._towed_too_fast())
 
     def _towed_too_fast(self) -> bool:
         """Whether her boat in tow is towed faster than her hull speed (package 90, the lead's
@@ -3683,7 +3697,7 @@ class Dealings:
         if not self.boat.away:
             self.boat.boat_name = boat.name
         return {
-            "words": self.boat.words(self._towed(), self._towed_too_fast()),
+            "words": self._boat_words(),
             "away": self.boat.away,
             "errand": self.boat.errand,
             "phase": self.boat.phase,

@@ -233,12 +233,22 @@ def _deck_hit(ship, keeper, gun, charge, target, x_m, side, scale, grape, rng, t
     if abs(x_m) < length / 4.0 and whole and rng.random() < BOAT_STOVE_SHARE:
         boat = whole[0]
         stove.append(boat.id)
+        # a boat towed astern on her painter (package 90, A4) is not on the booms: stove there,
+        # she fills and her painter is cut, and she is in tow no longer (`world.boats
+        # .keep_in_tow`; the lead's nudge 76, item 3: "stove on the booms by a shot" of a boat
+        # towing astern, and kept in tow; JUDGEMENT on the words). Her draw is the boats' as before
+        towed = bool(getattr(boat, "towed", False))
+        where = (
+            "stove by a shot as she tows astern; she fills, and her painter is cut"
+            if towed
+            else "stove on the booms by a shot"
+        )
         ship.note(
             "notable",
             "boat.stove",
-            f"{boat.name[:1].upper()}{boat.name[1:]} is stove on the booms by a shot.",
+            f"{boat.name[:1].upper()}{boat.name[1:]} is {where}.",
             None,
-            {"boat": boat.id},
+            {"boat": boat.id, "towed": towed} if towed else {"boat": boat.id},
         )
         keeper.minute.append(("boat", f"{boat.name} stove"))
         return seen
