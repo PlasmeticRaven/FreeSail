@@ -1299,7 +1299,10 @@ class World:
                 said = self._recurring_said = {}
             if sev is Severity.NOTABLE and said.get(kind) == text:
                 sev = Severity.ROUTINE  # the same words again: no news (package 58a)
-            said[kind] = text
+            if not (data or {}).get("turn_wait"):
+                # a wait behind other work (`runner.TURN_WAIT`), routine of itself, is no part
+                # of the memory: the lines about it keep the severity they had without it
+                said[kind] = text
         e = self.log.append(
             Event(
                 tick=self.clock.tick,
@@ -1907,7 +1910,7 @@ class World:
         """The minute's weather lines: the sky and the weather when they change, the
         hour's line with the glass, and at the watch's change the glass's fall or rise
         since the watch before (spec M5 §5). No line names a front or a centre."""
-        from freesail.world.weather import FOG_LINES, VISIBILITY_NM, WEATHER_LINES
+        from freesail.world.weather import WEATHER_LINES
 
         self._observe_weather()
         t = self.clock.ship_time
@@ -1922,40 +1925,11 @@ class World:
             )
         if was is not None and now.weather != was.weather:
             text = WEATHER_LINES.get((was.weather, now.weather)) or WEATHER_LINES[now.weather]
-            if now.weather == "fog" and 0.0 < float(getattr(now, "fog", 0.0)) < 1.0:
-                text = FOG_LINES["settling"]  # it comes on by degrees
             self.record(
                 Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
                 "weather.change",
                 text,
                 data={"weather": now.weather, "was": was.weather, "visibility": now.visibility},
-            )
-        elif (
-            was is not None
-            and now.weather == "fog"
-            and now.visibility != was.visibility
-            and now.visibility in VISIBILITY_NM
-            and was.visibility in VISIBILITY_NM
-        ):
-            # the sight closing or opening in the fog, a step at a time
-            thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[was.visibility]
-            # notable where the sight a ship is handled by has changed: shut in thick, or
-            # first opening from a cable; the steps between are routine
-            key = (
-                ("thick" if now.visibility == "a cable" else "thickening")
-                if thicker
-                else ("clearing" if was.visibility == "a cable" else "thinning")
-            )
-            self.record(
-                Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
-                "weather.fog",
-                FOG_LINES[key],
-                data={
-                    "weather": now.weather,
-                    "visibility": now.visibility,
-                    "was": was.visibility,
-                    "fog": float(getattr(now, "fog", 0.0)),
-                },
             )
         self._last_conditions = now
         if t.minute != 0:

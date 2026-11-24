@@ -493,17 +493,7 @@ def _module(path: Path):
     return module
 
 
-# The modules a builder has filled since stage 0, each writing its own file
-# (tests/test_profile.py's `MODULE_FILES` holds what it writes): the Diana's (package 90, her
-# builder). Old: none, the five stubs.
-FILLED = ("diana",)
-
-
 def test_the_five_modules_follow_the_four_and_each_stub_writes_nothing(tmp_path):
-    """Stage 0 (Plan-Package90.md §5.1 item 1): the five modules named after package 75's four,
-    each a docstring and a `build` writing nothing until its builder fills it; a filled one
-    (`FILLED`) is held by tests/test_profile.py's hook test. Old: all five stubs; the Diana's
-    filled since her builder's file."""
     gen = _module(ROOT / "tools" / "gen_ships.py")
     assert gen.SHIP_MODULES == (
         "indefatigable",
@@ -512,8 +502,7 @@ def test_the_five_modules_follow_the_four_and_each_stub_writes_nothing(tmp_path)
         "bellerophon",
         *NEW_MODULES,
     )
-    assert set(FILLED) <= set(NEW_MODULES)
-    for name in (n for n in NEW_MODULES if n not in FILLED):
+    for name in NEW_MODULES:
         path = ROOT / "tools" / "ships" / f"{name}.py"
         tree = ast.parse(path.read_text(encoding="utf-8"))
         assert ast.get_docstring(tree), name

@@ -64,8 +64,7 @@ ROAD_CHART = "channel-west"
 # yards too, and man their after braces (the hermaphrodite brig's main topsail and topgallant
 # yards on her schooner's main among them). As filed, no sail set, the ten without after yards
 # man their sheets and the eight their after braces. Named, not globbed, so that a file added
-# later is no move of this guard; a ship's builder may name hers beside them (the Diana's,
-# package 90: nineteen rows, nine with after braces; old: the eighteen).
+# later is no move of this guard.
 BRACES_SQUARE_SET = {
     "bilander": "after braces",
     "boat-cutter-23": "sheets",
@@ -74,9 +73,6 @@ BRACES_SQUARE_SET = {
     "boat-launch-31": "sheets",
     "boat-yawl-16": "sheets",
     "brig": "after braces",
-    # the Diana's (package 90, her builder): four head yards on the fore, eight after on the main
-    # and the mizen, read off her file as committed. Old: no row, before her file
-    "corvette-20": "after braces",
     "cutter": "braces",
     "frigate-36": "after braces",
     "hermaphrodite-brig": "after braces",
@@ -185,7 +181,12 @@ def brig() -> bytes:
 def test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_line(lugger):
     """Old: "Hands to the after braces; heave to.", "Fill away; man the after braces.", "Braced
     the yards full." and "Filled away on the starboard tack; braced full and steering WNW
-    (292°)."; every tick as it was."""
+    (292°)."; every tick as it was.
+
+    Package 127, its truth 7-781: her sheets drawn a second after the order with sternway still on
+    her, the line says so ("... she has no headway on her yet.") where it said "Filled away on the
+    starboard tack; steering WNW (292°).", on the same tick; "She gathers headway; filled away
+    ..." is said when she has it, after the minute this runs."""
     got = _lines(_from(lugger), [("heave to", 600), ("fill away", 60)])
     assert got == [
         (0, "Order: heave to."),
@@ -201,7 +202,11 @@ def test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_
         (601, "Hauled aft the head sheets; kept the helm a-lee to let her fall off."),
         (601, "Fill away; man the sheets."),
         (601, "Right the helm."),
-        (602, "Filled away on the starboard tack; steering WNW (292°)."),
+        (
+            602,
+            "Her sheets drawn on the starboard tack; steering WNW (292°); she has no headway on "
+            "her yet.",
+        ),
     ]
 
 
