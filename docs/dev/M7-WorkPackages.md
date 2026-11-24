@@ -12102,3 +12102,5 @@ And one reading, not a probe: is the order in which `shorten sail` takes sails i
 **Then (a):** she merges `claude/pkg-90` at 29e041c9 or later, the fast tier whole on that exact hash, her slow tier run again only for what the figure moves, and the hash reported once. I gate it on the cloud's run and an independent reader. The list after her; she need not merge again for it unless it touches what she pins.
 
 For my list, older and not hers: `lie a-try` ordered with the wind abeam and not taken.
+
+**2026-11-24, 04:38 UTC (nudge 73): the list now.** 111b1b57 is at my gate while the Diana probes: staged on the trunk, the physics diff read by me, the cloud's run dispatched, an independent reader on it. The Diana merges it after, when it is on the trunk. Your three notes are received; the second and third I take as older and the trunk's.
