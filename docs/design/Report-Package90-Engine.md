@@ -2675,3 +2675,47 @@ Both run again on this commit's hash with its tiers.
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 3d3841f2. Its code is 0040fda's: the fast tier is 0040fda's run, and the slow is 40a532e's, which runs the same slow tests on the same code but two entries' comments. The eighteen in gales and A2's harness run again on this hash. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the eight are this section's commit on `…/pkg-90-lateen`, pushed, its tiers running.
+
+## The lateen hulls' list's hash (nudge 71): `…/pkg-90` merged at 29e041c9, one mend found by the tiers, and the tiers on 111b1b5 (2026-11-24)
+
+**The hash to send is 111b1b5** on `…/pkg-90-lateen`. The commit after it, which writes these results, touches this report alone. It is two commits over the section above's 9df1b49:
+- **7bf7350, the merge**, parents 9df1b49 and **29e041c9** (`…/pkg-90`'s tip: the trunk at 009d88a6, A4 merged there at b765b169, and the engine's design corrected by the coordinating session at b366d6be), as nudge 71 asks before the next hash.
+  - It brings four docs and no other file: `docs/design/Decisions-Package90-2026-11.md`, `docs/design/Design-Package90-Engine.md` (the strain's words for a pressed lateen as built), `docs/dev/M7-WorkPackages.md` and `docs/dev/ShipsNudge.md`, as the trunk has them.
+  - One merge base, 3d3841f2. It merged clean: **no line resolved by hand.**
+  - No code, data, test or tool moves over 9df1b49.
+- **111b1b5, the mend**, `freesail/world/boats.py` alone, one line. 9df1b49's fast tier failed two cases, the reach's guard (`tests/test_knowledge.py`, and truth 7-380 in `tests/test_known_truths.py`): "kinds with no reach, to be placed in knowledge.REACH: ['boats.towed_too_fast']".
+  - The name was item 8's `ship.extra` key, `TOWED_TOO_FAST`, which the guard's scan of the code read as a log's kind by its dot.
+  - The line itself is logged as `boat.towed_too_fast`, whose family `boat` reaches the deck, and was placed.
+  - **Mended at the cause:** the key is named `boat_towed_too_fast`, as `boat_in_tow` beside it is.
+  - That guard's file was not among the lens files run before the eight's commit; it is now.
+  - No line, figure or word moves.
+
+**Checked on 7bf7350 and on 111b1b5:**
+- no conflict marker;
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**9df1b49's tiers, stopped:** its fast tier finished (9,000 cases: 8,989 passed, 8 skipped, 1 xfailed, **2 failed**, the two above; 1 h 10 min 30 s). Its slow tier was stopped two minutes in when the mend changed the code, so 9df1b49's tiers do not stand for the hash sent. Every tier below is 111b1b5's own.
+
+**The tiers of 111b1b5,** from the tree's root on a worktree of its own, one after the other, each junit compared test by test by the test's id (the xdist group's `@...` stripped). 3d3841f2's code is 0040fda's (an empty diff), so its fast tier is 0040fda's run, and its slow is 40a532e's, which runs the same slow tests on the same code but two entries' comments.
+
+| Run | 111b1b5 | Against 3d3841f2 | Against 9df1b49 |
+|---|---|---|---|
+| **Fast tier whole**, `--junitxml` | 9,000: 8,991 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 9 min 42 s) | 8,983 (8,974 passed, 8 skipped, 1 xfailed): **every one the same outcome**, none gone; **17 new, all passed**, the eight's own: `tests/test_lateen_whole.py` 12 and `tests/test_boat_towed.py` 5. The 8 skipped and the 1 xfailed the same cases | 9,000: every one the same outcome but two, the reach's guard and truth 7-380, failed there and passed here |
+| **Slow tier whole**, `--slow -m "slow and not pace"` | 569: 558 passed, 11 xfailed, **0 failed** (1 h 19 min 24 s) | 569 (558 passed, 11 xfailed): **every one the same outcome**, none gone, none new | not run to its end |
+
+**The guard set of §10.2**, tallied from the fast tier's junit, every case the same outcome as at 3d3841f2: the byte test and the golden classing table 96 passed; `tests/test_schooner_mast.py` 74; `tests/test_probes_90.py` 89; `tests/test_check_viewer_guns.py` 21; the lugger's set 58; the settee's 75; the going-about set 261; `test_grammar_book` and truth 7-606 74; `tests/test_lateen_whole.py` 267; all passed.
+
+**Nothing moves on today's ships, on this hash:**
+- **The eighteen in gales** (`n55/gales.py`, as at nudge 55): 360 runs, **byte for byte the trunk's run**, every event, tick, part sample and trace. That is 6,101 events, 1,766 strain warnings, 417 sails blown out, 49 spars carried away and 4 lines parted. `strain.py` moved, and every strain warning line and its tick on the eighteen is the trunk's.
+- **A2's harness** (`a2/harness.py`, every committed ship, 270 runs): **byte for byte 0040fda's** (3d3841f2's code), no line, tick, kind or trace moved.
+
+**For the lead, with this hash** (each set out in the section above):
+1. Within one cause, the dire step is not counted apart: the nudge 56 choice, seen again in the reader's run on the xebec (her mizzen yard warned "working" at 1.05, carried away at 1.86 with no second line, both sides alike).
+2. On the trunk, `clear for action` says "The boats are out and towing astern" of a boat at the booms, nothing moving her.
+3. On every ship, an order waiting behind work is said in its reply alone, never in the log. It is mended here for whole lateens only, so that no committed ship's line moves.
+
+The design's old words are corrected on `…/pkg-90` at b366d6be, and come in with this merge.
+
+**For the coordinating session:** the lateen hulls' list's hash is **111b1b5** on `…/pkg-90-lateen`, pushed and tiered whole, fast and slow, with no failure. The commit after it touches this report alone.
