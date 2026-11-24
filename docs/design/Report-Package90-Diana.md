@@ -87,6 +87,11 @@ choice comes back to the owner.
 - **The slow tier of her files** has 210 passed and 8 xfailed.
 - **Under the game's own captain** she is not unmanageable beyond the frigate-36.
 
+**Her topgallant yards (§17, nudge 72): probed, nothing filed.** No figure from 24 to 28 kn at which
+her captain begins to shorten keeps them in the rising wind abeam. The first shortening comes by
+the glass at 29.2 kn whatever the figure, and her small watch reaches the topgallants after 31. The
+figure is the King's ship book's, shared by five ships. To package 125 with the rest.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1777,3 +1782,60 @@ Each item her gate asks, where it stands on `308664a`:
    if she then holds it.
 
 For the owner: none new.
+
+## 17. Her topgallant yards and the shortening's figure: probed, nothing filed (2026-11-24)
+
+The lead's nudge 72 (the trunk at 2981ba58):
+- probe the figure at which her captain begins to shorten, at 24, 26 and 28 kn, in the same
+  rising wind, close-hauled and abeam;
+- file the highest at which she keeps her spars;
+- or file nothing, if none keeps them or the sooner shortening makes her worse to manage.
+
+**None keeps them, so nothing is filed.** It goes to package 125 with the rest. Her file is as at
+`77c1617`, and the merge and the fast tier wait for the lateen list on the trunk (nudge 73).
+
+### 17.1 Whose figure it is
+
+`shorten_sail_kn` is read from the captain's doctrine, `data/captains/<role>.yaml`
+(`captains.load_doctrine`). No ship's file overrides it.
+- Her role, bound for a port, is the King's ship's. Its book gives 30 kn ("the starter book's
+  thirty knots"), the cruiser's 30 and the commodore's 28.
+- **The King's ship book is shared**: the brig, the cutter, the frigate-36, the 74 and the Diana
+  sail by it. A figure filed there would move every one of them, so it is not hers to set alone.
+
+The probe set it inside each run's own process only: the cached book's figure, before the world
+was made. No file was changed.
+
+### 17.2 The probe
+
+The same game as §16.1: the wind from 20 kn rising to 35 over an hour and held an hour, gusts and
+shifts at 0.3, seed 7, bound for Falmouth, under the game's own captain. The figure was set to 24,
+26, 28 and 30 kn.
+
+| Figure | Abeam: first shortening | Abeam: jib down | **Abeam: spars** | Abeam: second hour | Close-hauled: spars | Close-hauled: what befalls her |
+|---|---|---|---|---|---|---|
+| 24 kn | 1,860 s, 29.2 kn (the standing order and the captain at once) | 2,240 s, 32.8 kn | **main and mizzen topgallant yards carried away, 2,038 and 2,091 s** | 8.9 to 10.9 kn at 76 to 88 deg off | kept | jib down 2,043 s at 31.0 kn; taken aback once; one wear fails (3,970 s) |
+| 26 kn | the same | the same | **the same two** | the same | kept | the same |
+| 28 kn | 1,860 s by the captain; the standing order at 1,945 s | the same | **the same two** | the same | kept | the same |
+| 30 kn, the book's | 1,860 s by the captain; the standing order at 2,106 s | the same | **the same two** | the same | kept | the same (the wear fails at 3,974 s) |
+
+- **The figure does not bring her shortening sooner than 1,860 s.** Her captain begins it there,
+  at 29.2 kn, by the book's other rule: the glass falling and the wind risen by `worsening_wind_kn` (6 kn)
+  within the hour. With 24 or 26 kn the standing order "shorten sail for weather" fires at the
+  same moment, not before. With 28 it follows at 1,945 s, and with 30 at 2,106 s.
+- **Her topgallant yards carry away at 31 kn under every figure, abeam.** Her watch takes the
+  sails in turn, and the shortening begun at 1,860 s has not reached them by 2,038 s. Close-hauled
+  she keeps her spars under every figure.
+- **Her handling is unmoved.** Her second hour abeam and close-hauled is the same under each
+  figure, so the sooner shortening makes her neither better nor worse to manage.
+
+### 17.3 For the lead
+
+- **No figure from 24 to 28 kn keeps her topgallant yards abeam in this wind.** The first shortening
+  comes by the glass at 29.2 kn whatever the figure, and her small watch's turn reaches the
+  topgallants after 31.
+- The figure is the King's ship book's, shared by five ships.
+- What would keep them is either sooner (the glass's rule, every ship's) or quicker (her watch, or
+  the order of the shortening, the engine's). Or her topgallant yards are rated nearer their load
+  than the frigate's: they are rated by the generator's shared rule on her scaled rig.
+- None of it is filed. It goes to package 125 with the rest.
