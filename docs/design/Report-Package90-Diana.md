@@ -77,6 +77,16 @@ way and stays from all three headings, and the jib holds. Taking in the spanker,
 does not cure it. The order of shortening is the engine's one rule for every ship, not hers. The
 choice comes back to the owner.
 
+**Her gate for "Join now" (§16, the owner's D-j3): built and tiered on `308664a`.**
+- **Truth E** is a count across the winds. Under all plain sail she stays in 12 and 15 kn and is
+  slack in stays in 20 and 25. Shortened, she stays in 20. In 25 she wants her jib, and stays from
+  every heading with it set again.
+- **Truth D** is as restated, owed with package 125. **Her rudder's note** is filed.
+- **Her fast tier whole** shows no outcome changed against the base: 9,121 passed, 8 skipped, 1
+  xfailed.
+- **The slow tier of her files** has 210 passed and 8 xfailed.
+- **Under the game's own captain** she is not unmanageable beyond the frigate-36.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1573,3 +1583,197 @@ shortening is not hers to set, and it is not bent for her.
 Nothing pinned or tiered. When the lead and the owner have ruled, her gate is ready to build as §14.4
 sets it out: truth E's two rows, truth D with the line owed with package 125, her rudder's note, and
 her truths split by case under the five-second line.
+
+## 16. Her gate for "Join now" (2026-11-24)
+
+The owner's word, Decisions Part F, row D-j3: **"Join now (Recommended)"**, given again on the
+ground moved, on the lead's nudge 70 (the trunk at 60734e6e). The gate as it asks, built in
+`77c1617`, the package's branch merged in `308664a`, and her tiers run on that exact hash (§16.8).
+
+### 16.1 The measure before anything was pinned: the game's own captain in a rising wind
+
+The wind from 20 kn rising to 35 over an hour and held an hour, with gustiness and variability
+0.3, as the captain's trials have them, at seed 7. She is bound for Falmouth from 40 miles south of
+it, under plain sail, and no order is given after. The frigate-36 sails beside her in the same.
+
+**With the wind abeam (from the west) she keeps her course.** Through the second hour she makes 8.8
+to 10.9 kn at 76 to 88 deg off, her helm 6 to 11 deg.
+- Her captain shortens sail at 1,860 s. **Her main and mizzen topgallant yards carry away in the
+  slings at 31 kn**, at 2,038 and 2,091 s, before her captain's shortening takes them in. The frigate-36 keeps
+  hers.
+- Ordered to lie a-try at 3,240 s, she sails on at 10.7 kn. The frigate lies a-try from 4,613 s.
+
+**Close-hauled (the wind from the north, Falmouth dead to windward)** she beats under plain sail to
+27.6 kn at 9.9 kn. Then:
+1. Her captain shortens at 1,860 s, and her jib is hauled down at 2,043 s.
+2. She gripes up, to 37 deg off at 1 to 2 kn, her rudder at its stop.
+3. She is taken aback at 2,592 s. Her captain takes in the spanker and the fore topmast staysail
+   and boxes her off.
+4. She heaves to for weather at 3,240 s. One wear fails at 3,974 s ("she would not come round").
+5. She lies a-try at 59 to 66 deg off and 4.8 to 7.3 kn.
+6. Filling away at 6,900 s, she gripes again.
+
+**The frigate-36 does the same in kind:**
+- her jib down at 1,993 s;
+- griping to 26 deg off at 1.15 kn;
+- taken aback twice, then paid off, worn and hove to;
+- lying a-try at 1 to 2.5 kn;
+- griping again as she fills away.
+
+**So she is not unmanageable under the game's own captain, beyond what the frigate is.** Abeam she
+keeps her course. Close-hauled, the gripe after her jib is taken in is the frigate's too. That is
+the engine's part, "a jib taken in where a ship cannot be held without it", booked with package
+125. For the lead:
+- her two topgallant yards carried away at 31 kn before her captain's shortening reached them;
+- the a-try ordered abeam and not taken;
+- the one wear she failed where the frigate came round.
+
+### 16.2 Truth E, as a count across the winds
+
+One case each, at seed 7, by the truths' helpers (`tests/test_diana.py`). Old beside new is in
+TuningNotes, "The Diana's gate for 'Join now'".
+
+| Row | From 290, 292.5, 295 | Stayed | Band |
+|---|---|---|---|
+| plain sail, 8 kn | stayed (351 s); missed; missed | 1 of 3 | 300 to 420 s |
+| plain sail, 12 kn | stayed (184 to 187 s) | 3 of 3 | 180 to 330 s |
+| plain sail, 15 kn | stayed (232 to 238 s) | 3 of 3 | 180 to 330 s |
+| plain sail, 20 kn | missed stays | 0 of 3 | |
+| plain sail, 25 kn | missed stays | 0 of 3 | |
+| the wear, 15 kn | 492 s | | 360 to 720 s |
+| **shortened by the game, 20 kn** | stayed (186 to 193 s), her jib left on her | **3 of 3** | 180 to 330 s |
+| **shortened by the game, 25 kn and no more** | from 290 her way holds and she stays (235 s); from 292.5 and 295 she gripes without her jib, 30 to 62 deg off at under 2.5 kn, and the tack is refused for want of way (or missed) | **1 of 3** | her angle off and her way in bands |
+| **shortened by the game, 25 kn, then `set the jib`** | stayed (184 to 189 s), the jib under its rating (0.68 to 0.78) and not blown out | **3 of 3** | 180 to 330 s |
+
+Her truth's words, as a seaman would be told it:
+- "She goes about as a light ship does: under all plain sail she stays in a working breeze, and
+  in a fresh breeze she is slack in stays."
+- "Shortened, she stays."
+- "In a fresh breeze, shortened by the game's own order, she wants her jib": it is taken in
+  there, and with it in she gripes past what her small rudder holds.
+- "Set the jib again and she bears away, gathers way and stays."
+
+### 16.3 Truth D, and her rudder
+
+- **Truth D** is as restated under (a), at `clr_x_m` 2.65. Its docstring, the TuningNotes and this
+  record carry the line: **owed with package 125, her `clr_x_m` and her helm measured again, and
+  truth D back to its first band if she then holds it.**
+- **Her rudder's note in her file:** traced from her plan (3.0 m2, Pages §5.5), the least of any
+  committed ship's against her lateral plane (0.0245). It is the cause of her griping when the
+  game's shortening takes in her jib in a fresh breeze, and not of her missed stays under all plain
+  sail.
+
+### 16.4 Her own words where they are served
+
+There is none to add to. Of her file, the game serves her era note's first clause as her class
+words (`api/readings.py`, `ship_class_words`), and her description's "what" as the glass's words
+("a corvette, flush-decked, eleven ports a side"). Neither is a place for her handling, and the
+glass cannot see it. **Left to her design note** (`docs/design/Design-Ship-Diana.md`, not my row),
+the line I would give it: "A light ship with a small rudder: in a fresh breeze keep her jib on
+her; taken in, she gripes up past her helm and will not be held until it is set again."
+
+### 16.5 Her truths and the five-second line
+
+Split by case, as the lead's nudges 34 and 69 ask, none marked slow. Timed alone:
+
+| Truth | Cases | Each, alone |
+|---|---|---|
+| B (7-661) | a case a wind | 4.2 to 4.9 s |
+| D (7-663) | a case a heading off the wind | about 4 s |
+| E (7-664), plain sail | a case a wind and heading | 3.5 to 4.2 s |
+| E, the wear | one case | about 4 s |
+
+**Still over the line, named for the lead.** No test guards it, so none fails.
+- **Truth C's two cases**, about 8 s each: each sails the frigate-36 beside her.
+- **Truth E's nine shortened cases**, 6.0 to 7.6 s: the game's shortening of her runs 800 to 900 s
+  of her time before the helm may be put down.
+
+### 16.6 The merges
+
+| Merged | As | Brought | By hand |
+|---|---|---|---|
+| the package's branch at 569031b1 | `13352b8` | A4's one commit (the boat entries' glosses, comments alone in two evolution files) and rows D-s to D-j | nothing |
+| the package's branch at dd658e8 | `308664a` | Part F's rows D-j2, D-j3 and D-v alone | nothing |
+
+### 16.7 Her files
+
+- Her file through the generator: the 95 m2 spanker of (a), `clr_x_m` 2.65, the bow port off her
+  drawn side, and her rudder's note.
+- **19 of 19 files byte for byte**, and `git diff 329648e9 308664a -- data/ships` names her file
+  alone, so the eighteen are unmoved.
+- `ruff check .` and `ruff format --check .` are clean, and no line the branch adds is over 100
+  characters.
+
+### 16.8 The tiers on 308664a
+
+Run as in §5, each fast tier whole as four pytest runs (`-n 4`, each with its own
+`--junitxml`), two commands of two shards each under the two-hour limit. The base is the merged
+tree's package side, dd658e8, in a worktree of its own.
+
+| Set | Tree | Result |
+|---|---|---|
+| **The base**: the fast tier whole | dd658e8 | **8,974 passed, 8 skipped, 1 xfailed** (8,983); no failure |
+| **Her final fast tier whole** | `308664a` | **9,121 passed, 8 skipped, 1 xfailed** (9,130); no failure |
+| **The slow tier of her files**, pace tests excepted (`--slow -m "slow and not pace"`: `tests/test_known_truths.py`, `tests/test_neufchatel.py`, `tests/test_range_audit.py`, `tests/test_rig_words.py`) | `308664a` | **210 passed, 8 xfailed**, no failure (48 minutes): `tests/test_known_truths.py` 197 and its eight marked xfails, the base's eight; `tests/test_range_audit.py`'s 11; `tests/test_neufchatel.py`'s 1; `tests/test_rig_words.py`'s 1 |
+| The 13 pace tests of `tests/test_known_truths.py` | | **not run**: they want the machine to themselves, and the coordinator runs them |
+
+**The final tier beside the base, test by test:**
+- **outcome changed: none.**
+- **only in her tree: 148, all passed:**
+  - her own 57 (`tests/test_diana.py`, her truths split by case);
+  - her 90 cases of the tests over every file;
+  - the schooner-mast guard renamed "nineteen files" from "eighteen".
+- **only in the base: 1**, that guard's old name.
+- **the skips and the xfail** are the base's, the same tests.
+- No harbour or browser test failed in either tier (nudge 35's ask).
+
+### 16.9 Her gate list (§9.5 as amended)
+
+Each item her gate asks, where it stands on `308664a`:
+
+- **Her files by the generator, byte for byte.** `tools/ships/diana.py` writes
+  `data/ships/corvette-20.yaml` as committed, 19 of 19 files byte for byte (§16.7).
+- **The eighteen unmoved.** `git diff 329648e9 308664a -- data/ships` names her file alone.
+- **The guards' tables with her rows**, each growing by her row alone, no other ship's figure
+  moved, each moved count old beside new:
+  - `tests/test_view_geometry.py`, with the two departures (§8.2);
+  - `tests/test_known_truths.py`: 7-190, 7-590, 7-700 and 7-701 (§8.3);
+  - `tests/test_neufchatel.py`, `tests/test_magazine.py`, `tests/test_lee_ports.py`,
+    `tests/test_schooner_mast.py`, `tests/test_profile.py` and `tests/test_probes_90.py`;
+  - `tests/test_range_audit.py` and the known list's ceilings (§8.2, §10.3);
+  - the package's new tables, `tests/test_yard_level.py` and `tests/test_rig_words.py` (§9.2).
+- **Her truths as bands, and as counts:**
+
+  | Truth | Holds | Band | Hers |
+  |---|---|---|---|
+  | 7-660 | her particulars hold their sources | the table's measures within 0.01 m; her mass the drawn body's middle, 470,000 kg | as filed |
+  | 7-661, B | Meyer's speed | 9.5 to 11.5 kn | 10.30 to 11.26 |
+  | 7-662, C | stiff | heel in 22 kn within 1.15 times the frigate-36's | 1.11, 1.12 |
+  | 7-663, D | restated under (a); owed with package 125 | close-hauled within 0.5 deg of amidships; abeam 1 to 3 | -0.33; 1.54 |
+  | 7-664, E | as a count across the winds (§16.2) | 180 to 330 s a tack made; the wear 360 to 720 s | 7 of 15 under plain sail; shortened 3 of 3 in 20 kn, 1 of 3 in 25, 3 of 3 with her jib |
+  | 7-665, F | her midship lee port | the dip at 21.1 deg and L2's shut at 18.50, both held | 21.1; 18.50 |
+- **The lead's rulings, each shown:**
+  - **nudge 30:** her mass, 470,000 kg, her drawn body outside the plank (§2.5). It stands, the
+    lead's nudge 66.
+  - **nudge 32:** the viewer's rows, the charges, her ports of 1817 and no stern lights (§8.2).
+  - **the owner's decision D-s2:** the spanker her spars carry, 95 m2 at 9.7 m, and `clr_x_m` 2.65
+    (§11).
+  - **nudge 59:** her bow port off her drawn side, 1.86 m (§10.2).
+  - **nudges 67 and 70:** truth E as a count, and her rudder's note (§16.2, §16.3).
+- **Her figures, measured, Winfield's by page, or judgement:** as §9.6 sets them out, with five
+  changes since:
+  - her bow port's half-breadth is computed off her drawn lines;
+  - her spanker is cut by her note's rule on her spars, computed;
+  - `clr_x_m` is 2.65, JUDGEMENT, by the wide table;
+  - her boom is Luce's chain, a rule; Steel's 45 ft 6 in is known and not used, by the owner's word;
+  - her gaff is the length of Steel's mizen yard.
+
+**For the lead:**
+1. the eleven cases still over the five-second line (§16.5);
+2. her topgallant yards carried away at 31 kn, the a-try not taken abeam, and the one wear she
+   failed under the game's own captain (§16.1);
+3. what package 125 carries for her: the haul's moment, and a jib taken in where a ship cannot be
+   held without it. After it lands she is measured again, and truth D goes back to its first band
+   if she then holds it.
+
+For the owner: none new.
