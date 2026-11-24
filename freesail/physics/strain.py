@@ -465,7 +465,7 @@ def pressed_reliefs(ship: Ship, cause: str, one: bool = True) -> str:
     or the sail taken in. Measured on the three probes, generator-rated, aback in 30 and 40 kn
     and on the bad hand in 40 and 50 (docs/dev/TuningNotes.md, "the lateen hulls' list as it
     stands"): a shift halves the yard's and mast's load within a second; boxing off the same,
-    aback; a take-in on the bad hand within 152 to 169 s, where with no order it never falls.
+    aback; a take-in on the bad hand within 152 to 170 s, where with no order it never falls.
     Not named: the sheet let fly, which on the bad hand raises the load (the xebec in 40 kn,
     her main yard 0.93 to 1.11) and aback eases it no more than doing nothing; boxing off on the
     bad hand, after which the polacre's yards rise past their load at the order (to 1.28 to

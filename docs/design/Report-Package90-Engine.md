@@ -2595,3 +2595,83 @@ On every committed ship no boat is towed, so the game fills `{boat_out}` with "H
 The slow tier is not asked for this commit and was not run. It is 40a532e's code with two entries' comments and one test added, and 40a532e's slow tier stands (569: 558 passed, 11 xfailed, 0 failed).
 
 **For the coordinating session:** A4's one commit is **0040fda** on `…/pkg-90-a4`, pushed, and its fast tier is whole with 0 failed. The commit after it touches this report alone. **Next:** the lateen hulls' list as it stands (nudge 60's eight), on `…/pkg-90-lateen` once A4 is on `…/pkg-90`.
+
+## The lateen hulls' list as it stands (nudge 60): the eight on `…/pkg-90-lateen`, each with its proof; nothing moves on today's ships (2026-11-24)
+
+**The branch:** `…/pkg-90-lateen`, brought to `…/pkg-90` at **3d3841f2** (A4 merged there) first, as the coordinating session asks. b3cd1eb, the branch's tip, is in 3d3841f2's history, so it came as a fast-forward: **no merge commit and no line resolved by hand.** The work is four commits of code and tests and this one of the notes and report:
+- **cd4c76b**, item 7;
+- **002fb54**, items 1 and 3;
+- **13330c7**, items 2 and 6;
+- **ac7ed13**, item 8.
+
+They touch:
+- `freesail/physics/strain.py` and `sails.py` (the strain's line, the widened words and what the rate is counted against);
+- `freesail/orders/navigation.py`;
+- `freesail/evolutions/runner.py` and `scripts.py`;
+- `freesail/world/boats.py`, `dealings.py` and `ports.py`, and `freesail/physics/integrate.py` (a comment only);
+- `tests/test_lateen_whole.py`, `tests/test_boat_towed.py` and `tests/test_known_truths.py` (7-672).
+
+**The equations are read, not changed:** no load, ratio, factor, rate, timing or drag figure moves. The measures, old beside new, are in `docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list as it stands: the eight of nudge 60".
+
+Each item and its proof (every pin fails with its mend undone, run so):
+1. **The dire warning missed: mended for a cause that ends and comes again.** A part pressed by a cause it was not pressed by at the last tick has that cause's ten minutes begun afresh (`strain._causes_come`).
+   - Proof: `test_a_cause_that_ends_and_comes_again_within_ten_minutes_is_warned_for_as_it_comes`, the xebec in 40 kn. She is aback and warned at 601 s, the cause ends, and she is aback again at 701. Old was silent at 701 at 1.15; new warns at 701.
+   - **The mast's key with two lateens: mended.** It is marked for the lateen that pulls hardest, not the last in the ship's order of sails. Proof: `test_a_spar_two_lateens_press_is_warned_for_the_one_that_pulls_it_hardest`.
+   - **Seen and left, as the lead chose at nudge 56:** within one cause the ten minutes' rule stands. The reader's run, reproduced as nearly as written, kept the xebec's mizzen yard on the bad hand from 613 s to its loss at 1,081 s. It was warned "working" at 1.05 and carried away at 1.86 with no second line, on both sides alike.
+2. **The three waits: said.**
+   - A furl of a set lateen held aback now waits as a take-in does, since it brails it up first (`LATEEN_BRAILED_FIRST_VERBS`), and says so at the order.
+   - A furl behind `trim sails` says it there too.
+   - An order to a whole lateen waiting behind other work says what it follows, at the order.
+   - Proofs: `test_a_furl_of_a_lateen_held_aback_waits_as_a_take_in_does_and_says_so`, `test_a_furl_behind_trim_sails_of_a_lateen_held_aback_says_its_wait_at_the_order` and `test_an_order_to_a_lateen_waiting_behind_other_work_says_so_at_the_order`.
+   - One pin moved, old beside new: nudge 53's take-in behind `trim sails` now says the "will follow" line at the order as well.
+3. **The advice: only orders she will take that are measured to bring the load down** (`strain.pressed_reliefs`, said by the strain's line and by the bow's). The three probes were generator-rated, held aback in 30 and 40 kn and on the bad hand in 40 and 50, and each order was set against the same run with no order.
+   - **Named:**
+     - shift it, both causes: under half the load within a second;
+     - box her off, held aback, where she has head yards to brace abox and is not hove to: the polacre and the tartane, under half within a second;
+     - take it in, on the bad hand: under half 152 to 170 s on, where with no order it never falls.
+   - **Not named:**
+     - let fly its sheet: it raises the load on the bad hand (the xebec in 40 kn, her main yard 0.93 to 1.11), and held aback it eases it no more than doing nothing;
+     - box her off on the bad hand: the polacre's yards then rise past their load at the order, to 1.28 to 2.10;
+     - a take-in held aback;
+     - ease off, and the helm's orders.
+   - The words, old beside new: aback "let fly its sheet, shift it or box her off" became "shift it" (the xebec, which refuses the box) or "shift it or box her off"; on the bad hand "let fly its sheet or shift it" became "shift it or take it in".
+   - Proofs: `test_held_aback_a_lateen_is_eased_by_each_order_its_warning_names` (four cases), `test_on_the_bad_hand_a_lateen_is_eased_by_each_order_its_warning_names` (two) and `test_on_the_bad_hand_the_sheet_let_fly_raises_the_load_and_is_not_named`. Each gives the order and reads the load falling, or rising.
+   - Four pins of the old words moved, old beside new.
+   - **"0.86 to 0.08"** is nudge 53's own figure ("my reader measured the yard from 0.86 of its rating to 0.08 at once"), which the bow's line's comment quoted. This report never gave a case for it. The nearest measured here is the xebec in 30 kn aback, her fore yard at 0.86: its sheet let fly, 0.52 at 30 s and 0.41 at a minute, as with no order by then; shifted, under half within the second. The comment now gives the measured reliefs.
+4. **Clearing for action:** as mended at nudge 53, untouched.
+5. **The aftermost lateen in stays, owed in measurement:** 300 tacks a side close-hauled, old the trunk's tip b49ed33d (A1d's ease), new this branch.
+   - The polacre in 20 kn: 4 hang, old all miss stays, new all come round.
+   - The polacre in 25 kn: 116 hang, old all miss, new all come round.
+   - The xebec and the tartane in 12, 16, 20 and 25 kn: never hang, 2,400 tacks the same tick for tick.
+   - **None lost against the trunk at any wind**, and the greatest lateen loads are the same both sides.
+6. **The haul line names every sail hauled or left, once.** The polacre with her jibs set, `tack ship and leave the lateens`: "Draw jib; trim aft the head sheets and the foresail sheet; draw the mizen on the mast.", where before the foresail was drawn and not named. The pin that held it so moved, old beside new. The lugger's line is as it was.
+7. **Truth 7-672's upper band:** under 0.15 of the rating. Measured at the bad-hand factor 2.5, 3.0 and 4.0, the tartane's great yard reaches 0.121, 0.145 and 0.193, so 4.0 now fails where a fifth alone passed it.
+8. **The boat in tow:**
+   - A boat towed past her own hull speed is said to sheer and ship water, once as she passes it, and her reading says so: "The boat towing too fast for her, sheering about astern on her painter and shipping water; shorten sail to ease her." (JUDGEMENT on the words).
+   - The drag figure past hull speed is marked as having no ground, and not changed.
+   - Now held by cases: no drag making sternway, and the two timings against `ports.BOAT_HAUL_ALONGSIDE_S` and `BOAT_VEER_ASTERN_S`.
+   - Run: clearing for action and anchoring with her boat towed, each as with it on deck.
+   - Proofs: `test_a_boat_towed_faster_than_her_hull_speed_is_said_to_sheer_and_ship_water`, `test_making_sternway_her_boat_in_tow_drags_nothing` (two) and `test_a_towed_boats_two_timings_are_the_ports_figures` (two).
+
+**Nothing moves on today's ships:** no committed file has a whole lateen or a towed boat, and every change is keyed to one or the other. Measured before this commit, on 002fb54 to ac7ed13's code:
+- the eighteen in gales on items 1 and 3, byte for byte the trunk's run (360 runs, 6,101 events, 1,766 strain warnings);
+- A2's harness, 270 runs over every committed ship, byte for byte 0040fda's (3d3841f2's code).
+
+Both run again on this commit's hash with its tiers.
+
+**For the lead:**
+- Within one cause, the dire step is still not counted apart (item 1). It is the lead's choice of nudge 56, and is seen again in the reader's run.
+- `docs/design/Design-Package90-Engine.md` still quotes the strain's old words ("let fly its sheet or shift it", "let fly its sheet, shift it or box her off"). The design is not this row's to edit.
+- Two older things on the trunk:
+  - the clear-for-action line says "The boats are out and towing astern" of a boat at the booms, nothing moving her;
+  - an order to any other sail waiting behind work is said in its reply alone, never in the log. It is mended here for whole lateens only, so that no committed ship's line moves.
+
+**Checked on this commit:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- no new line over 100 characters;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 3d3841f2. Its code is 0040fda's: the fast tier is 0040fda's run, and the slow is 40a532e's, which runs the same slow tests on the same code but two entries' comments. The eighteen in gales and A2's harness run again on this hash. The results follow in a section of their own; the commit after this one touches this report alone.
+
+**For the coordinating session:** the eight are this section's commit on `…/pkg-90-lateen`, pushed, its tiers running.
