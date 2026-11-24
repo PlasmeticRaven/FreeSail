@@ -37,8 +37,8 @@ game's choices.
   play" panel), shown while a game is in play. Its words go under it.
 - **The stations' table** keeps a row's choice only while it is drawn again for the same game. The
   state carries `games`, the count of games begun and ended from this harbour, and a game begun
-  after another draws its rows as its own scenario gives them. `Harbour.stations()` lists nothing
-  while no game is in play.
+  after another draws its rows as its own scenario gives them. A seat asked at the desk in the game that ended is listed by nobody after it
+  (the desk lists the stations of the World in play).
 
 **As a player reads it.** The page, under the game in play: the button "end the game". With
 nothing unsaved, under it: "The game is ended.", and the page's head says "no game yet". With play

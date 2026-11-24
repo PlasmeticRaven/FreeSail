@@ -1024,29 +1024,39 @@ class Harbour:
         from freesail.core.world import Scenario, World
         from freesail.ui.console import DEFAULT_SEED
 
-        if not self.started:
-            raise HarbourError("No game is in play to end.", 409)
-        lost = self.driver.unsaved()
-        if lost and not lose_unsaved:
-            raise HarbourError(lost + " End it all the same, or save it first.", 409)
-        # the doors first, the locks not held: a door stopping asks the game to release its
-        # station, and the release saves the station's record as it always has
-        for door in list(self.doors.values()):
-            if door.running:
-                with contextlib.suppress(Exception):
-                    self.stop_door(door.id)
-        # the harbour's lock first, then the driver's, as at the start: a page that asks
-        # while a game ends finds the whole game or none
-        with self._lock, self.driver.lock:
-            self.driver.replace_world(
-                World(seed=DEFAULT_SEED, scenario=Scenario()),
-                compression=self.driver.compression,
-                pace=self.driver.pace.rule,
-            )
-            self.game = {}
-            self.started = False
-            self.games += 1
-            self.seat_doors, self._seat_world = {}, None
+        # the harbour's lock held throughout, so that no start or door begun from another
+        # page comes between the asking and the end; the driver's only for the World's
+        # replacing (the start's order: the harbour's first, then the driver's), so that a
+        # page that asks while a game ends finds the whole game or none
+        with self._lock:
+            if not self.started:
+                raise HarbourError("No game is in play to end.", 409)
+            lost = self.driver.unsaved()
+            if lost and not lose_unsaved:
+                raise HarbourError(lost + " End it all the same, or save it first.", 409)
+            # the doors first, the driver's lock not held: a door stopping asks the game to
+            # release its station, and the release saves the station's record as it always has
+            for door in list(self.doors.values()):
+                if door.running:
+                    with contextlib.suppress(Exception):
+                        self.stop_door(door.id)
+            with self.driver.lock:
+                self.driver.replace_world(
+                    World(seed=DEFAULT_SEED, scenario=Scenario()),
+                    compression=self.driver.compression,
+                    pace=self.driver.pace.rule,
+                )
+                self.game = {}
+                self.started = False
+                self.games += 1
+                self.seat_doors, self._seat_world = {}, None
+            # a door begun from a page while the doors stopped (`start_door` takes no lock:
+            # the clock's tending starts the director's under the driver's) is stopped too;
+            # with no game in play none can begin after
+            for door in list(self.doors.values()):
+                if door.running:
+                    with contextlib.suppress(Exception):
+                        self.stop_door(door.id)
         return {"lines": ["The game is ended."], "game": self.game_state()}
 
     def game_state(self) -> dict[str, Any]:
@@ -1128,8 +1138,6 @@ class Harbour:
         d = self.driver
         out: list[dict[str, Any]] = []
         with d.lock:
-            if not self.started:
-                return out  # no game: no station held, whatever the last game's desk kept
             if d.desk is not None:
                 # the desk lists, beside the stations held, the seats still in their consent
                 # conversation and the seats stopped (a consent declined, a door stopped

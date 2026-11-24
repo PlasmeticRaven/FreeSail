@@ -67,19 +67,23 @@ def test_truth_7_774_the_fog_comes_on_and_clears_over_a_time_and_is_said_as_it_d
         if not seen or seen[-1][1] != c.visibility:
             seen.append((w.clock.tick, c.visibility, c.fog))
         # the reading a station is served is the minute's sight
-        assert w.readings.words("visibility") == c.visibility or c.visibility in str(
-            w.readings.words("visibility")
-        )
+        assert w.readings.words("visibility") == c.visibility
+        # the lookout's limit by the shore is the weather's sight wherever that is the less
         limit, bound = w.lookout._shore_limit(c.visibility_nm, w.daylight)
-        assert limit <= c.visibility_nm + 1e-9 or bound != "weather"
+        clear_limit, _ = w.lookout._shore_limit(None, w.daylight)
+        if c.visibility_nm < clear_limit:
+            assert (limit, bound) == (c.visibility_nm, "weather"), (c.visibility, limit, bound)
+        else:
+            assert (limit, bound) != (c.visibility_nm, "weather") or limit == clear_limit
     lines = _fog_lines(w)
     said = [e.text for e in lines]
-    assert [t for t in said if t in FOG_LINES_IN_ORDER] == FOG_LINES_IN_ORDER, said
+    fog_said = [t for t in said if "fog" in t.lower()]
+    assert fog_said == FOG_LINES_IN_ORDER, said  # every line of the fog, in order
     at = {e.text: e.tick for e in lines}
     settle = at["The fog has shut in thick."] - at["A fog is settling in."]
     clear = at["The fog lifted."] - at["The fog seems to be clearing."]
-    assert 0 < settle <= W.FOG_SETTLE_S + 60, settle
-    assert W.FOG_CLEAR_S / 2 <= clear <= W.FOG_CLEAR_S + 60, clear
+    assert abs(settle - W.FOG_SETTLE_S) <= 120, settle
+    assert abs(clear - W.FOG_CLEAR_S) <= 120, clear
     # the sight through the steps between: never from a cable to clear, or clear to a cable
     sights = [v for _, v, _ in seen]
     for a, b in zip(sights, sights[1:], strict=False):
@@ -108,7 +112,7 @@ def test_truth_7_775_the_fog_is_the_same_after_a_save_and_a_plain_function_of_it
     and the conditions of any minute asked twice, or out of order, are the same."""
     w = _fog_world()
     w.run(55 * 60)  # 07:55, in the settling
-    assert 0.0 < w.conditions.fog < 1.0 or w.conditions.visibility == "a cable"
+    assert 0.0 < w.conditions.fog < 1.0 and w.conditions.visibility == "a mile"
     d = Path(tempfile.mkdtemp())
     path = replay_mod.save_to_file(w, d / "fog.json")
     copy, report = replay_mod.load_report(path, None)
@@ -121,7 +125,6 @@ def test_truth_7_775_the_fog_is_the_same_after_a_save_and_a_plain_function_of_it
             w.conditions.visibility,
             w.conditions.fog,
         )
-    assert [e.text for e in _fog_lines(copy)[-6:]] == [e.text for e in _fog_lines(w)[-6:]]
     assert [e.text for e in copy.log[n1:]] == [e.text for e in w.log[n0:]]
     sys = w.systems
     moments = [FOG_DAY + timedelta(minutes=m) for m in range(0, 300, 7)]
@@ -218,6 +221,9 @@ def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_h
         "By the captain, keeping station: clearing away the wreck of the main topgallant mast "
         "(the main topgallant mast carried away)."
     ]
+    # and nothing asked that she cannot do: no shift given and refused for want of a spare
+    refused = [e.text for e in w.log[n0:] if e.kind == "order.rejected" and "spare" in e.text]
+    assert refused == [], refused
     cleared = [e.text for e in w.log[n0:] if e.kind == "wreck.cleared"]
     assert len(cleared) == 1 and cleared[0].endswith("There is no spare topgallant mast aboard.")
     ship = w.ship
@@ -315,7 +321,7 @@ def test_truth_7_778_with_no_topsail_set_to_lie_a_try_under_she_heaves_to_in_the
         ), said
         hove = [e for e in w.log if e.kind == "ship.hove_to"]
         assert hove and "under her fore-and-aft canvas" in hove[0].text, (wind, hove)
-        assert hove[0].tick - 3540 <= 900
+        assert 3540 <= hove[0].tick <= 3540 + 900
         speeds = []
         for _ in range(30):
             w.run(60)

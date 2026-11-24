@@ -654,6 +654,11 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     begun = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
     assert begun.status_code == 200 and begun.json()["game"]["games"] == 1
     played = port.driver.world
+    # a seat asked at the desk and in its consent conversation: listed while the game is in
+    # play, and nobody's once it has ended
+    asked = client.post("/api/agents/master", json={"model_name": "made-up-a", "door": "api"})
+    assert asked.status_code == 200, asked.text
+    assert [x["phase"] for x in client.get("/api/harbour/state").json()["stations"]] == ["consent"]
     ended = client.post("/api/harbour/end", json={})
     assert ended.status_code == 200, ended.text
     assert ended.json()["lines"] == ["The game is ended."]
@@ -661,7 +666,7 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     assert game["started"] is False and game["running"] is False and game["games"] == 2
     assert game["chosen"] == {} and game["captains"] == []
     assert port.driver.world is not played and port.driver.world.clock.tick == 0
-    assert port.driver.world.scenario.name in ("", None) or not port.driver.world.vessels.vessels
+    assert not port.driver.world.vessels.vessels and port.driver.world.player_seat is None
     assert {"type": "restart"} in told
     state = client.get("/api/harbour/state").json()
     assert state["game"]["started"] is False and state["stations"] == []
@@ -765,6 +770,20 @@ def test_truth_7_771_a_page_that_asks_while_a_game_ends_finds_one_whole_game_or_
     # once none, never the game again
     firsts = [i for i, s in enumerate(seen) if not s["started"]]
     assert all(not s["started"] for s in seen[firsts[0] :])
+    # the harbour's half of the order: the end waits for the harbour's lock before it asks
+    # or touches anything, so no start or end from another page comes between
+    import threading
+
+    port.harbour.start({"scenario": str(port.place / "planned.yaml"), "seed": 112})
+    ended: list[Any] = []
+    with port.harbour._lock:
+        t = threading.Thread(target=lambda: ended.append(port.harbour.end(lose_unsaved=True)))
+        t.start()
+        t.join(1.0)
+        assert t.is_alive() and not ended and port.harbour.started
+        assert port.harbour.game_state()["seed"] == 112
+    t.join(30)
+    assert ended and not port.harbour.started
 
 
 def test_a_game_started_with_a_seat_and_a_brief_is_the_servers_game_taken_up_in_place(port, client):

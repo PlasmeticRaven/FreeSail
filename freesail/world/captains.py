@@ -3506,17 +3506,22 @@ class Captain(Judgement):
             self._shape_leg(why="she has way again")
 
     def _topsail_to_lie_under(self) -> bool:
-        """Whether she has the topsail `lie a-try` keeps, and it is set: the order's own
-        refusals (`scripts.LieATryScript.check`) read beforehand, so that the gale's order
-        is one she can take."""
+        """Whether `lie a-try` is the gale's order for her: False only where she has the
+        topsail it keeps and it is furled or unbent (the smack's, under her plain sail),
+        which the order refuses (`scripts.LieATryScript.check`: "The topsail is not set")
+        and leaves her sailing on. A topsail in hand (lowered for its reefs) is set again
+        before the order begins, and a ship with no such topsail has the order's own
+        refusal, as before."""
         ship = self.world.ship
         try:
             from freesail.evolutions.scripts import _topsails_on, yards_to_back
+            from freesail.ship.parts import SailState
 
             kept = _topsails_on(ship, yards_to_back(ship))
-        except (AttributeError, KeyError, TypeError, ValueError):
+        except (AttributeError, KeyError, TypeError, ValueError, ImportError):
             return True  # as before: the order says what it cannot do
-        return any(s.is_set for s in kept)
+        stowed = (SailState.FURLED, SailState.UNBENT)
+        return not kept or any(s.state not in stowed for s in kept)
 
     def _lugger_storm_lug(self) -> bool:
         """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no
