@@ -15046,24 +15046,37 @@ def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxe
     monkeypatch,
 ):
     """Package 88, item 1 (package 86's finding, the convoy's stall): the commodore's brig in
-    the owner's convoy comes out of a short-handed tack at 1594 with no way on while her book
+    the owner's convoy comes out of a short-handed tack with no way on while her book
     shortens sail, her head forty degrees off the wind, every square sail shaking and the
     spanker drawing. With no headway, square sail set and none drawing, no manoeuvre in
     hand, for the doctrine's three minutes (`aback_recover_minutes`, judgement), her rules
     captain recovers her as Luce 1866 ch. XXV has it: the work waiting for hands avasted and
-    the spanker taken in at 1800, boxed off at 1980 and boxed off by 2110, the spanker set
-    again and the leg shaped when she has way (2160); at 2400 she makes four knots. With
-    the law's switch off (`captains.ABACK_RECOVER`) she lies so until the book's second
-    shortening takes in her spanker at 2671 (86's record): at 2400 still no way, no box-off."""
+    the spanker taken in, and boxed off if she does not pay off by that; the spanker set
+    again and the leg shaped when she has way. With the law's switch off
+    (`captains.ABACK_RECOVER`) she lies so until the book's second shortening takes in her
+    spanker at 2671 (86's record): at 2400 still no way, no box-off.
+
+    Package 127, its truth 7-787, at the lead's ruling: the book's first `shorten sail`, a
+    minute after `set plain sail`, now belays the topgallants still being set, where before
+    its take-in of them was refused as already furled and they were set, worn for and taken in
+    again; she tacks at 1567 (was 1594) with less in hand. Old beside new: aback with no way
+    1810 (the same), the work avasted and the spanker taken in at 1800 -> 1860, in at 1959 ->
+    2019; then, before, boxing her off at 1980, boxed off at 2110, the spanker set and the leg
+    shaped at 2160, four knots at 2400; now she pays off on the spanker alone, way again and the
+    spanker set at 2040, three knots at 2400. Where the spanker alone does not pay her off, the
+    box-off is truth 7-788's case."""
     from freesail.world import captains as C
 
     w = _scenario_world(CONVOY_SIX)
     w.run(2400)
     said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
-    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1800], said
-    assert [e.tick for e in said if "boxing her off" in e.text] == [1980], said
-    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2110]
-    assert any(e.tick == 2160 and "setting the spanker" in e.text for e in w.log)
+    assert [e.tick for e in w.log if e.kind == "ship.aback" and "no way" in e.text][:1] == [1810]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1860], said
+    assert [e.tick for e in said if "belaying" in e.text] == [1860] * 3, said
+    assert [e.tick for e in w.log if e.kind == "sail.taken_in" and "spanker" in e.text] == [2019]
+    assert any(
+        e.tick == 2040 and "setting the spanker (she has way again)" in e.text for e in w.log
+    )
     assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
     monkeypatch.setattr(C, "ABACK_RECOVER", False)
     old = _scenario_world(CONVOY_SIX)
