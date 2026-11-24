@@ -2764,7 +2764,9 @@ def test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_t
     """Nudge 53, item 2, at its other door: a take-in given behind `trim sails` with its lateen
     drawing, the wind then come round ahead onto it, waits on when the trim is done, and says so
     once then (`Runner._start_waiting`), as at an order with no work before it. Measured, seed 7,
-    25 kn, the wind four points ahead and then four more: begun 66 s on. Before, unsaid."""
+    25 kn, the wind four points ahead and then four more: begun 66 s on. Before, unsaid. Since
+    nudge 60 (item 2) its wait behind the trim is said at the order too, as of every order to a
+    whole lateen waiting its turn (was: nothing at the order)."""
     world = _from(xebec_in_a_breeze)
     ship = world.ship
     main = ship.sails["main.lateen"]
@@ -2777,13 +2779,17 @@ def test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_t
     world.run(5)
     (inst,) = [i for i in ship.extra["evolutions"].instances if i.evo.id == "take_in_lateen"]
     assert inst.waiting and not inst.lateen_wait_said
-    assert not [e for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    follows = (
+        "'Take in the mainsail' will follow 'trim the mainsail', which the hands are still at."
+    )
+    assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == [follows]
     _shift_the_wind(world, -4.0)
     world.run(1)
     assert scripts.lateen_aback(ship, main)
     world.run(300)
     assert main.state is SailState.IN_THE_GEAR
-    assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == [ABACK_WAITS]
+    waits = [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    assert waits == [follows, ABACK_WAITS]
 
 
 def test_clearing_for_action_begins_at_once_beside_the_work_handed_on(polacre):
@@ -2834,7 +2840,9 @@ def test_with_jibs_or_none_the_foresail_drawn_with_the_head_sheets_is_named_once
     """Nudge 53, item 6: the polacre's fore lateen, eased and drawn with the head sheets, is named
     there alone at "let go and haul"; the lateens left are the rest. Before, with her jibs furled,
     "Draw the foresail; trim aft its sheet; draw the lateens on their masts.", and with them "Draw
-    jib; trim aft the head sheets; draw the lateens on their masts."."""
+    jib; trim aft the head sheets; draw the lateens on their masts.". Nudge 60, item 6: with her
+    jibs set the foresail went unnamed ("Draw jib; trim aft the head sheets; draw the mizen on the
+    mast."); the line names every sail hauled or left, once."""
     said = {}
     for jibs in (True, False):
         world = _from(polacre)
@@ -2847,7 +2855,10 @@ def test_with_jibs_or_none_the_foresail_drawn_with_the_head_sheets_is_named_once
         world.run(600)
         (said[jibs],) = [e.text for e in _after(world, n0) if e.text.startswith("Let go and haul")]
     assert said == {
-        True: "Let go and haul. Draw jib; trim aft the head sheets; draw the mizen on the mast.",
+        True: (
+            "Let go and haul. Draw jib; trim aft the head sheets and the foresail sheet; draw the "
+            "mizen on the mast."
+        ),
         False: (
             "Let go and haul. Draw the foresail; trim aft its sheet; draw the mizen on the mast."
         ),
@@ -3218,3 +3229,66 @@ def test_on_the_bad_hand_the_sheet_let_fly_raises_the_load_and_is_not_named(xebe
     world.submit("let fly the main lateen sheet")
     world.run(60)
     assert _pressing(world, "main.lateen") > at_order + 0.1
+
+
+# ---------------------------------------------------------------------------
+# The lateen hulls' list as it stands (the lead's nudge 60): item 2, the waits said
+# ---------------------------------------------------------------------------
+
+LATEEN_ABACK_WAITS = (
+    "The mainsail is aback against the mast; it will not come in till she pays off."
+)
+
+
+def test_a_furl_of_a_lateen_held_aback_waits_as_a_take_in_does_and_says_so(xebec_in_a_breeze):
+    """Nudge 60, item 2: `furl the mainsail` of a set lateen held aback said "Hands to furl the
+    mainsail." at once, and its brails were hauled while the take-in of the same sail waited
+    (A1d). A furl brails it up first, as a take-in does (`LATEEN_BRAILED_FIRST_VERBS`): it waits
+    till she pays off and says so at the order. The xebec in 25 kn, the wind eight points
+    through her bow: old, begun at once, brailed up 137 s on and furled 314 s on; new, the line
+    at the order, begun 35 s on as she pays off, brailed up 170 s on and furled 347 s on."""
+    world = _from(xebec_in_a_breeze)
+    _shift_the_wind(world, -8.0)
+    world.run(30)
+    n0 = len(world.log.all())
+    world.submit("furl the mainsail")
+    world.run(2)
+    said = [e.text for e in _after(world, n0) if e.kind.startswith("evolution")]
+    assert said == [LATEEN_ABACK_WAITS], said
+    assert world.ship.sails["main.lateen"].is_set
+    world.run(400)
+    assert world.ship.sails["main.lateen"].state is SailState.FURLED
+
+
+def test_a_furl_behind_trim_sails_of_a_lateen_held_aback_says_its_wait_at_the_order(
+    xebec_in_a_breeze,
+):
+    """Nudge 60, item 2: a furl behind `trim sails` waited 69 s with only the order said (the
+    take-in's case of nudge 53, item 2, which the furl now shares)."""
+    world = _from(xebec_in_a_breeze)
+    _shift_the_wind(world, -8.0)
+    world.run(30)
+    world.submit("trim sails")
+    n0 = len(world.log.all())
+    world.submit("furl the mainsail")
+    world.run(2)
+    waits = [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    assert waits == [LATEEN_ABACK_WAITS], waits
+
+
+def test_an_order_to_a_lateen_waiting_behind_other_work_says_so_at_the_order(xebec_in_a_breeze):
+    """Nudge 60, item 2: `take in the mainsail` behind `shift the mainsail` waited over two
+    minutes with only "Order: take in the mainsail." said. An order to a whole lateen waiting
+    its turn says what it follows, at the order, as behind work handed on; of every other sail
+    the order's reply alone says it, as on the trunk."""
+    world = _from(xebec_in_a_breeze)
+    _on_the_bad_hand(world)
+    world.run(30)
+    assert world.submit("shift the mainsail").kind == "order.accepted"
+    n0 = len(world.log.all())
+    world.submit("take in the mainsail")
+    world.run(2)
+    waits = [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    assert waits == [
+        "'Take in the mainsail' will follow 'shift the mainsail', which the hands are still at."
+    ], waits
