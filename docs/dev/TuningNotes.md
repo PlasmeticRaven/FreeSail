@@ -39855,3 +39855,16 @@ Built by the engine track's builder; to be passed by an independent reader (the 
 The catalogue (`agents/tools.py`, `_evolution_text`) glosses `{sail}` alone. `take_in_pole` and `furl_pole` (A6) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`, which `scripts.pole_words` fills by the yard below. Each file's served notes now end with a paragraph that glosses them in the words the game fills them with, the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" ...; where no square yard is crossed below it, with "down to the hounds" ...". No line of code; what she does and says does not move. `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`, so a word changed in one place and not the other fails it; it fails with the gloss undone.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 127: words and waits on today's ships (2026-11-24)
+
+Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words (`docs/design/Report-Package127.md`); items 4 and 5, the cutter's going astern after filling away, and taking up the smack's waiting topsail would change what a ship does and wait for the lead's word. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-786, in `tests/test_words_and_waits.py`.
+
+**One new figure, JUDGEMENT:** `scripts.FILLED_WATCH_S` = 600 s, how long a ship filled away is watched for her way (the minutes a ship braced full from lying to takes to gather way and steer, with room). Her way is read against `physics.hull.WAY_ON_KN` (0.5 kn, the aback line's "way to lose"), not a new figure.
+
+**Pins moved, old beside new, each for the mend's own reason:**
+
+- `tests/test_lateen_whole.py`, `test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_turn_comes` (the xebec probe, no committed ship). Old: no `evolution.waiting` line while the take-in waited behind `trim sails`, and at the end the lateen's line alone, `[ABACK_WAITS]`. New: "'Take in the mainsail' will follow 'trim the mainsail', which the hands are still at." at the order, then the lateen's line at its turn, as before: `[behind, ABACK_WAITS]`. Reason: item 1, every wait behind other work is said in the log at the order; the pin held the very wait unsaid. Every tick of what she does is as it was.
+- `tests/test_rig_words.py`, `test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_line`. Old, at 602 s: "Filled away on the starboard tack; steering WNW (292°)." New, the same tick: "Her sheets drawn on the starboard tack; steering WNW (292°); she has no headway on her yet." Reason: item 3, she had sternway on her then; "She gathers headway; filled away on the starboard tack." comes when she has it, after the minute the test runs. Every tick of what she does is as it was.
+
+Built by package 127's builder; each moved pin to be passed by a reader other than the builder (the build report names who).

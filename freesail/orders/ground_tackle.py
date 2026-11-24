@@ -373,8 +373,10 @@ def execute(ship: Any, order: Order) -> Result:
             f"'{verb}' takes nothing after it; '{remainder.strip()}' was not understood."
         )
     runner = verbs.runner_of(ship)
-    text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params)
-    _waits_for_the_anchor(ship, runner, evo)
+    # its wait for the anchor said in its own words; any other wait behind work, the runner's
+    text = runner.start(ship, evo, verbs.SHIP_SUBJECT, params, say_wait=False)
+    if not _waits_for_the_anchor(ship, runner, evo) and "will follow" in text:
+        ship.note("notable", "evolution.waiting", text, verbs.SHIP_SUBJECT)
     data = {
         "verb": verb,
         "level": 1,
@@ -392,13 +394,13 @@ _BRINGS_HER_UP = ("come_to_anchor", "let_go_anchor", "moor")
 _WAITS_FOR_THE_ANCHOR = {"weigh_anchor": "The weigh", "unmoor": "The unmoor"}
 
 
-def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> None:
+def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> bool:
     """A line at the order when a weigh or an unmoor waits for her coming to an anchor: it
-    is begun as soon as she is brought up, every ship's."""
+    is begun as soon as she is brought up, every ship's. True if it was said."""
     what = _WAITS_FOR_THE_ANCHOR.get(evo)
     instances = list(getattr(runner, "instances", None) or [])
     if what is None or not instances or not getattr(instances[-1], "waiting", False):
-        return
+        return False
     mine = instances[-1]
     ahead = next(
         (
@@ -411,7 +413,7 @@ def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> None:
         None,
     )
     if ahead is None:
-        return
+        return False
     doing = {
         "come_to_anchor": "she is coming to an anchor",
         "let_go_anchor": "the anchor is letting go",
@@ -424,6 +426,7 @@ def _waits_for_the_anchor(ship: Any, runner: Any, evo: str) -> None:
         verbs.SHIP_SUBJECT,
         {"evolution": evo, "waits_for": ahead.evo.id},
     )
+    return True
 
 
 class _Reading:
@@ -433,7 +436,14 @@ class _Reading:
     def __init__(self) -> None:
         self.started: list[tuple[str, dict[str, Any]]] = []
 
-    def start(self, ship: Any, evolution_id: str, subject_id: str, params: Any = None) -> str:
+    def start(
+        self,
+        ship: Any,
+        evolution_id: str,
+        subject_id: str,
+        params: Any = None,
+        say_wait: bool = True,
+    ) -> str:
         self.started.append((evolution_id, dict(params or {})))
         return ""
 

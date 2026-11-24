@@ -2760,7 +2760,12 @@ def test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_t
     """Nudge 53, item 2, at its other door: a take-in given behind `trim sails` with its lateen
     drawing, the wind then come round ahead onto it, waits on when the trim is done, and says so
     once then (`Runner._start_waiting`), as at an order with no work before it. Measured, seed 7,
-    25 kn, the wind four points ahead and then four more: begun 66 s on. Before, unsaid."""
+    25 kn, the wind four points ahead and then four more: begun 66 s on. Before, unsaid.
+
+    Package 127, its truth 7-780: its wait behind the trim is said at the order too, as every
+    wait behind other work is ("'Take in the mainsail' will follow 'trim the mainsail', ..."),
+    where before this pinned no waiting line until its turn; the lateen's own line at its turn
+    is as it was, once."""
     world = _from(xebec_in_a_breeze)
     ship = world.ship
     main = ship.sails["main.lateen"]
@@ -2773,13 +2778,15 @@ def test_a_take_in_whose_lateen_comes_aback_behind_other_work_says_so_when_its_t
     world.run(5)
     (inst,) = [i for i in ship.extra["evolutions"].instances if i.evo.id == "take_in_lateen"]
     assert inst.waiting and not inst.lateen_wait_said
-    assert not [e for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    behind = "'Take in the mainsail' will follow 'trim the mainsail', which the hands are still at."
+    assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == [behind]
     _shift_the_wind(world, -4.0)
     world.run(1)
     assert scripts.lateen_aback(ship, main)
     world.run(300)
     assert main.state is SailState.IN_THE_GEAR
-    assert [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"] == [ABACK_WAITS]
+    said = [e.text for e in _after(world, n0) if e.kind == "evolution.waiting"]
+    assert said == [behind, ABACK_WAITS]
 
 
 def test_clearing_for_action_begins_at_once_beside_the_work_handed_on(polacre):

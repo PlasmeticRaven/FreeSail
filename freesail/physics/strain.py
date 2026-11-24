@@ -375,9 +375,14 @@ class _Warning:
     many: str | None  # the same for several; None: this warning is never grouped
 
 
-# The key a part's last dire warning is kept under in `StrainState.last_warning_s`, beside its
-# last warning of any kind (`warning_due`).
-DIRE_WARNING = "dire:"
+def _last_dire_s(st: StrainState) -> dict[str, float]:
+    """A part's last dire warning by its key (`warning_due`), beside `last_warning_s` (its last
+    warning of any kind): kept on the state from the first dire one, so that a state read from a
+    checkpoint written before it has none yet, and one with no dire warning is as it was."""
+    dire = st.__dict__.get("last_dire_s")
+    if dire is None:
+        dire = st.__dict__["last_dire_s"] = {}
+    return dire
 
 
 def warning_due(st: StrainState, key: str, dire: bool) -> bool:
@@ -394,10 +399,11 @@ def warning_due(st: StrainState, key: str, dire: bool) -> bool:
     last = st.last_warning_s.get(key)
     due = last is None or now - last >= WARNING_INTERVAL_S
     if dire:
-        last_dire = st.last_warning_s.get(DIRE_WARNING + key)
+        said = _last_dire_s(st)
+        last_dire = said.get(key)
         if last_dire is not None and now - last_dire < WARNING_INTERVAL_S:
             return False  # said dire within the interval: once
-        st.last_warning_s[DIRE_WARNING + key] = now
+        said[key] = now
         if due:
             st.last_warning_s[key] = now
         return True
