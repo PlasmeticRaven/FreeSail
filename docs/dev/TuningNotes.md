@@ -39919,11 +39919,24 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - `..._with_her_head_in_the_wind_is_in_irons` (new case): "Missed stays: she lies in irons, her head in the wind."
   - `..._on_the_new_tack_names_where_she_lies`: the old naming kept for a tack that has come round, held 100 degrees off on the new tack: "Tacked; braced up on the larboard tack, heading S by W (190°)."; its tick count (the timeout's 300 s and one) as the old test had it.
   - Why: a tack fallen back on her old tack had not come round (the brig in 20 kn was logged "Tacked" lying 110 to 149 degrees off on her old tack).
-- No other pin moved: the 46 test files that tack or shorten, 5,485 fast-tier tests, passed under each rule alone before the build (the report's §7).
+- `tests/test_captain_trials.py::test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it`, by E alone (every other rule switched off in turn leaves it failing; E off, it passes as before). The states and the line count, old beside new:
+  - The answer: her topgallant yards are reported working in 27 kn at 1502 and 1503, and the captain takes the topgallants in at 1560.
+  - The states: old `..., (15060, hove to), (30780, on passage), (30840, keeping station), (32160, hove to), (38340, on passage), (38400, beating), (38400, keeping station), (41880, hove to), (51480, on passage), (51540, beating)`; new `..., (15060, hove to), (26760, on passage), (26820, keeping station), (32220, hove to), (38340, on passage), (38400, beating), (67200, keeping station)`.
+  - The lines: 1561 -> 1940. By kind: ship.aback 9 -> 32, sail.backed 2 -> 42, ship.missed_stays 1 -> 5, ship.wore 1 -> 4, order.accepted 109 -> 149.
+  - Unchanged: never aground, nothing carried away or blown out. The digest is not asserted (02f37aef18207781 on this container).
+  - For the lead: she fills away sooner in the gale's tail and is taken aback more often beating off the land.
+- No other pin moved. Before the build, the 46 test files that tack or shorten (5,485 fast-tier tests) passed under each rule alone (the report's §7). On the build, the slow tier of the captain's files passed but for the trial above.
 
 **What moves in the fleet (the truths 7-760 to 7-762 tables).**
 - The hermaphrodite brig alone of the committed ships, by the haul: plain 8 kn 411/405/397 -> 300/296/291 s; 12 kn 267/266/263 -> 198/198/196; 20 kn 176/170/170 -> 186/184/183; shortened 20 kn 138/150/149 -> 186/185/183. Every other committed ship's tacks the same to the second.
 - The brig in 20 kn, by the words: plain from 292.5 and 295 and shortened from 290 and 292.5, "Tacked" at 456 to 460 s -> "Missed stays: she came through the wind and fell back on her old tack."
 - The jib kept in 25 kn shortened: the frigate 309/205/231 -> 233/252/265 s; the razee from 295, 486 -> 261.
 
-**Read by:** (filled in by the build report: a reader other than the builder, on the stronger tier).
+**Read by:** a reader other than the builder, on the stronger tier, a subagent of this session (2026-11-24).
+- The moved evolution pins: passed.
+- Truths 7-760 to 7-769: each fails with its mend taken out, and each passes with it.
+- Its three points, mended:
+  - 7-766's storm-staysail assertion checked nothing; it now asserts "storm staysail" is not in the reply.
+  - The old-tack pin's tick count is exact (301 and the squaring's 51).
+  - The in-irons pin has the whole line, the urgency and the fell-off.
+- The moved trial pin (above) was measured after that reading, and is put to the lead with the build.

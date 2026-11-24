@@ -155,6 +155,13 @@ Closed, nothing built (the lead's ruling).
 
 - **The brig at seed 3:** the answer came at 1,495 s, but her watch still had not got her fore topgallant in when its yard went at 3,019 s. It is her hands, not the answer.
 - **The topgallants come in sooner** for most ships in seeds 1, 2, 3, 4, 6 and 8, by 60 to 940 s. The captain's first three states and their times are the same in every run measured.
+- **The captain's trials.** Of the trials, only the station off Ushant with the land under her lee moves (TuningNotes):
+  - her topgallant yards are reported working in 27 kn at 1,502 s, and the captain takes the topgallants in at 1,560 s;
+  - her day runs otherwise from there: filled away from her first a-try at 26,760 s (30,780 before), no second a-try (41,880 before), beating to the station at 67,200 s;
+  - never aground, and nothing lost;
+  - **taken aback 32 times in the day (9 before), and five missed stays (one)**, beating the gale's tail off the land;
+  - 1,940 lines (1,561 before).
+  - Put to the lead: the answer is right for the yards, but the day after it is a worse one off a lee shore.
 
 ## 7. Pins
 
@@ -164,7 +171,7 @@ Closed, nothing built (the lead's ruling).
   - The jib: all pass.
   - The captain: all pass.
   - The words: one moves (TuningNotes), and one tide-gauge timing test failed in that run, timing alone.
-- **The build:** the fast tier whole, and the slow tier of what it touched and of the captain trials (the build report gives the counts).
+- **The build:** the slow tier of the captain's files and of the evolutions file: 176 passed, and 1 failed, the lee-shore trial, moved by E (above and TuningNotes). The fast tier whole and the slow tier of what it touched: the build report gives the counts.
 
 ## 8. For the lead, measured and not built
 
@@ -180,6 +187,8 @@ Closed, nothing built (the lead's ruling).
 1. "Mainsail haul" called later, with the wind ahead, for a ship that comes slack into stays (of the committed ships, the hermaphrodite brig), and her tacks' times (§2.4).
 2. "Missed stays: she came through the wind and fell back on her old tack." and "Missed stays: she lies in irons, her head in the wind.", urgent, where "Tacked; braced up on ..." was said of a ship that had not come round (§4). After them, the missed stay's own lines ("Squared the yards; she fell off on ...").
 3. "The jib is left on her: she gripes, and her helm will not hold her without it." in the reply to `shorten sail`, and the jib left set, where a jib was taken in by its rating and her helm needs it (§5). The storm staysails are no longer set in its place on that account.
-4. "By the captain, ...: taking in the topgallants (the topgallant yards working)." for every ship the game's captain sails, in a wind over his worsening line, with what follows from it: the topgallants in sooner, and the shortening's own "take in the topgallants" then finding them in (§6).
+4. "By the captain, ...: taking in the topgallants (the topgallant yards working)." for every ship the game's captain sails, in a wind over his worsening line, with what follows from it (§6):
+   - the topgallants in sooner, and the shortening's own "take in the topgallants" then finding them in;
+   - in the lee-shore trial, a different day after it.
 
 Nothing else is served differently. The fleet's sweeps (§1, §2.4) are the same to the second for every committed ship but the hermaphrodite brig; the fast tier of every file that tacks or shortens passes but for the one moved pin.

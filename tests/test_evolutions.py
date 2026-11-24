@@ -910,8 +910,9 @@ def test_a_tack_ended_by_the_steady_timeout_on_her_old_tack_is_a_missed_stay():
     assert [n for n in notes if n[1] == "ship.missed_stays"][0][0] == "urgent"
     assert kinds(notes)[-1] == "ship.fell_off"
     assert ship.dyn.tack == "starboard"
-    # the timeout's 300 s from the tick her head yards' swing ended, and then the squaring
-    assert held > EVOLUTIONS["tack"].timing["steady_timeout_s"]
+    # the timeout's 300 s from the tick her head yards' swing ended and one (as the new tack's
+    # case below), and then the yards squared, 51 s
+    assert held == EVOLUTIONS["tack"].timing["steady_timeout_s"] + 1 + 51
 
 
 def test_a_tack_ended_by_the_steady_timeout_with_her_head_in_the_wind_is_in_irons():
@@ -921,9 +922,11 @@ def test_a_tack_ended_by_the_steady_timeout_with_her_head_in_the_wind_is_in_iron
     _, notes, _ = _tack_held_at_the_end(95.0)
     said = dict(zip(kinds(notes), texts(notes), strict=True))
     assert "ship.tacked" not in kinds(notes)
-    assert said["ship.missed_stays"].startswith(
-        "Missed stays: she lies in irons, her head in the wind. "
+    assert said["ship.missed_stays"] == (
+        "Missed stays: she lies in irons, her head in the wind. Up helm; square the yards."
     )
+    assert [n for n in notes if n[1] == "ship.missed_stays"][0][0] == "urgent"
+    assert kinds(notes)[-1] == "ship.fell_off"
 
 
 def test_a_tack_ended_by_the_steady_timeout_on_the_new_tack_names_where_she_lies():

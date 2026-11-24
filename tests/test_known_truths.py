@@ -24114,7 +24114,7 @@ def test_truth_7_766_the_jib_she_cannot_be_held_without_is_left_on_her_and_said(
         "The jib is left on her: she gripes, and her helm will not hold her without it."
         in reply.text
     ), reply.text
-    assert "set the storm staysails" not in reply.text.lower()
+    assert "storm staysail" not in reply.text, reply.text  # not called for in its place
     world.tick()
     _idle_125(world, 1500)
     assert world.ship.sails["jib"].state == SailState.SET
