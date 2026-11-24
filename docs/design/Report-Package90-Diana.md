@@ -71,6 +71,12 @@ hold her. She comes up into the wind and loses her way before the helm is put do
 frigate-36's rudder ratio she stays from all three. The merge of 569031b1 is done; her truths and
 tiers wait on the lead.
 
+**In 25 knots shortened, her captain's cure (§15, nudge 69): measured, nothing filed.**
+`set the jib` again, once the game's shortening has taken it in, cures it. She bears away, gathers
+way and stays from all three headings, and the jib holds. Taking in the spanker, before or after,
+does not cure it. The order of shortening is the engine's one rule for every ship, not hers. The
+choice comes back to the owner.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1479,3 +1485,91 @@ to move. The options I see:
 
 Whether the owner's "Join now" stands on this is the lead's to put to them. Her tiers wait for the
 lead's word, and then run on the exact hash.
+
+## 15. In 25 knots shortened: can her captain cure it with an order the game takes? (2026-11-24)
+
+The lead's nudge 69 (the trunk at 0eb5d62a): the stop of §14 was right. The owner's "Join now" was
+given on the lead's words that she tacks shortened in both winds, and in 25 kn she does not. **The
+choice comes back to the owner when this probe is in, and none is put to them yet.** Nothing is
+pinned or tiered, and her file is as at 8ce21bd.
+
+The probe ran on scratch copies, nothing filed or tuned. In 25 kn from 290, 292.5 and 295 deg:
+1. Plain sail settled as the truths settle her.
+2. Each order given in turn, each run until the runner holds none of it.
+3. Up to 600 s for her to have way (4 kn or more at 60 deg off or more, for 60 s).
+4. "tack ship".
+
+Her weather helm (positive) and rudder are in degrees.
+
+### 15.1 What each order does, and the tack
+
+| Scenario | The Diana | The frigate-36 |
+|---|---|---|
+| A: `shorten sail` to its end, then `brail up the spanker` | **0 of 3**, missed stays at 49 to 51 s | 3 of 3 (187 to 263 s) |
+| B: `brail up the spanker` first, then `shorten sail` | **0 of 3**, missed at 47 to 51 s | 2 of 3 (227, 273 s; missed from 295) |
+| B2: `reef the spanker` (one reef) first, then `shorten sail` | 1 of 3 (from 290, 225 s) | 3 of 3 (226 to 248 s) |
+| **C: `shorten sail` to its end, then `set the jib`** | **3 of 3 (184, 187, 189 s)** | 3 of 3 (215 to 252 s) |
+
+The game took every order: "brail up" is one of its words for taking in a gaff sail, and her
+spanker has two reef bands.
+
+**Step by step**, at the end of each order and at the order to tack:
+
+| | From 290 | From 292.5 | From 295 |
+|---|---|---|---|
+| plain sail | 70.0 off, 8.5 kn, helm 0.9 | 67.6 off, 8.0 kn, 0.3 | 65.2 off, 7.3 kn, -0.4 |
+| shortened | 69.9 off, 7.6 kn, helm 7.4 | **59.4 off, 1.2 kn**, -3.7, rudder -7.8 | **35.2 off, 1.2 kn**, 2.1, rudder -19.7 |
+| A: spanker brailed | 73.6 off, 7.7 kn, 3.0 | 72.6 off, 3.7 kn, -3.0 | 56.7 off, 1.1 kn, 8.7 |
+| A: at the order to tack | 70.2 off, 7.2 kn, 0.3, **missed stays** | 62.2 off, 4.7 kn, 3.9, **missed** | 66.3 off, 5.8 kn, 1.2, **missed** |
+| C: jib set | 72.8 off, 8.7 kn, 1.5 | 67.5 off, 7.5 kn, -1.1 | 65.0 off, 6.9 kn, -2.1 |
+| C: at the order to tack | 70.2 off, 8.2 kn, -0.5, **tacked 184 s** | 67.5 off, 7.5 kn, -1.2, **tacked 187 s** | 65.0 off, 6.9 kn, -2.1, **tacked 189 s** |
+
+1. **`brail up the spanker` after the shortening: her helm comes back, and she bears away and
+   gathers way, but she does not stay.** With no spanker there is nothing at "helm's a-lee" to bring
+   her up ("haul aft the spanker sheet", the tack's own first order), and she misses from every
+   heading. The frigate-36 stays without hers.
+2. **The spanker in before the shortening does no better**, from any heading. With one reef in it
+   she stays from 290 alone.
+3. **`set the jib` again once shortened: the order is taken, the jib holds, and it brings her head
+   off.**
+   - From 59 and 35 deg off with 1.2 kn she bears away to her course and gathers 7.5 and 6.9 kn,
+     her helm within 2.1 deg of amidships, and she stays from all three headings in 184 to 189 s.
+   - Through the tack the jib is loaded to 0.68 to 0.78 of its rating, and in 45 minutes more it
+     is not blown out.
+   - At 0.75 or more of its rating, `shorten sail` would take it in again, if that order is given
+     again.
+   - The rules captain takes a strained head sail in only over `shorten_sail_kn`, 30 kn, so in 25
+     kn the jib is left set.
+4. **The frigate-36 under the same orders** stays in 11 of 12. She keeps her way through the
+   shortening from every heading. Her weather helm peaks at 14.5 deg during it (§14.2) and is 8.0
+   to 11.2 at its end, her rudder holding it.
+
+### 15.2 The order of shortening: the engine's, not hers
+
+`shorten sail` is the engine's one rule for every ship (`orders/storm.py`'s head):
+- the vocabulary's one list (`data/vocabulary.yaml`): the studding sails, the square sail where
+  there is one, the royals, the flying jib and the topgallants;
+- then every jib whose load is 0.75 (`HEAD_SAIL_IN_RATIO`) of its own rating or more;
+- over 40 kn of true wind, the storm staysails;
+- in a breeze, the topsails reefed, as traced (§14).
+
+All a ship's file gives it is which sails are her jibs (her groups: the jib and the flying jib)
+and each one's rating. Her jib's rating comes by the generator's shared rule from its area and the
+frigate's canvas.
+
+Her book sets when a captain shortens, not what is taken in or in what order. So the order of
+shortening is not hers to set, and it is not bent for her.
+
+### 15.3 For the lead
+
+- **Her captain can cure it with an order the game already takes: `set the jib` once the game's
+  shortening has taken it in.** She then bears away, gathers way and stays from all three headings
+  in 25 kn, and the jib holds.
+- **The spanker taken in, before or after, does not cure it.** It takes away what brings her up.
+- **What the cure turns on** is the engine's rule taking in a jib at 0.75 of its rating, which
+  leaves her with more weather helm than her rudder holds. That is the engine's rule and every
+  ship's. Her rudder, as traced, is the least of any ship's, and is the cause of her griping past it.
+
+Nothing pinned or tiered. When the lead and the owner have ruled, her gate is ready to build as §14.4
+sets it out: truth E's two rows, truth D with the line owed with package 125, her rudder's note, and
+her truths split by case under the five-second line.
