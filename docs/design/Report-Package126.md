@@ -40,6 +40,21 @@ game's choices.
   after another draws its rows as its own scenario gives them. `Harbour.stations()` lists nothing
   while no game is in play.
 
+**As a player reads it.** The page, under the game in play: the button "end the game". With
+nothing unsaved, under it: "The game is ended.", and the page's head says "no game yet". With play
+since the last save, under it in the refusal's colour: "This game has not been saved; what has passed
+in it, to <the ship's time now>, is lost if it is ended. End it all the same, or save it first." Or,
+after a save: "This game was last saved at <its time>; what has passed since, to <now>, is lost if it
+is ended. End it all the same, or save it first." Beside it is the button "end it, losing what is not
+saved".
+
+**A model's door closed by the end is said in the ended game's log before the world is let go.** The
+door's own Ctrl-C stands its station down, and the game's last line is the stand-down: "The watcher
+stood down by the API door: ... The station is released and may be taken again. The game is saved."
+(truth 7-773 holds it the log's last line). The model's side is told by its door, as at any stop, and
+the station's record is saved as at any stand-down. That save is a new file of the saves place, not a
+save the player made.
+
 **Truths.** 7-770 (the end, the refusal and its words, a save untouched, a game begun after,
 `tests/test_harbour.py`); 7-771 (a page that asks at every line of the end finds the whole game or
 none, never the one beside the other; the start's probe, applied to the end); 7-772 (in the
@@ -69,11 +84,29 @@ while the sight is a few miles and "thick" at a mile or less. `Conditions` carri
 (`fog`, a class default of 0 for a pinned sky and for a checkpoint written before).
 `coastal_fog` is now `fog_degree > 0`.
 
-**The lines** (`World._tick_weather`, `weather.FOG_LINES`): "A fog is settling in." as it first
-settles (the weather's change to fog, notable as "Fog came down." was, which stays for a fog that
-comes on at its full); "The fog is thickening." and "The fog has shut in thick." as the sight closes
-a step and shuts in to a cable (notable); "The fog seems to be clearing." as it first opens from a
-cable and "The fog is thinning." as it opens a step more (routine); "The fog lifted." as before. The
+**The lines** (`World._tick_weather`, `weather.FOG_LINES`), with their severities as the lead
+ruled them:
+
+| Line | When | Severity |
+|---|---|---|
+| "A fog is settling in." | the weather's change to fog ("Fog came down." stays for a fog that comes on at its full) | notable |
+| "The fog is thickening." | the sight closes a step short of a cable | routine |
+| "The fog has shut in thick." | the sight shuts in to a cable | notable |
+| "The fog seems to be clearing." | the sight first opens from a cable | notable |
+| "The fog is thinning." | the sight opens a step more | routine |
+| "The fog lifted." | the weather's change from fog, as before | routine |
+
+**One fog, first to last.** On a hazy sky (truth 7-774's) there are four lines, three of them
+notable; from a clear sky six, three notable. Before, there were two, one notable. A compressed
+clock is eased only by an urgent line (`Driver._on_event`), so a compressed passage runs on through
+a fog as before. The three notable lines are shown singly in the roll-up where routine ones are
+rolled up. A seated model whose policy samples on notable (the watcher's default, "every glass and
+on notable and urgent events") is sampled three times in a fog where it was sampled once, and under
+the pace rule the clock is at 1x while each sample is open.
+
+**A game saved by another build and taken up by replay** (not its checkpoint) is played again under
+this build's weather. Its fogs come on and go by degrees with these lines, and what was ordered in
+them is replayed as ordered; nothing compares its log with the save's. The
 steps are a new kind, `weather.fog`. The change of weather keeps its kind, `weather.change`, which the
 officer's and the captain's wakes read.
 
@@ -145,6 +178,31 @@ not in distress, the wind under the shortening figure). In turn:
 
 Each order says why, in his words: "By the captain, keeping station: shifting the main topmast (the
 main topmast carried away)."
+
+**What the period sources in the repository give a vessel to carry** (searched in
+`docs/references/`, an hour at most, as the lead asked; for the owner's question, no ship's file
+changed):
+
+| Source | What it gives |
+|---|---|
+| Luce 1866 (1877 printing), ch. XVII, "Spare Spars, Preparing for Sea" (the OCR's page number is not legible) | A ship's booms in two piles: on the starboard side the main topmast, a stump main topgallant mast, mast-fishes, a half-yard and the main topmast studding-sail booms; on the port side the same for the fore, with the flying jib-boom; the spare fore and main topsail yards on the quarters and the spare jib-boom amidships. "Top-gallant and royal-yards and studding-sail booms are easily replaced", while a spare topsail or lower yard may save a vessel on a lee shore. This is the frigate's and the ships' of the line list today, and the source of their files'. |
+| Luce 1884, ch. XXXI, p. 496 | "Topgallant mast carried away ... send down the wreck"; sprung, "send it down and send up" another; "All sprung spars should be shifted if possible". No list by size. |
+| Fincham 1843, p. 286 | A main yard carried away is made again at sea from the spare spars: the two topmast studding-sail booms end to end, scarphed with the spare topsail and topgallant yards and woolded. No list by size. |
+| Falconer 1780, SPARE | "spare top-masts, spare sails, spare rigging": the word, no list. |
+
+**No source in the repository gives the spare spars of a vessel of a brig's, a schooner's or a
+cutter's size.** Their files' spares are judgement after Luce 1866's ship's list (the brig's and the
+hermaphrodite brig's stump topgallant mast among them; the cutter, the schooners, the merchant brig,
+the lugger, the bilander and the smack none). I stopped there.
+
+**A note only (nothing of it built): a light spar made from a spare she does carry.** The game's
+work replaces a spar only by a spare of its own class (`shift_spar`), and a lower mast by a spare
+topmast stepped as a jury mast (`jury_mast`). Nothing in it makes a topgallant mast of a spare yard
+or boom. Fincham's temporary yard of scarphed spars is that kind of work, and Luce 1866's stump
+topgallant mast is a short spar of the same kind. A "jury topgallant mast" from the cutter's spare
+topsail yard would be a new evolution: its class, its time, its rating and what it may carry, beside
+`jury_mast.yaml`. Its sail would stand on the shortened spar at a share of its strength, as the jury
+mast's does.
 
 **Truths.** 7-776 (the cutter's main topmast: the wreck, the topmast, the jib, the topsail yard, the
 topsail, the gaff topsail; the topgallant mast left for want of a spare); 7-777 (the Renard's own

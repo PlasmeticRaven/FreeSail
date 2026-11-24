@@ -39855,3 +39855,30 @@ Built by the engine track's builder; to be passed by an independent reader (the 
 The catalogue (`agents/tools.py`, `_evolution_text`) glosses `{sail}` alone. `take_in_pole` and `furl_pole` (A6) serve marks of their own, `{pole_lowered}`, `{pole_hanging}`, `{pole_furl_from}` and `{pole_furled_on}`, which `scripts.pole_words` fills by the yard below. Each file's served notes now end with a paragraph that glosses them in the words the game fills them with, the yard below's and the hounds': "In its words the game fills {pole_lowered} with "down onto the yard below" ...; where no square yard is crossed below it, with "down to the hounds" ...". No line of code; what she does and says does not move. `tests/test_pole_mast.py`, `test_the_pole_evolutions_marks_are_glossed_where_they_are_served`, ties each gloss to `POLE_WORDS_ON_THE_YARD_BELOW` and `POLE_WORDS_AT_THE_HOUNDS`, so a word changed in one place and not the other fails it; it fails with the gloss undone.
 
 Built by the engine track's builder; to be passed by an independent reader (the plan's §10.4).
+
+## Package 126: the harbour, the weather and the captain (2026-11-24)
+
+**No pin moved.** The fast tier whole on the four parts before their truths were written
+(4f63d86, 89 min on four workers): 8,702 passed, 1 failed, 8 skipped, 1 xfailed; the one failure
+truth 7-284's timing pin on the tide's blend under the load of four workers (0.0169 s against 1.25
+x 0.0124 s), code not touched, passing alone three times of three. The new figures, each
+JUDGEMENT and defined with its ground where it stands:
+
+- `weather.FOG_SETTLE_S` 1,800 s and `FOG_CLEAR_S` 3,600 s: advection fog rolls in off the cold
+  water on a light air within the half hour, and is lifted and thins over an hour or so as the wind
+  freshens or the sun gains (W §1.4's fog, its pace judgement). The blocks that draw fog are the old
+  ones, the same seeded draw, so every fog of the old weather is one of the new, at the same edges.
+- `weather.FOG_WIND_THIN_KN` 3 kn and `FOG_COAST_THIN_KM` 5 km: thick three knots under the 12 kn
+  that lifts it and a few miles inside its 30 km reach; thinning between, where it stopped at once.
+- `captains.SPAR_MEND_ORDER` (after Luce 1884, ch. XXXI, p. 496: the wreck sent down first, "All
+  sprung spars should be shifted if possible"; Luce 1866, ch. XVII: "Top-gallant and royal-yards and
+  studding-sail booms are easily replaced", the topsail and lower yards the ones that save a ship
+  on a lee shore) and `SPAR_WORK_QUIET_S` 600 s (the repairs' own interval: never under fire).
+
+**One fog's lines, old beside new** (off Falmouth under the June high, seed 7, the morning of the
+5th; truth 7-774): old, "Fog came down." (notable) at the block's edge and "The fog lifted."
+(routine) at the next, the sight from the horizon to a cable and back at one minute each. New, on a
+hazy sky: "A fog is settling in." (notable), "The fog has shut in thick." (notable) 30 min later,
+"The fog seems to be clearing." (notable) an hour before the edge, "The fog lifted." (routine) at
+it; from a clear sky "The fog is thickening." and "The fog is thinning." (routine) between, six
+lines in all. The sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
