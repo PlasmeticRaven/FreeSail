@@ -23839,3 +23839,347 @@ def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
             w.captain.role = role
             kept = role == "prize-master" or ROLE_SERVICE[role] == other
             assert F.world_role(w) == (role if kept else SERVICE_ROLE[other]), (role, other)
+
+
+# ---------------------------------------------------------------------------
+# Package 125: the moment of the haul, a failed tack's words, the jib she cannot be held
+# without, and the captain's answer to a straining topgallant yard (truths 7-760 to 7-769;
+# docs/design/Report-Package125.md; docs/dev/TuningNotes.md, "Package 125")
+# ---------------------------------------------------------------------------
+
+# The fleet's tacks by ship and wind, measured at seed 7 by the truths' own helpers (the wind
+# from the north, no gusts): for each committed ship that tacks under the truths' settle, the
+# headings from which she stays (of 290, 292.5 and 295), the band her stays fall in (the
+# measured times less and more thirty seconds, to the ten; JUDGEMENT, a band and not the
+# seconds), and the count she made on the trunk before this package, by what she did (the
+# brig's two 20-knot tacks that fell back on her old tack and were logged "Tacked" are not
+# counted). The merchant brig, the bilander and the smack are not in it: under the truths'
+# settle their tacks never begin (the first two's small watch still setting their sail, the
+# smack not close-hauled for the runner at these headings; the report's §3). Under plain sail:
+FLEET_PLAIN = {
+    ("brig", 8): ((290.0, 292.5, 295.0), (130, 460), 3),
+    ("brig", 12): ((290.0, 292.5, 295.0), (340, 440), 3),
+    ("brig", 15): ((290.0, 292.5, 295.0), (410, 490), 3),
+    ("brig", 20): ((290.0,), (280, 350), 1),
+    ("brig", 25): ((290.0, 292.5, 295.0), (290, 540), 3),
+    ("cutter", 8): ((290.0, 292.5, 295.0), (100, 170), 3),
+    ("cutter", 12): ((290.0, 292.5, 295.0), (70, 140), 3),
+    ("cutter", 15): ((290.0, 292.5, 295.0), (70, 140), 3),
+    ("cutter", 20): ((290.0, 292.5, 295.0), (140, 210), 3),
+    ("cutter", 25): ((290.0, 292.5, 295.0), (190, 290), 3),
+    ("frigate-36", 8): ((290.0, 292.5, 295.0), (200, 270), 3),
+    ("frigate-36", 12): ((290.0, 292.5, 295.0), (140, 360), 3),
+    ("frigate-36", 15): ((290.0, 292.5, 295.0), (310, 480), 3),
+    ("frigate-36", 20): ((290.0, 292.5, 295.0), (190, 310), 3),
+    ("frigate-36", 25): ((290.0, 292.5, 295.0), (200, 310), 3),
+    ("hermaphrodite-brig", 8): ((290.0, 292.5, 295.0), (260, 330), 3),
+    ("hermaphrodite-brig", 12): ((290.0, 292.5, 295.0), (160, 230), 3),
+    ("hermaphrodite-brig", 15): ((290.0, 292.5, 295.0), (150, 230), 3),
+    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (150, 220), 3),
+    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (130, 210), 3),
+    ("lugger", 8): ((290.0, 292.5, 295.0), (150, 220), 3),
+    ("lugger", 12): ((290.0, 292.5, 295.0), (140, 210), 3),
+    ("lugger", 15): ((290.0, 292.5, 295.0), (140, 210), 3),
+    ("lugger", 20): ((290.0, 292.5, 295.0), (160, 230), 3),
+    ("lugger", 25): ((290.0, 292.5, 295.0), (160, 240), 3),
+    ("privateer-schooner", 8): ((290.0, 292.5, 295.0), (210, 280), 3),
+    ("privateer-schooner", 12): ((290.0, 292.5, 295.0), (130, 210), 3),
+    ("privateer-schooner", 15): ((290.0, 292.5, 295.0), (110, 180), 3),
+    ("privateer-schooner", 20): ((290.0,), (200, 270), 1),
+    ("privateer-schooner", 25): ((290.0, 292.5, 295.0), (120, 190), 3),
+    ("razee-44", 8): ((290.0,), (480, 550), 1),
+    ("razee-44", 12): ((290.0, 292.5, 295.0), (300, 420), 3),
+    ("razee-44", 15): ((290.0, 292.5, 295.0), (390, 520), 3),
+    ("razee-44", 20): ((290.0, 292.5, 295.0), (320, 410), 3),
+    ("razee-44", 25): ((290.0, 292.5, 295.0), (210, 310), 3),
+    ("seventy-four", 8): ((), None, 0),
+    ("seventy-four", 12): ((290.0, 292.5, 295.0), (170, 270), 3),
+    ("seventy-four", 15): ((290.0, 292.5, 295.0), (200, 290), 3),
+    ("seventy-four", 20): ((290.0, 292.5, 295.0), (250, 350), 3),
+    ("seventy-four", 25): ((290.0, 292.5, 295.0), (210, 300), 3),
+    ("sixty-four", 8): ((290.0,), (330, 400), 1),
+    ("sixty-four", 12): ((290.0, 292.5, 295.0), (180, 280), 3),
+    ("sixty-four", 15): ((290.0, 292.5, 295.0), (210, 300), 3),
+    ("sixty-four", 20): ((290.0, 292.5, 295.0), (240, 350), 3),
+    ("sixty-four", 25): ((290.0, 292.5, 295.0), (160, 320), 3),
+    ("topsail-schooner", 8): ((290.0, 292.5, 295.0), (210, 280), 3),
+    ("topsail-schooner", 12): ((290.0, 292.5, 295.0), (130, 210), 3),
+    ("topsail-schooner", 15): ((290.0, 292.5, 295.0), (110, 180), 3),
+    ("topsail-schooner", 20): ((290.0,), (200, 270), 1),
+    ("topsail-schooner", 25): ((290.0, 292.5, 295.0), (120, 190), 3),
+}
+# Shortened by the game's own `shorten sail`, run to its end, sixty seconds, then the helm put
+# down (the report's §1), in 20 and 25 knots:
+FLEET_SHORTENED = {
+    ("brig", 20): ((295.0,), (170, 240), 1),
+    ("brig", 25): ((290.0, 292.5, 295.0), (400, 500), 3),
+    ("cutter", 20): ((290.0, 292.5, 295.0), (60, 140), 3),
+    ("cutter", 25): ((290.0, 292.5, 295.0), (70, 140), 3),
+    ("frigate-36", 20): ((290.0, 292.5, 295.0), (220, 300), 3),
+    ("frigate-36", 25): ((290.0, 292.5, 295.0), (170, 340), 3),
+    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (150, 220), 3),
+    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (130, 200), 3),
+    ("lugger", 20): ((290.0, 292.5, 295.0), (160, 230), 3),
+    ("lugger", 25): ((290.0, 292.5, 295.0), (180, 260), 3),
+    ("privateer-schooner", 20): ((290.0, 292.5, 295.0), (80, 150), 3),
+    ("privateer-schooner", 25): ((290.0, 292.5, 295.0), (80, 150), 3),
+    ("razee-44", 20): ((290.0, 292.5, 295.0), (330, 430), 3),
+    ("razee-44", 25): ((290.0, 292.5, 295.0), (230, 520), 3),  # 261 from 295 with her jib kept
+    ("seventy-four", 20): ((290.0, 292.5, 295.0), (150, 290), 3),
+    ("seventy-four", 25): ((290.0, 292.5, 295.0), (170, 320), 3),
+    ("sixty-four", 20): ((290.0, 292.5, 295.0), (190, 290), 3),
+    ("sixty-four", 25): ((290.0, 292.5, 295.0), (170, 310), 3),
+    ("topsail-schooner", 20): ((290.0, 292.5, 295.0), (80, 150), 3),
+    ("topsail-schooner", 25): ((290.0, 292.5, 295.0), (80, 150), 3),
+}
+
+TACK_ENDS = ("ship.tacked", "ship.missed_stays", "evolution.failed")
+FLEET_HEADINGS = (290.0, 292.5, 295.0)
+
+
+def _idle_125(world, limit: int) -> None:
+    """Run her until no evolution of hers is under way, trimmed every two minutes, at most
+    `limit` seconds."""
+    for i in range(limit):
+        runner = world.ship.extra.get("evolutions")
+        if not getattr(runner, "instances", None):
+            return
+        world.tick()
+        if i % 120 == 60:
+            world.submit("trim sails")
+
+
+def _fleet_tack(world, made: bool, band) -> None:
+    world.submit("tack ship")
+    done, seconds = until(world, TACK_ENDS, 900)
+    kinds = [e.kind for e in done]
+    if made:
+        assert kinds == ["ship.tacked"], [e.text for e in done]
+        assert band[0] <= seconds <= band[1], seconds
+        assert world.ship.dyn.tack == "larboard"
+    else:
+        assert "ship.tacked" not in kinds, [e.text for e in done]
+
+
+def test_truth_7_760_no_ship_tacks_worse_than_she_did():
+    """Package 125 (truth 7-760, the table's own check): in every cell of the fleet's tables, plain
+    and shortened, she stays from at least as many headings as she did on the trunk before this
+    package, by what she did. The haul by her way moves no committed square-rigger's tack (every
+    one keeps 0.48 to 0.58 of her way at the point and hauls there as before); the hermaphrodite
+    brig, slack in stays (0.21 to 0.33), hauls with the wind ahead and stays as before, quicker in
+    light airs (411 to 291 s in 8 knots) and slower shortened in 20 (138 to 186 s)."""
+    for table in (FLEET_PLAIN, FLEET_SHORTENED):
+        for key, (made, band, trunk) in table.items():
+            assert len(made) >= trunk, key
+            assert (band is None) == (not made), key
+
+
+@pytest.mark.parametrize(
+    ("ship", "wind_kn", "heading"),
+    [(s, w, h) for (s, w) in sorted(FLEET_PLAIN) for h in FLEET_HEADINGS],
+)
+def test_truth_7_761_the_fleet_goes_about_under_plain_sail(ship, wind_kn, heading):
+    """Package 125 (truth 7-761): the fleet's tacks under all plain sail, 8 to 25 knots, each
+    case its outcome by the table and, made, its band. **Hauled by how she comes round, no
+    ship goes about worse than she did.**"""
+    made, band, _ = FLEET_PLAIN[(ship, wind_kn)]
+    world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
+    _fleet_tack(world, heading in made, band)
+
+
+@pytest.mark.parametrize(
+    ("ship", "wind_kn", "heading"),
+    [(s, w, h) for (s, w) in sorted(FLEET_SHORTENED) for h in FLEET_HEADINGS],
+)
+def test_truth_7_762_the_fleet_goes_about_shortened(ship, wind_kn, heading):
+    """Package 125 (truth 7-762): the same shortened by the game's own `shorten sail` in 20 and 25
+    knots, the shortening run to its end (six to eight seconds a case: the slow tier, by its
+    node ids in tests/conftest.py's `SLOW_TESTS`)."""
+    made, band, _ = FLEET_SHORTENED[(ship, wind_kn)]
+    world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
+    _idle_125(world, 900)
+    world.submit("shorten sail")
+    world.tick()
+    _idle_125(world, 1500)
+    run(world, 60)
+    _fleet_tack(world, heading in made, band)
+
+
+def _haul_moment(ship: str, wind_kn: float, heading: float) -> dict:
+    """Her head off the wind, and her way against her way at "helm's a-lee", at the tick the
+    tack's "mainsail haul" is called (the script's phase read each tick)."""
+    from freesail.evolutions.scripts import TackScript
+
+    world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
+    world.submit("tack ship")
+    for _ in range(300):
+        world.tick()
+        runner = world.ship.extra.get("evolutions")
+        tack = [i.script for i in runner.instances if isinstance(i.script, TackScript)]
+        if tack and tack[0].phase not in ("ready", "in_studding_sails", "helm_down"):
+            sc = tack[0]
+            return {
+                "off": off_wind(world),
+                "share": world.ship.dyn.speed / sc.speed_at_helm,
+                "through": sc.through,
+            }
+    raise AssertionError("no haul in 300 s")
+
+
+def test_truth_7_763_a_slack_ship_hauls_with_the_wind_ahead_a_smart_one_at_the_point():
+    """Package 125 (truth 7-763), Luce 1884 p. 417's two readings: the after yards hauled "with
+    the wind ahead or a point on the bow". **A ship coming round smartly hauls at the point; one
+    slack in stays waits for the wind ahead.** The frigate in 15 knots keeps half her way and more
+    at the point (0.53 measured) and hauls there, her head 8 to 11.25 degrees off; the
+    hermaphrodite brig keeps under two fifths (0.16 there) and hauls with her head within half a
+    degree of the wind, or through it (read at the tick's end, within a degree and a half). Old:
+    both a point off (the brig 10 to 11 degrees)."""
+    smart = _haul_moment("frigate-36", 15.0, 292.5)
+    assert smart["share"] >= 0.4 and 8.0 <= smart["off"] <= 11.25, smart
+    slack = _haul_moment("hermaphrodite-brig", 15.0, 292.5)
+    assert slack["share"] < 0.4, slack
+    # read at the end of the tick the haul is called in, her head swung on by then (1.09 deg)
+    assert slack["off"] <= 1.5 or slack["through"], slack
+
+
+def test_truth_7_764_a_tack_that_falls_back_is_said_to_have_missed_stays():
+    """Package 125 (truth 7-764), on a square rig: the brig in 20 knots from 292.5 comes through
+    the wind to some 90 degrees off, gathers sternway (her helm shifted hard over for it) and
+    falls back through the wind on to her old tack. **What she did is said: she missed stays,
+    and the line says how.** Urgent, and never "Tacked". Old: "Tacked; braced up on the starboard
+    tack, heading SW by S (211°)." at 459 s."""
+    world = close_hauled_on_starboard("data/ships/brig.yaml", knots_=20.0, heading=292.5)
+    world.submit("tack ship")
+    done, seconds = until(world, TACK_ENDS, 900)
+    assert [e.kind for e in done] == ["ship.missed_stays"], [e.text for e in done]
+    assert done[0].text.startswith(
+        "Missed stays: she came through the wind and fell back on her old tack. Up helm; "
+    )
+    assert done[0].severity.value == "urgent"
+    assert 400 <= seconds <= 520, seconds  # the timeout's end, as before (459 s)
+    assert world.ship.dyn.tack == "starboard"
+
+
+@pytest.mark.parametrize("held", ["old tack", "in irons"])
+def test_truth_7_765_a_fore_and_afters_failed_tack_is_said_as_she_lies(held):
+    """Package 125 (truth 7-765), on a fore-and-aft rig: the cutter put about in 15 knots and,
+    from the moment she is steadying on her new course, held on her old tack (her head at 292.5,
+    as she was), or with her head five degrees off the wind, until the timeout. **She is said to
+    have missed stays, fallen back on her old tack or in irons, and not to have tacked.** (Her
+    own tacks come round; this is the line's truth for a rig with no yards to square.)"""
+    from freesail.evolutions.scripts import TackScript
+
+    world = close_hauled_on_starboard("data/ships/cutter.yaml", knots_=15.0, heading=292.5)
+    world.submit("tack ship")
+    start = world.clock.tick
+    lie = math.radians(292.5 if held == "old tack" else 355.0)
+    for _ in range(900):
+        world.tick()
+        runner = world.ship.extra.get("evolutions")
+        tack = [i.script for i in runner.instances if isinstance(i.script, TackScript)]
+        if tack and tack[0].phase in ("steady", "missed"):
+            world.ship.dyn.heading = lie
+            world.ship.dyn.r = 0.0
+        if [e for e in world.log if e.kind in TACK_ENDS and e.tick > start]:
+            break
+    done = [e for e in world.log if e.kind in TACK_ENDS and e.tick > start]
+    assert [e.kind for e in done] == ["ship.missed_stays"], [e.text for e in done]
+    why = (
+        "she came through the wind and fell back on her old tack"
+        if held == "old tack"
+        else "she lies in irons, her head in the wind"
+    )
+    assert done[0].text.startswith(f"Missed stays: {why}. "), done[0].text
+
+
+def _settled_for_shortening(ship: str, wind_kn: float, heading: float):
+    world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
+    _idle_125(world, 900)
+    return world
+
+
+def test_truth_7_766_the_jib_she_cannot_be_held_without_is_left_on_her_and_said():
+    """Package 125 (truth 7-766): in 25 knots close-hauled the frigate's jib is loaded to three
+    quarters of its rating, and taken in she would want some ten degrees of helm of her 35 to hold
+    her (a quarter of the travel is the line). **The game's `shorten sail` leaves it on her and
+    says so**, the storm staysails not called for it; shortened, she keeps her course and her way
+    (65 to 72 degrees off, 6 to 9 knots measured 7.1 to 8.3). Old: the jib hauled down, and she
+    griped to 61 degrees off at the worst and came back. In 20 knots, its load under the line,
+    nothing is said of it."""
+    from freesail.ship.parts import SailState
+
+    world = _settled_for_shortening("frigate-36", 25.0, 292.5)
+    reply = world.submit("shorten sail")
+    assert (
+        "The jib is left on her: she gripes, and her helm will not hold her without it."
+        in reply.text
+    ), reply.text
+    assert "set the storm staysails" not in reply.text.lower()
+    world.tick()
+    _idle_125(world, 1500)
+    assert world.ship.sails["jib"].state == SailState.SET
+    assert 65.0 <= off_wind(world) <= 72.0 and 6.0 <= knots(world) <= 9.0
+    calm = _settled_for_shortening("frigate-36", 20.0, 292.5)
+    assert "left on her" not in calm.submit("shorten sail").text
+
+
+def test_truth_7_767_a_jib_over_its_rating_is_taken_in_and_the_players_order_obeyed():
+    """Package 125 (truth 7-767): the jib is kept only while it is under its whole rating; over
+    it, `shorten sail` takes it in as before (it is straining, and blows out at 1.8 of it). And
+    the player's own `take in the jib` is obeyed whatever her helm wants."""
+    from freesail.orders import storm
+
+    world = _settled_for_shortening("frigate-36", 25.0, 292.5)
+    jib = world.ship.sails["jib"]
+    taken, kept = storm.loaded_jibs(world.ship)
+    assert kept == [jib] and taken == []
+    rating = jib.effective_cloth_rating_kn
+    jib.load_kn = 1.05 * rating
+    taken, kept = storm.loaded_jibs(world.ship)
+    assert taken == [jib] and kept == []
+    reply = world.submit("take in the jib")
+    assert reply.kind != "order.rejected", reply.text
+    for _ in range(300):
+        world.tick()
+    assert not jib.is_set
+
+
+def test_truth_7_768_the_captain_takes_in_the_topgallants_when_their_yards_work():
+    """Package 125 (truth 7-768): **a topgallant yard reported straining under the press of sail,
+    in a wind over the worsening line (his book's `shorten_sail_kn` less `worsening_sooner_kn`,
+    24 knots in the King's ship's), is answered by the game's own captain at once: "take in the
+    topgallants".** Once, until the wind falls under the line again; never under it, and not for
+    a yard that is not a topgallant's, nor with no yard working. Every captain's, by his own
+    book's two figures."""
+    from types import SimpleNamespace
+
+    from freesail.world import captains as C
+    from tests.test_captains import _on_a_leg
+    from tests.test_captains import world_at as captains_world_at
+
+    w = captains_world_at(49.5, -5.5, ship=FRIGATE)
+    cap, given = _on_a_leg(w, "beating")
+    working = SimpleNamespace(
+        kind="strain.warning",
+        subject="main.topgallant.yard",
+        text="Main topgallant yard working under the press of sail.",
+        data={},
+    )
+    topsail = SimpleNamespace(
+        kind="strain.warning",
+        subject="main.topsail.yard",
+        text="Main topsail yard working under the press of sail.",
+        data={},
+    )
+    cap._topgallant_yards_working(C.Perception(tick=1000, wind_kn=23.0), [working])
+    assert given == []  # under the line
+    cap._topgallant_yards_working(C.Perception(tick=1010, wind_kn=26.0), [topsail])
+    cap._topgallant_yards_working(C.Perception(tick=1020, wind_kn=26.0), [])
+    assert given == []  # not a topgallant's yard; no yard working
+    cap._topgallant_yards_working(C.Perception(tick=1030, wind_kn=26.0), [working])
+    assert given == [("take in the topgallants", "the topgallant yards working")]
+    cap._topgallant_yards_working(C.Perception(tick=1040, wind_kn=27.0), [working])
+    assert len(given) == 1  # once in the blow
+    cap._topgallant_yards_working(C.Perception(tick=2000, wind_kn=20.0), [])
+    cap._topgallant_yards_working(C.Perception(tick=3000, wind_kn=26.0), [working])
+    assert len(given) == 2  # the wind fell under the line, and rose again
