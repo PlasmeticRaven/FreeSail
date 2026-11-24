@@ -92,6 +92,11 @@ her captain begins to shorten keeps them in the rising wind abeam. The first sho
 the glass at 29.2 kn whatever the figure, and her small watch reaches the topgallants after 31. The
 figure is the King's ship book's, shared by five ships. To package 125 with the rest.
 
+**Her hash for the gate (§18): `608830d`**, the trunk merged with the lateen list (one file resolved
+by hand, TuningNotes, at its end). Her fast tier whole against a base on b35aaaba changes no
+outcome: 9,138 passed, 8 skipped, 1 xfailed. The slow tier of her files, run again because the
+list moved the physics her slow truths read, has 210 passed and 8 xfailed.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1839,3 +1844,72 @@ shifts at 0.3, seed 7, bound for Falmouth, under the game's own captain. The fig
   the order of the shortening, the engine's). Or her topgallant yards are rated nearer their load
   than the frigate's: they are rated by the generator's shared rule on her scaled rig.
 - None of it is filed. It goes to package 125 with the rest.
+
+## 18. Her hash for the gate: the trunk merged with the lateen list, and tiered (2026-11-24)
+
+The lead's nudge 76 (the trunk at 41d1d1bc): "The Diana may now merge the trunk and tier her hash."
+**Her hash for the lead's gate is `608830d`**, tiered whole. The report commit on top of it adds
+this section alone.
+
+### 18.1 The merges since §16
+
+| Merged | As | Brought | By hand |
+|---|---|---|---|
+| the package's branch at 29e041c9 (the trunk at 009d88a6) | `3e55413` | A4 as merged and the engine design's strain words: docs alone | nothing |
+| the package's branch at d1a4feb3 | `e80ed51` | her design note's handling line (`docs/design/Design-Ship-Diana.md` §4.3): docs alone | nothing |
+| **the package's branch at b35aaaba** (the trunk at 41d1d1bc) | **`608830d`** | the engine's lateen hulls' list, the briefs of packages 125 to 127, the records | **`docs/dev/TuningNotes.md` at its end alone**: both sides added sections; the package's kept whole, then hers whole; checked as each side exactly, no marker left |
+
+At `608830d`, against b35aaaba:
+- `tests/test_known_truths.py`, merged by git, differs by her 50 lines alone.
+- The list changed engine code (`evolutions/runner.py`, `evolutions/scripts.py`,
+  `orders/navigation.py`, `physics/integrate.py`, `physics/sails.py`, `physics/strain.py`,
+  `world/boats.py`, `world/dealings.py`, `world/ports.py`), so her figures were proved again on it.
+  Her 57 tests pass on the merged tree, her truths pinned case by case, and nothing of hers moved.
+- The generator writes 19 of 19 files byte for byte, and `git diff b35aaaba 608830d -- data/ships`
+  names her file alone, so the eighteen are unmoved.
+
+### 18.2 The tiers on 608830d
+
+| Set | Tree | Result |
+|---|---|---|
+| **The base**: the fast tier whole | b35aaaba | **8,991 passed, 8 skipped, 1 xfailed** (9,000); no failure |
+| **Her fast tier whole** | `608830d` | **9,138 passed, 8 skipped, 1 xfailed** (9,147); no failure |
+| **The slow tier of her files**, pace excepted (`tests/test_known_truths.py`, `tests/test_neufchatel.py`, `tests/test_range_audit.py`, `tests/test_rig_words.py`) | `608830d` | **210 passed, 8 xfailed**, no failure (51 minutes): `tests/test_known_truths.py` 197 and its eight marked xfails, the base's eight; `tests/test_range_audit.py`'s 11; `tests/test_neufchatel.py`'s 1; `tests/test_rig_words.py`'s 1 |
+| The 13 pace tests | | not run: the coordinator's |
+
+- **Test by test:** no outcome changed. Only in her tree, 148, all passed: her own 57, her 90 cases
+  of the tests over every file, and the schooner-mast guard renamed "nineteen files". Only in the
+  base, that guard's old name. The skips and the xfail are the base's.
+- **Why the slow tier ran again:** the merge moved the physics and the scripts her slow truths read
+  (the integration, the sails' forces, the strain's words and warnings, the tack's and wear's
+  scripts). She carries no whole lateen and tows no boat, but the sweeps of the known truths range
+  over every file, hers among them, so they are run again on this hash rather than assumed.
+
+### 18.3 Her gate list
+
+As §16.9 sets it out, with §17's probe:
+- **Her files by the generator**, 19 of 19 byte for byte; **the eighteen unmoved**.
+- **The guards' tables with her rows** (§16.9).
+- **Her truths as bands and counts:**
+  - 7-660, her particulars;
+  - B, Meyer's speed;
+  - C, stiff;
+  - D, restated under (a) and owed with package 125;
+  - E, as a count across the winds, under plain sail and shortened;
+  - F, her midship lee port.
+- **The lead's rulings, each shown:**
+  - nudge 30, her mass;
+  - nudge 32, the viewer's rows, the charges, the 1817 ports and no stern lights;
+  - the owner's decision D-s2, her spanker and `clr_x_m`;
+  - nudge 59, her bow port;
+  - nudges 67 and 70, truth E and her rudder's note;
+  - nudge 72, the shortening's figure probed and nothing filed (§17).
+- **Her figures** measured, Winfield's by page, or judgement (§9.6 with §16.9's changes).
+- **Owed with package 125:**
+  - her `clr_x_m` and her helm measured again, and truth D back to its first band if she then
+    holds it;
+  - truth E's counts measured again;
+  - her topgallant yards in a rising wind (§17).
+- **Named for the lead:**
+  - truths C's and E's cases over the five-second line (allowed, nudge 72);
+  - the a-try ordered abeam and not taken (the lead's own list).
