@@ -3506,7 +3506,8 @@ class Captain(Judgement):
             if e.kind != "strain.warning":
                 continue
             parts = list((getattr(e, "data", None) or {}).get("parts") or [e.subject])
-            if any(str(pid).endswith("topgallant.yard") for pid in parts):
+            # a part id `<mast>.topgallant.yard`, read by its last two words
+            if any(str(pid).split(".")[-2:] == ["topgallant", "yard"] for pid in parts):
                 self._business["topgallants_in"] = p.tick
                 self.give("take in the topgallants", why="the topgallant yards working")
                 return
