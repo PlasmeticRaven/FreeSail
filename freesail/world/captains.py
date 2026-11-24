@@ -4838,7 +4838,6 @@ class Captain(Judgement):
         as a jury mast from a spare topmast (`jury_mast.yaml`), in `SPAR_MEND_ORDER`, what
         keeps her manageable first; and the sails the wreck took bent again to the spar
         that stands. A spar she has no spare for is left as it is."""
-        from freesail.combat.hits import damage_of
         from freesail.evolutions.repair_scripts import _name
         from freesail.evolutions.scripts import wreck_root, wrecks
         from freesail.ship import parts
@@ -4848,7 +4847,8 @@ class Captain(Judgement):
             getattr(inst, "all_hands", False) for inst in getattr(runner, "instances", []) or []
         ):
             return None
-        keeper = damage_of(ship)
+        # read, never made: `damage_of` would put a damage record on a ship that has none
+        keeper = (getattr(ship, "extra", {}) or {}).get("damage")
         came = (getattr(keeper, "struck_by", {}) or {}).values()
         struck = max((int(t) for t in came), default=None)
         if struck is not None and tick - struck < SPAR_WORK_QUIET_S:
