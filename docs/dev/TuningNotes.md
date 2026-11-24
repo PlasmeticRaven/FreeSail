@@ -39931,3 +39931,24 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **Boxing off is not offered hove to:** `pressed_reliefs` of the polacre, aback, "shift the mizen or box her off", and hove to "shift the mizen".
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
+
+## Package 90, the lateen hulls' list, its third pass: the boat lost by the lost road, the reliefs that wait, the bow's list as said (the lead's nudge 77, 2026-11-24)
+
+The branch `…/pkg-90-lateen3`, cut from `…/pkg-90` at 86fa56d3 (the second pass merged on the trunk at 474eff8b). The equations are read, not changed. Old is 86fa56d3.
+
+1. **A towed boat stove and cut adrift is lost by the road a boat swamped or cut adrift takes** (`world/boats.py`, `stove_in_tow`, kept each tick by her dealings after `keep_in_tow`; `lose_boat`): "The boat stove by a shot as she towed astern, and cut adrift. A new one is the yard's.", her reading "the boat lost: stove on the 10th; a new one is the yard's".
+   - Old: `send the boat ashore`, `lay out a kedge` and `go to the boat` obeyed with her; new: each refused, as of any boat lost.
+   - **The kedge refused no lost boat at all** (`LayOutKedgeScript.check`), so a boat swamped or cut adrift could lay one out on any ship: mended at the cause, "the boat is lost: ...". A committed ship's boat is lost only so, and no run of the gales or the harness loses one.
+   - `clear for action`: old "The boats are out and towing astern; the ship is clear." of a ship whose boat was lost; new, of the tartane probe (two boats, the other on the booms), "The rest of her boats are out and towing astern, the boat lost; the ship is clear.", and of a ship with no other boat "The ship is clear; the boat is lost.". Every other ship's line is as it was (that it says so of boats left on the booms is the trunk's).
+2. **A spar lost while its shift waits: the dire step, waiting for package 127's rule.** Not built here.
+3. **A relief that waits is said to wait** (`strain._shift_held`): the work given before it that holds the lateen, behind which a shift or a box ordered now waits. The tartane in 40 kn, her lateens put on the bad hand while her watch is at her trims, her main yard at 1.51: old "...: shift the mainsail or box her off."; new "...: shift the mainsail or box her off when the hands are done trimming the mainsail.". Measured, a shift given then begun 182 s on, and a box 82 s on.
+   - **Boxing off, coming to:** old, `box her off` given while a heave-to was in hand was taken, waited, and did nothing (the polacre in 40 kn, aback). New: the words do not offer it, and the order is refused, "She is heaving to; she will not box off while she comes to." (`scripts.heave_to_in_hand`, `Runner.start`, `BoxOffScript.check`; a lie a-try the same). That refusal is every ship's: a box given while she comes to was taken and did nothing on any of them.
+4. **Pins:**
+   - "its shift waits its turn" is not said while her own shift runs;
+   - the hands named are those shifting, not another shift waiting too;
+   - the stove line's `towed` key in its data;
+   - two boats towed astern, each her own drag, the one not the errands' stove leaving the other in tow and the ship's boat not lost.
+5. **The bow's line in her sails' order, said as a seaman lists three things, and the order taken as said** (`scripts.sails_listed`, by their masts from forward aft; `orders/grammar.py`, a whole lateen hull's `shift` reading a list with commas as its "and" list, a side after a comma still a side).
+   - The xebec, the wind through her bow: old "the foresail and the mizen and the mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."; new "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.".
+   - The stern's line the same, and "shift it when you will" of a lateen on its mast now names it: "shift the mizen when you will".
+   - "shift the foresail, the mainsail and the mizen" is taken as said. No hull without a whole lateen reads a comma so.

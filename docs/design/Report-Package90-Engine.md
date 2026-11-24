@@ -2728,3 +2728,61 @@ The lens (`test_lateen_whole`, `test_boat_towed`, `test_knowledge`, `test_strain
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against b35aaaba's code, which is 111b1b5's: its fast tier is the l72t run of 111b1b5 and its slow likewise. The eighteen in gales and A2's harness run on it too, since `strain.py` moves. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the branch to watch is **`…/pkg-90-lateen2`**, this section's commit, pushed, its tiers running.
+
+## The lateen hulls' list, its third pass (nudge 77): on `…/pkg-90-lateen3`, items 1, 3, 4 and 5 built and pinned; item 2 waiting for package 127 (2026-11-24)
+
+**The branch:** **`…/pkg-90-lateen3`**, cut from `…/pkg-90` at its tip **86fa56d3** (the trunk at 86fa56d3, the second pass merged there at 474eff8b), as the coordinating session asks.
+- `…/pkg-90` is still at 86fa56d3, and the trunk at b547cf88 by one record of docs. **Packages 125 to 127 have not landed**, so there is nothing to merge before this hash, and **no line was resolved by hand.**
+- The work is one commit of code and tests, **64d45bf**, and this one of the notes and report.
+- Its files:
+  - `freesail/world/boats.py` and `dealings.py`;
+  - `freesail/evolutions/scripts.py`, `runner.py` and `action_scripts.py` (the engine track's);
+  - `freesail/physics/strain.py` (the widened words);
+  - `freesail/orders/navigation.py` and `orders/grammar.py` (the shift of a whole lateen hull, the engine track's lateen rows);
+  - `tests/test_lateen_whole.py` and `tests/test_boat_towed.py`.
+
+**The equations are read, not changed.** The measures, old beside new, are in `docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list, its third pass".
+
+1. **A towed boat stove and cut adrift is lost by the lost road** (`boats.stove_in_tow`, `lose_boat`): sent, laid out and gone to by nobody till the yard replaces her, and said so.
+   - **The kedge refused no lost boat at all** (`LayOutKedgeScript.check`), on any ship: mended at the cause.
+   - `clear for action` no longer says a lost boat is out and towing astern.
+   - Proofs: `test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms` (now with the three orders refused and the line of her loss) and `test_clearing_for_action_her_boat_lost_says_no_boat_out`.
+2. **A spar lost while its shift waits:** the dire step, by package 127's rule when it lands, as the lead asks. **Not built; 127 has not landed.** Items 1, 3, 4 and 5 do not wait for it: the lead to say whether they go alone.
+3. **A relief that waits behind work in hand is said to wait:** "...: shift the mainsail or box her off when the hands are done trimming the mainsail." (the tartane: her shift begun 182 s and her box 82 s after the order).
+   - **Coming to, the box is neither offered nor taken:** "She is heaving to; she will not box off while she comes to.". It was taken, and did nothing. **The refusal is every ship's,** the box having done nothing so on any.
+   - Proofs: `test_a_relief_that_waits_behind_work_on_its_sail_is_said_to_wait` and `test_coming_to_she_is_neither_offered_nor_given_boxing_off`.
+4. **Pins:**
+   - "waits its turn" not said while her own shift runs, and the hands named shifting, not waiting: `test_waits_its_turn_is_said_only_while_her_own_shift_waits_and_names_the_hands_shifting`;
+   - the `towed` key, in the stove case above;
+   - two towed boats: `test_of_two_boats_towed_each_is_in_tow_and_one_stove_leaves_the_other`.
+5. **The bow's line in her sails' order, a seaman's list, and the order taken as said:** "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.", and "shift the foresail, the mainsail and the mizen" taken (a whole lateen hull's `shift` alone reads a comma list).
+   - "shift it when you will" names its sail.
+   - Proof: `test_the_bows_list_in_her_sails_order_is_taken_as_said`.
+   - Three pins of the old words moved, old beside new: the stern's line, the bow's, and the bow's with the mizen on its mast.
+
+**Each pin fails with its mend undone**, run so, eight faults:
+- the stove boat not lost;
+- the kedge with a lost boat;
+- the box taken coming to;
+- the box offered coming to;
+- the list out of order;
+- the comma list refused;
+- the held sail unsaid;
+- the boats said out though lost.
+
+The lens (the lateen, boat, knowledge, strain, combat, action, grammar, orders, ports, evolutions, probes and rig-words files): 1,589 passed.
+
+**For the lead:**
+- Two of these reach past a lateen hull, each mended at its cause:
+  - the kedge's refusal of a lost boat;
+  - the box refused while a heave-to or a lie a-try is in hand.
+- No committed file has a whole lateen or a towed boat, and the gales and the harness below are run to show their lines unmoved.
+
+**Checked on this commit:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 86fa56d3's code, which is b88f3bc's: its tiers are the l76t runs of b88f3bc. The eighteen in gales and A2's harness run on it too. The results follow in a section of their own; the commit after this one touches this report alone.
+
+**For the coordinating session:** the branch is **`…/pkg-90-lateen3`**, this section's commit, pushed, its tiers running. Item 2 waits for package 127.
