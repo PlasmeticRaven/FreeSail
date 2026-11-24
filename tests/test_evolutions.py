@@ -901,7 +901,7 @@ def test_a_tack_ended_by_the_steady_timeout_on_her_old_tack_is_a_missed_stay():
     world the frigate is turned through the wind and, her head yards swung, falls back on the old
     tack, four knots of way and 55 degrees off on the starboard tack."""
     ship, notes, held = _tack_held_at_the_end(None)
-    said = dict(zip(kinds(notes), texts(notes)))
+    said = dict(zip(kinds(notes), texts(notes), strict=True))
     assert "ship.tacked" not in kinds(notes)
     assert said["ship.missed_stays"] == (
         "Missed stays: she came through the wind and fell back on her old tack. Up helm; square "
@@ -919,7 +919,7 @@ def test_a_tack_ended_by_the_steady_timeout_with_her_head_in_the_wind_is_in_iron
     lies in irons, a missed stay: "Missed stays: she lies in irons, her head in the wind." (old:
     "Tacked; braced up on the larboard tack", the tack her head five degrees over named)."""
     _, notes, _ = _tack_held_at_the_end(95.0)
-    said = dict(zip(kinds(notes), texts(notes)))
+    said = dict(zip(kinds(notes), texts(notes), strict=True))
     assert "ship.tacked" not in kinds(notes)
     assert said["ship.missed_stays"].startswith(
         "Missed stays: she lies in irons, her head in the wind. "
