@@ -39902,3 +39902,28 @@ The branch `…/pkg-90-lateen`, fast-forwarded to `…/pkg-90` at 3d3841f2 (A4 m
    - **The figure's ground is marked:** past the boat's hull speed the drag is the hull's wave term carried on unchecked (the yawl's 7.6 kN at 10.4 kn), with no ground there; not changed.
    - **Cases now held:** making sternway she drags nothing, tick for tick as the probe with her boat on deck (and ahead, more); `ports.BOAT_HAUL_ALONGSIDE_S` and `BOAT_VEER_ASTERN_S` are the two evolutions' timings.
    - **Run, as asked:** `clear for action` with her boat towed, at sea in 12 kn: "The boats are out and towing astern; the ship is clear." at 357 s, cleared at 465 s, her boat still in tow, as with it on deck. `let go the best bower` with it towed, Carrick Road: let go at 85 s, at anchor, her boat towing astern, as with it on deck. **Seen, older:** on the trunk the clear-for-action line says "The boats are out and towing astern" of a boat at the booms, nothing moving her.
+
+## Package 125, the moment of the haul, a failed tack's words, the jib she cannot be held without, and the captain's topgallants (2026-11-24)
+
+The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: docs/design/Report-Package125.md. Measured at seed 7 by the truths' own helpers (the wind from the north, no gusts), every committed ship that tacks, from 290, 292.5 and 295 degrees in 8, 12, 15, 20 and 25 knots, plain and shortened by the game's own `shorten sail`.
+
+**The figures, each JUDGEMENT on the measure.**
+- `scripts.HAUL_WAY_FRACTION` 0.4 (new). "Mainsail haul" a point on the bow while she keeps two fifths of her way at "helm's a-lee"; under it, with the wind ahead. At the point every committed square-rigger keeps 0.48 to 0.58; the hermaphrodite brig 0.21 to 0.33; the light corvette of the ships' package 0.25 to 0.37 (0.37 at 8 kn, 0.30 to 0.36 at 12, 0.29 to 0.35 at 15, 0.28 to 0.33 at 20, 0.25 to 0.30 at 25). The lead's test of a lower figure: 0.33 loses her 20-kn tack from 290 (she hauls at the point there with 0.33); 0.35 keeps her 20 and 25 kn and moves no committed ship, but her 12-kn tacks from 292.5 and 295 are still 319 and 331 s against the trunk's 187 and 184. No figure keeps all three of the lead's terms, so 0.4.
+- `scripts.WIND_AHEAD_RAD` half a degree (new): Luce's "with the wind ahead"; a quarter point and half a point were measured for her, 13 of 15 either way and no better on the whole.
+- `storm.HELM_IN_HAND_SHARE` 0.25 (new). A jib loaded to its 0.75 is left set where she would want more than a quarter of her rudder's travel without it, while under its whole rating. At the order in 25 kn the frigate and the corvette would each want 9.5 to 12 degrees; with the jib in the frigate gripes to 11 to 20 and recovers, the corvette to 21 to 25 and does not. A third of the travel (11.7) would keep it from 295 alone.
+- The captain's answer to a straining topgallant yard: over `shorten_sail_kn` less `worsening_sooner_kn` (24 kn in every committed book), the books' own two figures; no new figure.
+
+**Pins moved, old beside new.**
+- `tests/test_evolutions.py::test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on`, replaced by three tests in its place:
+  - `..._on_her_old_tack_is_a_missed_stay`: the stub frigate fallen back and held on her old tack. Old "Tacked; braced up on the starboard tack, heading NE by N (35°)."; new "Missed stays: she came through the wind and fell back on her old tack. Up helm; square the yards." (urgent), then "Squared the yards; she fell off on the starboard tack, to try again or to wear."
+  - `..._with_her_head_in_the_wind_is_in_irons` (new case): "Missed stays: she lies in irons, her head in the wind."
+  - `..._on_the_new_tack_names_where_she_lies`: the old naming kept for a tack that has come round, held 100 degrees off on the new tack: "Tacked; braced up on the larboard tack, heading S by W (190°)."; its tick count (the timeout's 300 s and one) as the old test had it.
+  - Why: a tack fallen back on her old tack had not come round (the brig in 20 kn was logged "Tacked" lying 110 to 149 degrees off on her old tack).
+- No other pin moved: the 46 test files that tack or shorten, 5,485 fast-tier tests, passed under each rule alone before the build (the report's §7).
+
+**What moves in the fleet (the truths 7-760 to 7-762 tables).**
+- The hermaphrodite brig alone of the committed ships, by the haul: plain 8 kn 411/405/397 -> 300/296/291 s; 12 kn 267/266/263 -> 198/198/196; 20 kn 176/170/170 -> 186/184/183; shortened 20 kn 138/150/149 -> 186/185/183. Every other committed ship's tacks the same to the second.
+- The brig in 20 kn, by the words: plain from 292.5 and 295 and shortened from 290 and 292.5, "Tacked" at 456 to 460 s -> "Missed stays: she came through the wind and fell back on her old tack."
+- The jib kept in 25 kn shortened: the frigate 309/205/231 -> 233/252/265 s; the razee from 295, 486 -> 261.
+
+**Read by:** (filled in by the build report: a reader other than the builder, on the stronger tier).
