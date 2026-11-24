@@ -83,6 +83,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 5.0
     span_m: 2.7
+  # She steers by a tiller on deck: by the rule only (Falconer 1780, HELM: a wheel save in small vessels, which need none; Lever 1827, the Rudder, fig. 373: the tiller worked by a wheel in large ships); no draught of hers is read for it. Judgement.
+  helm: tiller
   # Her own lines, drawn only: RMG ZAZ6381, 'Sherbourn Cutter', June 1763, 1:48, with ZAZ6382 (hold and deck), CHN0224 and CHN0102 (as built), CHN0103 (the stern, 1:24) (docs/design/ships-design/pages-zaz6381.md; read and cited, never copied). x forward of the middle of the load line rabbet to rabbet, 27.16 ft from the after perpendicular; z above the load line at each station; metres. The load line is the top green line, unnamed on the sheets: judgement on the displacement, Steel's five-eighths (1805, OCR l. 15184-15188), the wale and the height of breadth (the note's §4.2). It lies 3.24 degrees to the page; x stays along the page, a shear and not a turn. As built: the rail, the deck and the sills of one state (the note's §5.3).
   profile:
     # ZAZ6381 (±0.05 ft), the rail's top raised as built: CHN0224 and CHN0102, 1024-px previews at 1.2 in a pixel, top line to top line (the note's §3.4, ±0.1 ft), with the sills; its last two points where it meets the stem head's box and the box's top (the note's §5.5). Every height here is the sheet's at its own station, the file's draught and drag standing beside them.

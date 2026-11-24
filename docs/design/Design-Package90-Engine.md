@@ -1436,7 +1436,25 @@ Both are module constants of `physics/sails.py` beside `LUG_AGAINST_MAST_AREA`. 
 lines take the plain pull as now. Nothing in `physics/strain.py` changes: the ratio, the wear over
 1.0, the warning, the chance over 1.5, the certain failure at nought and `_wreck_spar` with its
 dependents are the engine's as they are. **No new kind of damage**: a yard or a mast carried away
-as any spar is, its sail and gear with it.
+as any spar is, its sail and gear with it. *Widened 2026-11-23 (the lead's nudge 55; the lateen
+hulls' list, items 1 and 3):* `physics/strain.py` changes in its warning alone, never a figure of
+load, strain or damage. `_apply_loads` marks each spar of the chain with what presses it, aback or
+the bad hand (`lateen_pressed`, under `strain.LATEEN_PRESSED`, for each substep as its load), and
+`_warn` counts the ten minutes' rate against the part and its cause, so a lateen coming aback or
+onto the bad hand is warned for as it comes, whatever was said before, in words that say why and
+what eases it: "Main lateen yard bending like a whip, the mainsail lying on the mast; she will
+carry it away: shift it or take it in." (aback, "..., the mainsail aback against the mast; ...:
+shift it or box her off.", "box her off" only where she has head yards to brace abox and is not hove
+to). *Corrected 2026-11-24 (the lead's nudge 60, item 3; `strain.pressed_reliefs`):* the words name
+only orders she will take that are measured to bring the load down. A shift halves the yard's and
+mast's load within a second; boxing off does the same, aback; a take-in on the bad hand brings it
+down within 152 to 170 s, where with no order it never falls. The sheet let fly is no longer named:
+on the bad hand it raises the load (the xebec in 40 kn, her main yard 0.93 to 1.11), and aback it
+eases it no more than doing nothing. Before, the one warning a part in ten minutes let a
+yard warned on the good hand carry away on the bad hand unwarned (the xebec probe in 57 kn), and
+"if sail is not shortened" pointed the wrong way of a lateen whose taking in the game holds while
+it is aback. No committed sail is a whole lateen, so their warnings keep the rule as it was (the
+eighteen in gales, old beside new, in the engine's report).
 - **Why a factor at all** (measured, §2.2b). "As a backed square sail does", the plate's force on
   the chain and no more, a lateen taken aback with her way on (the wind shifted onto her other bow)
   carries on its yard 0.12 to 0.15 of the generator's rating in 15 kn, 0.25 to 0.29 in 22, 0.39 to
@@ -1557,7 +1575,13 @@ words):**
   peak up the yard and pass the car round." where it is changed.
 - **Hung in stays** (`_hang`): a foremost lateen is left aback with the head sails to pay her head
   off ("Her head is through the wind; the head sails and the fore lateen aback pay her off."); an
-  aftermost one's sheet is eased till "let go and haul".
+  aftermost one is **hauled to windward with the booms** till "let go and haul", as the mizen
+  course and the settee are. *Corrected 2026-11-23 (the lead's nudge 55; the lateen hulls' list,
+  item 5):* this draft and A1d had it eased. That was A1d's own judgement, that a whole lateen
+  cannot be hauled over its mast as a boom is, and no source gave it. Measured over 1,536 probe
+  tacks, the 22 that hang in stays (all the polacre's) all missed stays with it eased and all came
+  round with it hauled, the yard well under its rating either way. So the ease cost her stays for
+  nothing, and it is put back (the engine's report, "The lateen hulls' list (nudge 53)", item 5).
 - **In the wear**, at "wind aft", each lateen to be left goes over against its mast with the other
   sheets ("Wind aft. Shifted over the sheets; the mainsail over against the mast."), each to be
   changed begins its change; a wear never holds one aback.

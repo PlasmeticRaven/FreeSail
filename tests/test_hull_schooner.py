@@ -466,12 +466,20 @@ ITEM_37 = {
 }
 
 
+# Package 90, A3 (the helm's kind; TuningNotes, "Package 90, A3"), old beside new: the hull's
+# `helm`, said nowhere before (the wheel, the key's default) and the tiller now, the one key the
+# step writes into both files (one hull dict of the generator's). The physics reads it not: only the
+# helm's words do (`evolutions.scripts.helm_words`).
+HELM_A3 = (None, "tiller")
+
+
 @pytest.mark.parametrize("path", BOTH)
 def test_no_figure_the_physics_reads_moved(path):
     """§5.0 principle 8, §5.6: her hull's figures as filed, and a diff of her file's physics keys
     against git, the commit before her hull, shows none: only the profile is added, and only a port
     or rail gun's height and its deck move (§5.3), but the keys a ruled move names, old beside new
-    (package 75's SW-4; package 90's item 37, her three booms' ratings)."""
+    (package 75's SW-4; package 90's item 37, her three booms' ratings, and A3, her hull's
+    `helm`)."""
     now = yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
     for key, value in HULL_FIGURES.items():
         assert now["hull"][key] == value, key
@@ -508,6 +516,8 @@ def test_no_figure_the_physics_reads_moved(path):
     assert moved == ITEM_37
     for sid in ITEM_37:
         spars_now[sid]["rating_kn"] = spars_before[sid]["rating_kn"]
+    # Package 90, A3: her helm, held to its move and taken out here only
+    assert (before_view["hull"].get("helm"), now_view["hull"].pop("helm", None)) == HELM_A3
     assert now_view == before_view
 
 

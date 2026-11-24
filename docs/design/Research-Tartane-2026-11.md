@@ -1,5 +1,18 @@
 # Research note: the Mediterranean tartane, her lateen and her square topsail (November 2026)
 
+**Corrected 2026-11-20 by her measuring** (`docs/design/ships-design/pages-tartane.md`, **Pages**).
+Chapman's plates of her type were measured on the Sjöhistoriska museet's photographs and Forfait's
+leaf n179 re-read, and the lead ruled on the measuring the same day (13:35 UTC, nudge 29). Only what
+the measuring corrects is corrected here. Each correction is set after the reading it corrects, which
+stands as it was found (the marks are never upgraded), but for the plate's number: **Pl. LVII**, not
+LVIII, corrected in place in seven places by the engraved number and the museum's record (the lead's
+ruling 5). The corrections:
+- Chapman's plate, reached and measured ("In short", §0, §2.2, §10 item 4);
+- the éperon's printed pair, re-read (§2.1);
+- the draught: Chapman's 6⅔ ft is his after draught (§2.3);
+- the main's rake on Chapman's Pl. LXII, and the mizen's (§3.1, §3.2, §9);
+- the war tartane's ports (§7).
+
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The tartanas' entries (Winfield et al. 2023, pp. 1252-1253), the coastguard (pp. 168-169)
 and the místicos (pp. 1195-1201) came, set down in `VesselReferences-2026-11-Spanish.md` §9 to
@@ -85,10 +98,14 @@ memory, unverified).
   pieds (19.17 m), her lateen yard 75 pieds (24.36 m), her mizen 30 pieds (9.75 m) with a lateen yard
   of 47 (15.27 m), her sail 2,237½ square pieds (236 m²). The *Humble* is the owner's rig to the
   sail.
-- **One plan of the type exists in the period: Chapman 1768 Pl. LVIII No. 16, a French tartane
+- **One plan of the type exists in the period: Chapman 1768 Pl. LVII No. 16, a French tartane
   for war**, 62¼ by 17 7/12 Swedish feet, drawing 6⅔ (18.48 by 5.22 m, 1.98 m), eight 4-pounders and
   four swivels (read there, `VesselReferences-2026-10.md` §3.1). Her lines are the only lines; the
-  plate was not reached at a readable size in this round.
+  plate was not reached at a readable size in this round. **Corrected 2026-11-20** (Pages): reached
+  on the museum's photographs and measured. Her waterline is 56.55 ft (16.79 m); her load line is
+  drawn inclined to the keel, and the stated 6⅔ ft is her after draught; four ports a side; no mast
+  drawn. Pl. LXII No. 16 draws a two-masted lateen with no topsail, no mizen and no headsail, its main
+  upright.
 - **The Spanish navy kept seven tartanas**, mostly bought or chartered from French builders; they
   served now and then as coastguard and look-out vessels; the rig is Monleón's (Winfield pp. 1249
   to 1252, the lead's words). Their names, sizes, guns and men are the passages to ask for.
@@ -129,7 +146,7 @@ memory, unverified).
 | Falconer 1780 | *An Universal Dictionary of the Marine* | `falconer/falconer-1780-universal-dictionary-of-the-marine-ocr.txt` | TARTAN (l. 18934 to 18936); TREOU (l. 34373 to 34375); *Voile de fortune* (l. 28070 to 28072); SQUARE-SAIL (l. 18076 to 18081); STUDDING-SAILS, the tartane's scudding sail (l. 18544 to 18545); CAGOUILLE, the scroll at a tartane's prow (l. 23697 to 23700); XEBEC, the three suits (l. 21245 to 21253) | A |
 | Steel 1794 I | Steel, *The Elements and Practice of Rigging and Seamanship*, vol. I | `steel/steel-1794-rigging-and-seamanship-vol1-ocr.txt` | TARTAN, among the foreign vessels (OCR l. 26487 to 26490; the page near the xebec's p. 237, not checked) | A |
 | Röding | Röding, *Allgemeines Wörterbuch der Marine*, vols. I and II | `roeding/roeding-1794-allgemeines-woerterbuch-der-marine-vol2-ocr.txt`, `vol1` | TARTANE (vol. II, OCR l. 84779 to 84807, col. 771 or 772 by the running heads, not checked; Röding's Fig. 289 in the plates volume, not seen); GIEPEN, with the French *changer, muder, trelucher* of fore-and-aft sails and the Spanish *tomar por la pena* (vol. I col. 655, l. 98905 to 98915) | A |
-| Chapman 1781 | Chapman, *Traité de la construction des vaisseaux*, trans. Vial du Clairbois | `chapman/chapman-1781-traite-de-la-construction-des-vaisseaux-ocr.txt` | The text explaining the plates (not re-read for the tartane; to read for Pl. LVIII No. 16) | A |
+| Chapman 1781 | Chapman, *Traité de la construction des vaisseaux*, trans. Vial du Clairbois | `chapman/chapman-1781-traite-de-la-construction-des-vaisseaux-ocr.txt` | The text explaining the plates (not re-read for the tartane; to read for Pl. LVII No. 16) | A |
 | Michelot 1709 | Michelot, *Portulan de la mer Méditerranée* (79c's pilot) | `pilots/michelot-1709-portulan-de-la-mer-mediterranee-ocr.txt` | Tartanes in the Gulf of Lion's shallow entries: the Rhône's north-east mouth "by which all the tartanes enter that go to Arles" (l. 4864 to 4865); the tartanes that bring fish to the Saintes-Maries (l. 4799 to 4800); La Nouvelle, Maguelone, Martigues (l. 4553, 4738, 4985) | A |
 | Bérard 1837 | Bérard, *Description nautique des côtes de l'Algérie* (79c's pilot) | `pilots/berard-1837-description-nautique-cotes-algerie-ocr.txt` | Marseilles tartanes moored close in off a cove west of the Lion, trying to winter there (l. 8992 to 8995); later than the era by a few years | A (late) |
 
@@ -143,7 +160,7 @@ memory, unverified).
 
 | Short form | Work | Where | What it gives | Rung |
 |---|---|---|---|---|
-| Chapman 1768 | *Architectura Navalis Mercatoria*, Pl. LVIII No. 16, "A French tartane (Vessels of war)", and Pl. LXII's "Tartane with lateen sails" | the 1971 Adlard Coles reprint (IA `architecturanava0000fred`; the reprint's text and tables in copyright, the plates Chapman's and public domain) | Her particulars as read there (`VesselReferences-2026-10.md` §3.1). The plate's leaf was not found in this round: see §9 | A (the plate), the reprint's tables secondary |
+| Chapman 1768 | *Architectura Navalis Mercatoria*, Pl. LVII No. 16, "A French tartane (Vessels of war)", and Pl. LXII's "Tartane with lateen sails" | the 1971 Adlard Coles reprint (IA `architecturanava0000fred`; the reprint's text and tables in copyright, the plates Chapman's and public domain) | Her particulars as read there (`VesselReferences-2026-10.md` §3.1). The plate's leaf was not found in this round: see §9. **2026-11-20:** both plates read on the Sjöhistoriska museet's photographs, Plansch LVII and LXII, public domain (Pages §1.1) | A (the plate), the reprint's tables secondary |
 | PCI 2018 | *L'art de la navigation sous voile latine*, fiche d'inventaire du patrimoine culturel immatériel, ministère de la Culture, no. 2018_67717_INV_PCI_FRANCE_00412 (enquiry 2016 to 2018), culture.gouv.fr | read through the web (its text layer); in copyright, not held, paraphrased only | The lateen's two hands (the mast to windward, the sail clear; the mast to leeward, the sail pressed against it), the wear with the yard and sail passed round (*faire le car*, *muder*), the spontaneous shift running on the wrong hand (*la trélouche*), the reef at man's height; citing Jules Vence, *Construction et manoeuvre des bateaux et embarcations à voilure latine*, Marseille 1897, and Huet, Rigaud and Vigne, *Renaissance des bateaux de Méditerranée* | B (secondary; late small craft) |
 
 **Pictures, for the eye** (`docs/references/images/`): `tartane-roux-school-watercolour.webp`
@@ -153,10 +170,10 @@ family's last painter, 1811 to 1882, memory, unverified). Seen; §4.6 says what 
 
 **Not reached in this round:**
 
-- **Chapman's Pl. LVIII at a readable size.** The 1971 reprint's leaves were viewed through the
+- **Chapman's Pl. LVII at a readable size.** The 1971 reprint's leaves were viewed through the
   built-in browser, but the pane is shared with the package's other agents and another hull's work
   took it over before the leaf was found. The plate is the hull's only S† source: the first task of
-  the build's step 1 (her design's §3).
+  the build's step 1 (her design's §3). **2026-11-20: reached and measured** (Pages).
 - **Monleón's print of a tartana** (Winfield p. 1249): its holding and number were searched in the
   Museo Naval's and the Ministry of Defence's catalogues and not found. Asked of the owner (§10).
 - **O'Scanlan, *Diccionario marítimo español*, 1831** (TARTANA, the Spanish words of the rig):
@@ -265,7 +282,10 @@ to length × breadth for the sail), the figures in pieds, pouces and lignes; the
   centre of effort, 3 pi 4 po 11 li ÷ 62¾ = 0.054 against the 0.056 read (0.056 × 62¾ = 3 pi 6 po
   2 li). One figure of each pair is misread, or the page's own. **Both are to be re-read on the page
   image (leaf n179) before either becomes a constant**; the beak's length (Tar-D decision 11) waits
-  on it.
+  on it. **Corrected 2026-11-20** (Pages §1.3): the éperon's pair re-read on leaf n179: the page
+  prints both 10½ and 0.151, so the disagreement is the page's own. Ruled 10½ pieds (3.41 m), the
+  printed ratio taken as the misprint (the lead, JUDGEMENT); Chapman's beak, scaled to her, is 3.53 m
+  to the berthelot's point. The centre of effort's pair was not re-read.
 - **Which length** (on deck, or stem to sternpost) and the height's datum are not stated in the
   table. Forfait's other tables give the centre's height "relativement au plan de flottaison" (OCR
   l. 11291), above the load water line; taken so here (JUDGEMENT on the carrying).
@@ -283,7 +303,7 @@ to length × breadth for the sail), the figures in pieds, pouces and lignes; the
 
 ### 2.2 Chapman's French tartane (read there, `VesselReferences-2026-10.md` §3.1)
 
-Pl. LVIII No. 16, "A French tartane (Vessels of war)": 62¼ Swedish feet between perpendiculars
+Pl. LVII No. 16, "A French tartane (Vessels of war)": 62¼ Swedish feet between perpendiculars
 (18.48 m), breadth moulded 17 7/12 (5.22 m), draught 6⅔ (1.98 m); eight 4-pounders, four swivels;
 "used in the Mediterranean both to carry merchandise and as a fighting ship" (the reprint's
 gloss). Length to breadth 3.54, against the *Espiègle*'s 2.88 and the *Humble*'s 3.09: a fine
@@ -291,6 +311,15 @@ vessel for war beside Forfait's traders, whose "relative breadth is always very 
 (JUDGEMENT on the comparison). **Not read here**: the plate itself (its lines, its deck, its ports
 and its masts), Pl. LXII's rig drawing ("Tartane with lateen sails", OCR only there), and the
 Tractat's text on it.
+
+**Corrected 2026-11-20** (Pages §1.2, §3.2, §4, §5): the plate is No. 16 of **Pl. LVII** (the
+engraved number; the museum's record of Plansch LVII names Nos. 14 to 16). Measured on it: 62.39 ft
+between the perpendiculars (+0.2% on the table), breadth 17.51 to 17.60 ft (−0.4%, +0.1%); her
+waterline 56.55 ft (16.79 m), shorter than the perpendiculars by the stem's rake forward and the
+post's aft; her load line drawn inclined to the keel (0.29°), the stated 6⅔ ft her after draught on
+the waterlines' steeper line (6.70 ft); her deck low amidships under a high waist bulwark; four ports
+a side; no raised after deck, no mast and no rudder drawn. The ratio of 3.54 is on the length between
+the perpendiculars and stands.
 
 ### 2.3 What the sizes say together (JUDGEMENT)
 
@@ -301,7 +330,9 @@ Tractat's text on it.
 - Chapman's tartane is the size of the *Espiègle* in length and narrower; she is the type's only
   lines.
 - No draught, depth of hold or displacement of a trading tartane was found. The *Humble*'s draught
-  by Chapman's draught to breadth (0.379) would be 2.50 m (JUDGEMENT).
+  by Chapman's draught to breadth (0.379) would be 2.50 m (JUDGEMENT). **Corrected 2026-11-20**
+  (Pages §4.2): Chapman's 6⅔ ft is his after draught. On his plate scaled to her, her mean draught on
+  the drawn line is 2.38 m (2.43 m aft, 2.32 m forward), accepted by the lead.
 
 ## 3. The rig, mast by mast
 
@@ -319,7 +350,11 @@ Tractat's text on it.
 - **Its rake.** Decision 11 says "one raking mast". The texts read give no rake for a tartane's
   main; Forfait's xebec has the fore mast raked forward and the mizen aft, "these opposite rakes
   spreading the sails over a greater length" (p. 128, read, OCR). The watercolour's main stands
-  near upright, its mizen raked well aft (seen). **Open** (§9).
+  near upright, its mizen raked well aft (seen). **Open** (§9). **Corrected 2026-11-20** (Pages §7):
+  Chapman's Pl. LXII No. 16 draws a tartane's main **upright** (0.6° to 1.1° aft, ±0.5°), on a
+  two-masted lateen rig with a fore mast raked 23° forward and no topsail, mizen or headsail: another
+  rig than the owner's. The owner's 3° forward is kept, and the owner has been asked whether to
+  revisit it (the lead, 2026-11-20).
 - **The great lateen yard** (*antenne*): of two pieces of fir laid together for most of their
   length, long and very thin, bound by woolding and iron hoops, thickest where it meets the mast,
   tapering to a point at the top; slung by a parrel (*racage*, *chapelet*) at about a third of its
@@ -351,6 +386,8 @@ Tractat's text on it.
   the wind was foul: the mizen is a **driver**, a sail to bring her head up.
 - The watercolour's mizen rakes well aft, its yard nearly upright, its sheet led to a spar over the
   stern (an outrigger, seen); Forfait's xebec's after mast "panché vers l'arrière" (p. 128).
+  **2026-11-20:** neither of Chapman's plates draws a tartane's mizen (Pages §7); its rake stays
+  JUDGEMENT.
 - Winfield (the lead's words): Monleón's print shows the "diminutive mizen" of the custom.
 
 ### 3.3 The head
@@ -529,7 +566,7 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
 ## 7. Her guns
 
 - **The trader**: unarmed by default (JUDGEMENT; the bilander's and the merchant brig's pattern).
-- **The fighting tartane** (rung A): eight 4-pounders and four swivels (Chapman Pl. LVIII No. 16,
+- **The fighting tartane** (rung A): eight 4-pounders and four swivels (Chapman Pl. LVII No. 16,
   read there). The pound is French (memory: the livre poids de marc, 0.4895 kg, so a French
   4-pounder threw about 4.3 English pounds; unverified).
 - **The Spanish coastguard tartanas**: not given in the lead's words; Winfield's rows to ask for.
@@ -538,6 +575,8 @@ p. 121: in the one-masted lateen barque the car is tacked at the stem.
   tartana armed as a gunboat, has none given); Chapman's eight 4-pounders stand. The libra is 0.4608
   kg (Winfield et al. 2023, pp. 41-46).
 - **Ports**: the plate's to read; none is seen in the watercolour, whose tartane is a trader (seen).
+  **Corrected 2026-11-20** (Pages §5.7): **four a side** on the plate, closed lids in the waist
+  bulwark, in two pairs; 0.52 by 0.54 m in hers; no swivel drawn.
 
 ## 8. What the engine does today (observed)
 
@@ -584,7 +623,7 @@ braced sharp up, trimmed every two minutes, settled 2,400 s), the cutter as file
 | The topsail | Lescallier, Steel, Falconer: none named. Röding: usually. Forfait: the tartane simple's mark. Winfield (Monleón): "for stability". The watercolour: yes | The owner's settled rig (2026-11-06) |
 | The headsails | Lescallier, Steel, Röding: one. Forfait's ocean rig: two or three. The README and the Spanish note: two in the watercolour; this note: one seen. The owner's reading of Monleón's print and other tartane prints (2026-11-19): one | By judgement, as decision 11 leaves it: one great jib (Tar-D decision 11); the README's two recorded; borne out by the owner's reading |
 | Bowsprit or beak | Steel, Falconer: a bowsprit. Lescallier, Forfait: none, an éperon with a berthelot | The berthelot over an éperon (rung A from two French constructors and riggers; the English words loose) |
-| The mast's rake | Decision 11: "one raking mast". No text gives the main's rake; the watercolour's main near upright, its mizen raked aft | The owner's: their word beside their picture (§11 question 3; Tar-D §16.1 question 3) |
+| The mast's rake | Decision 11: "one raking mast". No text gives the main's rake; the watercolour's main near upright, its mizen raked aft | The owner's: their word beside their picture (§11 question 3; Tar-D §16.1 question 3). **2026-11-20:** Chapman's Pl. LXII No. 16 draws the main upright, on a two-masted lateen rig (Pages §7); the owner's 3° forward kept |
 | Tacking | Lescallier: the yard changed "pour virer de bord" (either way). Forfait: lateens taken aback in a strong wind are mortal. PCI 2018: the yard changed by a wear when the weather allows. Stratico, O'Scanlan: the new board held with the yard left (GA) | Tacked and worn, the yard changed or left: the owner's answer to question 3 (2026-11-18); no source says she could not tack (§4.2) |
 | The engine's probe and her | The probe's yard 16 m, the *Humble*'s 24.4 m; the probe's lateen 120 m² on a 106-t cutter's hull | The probe classes her and was never meant to sail her; her design takes the *Humble* |
 | Chapman's proportions and Forfait's | 3.54 breadths against 2.88 and 3.09 | War against trade (JUDGEMENT); the lines scaled by principle 7 |
@@ -615,10 +654,11 @@ filled from other research (the prize papers, item 9) or judgement.
 
 **For the build's step 1 (public domain, outside the tree):**
 
-4. **Chapman Pl. LVIII No. 16** at a readable size: lines, deck, ports, masts, the draught's
+4. **Chapman Pl. LVII No. 16** at a readable size: lines, deck, ports, masts, the draught's
    datum; and Pl. LXII's "tartane with lateen sails" for the rig's heights (the IA reprint's leaf, or
    Commons, or the Sjöhistoriska museet's DigitaltMuseum), measured outside the repository as Gwyn's
-   was.
+   was. **Done 2026-11-20** (Pages): both plates on the Sjöhistoriska museet's photographs. Items 5
+   and 7 were not sought, and item 6 was not reached (Pages §9).
 5. **Lescallier tome II, Pl. XXII fig. 5** (IA `bub_gb_u_FWAAAAcAAJ`): the tartane drawn.
 6. **Forfait's figs. 9 and 35** (the sloop's topsail and the one-masted lateen barque) for the
    topsail's set and the lateen's cut.

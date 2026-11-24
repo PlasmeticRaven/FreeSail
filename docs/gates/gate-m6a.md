@@ -1,6 +1,6 @@
 # Gate M6a: People, the captain's station, and the wardroom (6a and 6b as one)
 
-**Verdict:** open. The build `m6a`, cut 2026-10-10 at package 37p's merge, the last in (branch `gates/m6a`, tag `gate-m6a`, the release's zip; the owner's word of 2026-10-10, decision 44: one gate for 6a and 6b, carrying the yards and the helm by the wind with it), after
+**Verdict:** closed with milestone 7 (the owner, 2026-11-24: "Closing milestone 7 may also close the older gates." `docs/gates/gate-m7.md`). As it stood until then: open. The build `m6a`, cut 2026-10-10 at package 37p's merge, the last in (branch `gates/m6a`, tag `gate-m6a`, the release's zip; the owner's word of 2026-10-10, decision 44: one gate for 6a and 6b, carrying the yards and the helm by the wind with it), after
 packages 40 (the ship's company, the rules-based captain in three layers, the captain's
 station and the player's seat), 40b (the lessons and the officer's own reckoning) and 40c
 (the captain's trials), 37p (the yards and the helm by the wind, the ship in a gale), 41 (the wardroom), 42a (the consent brief revised) and 42 (the API door, the replay by acts, the pictures). The chart blocks 39a and 39b landed before it and are checked here

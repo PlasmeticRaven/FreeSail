@@ -1663,11 +1663,11 @@ def _covered(world: Any, prey: Any) -> bool:
     ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
-        from freesail.world.service import KINGS, service_of
+        from freesail.world.service import kings_force
 
         # the King's ships protect the trade; a privateer by her papers was not in that
-        # business (`service_of`; package 121)
-        covering = service_of(world) == KINGS
+        # business (`service_of`; package 121), nor a prize under her prize-master
+        covering = kings_force(world)
         if covering and R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM):
             return True
     return False

@@ -33,7 +33,10 @@ timing:
   box_timeout_s: 900      # give up after this long
   box_estimate_s: 360     # what the state snapshot shows as remaining at the start
 on_start: {log: "Stations for stays; stand by to box-haul."}
-on_complete: {log: "Box-hauled; braced sharp up on the {new_tack} tack, heading {new_course}.", kind: ship.box_hauled, severity: notable}
+# {braced}: "braced sharp up", or "full and by" where she works no braces, a rig of head yards
+# alone with no square sail set (package 90, A2's second pass: `scripts.braces_worked`,
+# `BoxHaulScript.words`; "braced sharp up" whatever her sails before it)
+on_complete: {log: "Box-hauled; {braced} on the {new_tack} tack, heading {new_course}.", kind: ship.box_hauled, severity: notable}
 on_fail: {log: "Could not box-haul her: {reason}.", kind: evolution.failed, severity: notable}
 # crew: "Station the men as for stays": all hands (Luce 1884, ch. XXIV, 'Box-hauling').
 crew: {hands: all, rating: ordinary, stations: [all hands]}

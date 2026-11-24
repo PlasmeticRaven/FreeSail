@@ -1,5 +1,19 @@
 # Research note: the *Purísima Concepción* class three-decker (package 90, November 2026)
 
+**Corrected 2026-11-20 by her measuring** (`docs/design/ships-design/pages-concepcion.md`,
+**Pages**). Her own plan, PB-039, was measured at the library's full size (12,932 × 4,574 px, 39.75 px
+a pie), and her sister's sheets at Greenwich, ZAZ0100 to ZAZ0103, at the 1,280 px the museum serves.
+The owner chose PB-039 for her hull the same day ("Use PB-039 (Recommended)"), and the lead ruled on
+the measuring (nudge 30, item 4). Only what the measuring corrects is corrected here. Each correction
+is set after the reading it corrects, which stands as it was found (the marks are never upgraded):
+- what PB-039 holds: a body plan and a half-breadth plan, not a section only (§0.2, §2.4);
+- its scale (§2.4) and her drawn length, 219.8 pies post to stem, not about 214 (In short, §2.4);
+- its two dashed lines, neither a waterline, and her load line (§2.4, §2.6);
+- her displacement, her draught and her sills, now measured (§2.5, §2.6, §9, §10);
+- the Greenwich sheets, viewed at 1,280 px: their length, and the sixteenth lower pair's place (§0.3,
+  §2.2, §2.3, §9, §10);
+- her source, the owner's (§2.3, §11).
+
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The units (Winfield et al. 2023, pp. 41-46), the complements of 1 January 1788 (p. 1446 and
 the two pages following) and of the Regulation of 16 October 1803, and the ordinance of 1803's guns
@@ -76,12 +90,17 @@ put to the engine, never a design figure.
   Burgos at 39.8 px a pie, the drawn hull about 214 pies long, the lower ports 12¾ pies apart
   (3.56 m) (measured, §2.4). It is the rung-A source for her as built. It is not in the tree; the
   owner decides whether it is held (§11).
+  **Corrected 2026-11-20** (Pages §1, §3, §5.1): the sheet holds a body plan of eighteen sections and
+  a half-breadth plan as well as the sheer; its scale is 39.75 px a pie; her drawn length is **219.8
+  pies (61.26 m)** from the post's after face to the stem's fore face on her line, the 214 having
+  stopped short of the stem. **By the owner's choice of 2026-11-20 her hull is drawn from it.**
 - **Her sister's lines as rebuilt are at Greenwich**, the *San Josef* as fitted at Plymouth for a
   114-gun first rate: **ZAZ0101** (body plan, sheer and half-breadth, 1:48, 25 February 1801,
   signed by John Marshall), **ZAZ0102** (middle, gun and orlop decks, 1:96), **ZAZ0103**
   (quarterdeck, forecastle and upper deck, 1:96), and **ZAZ0100**, the full colour plan Winfield
   reproduces as J1945, which Greenwich dates **1799**, not 1797 (catalogue, read). Crown copyright;
-  cited by object number, never copied.
+  cited by object number, never copied. **Corrected 2026-11-20:** viewed at 1,280 px, the only size
+  the museum serves free (Pages §1.2, §11); her comparison, not her hull, by the owner's choice.
 - **Winfield's figures** (via Winfield, pp. 406 to 410): as built 213 ft 9 in by 58 ft by 29 ft
   (59.55 × 16.16 × 8.08 m); as rebuilt at Cádiz 1786 to 1793, 220 ft 6 in, keel 186 ft, 58 ft 4 in
   by 28 ft 9 in (61.30, 51.82, 16.25, 8.01 m), 2,771 tons; 5,167 t displacement; 839 men. Two of
@@ -101,7 +120,8 @@ put to the engine, never a design figure.
 - **No Spanish masting, company breakdown, gun weights, draught or sill height was found.** The
   masts rest on Steel 1794's rule (half the lower deck and the extreme breadth for the main mast:
   vol. I p. 39, read (OCR)), British and applied to her by judgement; the rest are passages to ask
-  for (§11).
+  for (§11). **Corrected 2026-11-20:** her draught and her sills are measured on her own plan, PB-039
+  (§2.6).
 - **The engine, run.** It already takes a third gun deck: the deck word `middle`, the guns
   numbered by deck, the beat's deck lines, the orders by deck and the viewer's check all work on
   the scratch three-decker (observed, §7). What it lacks is hers to give: a description and rank
@@ -130,9 +150,9 @@ put to the engine, never a design figure.
 
 | Short form | Work, where, standing | Rung | What it gives here |
 |---|---|---|---|
-| **PB-039** | Gautier, *Plano del Navío de S.M.C. Nombrado Nuestra Señora de la Concepción del Porte de 112 Cañones*, Ferrol 1779, manuscript, colour, 29 × 82 cm, "1 sección y 1 alzado"; Archivo Histórico de la Armada J. S. de Elcano, PB-039; Biblioteca Virtual de Defensa, record 1026905 (image group path 348289; image id 4140128, 12,932 × 4,574 px); **CC BY 4.0** with the credit above | A (her own plan, as built) | §2.4: her tiers and their ports, her scale, her length as drawn, the upper works, the channels, the head and the quarter galleries; read on screen only |
+| **PB-039** | Gautier, *Plano del Navío de S.M.C. Nombrado Nuestra Señora de la Concepción del Porte de 112 Cañones*, Ferrol 1779, manuscript, colour, 29 × 82 cm, "1 sección y 1 alzado"; Archivo Histórico de la Armada J. S. de Elcano, PB-039; Biblioteca Virtual de Defensa, record 1026905 (image group path 348289; image id 4140128, 12,932 × 4,574 px); **CC BY 4.0** with the credit above | A (her own plan, as built) | §2.4: her tiers and their ports, her scale, her length as drawn, the upper works, the channels, the head and the quarter galleries; read on screen only. **Corrected 2026-11-20:** fetched at full size from the record's second image group (356204, a one-page PDF) and measured, kept outside the tree; the sheet holds a body plan of ten after and eight fore sections with five diagonals, and a half-breadth plan under the sheer (Pages §1.1, §1.3) |
 | ZAZ0100 | RMG, *San Josef (captured 1797)*, the full colour plan, dated 1799, 654 × 1,960 mm; image J1945; © Crown copyright, NMM | A (her sister as fitted), catalogue | the plan Winfield reproduces (p. 410); the catalogue dates it 1799 and the fitting at Plymouth June 1799 to January 1801 |
-| ZAZ0101 | RMG, *San Josef (captured 1797)*, body plan, sternboard with its decoration, sheer with inboard detail, quarter decoration, figurehead and half-breadth, 1:48, 25 February 1801, "as fitted at Plymouth Dockyard for a 114-gun First Rate, three-decker", pencil alterations of April 1808 for her large repair of 1807 to 1809, signed by John Marshall; image J1950, 678 × 1,982 mm; Crown copyright | A (her sister's lines as rebuilt), catalogue | the source for her lines as she sailed in 1797 and after |
+| ZAZ0101 | RMG, *San Josef (captured 1797)*, body plan, sternboard with its decoration, sheer with inboard detail, quarter decoration, figurehead and half-breadth, 1:48, 25 February 1801, "as fitted at Plymouth Dockyard for a 114-gun First Rate, three-decker", pencil alterations of April 1808 for her large repair of 1807 to 1809, signed by John Marshall; image J1950, 678 × 1,982 mm; Crown copyright | A (her sister's lines as rebuilt), catalogue | the source for her lines as she sailed in 1797 and after. **Corrected 2026-11-20:** viewed at 1,280 px (RMG object 79892) and measured coarsely, 7.5 cm a pixel (Pages §11.2); her comparison by the owner's choice |
 | ZAZ0102 | RMG, the *San Josef*'s middle, gun (lower) and orlop decks with the platforms, 1:96, 25 February 1801; image J1949; Crown copyright | A, catalogue | her decks |
 | ZAZ0103 | RMG, the *San Josef*'s quarterdeck, forecastle and upper deck, 1:96, 25 February 1801; image J1948; Crown copyright | A, catalogue | her upper works |
 | PB-049 | Tomás Bryant, *Plano de aloxamientos y cubiertas del Navío de tres puentes del porte de 112 cañones nombrado la Reyna Luisa*, Ferrol, 29 October 1791, 65 × 100 cm, Romero Landa's project; its note "Tipo: Mejicano, Conde de Regla, Salvador del Mundo, Real Carlos, San Hermenegildo y Príncipe de Asturias"; the verso "Repartimiento de Cubiertas para Navios de 3 puentes"; AHA; BVMDefensa record 1027262; CC BY 4.0 | A for the type (S†), catalogue | the Santa Ana class 112s' decks and quarters: the next class, the same establishment |
@@ -158,6 +178,8 @@ put to the engine, never a design figure.
 - **The images of ZAZ0100 to ZAZ0103**: not viewed. Under the Greenwich rule they are read and
   cited by object number, as *Minorca*'s ZAZ4270 is for the xebec; what is the owner's is whether
   her hull is drawn from them (her sister's as rebuilt) or from PB-039 (her own as built) (§11).
+  **Corrected 2026-11-20:** viewed and measured at 1,280 px, RMG objects 79891 to 79894, the only
+  size served free (Pages §1.2, §11); the owner chose PB-039 (§11).
 
 ---
 
@@ -251,6 +273,10 @@ passage is asked (§11).
   Winfield's as-built 59.55 m and 2.1 m under the book's rebuilt 61.30 m. Either the *San José*'s rebuild
   did not lengthen her as the *Concepción*'s did, or the two measure differently (judgement);
   ZAZ0101's scale settles it for the sister, and PB-039's for the *Concepción* as built.
+  **Corrected 2026-11-20** (Pages §5.1, §11.2): ZAZ0101 and ZAZ0100 draw the *San Josef* **195.9 ft
+  (59.71 m)** from the post's after face to the stem's fore face, 1 ft 8 in over James's gun deck;
+  PB-039 draws the *Concepción* **61.26 m** on her line: the sisters' drawings differ by 1.55 m. Her
+  length is ruled PB-039's (the lead, 2026-11-20).
 - **The tons.** James's 2,457 bm and Winfield's 2,456 for one of the book's as-built figures are one ton
   apart: Winfield's 2,456 may be the British measure of the *San Josef* (judgement, §11).
 - **Spanish ships broad and high.** James vol. 1 p. 29 (read (OCR)): Spain built "higher" and
@@ -273,6 +299,12 @@ sister's lines). Not viewed yet, it holds no rung until then (principle 3). PB-0
 read on screen, but of the hull before the rebuild: scaled to her rebuilt length it is her
 stand-in (S†) meanwhile.
 
+**Corrected 2026-11-20** (Pages §1.2, §5.1, §11): ZAZ0101 was read only at Greenwich's 1,280 px
+(7.5 cm a pixel); its sections, load line, sills and decks are not measurable at that size. PB-039
+already draws her about 220 pies outside the stem and post, so the scaling to her rebuilt length
+would count the rebuild twice. **The owner chose PB-039 for her hull** the same day ("Use PB-039
+(Recommended)"): her own lines, rung S, unscaled; the Greenwich sheets her comparison.
+
 ### 2.4 Her own plan, PB-039, read on screen (measured)
 
 The plan was viewed at the full resolution the library serves (12,932 × 4,574 px) by drawing
@@ -282,10 +314,15 @@ of sixty pies de Burgos ("Escala de ... Pies de Burgos", its first ten feet numb
 every second foot to 60); and the sheer elevation, stern to the left, her title across the top
 ("del Porte de 112 Cañones").
 
+**Corrected 2026-11-20** (Pages §1.3): not a midship section but a **body plan** of eighteen
+sections (ten after, eight fore) with five diagonals, in a frame 58.25 pies wide; and a
+**half-breadth plan** under the sheer. Pages reads the bar as 58 pies, its first pie split by a
+diagonal scale; the count of 57 divisions over about 2,268 px is the same (Pages §3).
+
 | Reading | Figure | How |
 |---|---|---|
-| The scale | **39.8 px a pie de Burgos** (142.9 px a metre), ±1% | 57 even divisions over 2,268 px between the bar's 356th and 2,624th columns (the first foot or two split by a diagonal scale) |
-| Her drawn length, the stern's after edge to the head's fore edge | about 214 pies (59.6 m), ±2 pies | the hull from about x 3,150 to 11,700 px at the water's height, rough; agrees with Winfield's 213 ft 9 in as built |
+| The scale | **39.8 px a pie de Burgos** (142.9 px a metre), ±1% | 57 even divisions over 2,268 px between the bar's 356th and 2,624th columns (the first foot or two split by a diagonal scale). **Corrected 2026-11-20:** 39.75 px a pie, ±0.4% (the bar's lines fitted at 39.69, 39.80 end to end, the body plan's frame its 58 pies at 39.92: Pages §3) |
+| Her drawn length, the stern's after edge to the head's fore edge | about 214 pies (59.6 m), ±2 pies | the hull from about x 3,150 to 11,700 px at the water's height, rough; agrees with Winfield's 213 ft 9 in as built. **Corrected 2026-11-20:** **219.8 pies (61.26 m)** from the post's after face (x 3,131) to the stem's fore face (x 11,870) on her line, the 11,700 having stopped 170 px short of the stem; 220.0 pies outside them at the lower deck and 215.5 between the rabbets there (Pages §5.1, measured). **Ruled her length, 61.26 m** (the lead, 2026-11-20) |
 | The lower tier | **15 ports a side**, 12¾ pies apart centre to centre (3.56 m), spanning 178.7 pies (49.8 m) | centres at x 3,982 to 11,095 px |
 | The middle tier | **16 ports a side**, staggered between the lower and the upper, spanning 191.8 pies (53.4 m) | x 3,713 to 11,346 px |
 | The upper tier | **16 ports a side**, over the lower tier's ports and one more aft, spanning 191.8 pies | x 3,453 to 11,086 px; its centre 6.8 pies (1.9 m) abaft the lower tier's |
@@ -294,7 +331,7 @@ every second foot to 60); and the sheer elevation, stern to the left, her title 
 | The head | a beakhead with its rails and a figure | seen |
 | The stern | quarter galleries in two closed tiers with a third tier of lights above | seen |
 | The inboard | the decks in carmine, a pump in the waist from the lower deck to the hold | seen |
-| Below the lower tier | two dashed lines along the wales, one about 1 m and one about 2.5 m below the lower sills at midships, neither labelled in what was read | **not identified**: either may be a waterline; so the lower sill's height above her load line is not read (§10) |
+| Below the lower tier | two dashed lines along the wales, one about 1 m and one about 2.5 m below the lower sills at midships, neither labelled in what was read | **not identified**: either may be a waterline; so the lower sill's height above her load line is not read (§10). **Corrected 2026-11-20:** **neither is a waterline**: both curve up toward both ends, as a deck's or a ribband's sheer does. Her drawn load line is L0, the top of seven faint ruled waterlines, inclined 0.47° to the keel (Pages §4.1); **ruled her load line as traced** on it, 8.02 m to K aft and 7.94 m at the middle, the straight fit recorded beside it (the lead, 2026-11-20; Pages §12.1) |
 
 Her as-built ports, 15, 16 and 16 a side, are Winfield's 30, 32 and 32 guns on the three decks
 exactly (94 as built). The plan's title says 112, and its upper works are pierced: so the sheet
@@ -312,6 +349,15 @@ figure is at a deeper load than the game's sailing water, or the block of a Span
 is much fuller than a British 74's. Her lines (ZAZ0101, PB-039) give the answer when measured; the
 design carries 5,167 t beside the measured figure (§10).
 
+**Corrected 2026-11-20** (Pages §4.3, §12): measured on PB-039's sections, her body to her drawn line
+is 4,325 t moulded, 4,349 t with her keel, 4,443 to 4,473 t outside 3 to 4 pulgadas of plank
+(JUDGEMENT on the plank); on the line as traced, 4,421 to 4,452 t. **Ruled (the lead, 2026-11-20):
+her file's displacement is that body, about 4,440 t** (the range 4,421 to 4,473 t). To float 5,167
+metric tonnes her own body would draw **8.70 to 8.85 m to K** at the middle, not 9.6, a line 0.8 to
+0.9 m above her drawn one, in the wale's band, drawn nowhere on the sheet. Read as toneladas of
+2,000 libras, 5,167 is about 4,762 t, most likely reckoned level near her after draught (JUDGEMENT;
+the book's own mark on the figure, p. 407, would settle it).
+
 ### 2.6 Her draught and her lower sills
 
 Not found. VR-Sp gives no draught (*calado*); James gives none; PB-039's two dashed lines are not
@@ -319,6 +365,11 @@ identified (§2.4). The lower sills' height above her water decides when her lee
 (package 70's rule, the 74's 5 ft 2 in being the *Bellona*'s report): for her it is to be measured
 on ZAZ0101 or PB-039 once a waterline is identified, or read from Winfield if the book gives a battery
 height (*altura de la batería*) (§11).
+
+**Corrected 2026-11-20** (Pages §4.2, §5.2, §12.1): measured on PB-039's drawn line, **7.94 m to K at
+the middle on the line as traced** (8.02 m at the post's after face, 7.65 m at the stem's fore face;
+7.92 m on its straight fit), and her lower sills **1.89 to 2.48 m above it, 1.91 m amidships**; the
+midship lee port dips at 13.3°. No source read gives her draught at sea.
 
 ---
 
@@ -544,9 +595,9 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
 | The middle deck's guns in 1797 | Winfield 32 × 24; James 32 × 18 (the *San Josef* at capture) | Winfield's, the book's broadside's sum the check (§3.2) |
 | Her company | Winfield 839; James 917 at capture by the warrants; 850 in British service | Winfield's for her file; James's day includes a flag officer's people (judgement) |
 | The keel and the rebuilt length | Winfield's feet and the book's metres disagree by 0.05 and 0.13 m | the owner re-reads p. 407 (§2.1) |
-| The rebuilt length | Winfield 61.30 m (the *Concepción*); James 59.21 m (the *San Josef*) | ZAZ0101 measured; until then Winfield's (§2.2) |
+| The rebuilt length | Winfield 61.30 m (the *Concepción*); James 59.21 m (the *San Josef*) | ZAZ0101 measured; until then Winfield's (§2.2). **Corrected 2026-11-20:** ZAZ0101 59.71 m post to stem; PB-039 61.26 m, ruled her length (§2.2) |
 | The breadth | Winfield's *manga* 16.25 m; James's extreme 16.54 m | the plank (judgement, §2.2) |
-| The displacement | Winfield 5,167 t; her length and breadth at a 74's block, about 4,000 to 4,300 t | her lines measured (§2.5) |
+| The displacement | Winfield 5,167 t; her length and breadth at a 74's block, about 4,000 to 4,300 t | her lines measured (§2.5). **Corrected 2026-11-20:** her drawn body about 4,440 t, ruled; Winfield's figure most likely toneladas, about 4,762 t (§2.5) |
 | The Spanish pound | Winfield's pairs 1.079; James's rule 1.014 | Winfield's, by the lead's rule (§3.3) |
 | PB-039's title and Winfield | the plan says 112 and pierces the upper works; Winfield says built as 90 with nothing above | the sheet drawn or titled for the later establishment (judgement, §2.4) |
 | J1945's date | Winfield and the images README "as taken in 1797"; Greenwich 1799, the fitting at Plymouth | Greenwich's (§2.3) |
@@ -556,8 +607,9 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
 ## 10. What is open
 
 - **Her lower sills above her water**, and her draught: not read anywhere (§2.6). The lee ports'
-  truth waits on them.
-- **Her displacement** at her sailing water (§2.5).
+  truth waits on them. *Measured 2026-11-20 on PB-039* (§2.6).
+- **Her displacement** at her sailing water (§2.5). *Measured 2026-11-20 and ruled, about 4,440 t*
+  (§2.5).
 - **The 839 by kind** (officers, seamen, marine infantry, the navy's gunners, boys). *Met
   2026-11-19 by the regulations of 1788 and 1803 (§4).*
 - **Her guns' weights, lengths and crews** by Spanish practice; the obús's. *Not in the passages of
@@ -566,10 +618,12 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
   images; PB-078's sails.
 - **The mizen**: a lateen yard or a gaff in 1797 and in 1809.
 - **The sixteenth lower pair's place** (forward or aft), cut in 1791 and empty in Spanish service.
+  *Read 2026-11-20 on ZAZ0100: the aftmost* (Pages §11.3).
 - **The 1784 trials' findings.**
-- **PB-039's dashed lines**: which is her load line, if either.
+- **PB-039's dashed lines**: which is her load line, if either. *Neither, 2026-11-20; her load line
+  L0, ruled as traced* (§2.4).
 - **ZAZ0100 to ZAZ0103 not viewed**: her sister's lines, decks and colour plan; measured, they
-  give the hull as rebuilt.
+  give the hull as rebuilt. *Viewed 2026-11-20 at 1,280 px only; her comparison* (§0.3).
 - **PB_0050** (the Museo Naval): not online; the 1795 deck plan with the cabins.
 - **Brenton's page** for the phrase Winfield quotes; **Nicolas's** volume and page for "the finest
   ship in the world".
@@ -587,7 +641,8 @@ signal book (`data/nations.yaml`; Mazarredo's, package 76).
 - whether her hull is drawn from **ZAZ0100 to ZAZ0103** (her sister's as rebuilt), measured on
   Greenwich's site under the standing Greenwich rule (read and cited by object number, never
   copied, as the 74's draughts were and *Minorca*'s are), or from PB-039 alone (her own as built):
-  viewing needs no permission, the choice of hull is the owner's (Dec 10 question 2).
+  viewing needs no permission, the choice of hull is the owner's (Dec 10 question 2). *Answered
+  2026-11-20:* "Use PB-039 (Recommended)", to "Draw her hull from PB-039 instead?" (Dec Part F).
 
 **Winfield, the passages to ask for by title and class** (the owner sources them; the lead asks):
 1. ***Spanish Warships in the Age of Sail, 1700–1860*, the *Purísima Concepción* class, pp. 406 to
