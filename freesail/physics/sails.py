@@ -1580,10 +1580,15 @@ def _apply_loads(ship: Ship, sail: Sail, force_kn: float, d: _Drawing | None = N
     pressed = lateen_pressed(sail, d)
     if pressed is not None:
         # the cause beside the load, for the strain's warning (package 90, the lateen hulls'
-        # list, items 1 and 3): no figure, and never on a committed ship
+        # list, items 1 and 3): no figure, and never on a committed ship. A spar two lateens
+        # press (a mast with two) is marked for the one that pulls hardest, whose cause and
+        # words its warning gives (the lead's nudge 60, item 1), not for the last in the ship's
+        # order of sails
         marks = ship.extra.setdefault(LATEEN_PRESSED, {})
         for spar in path.spars:
-            marks[spar.id] = (pressed, sail.id)
+            mark = marks.get(spar.id)
+            if mark is None or force_kn > mark[2]:
+                marks[spar.id] = (pressed, sail.id, force_kn)
     if d is not None and d.side_sign != 0.0:
         # a fore-and-aft sail: its working sheet carries the pull, a sheet let fly nothing
         if d.working_sheet is not None:

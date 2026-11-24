@@ -101,11 +101,14 @@ WARNING_INTERVAL_S = 600.0  # one strain.warning per part per ten minutes
 # What presses a whole lateen's spars on its mast, beside their loads (package 90, the lateen
 # hulls' list, items 1 and 3; the lead's widening of nudge 55): `physics/sails.py` writes it
 # in `ship.extra` under this key where A1d's factors are applied, as {spar id: (cause, the
-# lateen's sail id)}, the cause "aback" or "bad hand", for each substep as its loads. Such a
-# part's warning is counted against the part and its cause, so a lateen coming aback or onto
-# the bad hand is warned for as it comes, whatever was said before, in words that name the
-# cause and what eases it. No committed sail is a whole lateen: no committed ship's part is
-# ever pressed so, and their warnings keep the rule as it was.
+# lateen's sail id, its pull)}, the cause "aback" or "bad hand", for each substep as its loads;
+# a spar two lateens press is marked for the one that pulls hardest. Such a part's warning is
+# counted against the part and its cause, and a cause that comes again, though it ended a
+# moment before, begins its ten minutes afresh (`_causes_come`; the lead's nudge 60, item 1), so
+# a lateen coming aback or onto the bad hand is warned for as it comes, whatever was said
+# before, in words that name the cause and what is measured to ease it. No committed sail is a
+# whole lateen: no committed ship's part is ever pressed so, and their warnings keep the rule
+# as it was.
 LATEEN_PRESSED = "strain.lateen_pressed"
 SUBSTEP_S = 0.25  # the physics substep (spec §3.1); the probability is per substep
 
@@ -167,6 +170,9 @@ class StrainState:
     parted: list[str] = field(default_factory=list)  # line ids, in order
     blown_out: list[str] = field(default_factory=list)  # sail ids, in order
     carried_away: list[str] = field(default_factory=list)  # spar ids, in order (roots only)
+    # the cause each part a whole lateen pressed was pressed by at the last tick (package 90,
+    # `LATEEN_PRESSED`); a save from before has none (`_causes_come` reads it so)
+    pressed_by: dict[str, str] = field(default_factory=dict)
 
     def snapshot(self) -> dict[str, Any]:
         return {
@@ -212,6 +218,8 @@ def apply_strain(ship: Ship, dt: float, rng_stream: random.Random | None = None)
     seaway = motion.load_factor if motion is not None else 1.0
     warnings: list[_Warning] = []
     pressed = ship.extra.get(LATEEN_PRESSED)  # package 90: None on every committed ship
+    if pressed or getattr(st, "pressed_by", None):
+        _causes_come(st, pressed or {})
     for part, kind in _parts_by_kind(ship):  # insertion order: deterministic
         # `_out_of_action`, with each part's class looked up once per ship (package 29's
         # profile: three hundred parts a tick)
@@ -381,7 +389,7 @@ def _warn(
     part: Part,
     ratio: float,
     out: list[_Warning] | None = None,
-    pressed: tuple[str, str] | None = None,
+    pressed: tuple[str, str, float] | None = None,
 ) -> None:
     # one warning a part in ten minutes; where a whole lateen presses it (`LATEEN_PRESSED`),
     # one a part and its cause, and its plain strain counted as said with it (package 90)
@@ -436,22 +444,56 @@ def _warn(
         out.append(warning)
 
 
-def _pressed_words(ship: Ship, pressed: tuple[str, str], dire: bool) -> tuple[str, str]:
-    """A spar's warning where a whole lateen presses it on its mast: the cause, and what eases
-    it in place of "if sail is not shortened", which the game itself does not do while it is
-    aback (package 90, the lateen hulls' list, item 3; JUDGEMENT on the words, in the anchor's
-    form; the reliefs the lead's, nudge 53). Held aback: its sheet let fly, its yard shifted
-    round the mast or the ship boxed off, as the bow's line says (`orders/navigation.py`); on
-    the bad hand, its sheet let fly or its yard shifted, for paying off leaves it there."""
-    cause, sail_id = pressed
-    sail = _name(ship, sail_id, False)
+def _causes_come(st: StrainState, pressed: dict[str, tuple[str, str, float]]) -> None:
+    """A cause that comes again is warned for as it comes, whatever was said before (package 90,
+    the lead's nudge 60, item 1): a part pressed by a cause it was not pressed by at the last
+    tick has that cause's ten minutes begun afresh. Before, a lateen aback and warned, its sheet
+    let fly, on the bad hand and warned, and aback and on the bad hand again within the ten
+    minutes, was silent the second time, at 1.59 of its rating, till its yard carried away."""
+    last = getattr(st, "pressed_by", None) or {}
+    for part_id, mark in pressed.items():
+        if last.get(part_id) != mark[0]:
+            st.last_warning_s.pop(f"{mark[0]}:{part_id}", None)
+    st.pressed_by = {part_id: mark[0] for part_id, mark in pressed.items()}
+
+
+def pressed_reliefs(ship: Ship, cause: str, one: bool = True) -> str:
+    """What is measured to ease a whole lateen pressed on its mast, by its cause and the ship,
+    in the orders she will take (package 90, the lead's nudge 60, item 3; the equations read,
+    not changed): held aback, its yard shifted, or her head boxed off where she has head yards
+    to brace abox and is not hove to (`BoxOffScript.check`); on the bad hand, its yard shifted
+    or the sail taken in. Measured on the three probes, generator-rated, aback in 30 and 40 kn
+    and on the bad hand in 40 and 50 (docs/dev/TuningNotes.md, "the lateen hulls' list as it
+    stands"): a shift halves the yard's and mast's load within a second; boxing off the same,
+    aback; a take-in on the bad hand within 152 to 170 s, where with no order it never falls.
+    Not named: the sheet let fly, which on the bad hand raises the load (the xebec in 40 kn,
+    her main yard 0.93 to 1.11) and aback eases it no more than doing nothing; boxing off on the
+    bad hand, after which the polacre's yards rise past their load at the order (to 1.28 to
+    2.10); a take-in held aback, which waits till she pays off. Of one sail, or of more
+    (`one` false: "shift them")."""
+    it = "it" if one else "them"
     if cause == "aback":
-        how, ease = (
-            f"the {sail} aback against the mast",
-            "let fly its sheet, shift it or box her off",
-        )
+        from freesail.evolutions.scripts import head_and_after_yards
+
+        if head_and_after_yards(ship)[0] and "hove_to" not in ship.extra:
+            return f"shift {it} or box her off"
+        return f"shift {it}"
+    return f"shift {it} or take {it} in"
+
+
+def _pressed_words(ship: Ship, pressed: tuple[str, str, float], dire: bool) -> tuple[str, str]:
+    """A spar's warning where a whole lateen presses it on its mast: the cause, and what is
+    measured to ease it in place of "if sail is not shortened", which the game itself does not
+    do while it is aback (package 90, the lateen hulls' list, item 3; JUDGEMENT on the words, in
+    the anchor's form; the reliefs by `pressed_reliefs`, as the bow's line says them,
+    `orders/navigation.py`)."""
+    cause, sail_id = pressed[0], pressed[1]
+    sail = _name(ship, sail_id, False)
+    ease = pressed_reliefs(ship, cause)
+    if cause == "aback":
+        how = f"the {sail} aback against the mast"
     else:
-        how, ease = f"the {sail} lying on the mast", "let fly its sheet or shift it"
+        how = f"the {sail} lying on the mast"
     if dire:
         return (
             f"bending like a whip, {how}; she will carry it away: {ease}.",

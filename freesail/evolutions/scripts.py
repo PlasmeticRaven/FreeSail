@@ -893,10 +893,22 @@ def lateen_aback(ship: Ship, sail: Sail) -> bool:
     )
 
 
+# The orders whose first work on a set whole lateen is to brail it up to its yard, as a take-in
+# is (`data/evolutions/take_in_lateen.yaml`, `furl_lateen.yaml`'s first step): held aback, each
+# waits as a take-in does (the lead's nudge 60, item 2: `furl the mainsail` said "Hands to furl
+# the mainsail" at once and the sail stayed set, 136 s with no word of a wait).
+LATEEN_BRAILED_FIRST_VERBS = frozenset({"take_in", "furl"})
+
+
 def lateen_take_in_waits(ship: Ship, evo_verb: str, subject: Any) -> bool:
-    """Whether a take-in of this subject waits: a whole lateen held aback while the mean true wind
-    is over `LATEEN_TACK_KN` (package 90, A1d); it goes on when it fills or is drawn over."""
-    if evo_verb != "take_in" or not isinstance(subject, Sail) or not lateen_aback(ship, subject):
+    """Whether a take-in of this subject waits, or a furl, which brails it up first: a whole lateen
+    set and held aback while the mean true wind is over `LATEEN_TACK_KN` (package 90, A1d); it
+    goes on when it fills or is drawn over."""
+    if (
+        evo_verb not in LATEEN_BRAILED_FIRST_VERBS
+        or not isinstance(subject, Sail)
+        or not lateen_aback(ship, subject)
+    ):
         return False
     from freesail.orders.navigation import LATEEN_TACK_KN, mean_true_wind_kn  # no cycle at load
 
@@ -2486,7 +2498,17 @@ class TackScript(Script):
                     ease_off_sheets(self.ship, [aft], new_lee)
                     self.mizen_eased = True
                 draw = " Draw jib; trim aft the head sheets." if self._jibs() else ""
-                if self.heads and not draw:
+                drawn_lateens = [sl for sl in self.heads if is_whole_lateen(sl)]
+                if drawn_lateens and draw:
+                    # the fore lateen drawn with the jibs, named with them (the lead's nudge 60,
+                    # item 6: "Draw jib; trim aft the head sheets; draw the mizen on the mast."
+                    # named every sail but the polacre's foresail; JUDGEMENT on the words)
+                    sheets = "sheet" if len(drawn_lateens) == 1 else "sheets"
+                    draw = (
+                        " Draw jib; trim aft the head sheets and the "
+                        f"{self._boom_names(drawn_lateens)} {sheets}."
+                    )
+                elif self.heads and not draw:
                     # the fore lateen alone drawn on the new board (package 90, nudge 48)
                     draw = f" Draw the {self._boom_names(self.heads)}; trim aft its sheet."
                 # a lateen drawn with the head sheets is named there alone (the lead's nudge 53,
