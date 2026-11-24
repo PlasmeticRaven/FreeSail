@@ -471,7 +471,7 @@ The single most important boundary is between `core`/`ship`/`physics`/`crew` (th
 
 ### 8.3 Multiplayer readiness
 
-Not built, but not blocked: the sim already runs as a server that agents connect to; a human on another machine is an agent whose client speaks the same protocol. Deterministic lockstep means the server sends orders and ticks, not world state. The unsolved parts (matchmaking, latency hiding at high compression, and replay exact only on one build, decision 36) are real but later.
+**Struck by the owner on 24 November 2026 (decision 79): "Multiplayer may be struck."** Nothing is built toward it and nothing is held back for it. As first written: not built, but not blocked: the sim already runs as a server that agents connect to; a human on another machine is an agent whose client speaks the same protocol. Deterministic lockstep means the server sends orders and ticks, not world state. The unsolved parts (matchmaking, latency hiding at high compression, and replay exact only on one build, decision 36) are real but later.
 
 ---
 
@@ -525,24 +525,26 @@ Each milestone ends in something you can run, and in a **gate**: a report writte
 | M3b | (not in the first roadmap) | Brace limits, canvas, studding sails in the physics | Passed 27 Sep |
 | M4 | Standing orders, the watcher | As written, three gates | 4a–4c passed by 29 Sep |
 | M5 | A world | A far larger sea, ports by file, navigation, tides, anchoring | 5a–5c passed; 5c on 8 Oct |
-| M6 | Officers and captains | Stations, the wardroom, rules captains, the business, the regatta, the chart to the Azores | 6a (with 6b) open; 6c run in part |
-| M7b | The director | Ten parts; frozen open (decision 51) | Never run |
-| M7 | Powder | Combat, signals, squadrons, health, prizes, one world, more sea, five ships, the harbour, safety work | Cut and released as `gate-m7` (21 Nov); the verdict pending |
+| M6 | Officers and captains | Stations, the wardroom, rules captains, the business, the regatta, the chart to the Azores | 6a (with 6b) open and 6c run in part until 24 Nov; **closed with milestone 7** (decision 79) |
+| M7b | The director | Ten parts; frozen open (decision 51) | Never run; **closed with milestone 7** (decision 79) |
+| M7 | Powder | Combat, signals, squadrons, health, prizes, one world, more sea, five ships, the harbour, safety work | Cut and released as `gate-m7` (21 Nov); **closed, with a list, by the owner on 24 Nov** |
 | M7c | (new, decision 69e) | The data made true across 1792 to 1825 | Not begun |
 
 The first roadmap's words for milestones 0 to 8 are in version 0.2 (`docs/DesignProposal-v0.2.md`, §11).
 
-**Milestone 7 closes at the owner's gate** (`docs/gates/gate-m7.md`): played on the build `m7` as cut the second time (packages 118 to 121 in it); *closed*, *closed, with a list*, or *not yet*. On *closed*, the lead writes "the game as built" and the list carried forward, and milestone 8 is fixed from it.
+**Milestone 7 closes at the owner's gate** (`docs/gates/gate-m7.md`): played on the build `m7` as cut the second time (packages 118 to 121 in it); *closed*, *closed, with a list*, or *not yet*. On *closed*, the lead writes "the game as built" and the list carried forward, and milestone 8 is fixed from it. **Closed, with a list, on 2026-11-24:** the game as built is `docs/TheGameAsBuilt.md`; the list carried forward is `docs/dev/CarriedForward-M7.md`, its first section the four things the owner names to be mended first in milestone 8.
 
 ### Milestone 8: the ship and her people (decision 75)
 
-Each with what the owner decides before it starts.
+Each with what the owner decides before it starts. **A gate in its middle and one at its end** (decision 79), on the line the lead proposed and the owner approved on 24 November: **to the middle gate, the ship fights and is kept** (the mending step; 77; 87; a privateer's and a merchantman's own people; package 122; the fight's known faults; package 90's ships); **to the end gate, her people and her handling** (the crew made true; 78b; the rest of package 60; the note on a ship made by a player; the boundary's structural work).
+
+- **First, the mending step** (decision 79): from the gate's list, a game ended from the harbour, fog that comes on and clears over a time, and the game's own captain replacing a spar carried away; the older faults on today's ships (`docs/dev/CarriedForward-M7.md`, section 4); and **package 125, the moment of the haul**. The test suite's package is planned beside it. *Packages 125, 126 (the harbour, the weather and the captain) and 127 (words and waits on today's ships) launched on 24 November at his word.*
 
 - **77, the fight's and damage control's evolutions**, "clear for action" made true, the chain pumps. *Approved 11 November; he says when it launches.*
-- **87, the warrant officers' stations**: gunner first, then surgeon, carpenter, sailmaker, boatswain, each one a person or a model may hold (the owner, 27 October). *Its brief, after 77; all five now or the gunner first.*
-- **78b, fine control of the sails, and the gybe by hand**: spilling the wind by vangs and sheets, a yard dropped with the sail still set, the gybe. *Whether his list of 10 November is the whole, and whether the sailing evolutions' finds the lead sorted go with it.*
+- **87, the warrant officers' stations**: gunner first, then surgeon, carpenter, sailmaker, boatswain, each one a person or a model may hold (the owner, 27 October). *Its brief, after 77; all five at once (decision 79).*
+- **78b, fine control of the sails, and the gybe by hand**: spilling the wind by vangs and sheets, a yard dropped with the sail still set, the gybe. *His list of 10 November, and whatever else is desirable, interesting or falls out of the work (decision 79).*
 - **The rest of package 60**: a ship left and taken up again; the two bodies of a ship. *The lead's design statement of the near and far ship, read first.*
-- **The crew made true**: skill aloft read, or the line struck; the fatigue of work aloft charged in full; morale per man, or the line struck. *Each, build or strike; and whether ordinary hands stay "numbers only" (decision 6).*
+- **The crew made true**: skill aloft read, or the line struck; the fatigue of work aloft charged in full; morale per man, or the line struck. *Each, build or strike; and whether ordinary hands stay "numbers only" (decision 6). **Decided, 24 November (decision 79):** a man's own skill read in the work; the fatigue of work aloft charged in full, per man; morale the company's one figure, carried beyond the fight (victuals, hard driving, losses, prizes) and said in the log, with a man's own part drawn from it where an event calls for one; ordinary hands stay "numbers only".*
 - **A privateer's and a merchantman's own people** (found by package 121): a ship given a privateer's or a merchant's papers on a King's hull keeps the file's post-captain, the Navy's lieutenants and the marines. New ship files by the generator with the owners' complement and no marines, and people files with a courtesy captain, the owners' lieutenants and prize-masters, or a master and mates; the harbour offering them. *He says when it is booked and launched.*
 - **Package 122, the log read back as it was shown, and the captain's order given once**: a past line judged by where the player stood when it was said, not where he stands now; the game's own captain no longer ordering "fill away" twice. *Booked 20 November, low priority; launched at his word.*
 - **Package 90's ships** (the tartane, the polacre, the xebec, the corvette *Diana* and the three-decker), building now; released across the gate by the owner on 19 November. Their corsair fits are held for the corsair's package (decision 76).
@@ -551,7 +553,7 @@ Each with what the owner decides before it starts.
 
 **Beside it, the structural work** (decision 75): **a cheaper and truer test suite** (tests that pass with the game broken mended or removed; pins that say why they hold; timing tests out of the ordinary tiers), and **the boundary between the simulation and what drives or shows it** (a test that counts today's crossings and fails at one more, then the worst of them). Neither changes play. *He agrees their cards; no design is his.*
 
-### Then, in either order (settled when milestone 8 closes)
+### Then, in this order (decision 79: the world and the career after milestone 8, the first hours after that)
 
 **The world that moves, and the career.**
 - 103b, what play owns and what the calendar carries; then milestone 7c's dated wars, holders and ports.
@@ -561,10 +563,11 @@ Each with what the owner decides before it starts.
 - Shore batteries (decision 54; placed here by the owner, 21 November).
 - The leaders' offices (decision 53).
 - Package 96's deeper layer, the ship's configuration; data that refuses unknown keys first.
-- *He decides:* closed economy or supply and demand; a career across saves; how far the land goes.
+- Careening, with the ports that mend a ship (decision 79).
+- *Decided (decision 79):* supply and demand, so that the world can work of itself; a career persists across saves; the land carried as far as the sea's simulation needs, by a design package of its own.
 
 **The player's first hours.**
-- The Sailing Master's guided first passage.
+- The Sailing Master's guided first passage; *A first passage* teaching the time's compression once the first `tick` has shown what one is (the owner's first note at gate M7).
 - The harbour's newcomer side finished.
 - 78a, sight across land; 99, the views by the player's place.
 - 91, the viewer's light and air.
@@ -1158,25 +1161,62 @@ After the base game: the steam expansion and the Americas (decision 54).
     and polish" is no longer a milestone, and what of it has no place is carried on the
     open list below. The decisions before this one are a record and are not rewritten.
 
+79. **Milestone 7 closed, and the road from it.** Owner, 2026-11-24. At the gate: closed,
+    with a list (`docs/gates/gate-m7.md`; the game as built, `docs/TheGameAsBuilt.md`; the
+    list carried forward, `docs/dev/CarriedForward-M7.md`). Then, the proposal read over
+    together, his answers to its open points: "2. For fine control, my list consists of the
+    things I would like, but other work that is desirable, interesting, or falls out of the
+    work listed may also be added. 3. All five at once. 4. For the career, supply and demand
+    is desirable so that the world can function dynamically. A career should be able to
+    persist across saves. The land simulation should extend to a degree which can
+    satisfactorily support the simulation of the sea, this probably being worth a design
+    package. 5. Multiplayer may be struck. The obscure seamanship features are all wanted,
+    pending a time where their implementation is not in front of more important work.
+    Careening may come with the world/career milestone." On the order: "I would put the
+    world/career milestone after 8, and the first hours yet after." On the lead's three
+    points: "1. Milestone 8 may be planned with a gate in the middle and one at the end, the
+    work split along a line that you may propose. 2. The mending step may come next, with
+    package 125 as well. We may also plan the test suite package alongside. 3. My first note
+    may be added for the first hours milestone, but the ordering may be as above, 8,
+    world/career, then first hours." His first point was a question (what a man's own morale
+    and skill would cost, and what a more general one would lose), answered by the lead the
+    same day and still his to settle. So: the milestones run 8, the world that moves and the
+    career, the player's first hours; milestone 8 opens with a mending step (the gate's list
+    but its first note, the older faults carried forward, package 125) and has a gate in its
+    middle and one at its end; the five warrant officers' stations are built together; the
+    economy is supply and demand, a career persists across saves, and the land is carried as
+    far as the sea needs, by a design package; §8.3 is struck; the obscure seamanship of §9
+    is all wanted and waits its turn, careening with the world and the career.
+    And of the older gates left open or run in part, the same day: "Closing milestone 7 may
+    also close the older gates." So gates 6a (with 6b), 6c and 7b are closed with milestone
+    7; what 7b left unbuilt is placed against the milestones by the lead, for him.
+    And on the lead's proposals of that day: "1. 125, 126, and 127 are approved to launch on
+    Opus. 2. Your proposed split is approved. 3. I say we go with your recommended
+    implementation of the morale and skill system, I don't mind the time needed to make it
+    meaningful."
+    So packages 125, 126 and 127 are launched; milestone 8 is split as §11 now gives it; and
+    the crew is made true by a man's own skill and fatigue and the company's one morale,
+    carried beyond the fight, with ordinary hands still "numbers only" (decision 6 stands).
+
 ### Still open
 
 At the proposal level (decision 66's open half is answered for 1792 to 1825 by decision 69(a)):
 
-1. Whether gate m7 also closes 6a, 6c and 7b, and where 7b's unbuilt work goes (51's chart, 61, 69, 55). *The owner, with his verdict at the gate.*
-2. The closed economy (decision 58) against §5.2's supply and demand. *The owner, in study 92.*
-3. A career inside one saved game, or across games. *The owner, in study 92.*
+1. *Answered by decision 79:* gate M7 also closes 6a, 6c and 7b. **Where 7b's unbuilt work goes** (51's chart, 61, 69, 55) is still to be placed: the lead lists it against the milestones for him.
+2. *Answered by decision 79:* supply and demand, not the closed economy of decision 58.
+3. *Answered by decision 79:* a career persists across saves.
 4. The papers and start each calling gives a career. *Study 92.*
 5. How a man of a wartime profession "finds the way to live" in peace (decision 73), as the systems give it. *Study 92.*
-6. How far the land goes ("a coarse account, never a land game"). *Study 92.*
+6. How far the land goes: *as far as the sea's simulation needs (decision 79)*; what that is, a design package.
 7. What play owns and what the calendar carries (decision 69c). *Design note 103b.*
 8. The words the consent brief gives the corsair's station (decision 76), which change only by the owner's own process. *The owner.*
 9. The six findings package 117 left to him (decision 70). *The owner.*
 10. What a player's ship sheet holds (decision 72). *A design note.*
-11. Per-man morale, skill aloft, "numbers only". *The owner, before the crew work.*
-12. What fine control of the sails includes. *The owner, for 78b.*
-13. Multiplayer: strike §8.3, or keep "not blocked" as a rule that is tested. *The owner.*
+11. *Answered by decision 79:* a man's own skill and fatigue; the company's one morale; ordinary hands "numbers only".
+12. *Answered by decision 79:* fine control is his list of 10 November and whatever else is desirable, interesting or falls out of the work.
+13. *Answered by decision 79:* multiplayer is struck.
 14. Ports made to mend and man a ship before more ports are added. *The owner.*
-15. The §9 items no record decides (club-hauling, springs on the cable, warping, careening, bonnets and drabblers, skysails): wanted or struck. *The owner.*
+15. *Answered by decision 79:* the §9 items (club-hauling, springs on the cable, warping, careening, bonnets and drabblers, skysails) are all wanted, when they are not in front of more important work; careening with the world and the career.
 16. Two directors competing; a hint in character (§7.6). *Later; the owner.*
 17. Where fidelity to the day is worth its cost beyond 1792 to 1825 (decision 66). *Not before another episode.*
 18. **The unplaced work of the old milestone 8** (decision 78): the rigs beyond package 90 (barque, snow, brigantine, ketch, sloop, the armed Indiaman); disease; the deck view; the 2.5D view's aspects, movement and backgrounds; the rest of §9's list. *The owner, as each is wanted.*
