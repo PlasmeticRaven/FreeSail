@@ -1202,7 +1202,7 @@ After the base game: the steam expansion and the Americas (decision 54).
 
 At the proposal level (decision 66's open half is answered for 1792 to 1825 by decision 69(a)):
 
-1. *Answered by decision 79:* gate M7 also closes 6a, 6c and 7b. **Where 7b's unbuilt work goes** (51's chart, 61, 69, 55) is still to be placed: the lead lists it against the milestones for him.
+1. *Answered by decision 79:* gate M7 also closes 6a, 6c and 7b. **Where 7b's unbuilt work goes** (51's chart, 61, 69, 55): placed by the lead in `docs/dev/CarriedForward-M7.md`, section 9, a proposal that is his to change.
 2. *Answered by decision 79:* supply and demand, not the closed economy of decision 58.
 3. *Answered by decision 79:* a career persists across saves.
 4. The papers and start each calling gives a career. *Study 92.*

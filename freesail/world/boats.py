@@ -964,7 +964,14 @@ def keep_in_tow(ship: Any, state: Any) -> None:
     if not towed or not isinstance(extra, dict):
         return
     gone = str(state.boat_id) if (state.away or state.lost) else None
-    in_tow = [(b, h) for b in towed if b.id != gone and (h := _towed_hull(b)) is not None]
+    # a boat towed astern stove by a shot is cut adrift (`combat.hits`; the lead's nudge 76,
+    # item 3): in tow no longer
+    stove = set(extra.get("boats_stove") or ())
+    in_tow = [
+        (b, h)
+        for b in towed
+        if b.id != gone and b.id not in stove and (h := _towed_hull(b)) is not None
+    ]
     if in_tow:
         extra["boat_in_tow"] = tuple(h for _, h in in_tow)
     else:

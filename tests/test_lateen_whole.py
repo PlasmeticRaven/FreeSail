@@ -303,8 +303,8 @@ def test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert [e.text for e in said] == [
         "The wind has come round ahead to the larboard bow: the foresail and the mizen and the "
-        "mainsail are aback against their masts; shift them."
-    ]
+        "mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."
+    ]  # was "...; shift them.", which she refused as worded (nudge 76, item 2)
 
 
 def test_the_bow_watch_says_a_luggers_lugs_left_on_their_masts_at_the_same_cause():
@@ -2899,8 +2899,9 @@ def test_the_bows_line_names_what_eases_a_lateen_aback_and_says_when_you_will_on
     (line,) = [e.text for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert line == (
         "The wind has come round ahead to the larboard bow: the mainsail is aback against the "
-        "mast; shift it; and the mizen lies on the mast; shift it when you will."
-    )  # was "...; let fly its sheet, shift it or box her off; and ..." (nudge 60, item 3)
+        "mast; shift the mainsail; and the mizen lies on the mast; shift it when you will."
+    )  # was "...; let fly its sheet, shift it or box her off; and ..." (nudge 60, item 3), then
+    # "...; shift it; and ...", which she refused as worded (nudge 76, item 2)
 
 
 # ---------------------------------------------------------------------------
@@ -2990,8 +2991,10 @@ def test_a_lateen_come_onto_the_bad_hand_in_a_gale_is_warned_for_at_once_before_
         assert said[0].tick < gone.get(yid, math.inf)
         assert said[0].data["ratio"] > strain.CARRY_AWAY_RATIO
         assert f"the {names[sid]} lying on the mast;" in said[0].text
-        # was "let fly its sheet or shift it.": the sheet let fly raises it (nudge 60, item 3)
-        assert said[0].text.endswith("shift it or take it in."), said[0].text
+        # was "let fly its sheet or shift it.": the sheet let fly raises it (nudge 60, item 3);
+        # then "shift it or take it in.", the take-in easing nothing for two minutes and "shift
+        # it" refused as worded (nudge 76, items 1 and 2)
+        assert said[0].text.endswith(f"shift the {names[sid]}."), said[0].text
         assert "if sail is not shortened" not in said[0].text
 
 
@@ -3014,8 +3017,8 @@ def test_a_lateen_held_aback_is_warned_for_with_its_cause_and_what_eases_it(xebe
     (said,) = _warned(_after(world, n0), "main.lateen_yard")
     assert said.text == (
         "Main lateen yard working under the press of sail, the mainsail aback against the mast: "
-        "shift it."
-    )
+        "shift the mainsail."
+    )  # was "...: shift it.", refused as worded (nudge 76, item 2)
     world.run(590)
     assert len(_warned(_after(world, n0), "main.lateen_yard")) == 1
 
@@ -3154,10 +3157,10 @@ def test_a_spar_two_lateens_press_is_warned_for_the_one_that_pulls_it_hardest(
 @pytest.mark.parametrize(
     ("fixture", "sail_id", "order", "words"),
     [
-        ("xebec_in_40", "main.lateen", "shift the mainsail", "shift it."),
-        ("polacre_in_40", "mizzen.lateen", "shift the mizen", "shift it or box her off."),
-        ("polacre_in_40", "mizzen.lateen", "box her off", "shift it or box her off."),
-        ("tartane_in_40", "main.lateen", "box her off", "shift it or box her off."),
+        ("xebec_in_40", "main.lateen", "shift the mainsail", "shift the mainsail."),
+        ("polacre_in_40", "mizzen.lateen", "shift the mizen", "shift the mizen or box her off."),
+        ("polacre_in_40", "mizzen.lateen", "box her off", "shift the mizen or box her off."),
+        ("tartane_in_40", "main.lateen", "box her off", "shift the mainsail or box her off."),
     ],
 )
 def test_held_aback_a_lateen_is_eased_by_each_order_its_warning_names(
@@ -3188,24 +3191,27 @@ def test_held_aback_a_lateen_is_eased_by_each_order_its_warning_names(
 
 
 @pytest.mark.parametrize(
-    ("order", "within"), [("shift the mainsail", 60), ("take in the mainsail", 240)]
+    ("order", "within", "named"),
+    [("shift the mainsail", 60, True), ("take in the mainsail", 240, False)],
 )
-def test_on_the_bad_hand_a_lateen_is_eased_by_each_order_its_warning_names(
-    xebec_in_50, order, within
+def test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning_names(
+    xebec_in_50, order, within, named
 ):
-    """Nudge 60, item 3: on the bad hand the words name its yard shifted or the sail taken in,
-    each measured to bring the load down. The xebec in 50 kn, her lateens put on the bad hand,
-    her main yard warned at once at 1.28, "... the mainsail lying on the mast: shift it or take
-    it in.", and at 1.57 30 s on (within the cause, the ten minutes' rule as for every spar, the
-    lead's choice at nudge 56): shifted, under half within a minute (measured: a second);
-    taken in, within four minutes (measured: 169 s, where with no order it never falls). Not
-    named, the sheet let fly, which raises it (this case: 1.57 to 1.71)."""
+    """Nudges 60 and 76, item 3 and item 1: on the bad hand the words name its yard shifted, which
+    eases it at once, and nothing that does not (the dire line names only what eases at once).
+    The xebec in 50 kn, her lateens put on the bad hand, her main yard warned at once at 1.28,
+    "... the mainsail lying on the mast: shift the mainsail.", and at 1.57 30 s on (within the
+    cause, the ten minutes' rule, the lead's choice at nudge 56): shifted, under half within a
+    minute (measured: a second). Taken in, it eases nothing for two minutes, held at 1.57 to 1.60
+    (measured: under half 169 s on), so it is not named; before nudge 76, "shift it or take it
+    in.". Not named either, the sheet let fly, which raises it (this case: 1.57 to 1.71)."""
     world = _from(xebec_in_50)
     n0 = len(world.log.all())
     _on_the_bad_hand(world)
     world.run(30)
     (said,) = _warned(_after(world, n0), "main.lateen_yard")
-    assert said.text.endswith("the mainsail lying on the mast: shift it or take it in."), said.text
+    assert said.text.endswith("the mainsail lying on the mast: shift the mainsail."), said.text
+    assert ("take" in said.text) is False
     at_order = _pressing(world, "main.lateen")
     assert at_order > strain.CARRY_AWAY_RATIO, at_order
     assert world.submit(order).kind == "order.accepted"
@@ -3215,6 +3221,8 @@ def test_on_the_bad_hand_a_lateen_is_eased_by_each_order_its_warning_names(
         seen.append(_pressing(world, "main.lateen"))
     eased = next(i for i, r in enumerate(seen) if r < at_order / 2)
     assert eased < within and max(seen[eased:]) < at_order, (eased, at_order)
+    if not named:
+        assert eased > 120 and min(seen[:120]) > strain.CARRY_AWAY_RATIO, (eased, min(seen[:120]))
 
 
 def test_on_the_bad_hand_the_sheet_let_fly_raises_the_load_and_is_not_named(xebec_in_40):
@@ -3292,3 +3300,72 @@ def test_an_order_to_a_lateen_waiting_behind_other_work_says_so_at_the_order(xeb
     assert waits == [
         "'Take in the mainsail' will follow 'shift the mainsail', which the hands are still at."
     ], waits
+
+
+# ---------------------------------------------------------------------------
+# The lateen hulls' list, its second pass (the lead's nudge 76): item 4, the pins
+# ---------------------------------------------------------------------------
+
+
+def test_a_cause_that_turns_to_another_and_back_is_warned_for_each_time_it_comes(xebec_in_40):
+    """Nudge 76, item 4 (the reader's hunt scenario I): a rule that begins a cause's ten minutes
+    afresh only from no cause passed every case and brought the fault back. The xebec in 40 kn,
+    the wind eight points through her bow: her main yard aback at 1.84 and warned; its sheet let
+    fly, straight onto the bad hand at 1.04 and warned; `trim sails`, straight aback again at
+    1.39, never without a cause between: warned the third time, 40 s after the first."""
+    world = _from(xebec_in_40)
+    n0 = len(world.log.all())
+    _shift_the_wind(world, -8.0)
+    world.run(10)
+    world.submit("let fly the main lateen sheet")
+    world.run(30)
+    world.submit("trim sails")
+    causes = []
+    for _ in range(20):
+        world.tick()
+        mark = world.ship.extra.get(strain.LATEEN_PRESSED, {}).get("main.lateen_yard")
+        causes.append(mark[0] if mark else None)
+    said = _warned(_after(world, n0), "main.lateen_yard")
+    assert [e.tick - said[0].tick for e in said] == [0, 10, 40], [(e.tick, e.text) for e in said]
+    assert [("aback" in e.text, "lying on the mast" in e.text) for e in said] == [
+        (True, False),
+        (False, True),
+        (True, False),
+    ]
+    assert None not in causes[: causes.index("aback") + 1], causes  # no cause between
+
+
+def test_hove_to_she_is_not_offered_boxing_off(polacre_in_40):
+    """Nudge 76, item 4: boxing off is refused hove to ("She is hove to; fill away first, or
+    wear.", `BoxOffScript.check`), and the words offer only what she will take."""
+    world = _from(polacre_in_40)
+    ship = world.ship
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen or box her off"
+    ship.extra["hove_to"] = True
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen"
+    assert strain.pressed_reliefs(ship, "bad hand", "the mizen") == "shift the mizen"
+
+
+def test_a_lateen_whose_shift_waits_for_hands_is_told_so_not_to_shift_it(xebec_in_50):
+    """Nudge 76, item 2: the words give an order she takes as worded ("shift the foresail and
+    the mainsail and the mizen", where "shift them" was refused), and say truly what the hands
+    can do at once: the xebec's shifts run one after another, so a lateen warned while its own
+    shift waits is told that, and what the hands are at, not to shift it. The xebec in 50 kn,
+    her lateens on the bad hand, all three shifts ordered at once: the mizen warned again at
+    1.65 of its rating ten minutes on, its shift waiting behind the mainsail's (measured: the
+    foresail shifted 443 s on, the mainsail begun then)."""
+    world = _from(xebec_in_50)
+    n0 = len(world.log.all())
+    _on_the_bad_hand(world)
+    world.run(30)
+    order = "shift the foresail and the mainsail and the mizen"
+    assert world.submit(order).kind == "order.accepted"
+    world.run(600)
+    said = _warned(_after(world, n0), "mizzen.lateen_yard")
+    assert said[0].text.endswith(
+        "the mizen lying on the mast; she will carry them away: shift the mizen."
+    )
+    assert said[-1].text.endswith(
+        "the mizen lying on the mast; she will carry them away: its shift waits its turn, the "
+        "hands shifting the mainsail."
+    ), [e.text for e in said]

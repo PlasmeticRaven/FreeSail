@@ -39903,6 +39903,35 @@ The branch `…/pkg-90-lateen`, fast-forwarded to `…/pkg-90` at 3d3841f2 (A4 m
    - **Cases now held:** making sternway she drags nothing, tick for tick as the probe with her boat on deck (and ahead, more); `ports.BOAT_HAUL_ALONGSIDE_S` and `BOAT_VEER_ASTERN_S` are the two evolutions' timings.
    - **Run, as asked:** `clear for action` with her boat towed, at sea in 12 kn: "The boats are out and towing astern; the ship is clear." at 357 s, cleared at 465 s, her boat still in tow, as with it on deck. `let go the best bower` with it towed, Carrick Road: let go at 85 s, at anchor, her boat towing astern, as with it on deck. **Seen, older:** on the trunk the clear-for-action line says "The boats are out and towing astern" of a boat at the booms, nothing moving her.
 
+## Package 90, the lateen hulls' list, its second pass: the reliefs as orders she takes, a waiting shift, a towed boat stove, three pins (the lead's nudge 76, 2026-11-24)
+
+The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of eight merged on the trunk at da356b76). The equations are read, not changed: no load, ratio, factor, rate, timing or draw moves. Old is b35aaaba.
+
+1. **"Take it in" on the bad hand is no longer named** (`strain.pressed_reliefs`). It eases nothing for two minutes and more: the xebec in 50 kn, her lateens on the bad hand, her main yard held at 1.57 to 1.60 of its rating till under half 169 s after the order (152 to 170 s over the three probes in 40 and 50 kn; the lead's reader, 133 to 170 s, and one mizzen yard lost in six runs while brailing). The dire line names only what eases at once. Old "shift it or take it in"; new "shift the mainsail".
+2. **The reliefs are orders she takes word for word, and a waiting shift is said truly.**
+   - What she takes, measured on the xebec on the bad hand:
+     - "shift them": refused, "There is no such part as the them in this ship.";
+     - "shift it": refused, "There is no such part as the it in this ship; did you mean the bowsprit?";
+     - "shift the lateens": refused, "There is no such part as the lateens in this ship";
+     - "shift the foresail, the mainsail and the mizen": refused, the commas not understood;
+     - "shift the foresail and the mainsail and the mizen": taken;
+     - "shift the mainsail": taken.
+   - The words now name the sails as `scripts.names_of_sails` joins them, the form she takes:
+     - the strain's line: "...: shift the mainsail." and "...: shift the mizen or box her off.";
+     - the bow's line: "...; shift the foresail and the mizen and the mainsail.".
+   - **Her shifts run one after another** where the hands are too few for all at once: the xebec in 50 kn, the three ordered together: the foresail begun at once and shifted 443 s on, then the mainsail, and the mizen waiting. The runner says it at the order: "Shifting the fore lateen, main lateen and mizzen lateen: not hands enough for all at once; the watch takes the sails in turn.".
+   - **A lateen warned while its own shift waits is told so**, and what the hands are at (`strain._shift_waiting`). The mizen at 1.65, 600 s on: old "...: shift it or take it in."; new "...: its shift waits its turn, the hands shifting the mainsail.".
+   - **For the lead, beyond this row:**
+     - "the lateens" is a group a ship's file gives, as "the jibs" and "the staysails" are (`groups:`, the generator's for a committed hull, stage 0's for the probes);
+     - a list with commas is the order parser's for every order on every ship;
+     - the runner's in-turn line names the parts ("the fore lateen") where the warnings name the sails, and says "the watch" before all hands are up. It is every ship's line, and is left as it is.
+3. **A boat towed astern stove by a shot** (`combat/hits.py`, the engine track's file; `world/boats.py`, `world/dealings.py`). Old: "The boat is stove on the booms by a shot.", and she stayed in tow, her drag on the ship. New: "The boat is stove by a shot as she tows astern; she fills, and her painter is cut.", in tow no longer, and her reading "the boat stove by a shot and cut adrift" (JUDGEMENT on the words). The draw is as it was. A boat on the booms is stove there as before.
+4. **Pins:**
+   - **The hunt scenario** (the reader's I): a rule that begins a cause's ten minutes afresh only from no cause passed every case. The xebec in 40 kn, the wind eight points through her bow: her main yard aback at 1.84 and warned at 601 s; its sheet let fly, straight onto the bad hand at 1.04, warned at 611; `trim sails`, straight aback again at 1.39, warned at 641, with no tick without a cause between. That rule fails it.
+   - **Boxing off is not offered hove to:** `pressed_reliefs` of the polacre, aback, "shift the mizen or box her off", and hove to "shift the mizen".
+   - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
+5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
+
 ## Package 90, the Diana: her file, her tuning and the pins she moves (2026-11-20)
 
 Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D). Her file, `data/ships/corvette-20.yaml`, is new, written by `tools/ships/diana.py` through the generator; every other ship file comes out byte for byte. Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `under_plain_sail`, `close_hauled_on_starboard`, `until`, `wear`, `hove_to`), on her file with each figure changed in a scratch copy.

@@ -55,6 +55,8 @@ Found by the ships' session's builders and the lead's readers while gating packa
 13. `clear for action` says "The boats are out and towing astern" of a boat at the booms.
 14. The helm is kept as for headway while she makes sternway: the cutter, after `lie a-try` and `fill away`, sags to 39 degrees off the wind with 29 degrees of rudder the wrong way and goes astern at a knot for an hour (found by package 127's builder, 24 November; every ship's helm; package 127 makes the log say it and mends nothing of it).
 
+15. A boat stove on the booms by a shot still reads as on the booms and can be sent ashore (found 24 November by the lead's reader; on the trunk before package 90).
+
 Of these, package 127 (launched 24 November) takes 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed.
 
 ## 5. Booked by the owner or the lead, not launched
@@ -66,7 +68,7 @@ Of these, package 127 (launched 24 November) takes 1, 3, 4, 7, 8, 9 and 13; pack
 
 ## 6. Package 90, the ships, in hand across the gate
 
-Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. The lateen hulls' list of eight was merged on 24 November with five things of it still owed before the tartane's file. Then the corvette *Diana*, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a breeze under all plain sail, who wants her jib; her helm and her tacks are measured again when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
+Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. The lateen hulls' list of eight was merged on 24 November and its second pass the same day; a third pass of five is owed before the tartane's file. Then the corvette *Diana*, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a breeze under all plain sail, who wants her jib; her helm and her tacks are measured again when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
 
 **The rule the lead set, the owner's to overturn:** lateen and tow steps join the trunk when today's ships are proven unmoved; every fault that reaches only a lateen hull or a boat in tow is owed in full, and proven, before any lateen hull's file joins.
 
@@ -86,5 +88,16 @@ Each was told to him when it was made and is in the records of its package.
 
 - (Settled 24 November: the line between milestone 8's two gates, and the crew's morale and skill; the proposal's decision 79.)
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
-- The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is to be placed against the milestones by the lead.
+- The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is placed in section 9, the lead's proposal.
 - The chart's work, parked; its records say where it stopped.
+
+## 9. What the director's milestone (7b) left unbuilt, placed
+
+Gate 7b is closed with milestone 7 (the owner, 24 November). Of the packages decision 51 left on its books, 60, 63 and 65 were brought into milestone 7 and built, 64 was struck, and the heart of 51 landed as package 82. Four remain. **The placing below is the lead's proposal and the owner's to change; none is launched by it.**
+
+| Left by 7b | What it is | Placed |
+|---|---|---|
+| The rest of package 51 | The director's chart, the truth drawn; the director's focus, and the ships' logs by kind and by a range of ticks | The world that moves and the career: the director's tools for a world that goes on without the player |
+| Package 61 | A course laid clear of the land and the dangers, for every captain and the player, its legs said as the plan | The world that moves and the career, with the design package on how far the land goes |
+| Package 69 | Five recorded passages that give another answer on Windows than on Linux; the harbour's banner test; the maker's doubled line ends on Windows | Milestone 8's structural work: the test suite's package, since the owner plays on Windows |
+| Package 55 | The solo director and the gate's scenarios; the consent brief's revision; the gate's document | The revision is done (package 117) and the gate is closed. The solo director, a director with no player's ship, goes with the rest of 51 |
