@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 15:56 UTC (THE SECOND PASS IS MERGED at 474eff8b; THE DIANA IS STAGED ON IT, her run green, her reader at work: DO NOT MERGE THE TRUNK INTO HER AGAIN; A THIRD PASS of five before the tartane's file: a boat cut adrift still used; a spar lost while its shift waits; a relief not at once; four pins; the bow's list). Nudge number: 77.
+Latest note: 2026-11-24, 16:07 UTC (THE DIANA: MY READER PASSES HER, THE CLOUD GREEN; HELD FOR ONE SMALL COMMIT OF WORDS: her reading says 'a a light frigate' (her era_notes; mend at her generator, pin it); the primer's chapter 28 has no row for her; 'a Spanish ship sloop' to resolve; one line on being put about before she is settled). Nudge number: 78.
