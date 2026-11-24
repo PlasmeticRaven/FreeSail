@@ -86,5 +86,16 @@ Each was told to him when it was made and is in the records of its package.
 
 - (Settled 24 November: the line between milestone 8's two gates, and the crew's morale and skill; the proposal's decision 79.)
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
-- The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is to be placed against the milestones by the lead.
+- The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is placed in section 9, the lead's proposal.
 - The chart's work, parked; its records say where it stopped.
+
+## 9. What the director's milestone (7b) left unbuilt, placed
+
+Gate 7b is closed with milestone 7 (the owner, 24 November). Of the packages decision 51 left on its books, 60, 63 and 65 were brought into milestone 7 and built, 64 was struck, and the heart of 51 landed as package 82. Four remain. **The placing below is the lead's proposal and the owner's to change; none is launched by it.**
+
+| Left by 7b | What it is | Placed |
+|---|---|---|
+| The rest of package 51 | The director's chart, the truth drawn; the director's focus, and the ships' logs by kind and by a range of ticks | The world that moves and the career: the director's tools for a world that goes on without the player |
+| Package 61 | A course laid clear of the land and the dangers, for every captain and the player, its legs said as the plan | The world that moves and the career, with the design package on how far the land goes |
+| Package 69 | Five recorded passages that give another answer on Windows than on Linux; the harbour's banner test; the maker's doubled line ends on Windows | Milestone 8's structural work: the test suite's package, since the owner plays on Windows |
+| Package 55 | The solo director and the gate's scenarios; the consent brief's revision; the gate's document | The revision is done (package 117) and the gate is closed. The solo director, a director with no player's ship, goes with the rest of 51 |
