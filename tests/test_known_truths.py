@@ -24183,3 +24183,87 @@ def test_truth_7_768_the_captain_takes_in_the_topgallants_when_their_yards_work(
     cap._topgallant_yards_working(C.Perception(tick=2000, wind_kn=20.0), [])
     cap._topgallant_yards_working(C.Perception(tick=3000, wind_kn=26.0), [working])
     assert len(given) == 2  # the wind fell under the line, and rose again
+
+
+# The wind rising from twenty knots to thirty-five over the hour and held, gusts and shifts
+# at 0.3 as the captain's trials have them, the glass falling for a low coming in; the brig
+# under plain sail bound for Falmouth from forty miles south of it, the wind abeam, sailed
+# by the game's own captain and no order given (the report's §6; seed 1 of the eight
+# measured, the one where the shortening by the glass came late, at 3,120 s).
+RISING_WIND_SCENARIO = """name: A rising wind, the brig under the game's own captain
+seed: 1
+start: 1805-06-14T04:00
+position: 49 28.8 N 5 4 W
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/brig.yaml
+  heading_deg: 0
+  speed_kn: 6
+  glass: true
+  instrument: sextant
+wind:
+  gustiness: 0.3
+  variability: 0.3
+intent: bound for Falmouth
+papers:
+  chart: {year: 1804}
+  epitome: norie
+  almanac: 1805
+ports: [falmouth, plymouth]
+weather:
+  wind:
+    - {at: 1805-06-14T00:00, from_deg: 270, knots: 20, air_mass: neutral}
+    - {at: 1805-06-14T04:00, from_deg: 270, knots: 20}
+    - {at: 1805-06-14T05:00, from_deg: 270, knots: 35}
+    - {at: 1805-06-14T06:00, from_deg: 270, knots: 35}
+    - {at: 1805-06-14T12:00, from_deg: 270, knots: 35}
+  background:
+    {hpa: 1004, gradient_hpa_per_100km: 1.2, high_toward_deg: 200}
+  systems:
+    - name: a low coming in
+      kind: low
+      radius_km: 700
+      track:
+        - {at: 1805-06-14T00:00, x_km: -900, y_km: 300, hpa: 1000}
+        - {at: 1805-06-14T08:00, x_km: -300, y_km: 200, hpa: 985}
+  sky: {sky: overcast, weather: squally, visibility: a few miles}
+  sea: true
+orders:
+  - set plain sail
+"""
+
+
+def test_truth_7_769_in_a_rising_wind_the_captain_has_her_topgallants_in_before_they_go(
+    tmp_path,
+):
+    """Package 125 (truth 7-769): in that rising wind **the game's own captain answers the
+    topgallant yards working by taking in the topgallants, before the glass's shortening, and
+    the brig keeps every spar**. Measured (seed 1): the answer at 2,640 s and her topgallants in
+    by 3,291 and 3,323 s, the shortening by the glass at 3,120 s; nothing carried away or blown
+    out in the two hours. Old: no answer; the shortening at 3,120 s took the topgallants in turn,
+    and her fore topgallant yard carried away in the slings at 3,484 s, the topgallants in at
+    4,234 s.
+    (Of the eight seeds, the trunk lost a spar or a sail in six runs of the six ships measured,
+    this package in three: the report's §6.)"""
+    from freesail.world.scenarios import begin, load_scenario, make_scenario_world
+
+    path = tmp_path / "rising.yaml"
+    path.write_text(RISING_WIND_SCENARIO, encoding="utf-8")
+    sf = load_scenario(str(path))
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(2 * 3600)
+    answer = [
+        e
+        for e in w.log
+        if e.kind == "order.accepted" and "(the topgallant yards working)" in e.text
+    ]
+    glass = [e for e in w.log if e.kind == "order.accepted" and "(the glass falling" in e.text]
+    assert answer and glass, [e.text for e in w.log if e.kind == "order.accepted"]
+    assert answer[0].tick < glass[0].tick
+    assert answer[0].text.startswith("By the captain"), answer[0].text
+    assert "taking in the topgallants" in answer[0].text, answer[0].text
+    assert not [e for e in w.log if e.kind in CARRIED_AWAY], [
+        e.text for e in w.log if e.kind in CARRIED_AWAY
+    ]

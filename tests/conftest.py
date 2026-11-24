@@ -116,6 +116,8 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 76 (step 7): a Spanish chase signalled and read (10 s); three nations' convoys
         "test_known_truths.py::test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone",
         "test_known_truths.py::test_truth_7_433_a_nations_book_is_added_by_data_alone",
+        # package 125 (truth 7-769): two hours of a rising wind under the game's own captain
+        "test_known_truths.py::test_truth_7_769_in_a_rising_wind_the_captain_has_her_topgallants_in_before_they_go",
         # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
         # shortening run to its end before the helm goes down (6 to 8 s a case)
         *(
