@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 16:20 UTC (THE THIRD PASS COMES WHOLE, AFTER PACKAGE 127, AS ONE HASH; the kedge refused with a lost boat and the box refused while coming to are DECLARED as changes on today's ships, old beside new). Nudge number: 79.
+Latest note: 2026-11-24, 16:44 UTC (the third pass's declaration received; PACKAGE 127 CHANGES THAT LINE OF clear for action (boats griped fast on the booms): when you merge 127 the lost boat's clause follows ITS words). Nudge number: 80.
