@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 00:13 UTC (THE DIANA IN 25 KNOTS SHORTENED: the stop was right; the owner told the ground has moved, NO CHOICE PUT YET; ONE PROBE: the spanker brailed up or taken in after and before shorten sail, the jib set again, the frigate beside her; is the order of shortening hers or the engine's; nothing pinned or tiered meanwhile). Nudge number: 69.
+Latest note: 2026-11-24, 00:19 UTC (THE DIANA: HER CAPTAIN CAN CURE IT (set the jib); PUT TO THE OWNER AGAIN: JOIN NOW (recommended, as measured, all said in her truths, the engine's part booked as package 125) or WAIT; if he joins her: E's shortened row in three cases, AND ONE MEASURE THAT MAY STOP HER: a game left to the game's own captain, 20 rising to 35 knots). Nudge number: 70.
