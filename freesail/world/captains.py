@@ -229,6 +229,55 @@ SPAR_MEND_ORDER: tuple[str, ...] = (
 # No spar is shifted within this many seconds of a shot come aboard (JUDGEMENT: ten minutes,
 # as the repairs' own interval: the work is begun out of action, never under fire).
 SPAR_WORK_QUIET_S = 600
+# The light spars (the lead's list of 2026-11-24, A3: "a light spar she does not need to work
+# her"): shifted last of all, and only with nothing at all in hand. A studding-sail boom, a
+# royal mast and what stands on one (JUDGEMENT, after Luce 1866, ch. XVII: "Top-gallant and
+# royal-yards and studding-sail booms are easily replaced", the lighter yards "of little use"
+# to a ship saving herself).
+LIGHT_SPAR_CLASSES = frozenset({"studdingsail_boom", "royal_mast"})
+
+
+def light_spar(ship: Any, spar: Any) -> bool:
+    """A spar she does not need to work her: of a light class, or standing on one."""
+    if spar.cls in LIGHT_SPAR_CLASSES:
+        return True
+    parent = ship.parent_of(spar)
+    return parent is not None and parent.cls in LIGHT_SPAR_CLASSES
+
+
+# A spare yard of the booms answers a topsail yard alone: the files' spare yards are spare
+# topsail yards (Luce 1866, ch. XVII: "spare main-topsail-yard on the starboard-quarter"), and a
+# lower yard is not made of one but of the spare spars scarphed together (Fincham 1843, p. 286,
+# a temporary main yard), work the game has not; a topgallant or royal yard is the lighter, made
+# of a spare spar of its own (not carried by the files).
+SPARE_YARD_ANSWERS = frozenset({"topmast"})
+
+
+def spare_yard_answers(ship: Any, yard: Any) -> bool:
+    """Whether a spare yard of the booms may be shifted in for this yard: one crossed on a
+    topmast (a topsail yard)."""
+    parent = ship.parent_of(yard)
+    return parent is not None and parent.cls in SPARE_YARD_ANSWERS
+
+
+def spares_of(ship: Any, cls: str) -> int:
+    """How many spare spars would answer a spar of this class, read without writing: the
+    store kept on the ship once made (`parts.booms`), else the ship file's own count, the
+    ship left as it was (the lead's list, E: the booms' keys were written into every ship
+    the captain looked at)."""
+    from freesail.ship import parts
+
+    store = (getattr(ship, "extra", {}) or {}).get("booms")
+    if isinstance(store, parts.Booms):
+        return store.have(cls)
+    # the ship file's store made on a stand-in that carries only her spec (`parts._stores_of`
+    # reads the spec alone), so that nothing is written into her
+    probe = type("Probe", (), {})()
+    probe.extra = {}
+    probe.spec = getattr(ship, "spec", None)
+    return parts.booms(probe).have(cls)
+
+
 # The work in hand that leaves no hands to spare for a spar's.
 SPAR_WORK_BUSY = frozenset(
     {
@@ -4817,7 +4866,7 @@ class Captain(Judgement):
             # its class, or a jury mast stepped for a lower mast, the most wanted first; only
             # with nothing else in hand and no shot come aboard of late (the owner's note 4
             # of gate M7: the Renard sailed three hours with her topgallant mast gone)
-            spar_work = self._spar_work(ship, tick, in_hand, runner)
+            spar_work = self._spar_work(ship, p, in_hand, runner)
             if spar_work is not None:
                 wanted.append(spar_work)
         if not wanted:
@@ -4827,46 +4876,61 @@ class Captain(Judgement):
         self.give(text, why=why)
 
     def _spar_work(
-        self, ship: Any, tick: int, in_hand: set[str], runner: Any
+        self, ship: Any, p: Perception, in_hand: set[str], runner: Any
     ) -> tuple[str, str] | None:
-        """The next work on a spar carried away, as (the order, why), or None: never under
-        fire (a shot come aboard within `SPAR_WORK_QUIET_S`) and only with hands to spare (no
-        repair and no all-hands work in hand). The wreck is cleared first, the spar's
-        and every spar's that went with it (`clear_wreck.yaml`: a wreck hanging drags and
-        tears the sails); then each spar cleared and standing on what stands is shifted for
-        a spare of its class from the booms (`shift_spar.yaml`), a lower mast stepped again
-        as a jury mast from a spare topmast (`jury_mast.yaml`), in `SPAR_MEND_ORDER`, what
-        keeps her manageable first; and the sails the wreck took bent again to the spar
-        that stands. A spar she has no spare for is left as it is."""
+        """The next work on a spar carried away, as (the order, why), or None.
+
+        When: never struck (a prize's spars are her captor's to order), never under fire (a
+        shot come aboard within `SPAR_WORK_QUIET_S`), only with hands to spare (no repair
+        and no all-hands work in hand), and only with her under command (`_under_command`:
+        no manoeuvre in hand, her way on and her sails drawing), so that no hand is taken
+        from working her; a manoeuvre begun meanwhile belays the spar's work and gives its
+        hands to the manoeuvre (`runner.SPAR_WORK_BELAYED`).
+
+        What, in turn: the wreck cleared, the spar's and every spar's that went with it
+        (`clear_wreck.yaml`: a wreck hanging drags and tears the sails); a head sail the
+        wreck took bent again as soon as its spar stands; each spar cleared and standing on
+        what stands shifted for a spare of its class (`shift_spar.yaml`), or a lower mast
+        stepped again as a jury mast (`jury_mast.yaml`), in `SPAR_MEND_ORDER`, what keeps her
+        manageable first, a light spar (`light_spar`) last of all and only with nothing at
+        all in hand; the rest of the sails bent again; and each sail bent again set where her
+        sail as she carries it calls for it (`_set_again`). A spar she has no spare for is
+        left as it is: a spare yard answers a topsail yard alone (`SPARE_YARD_ANSWERS`)."""
         from freesail.evolutions.repair_scripts import _name
-        from freesail.evolutions.scripts import wreck_root, wrecks
-        from freesail.ship import parts
+        from freesail.evolutions.scripts import wrecks
         from freesail.ship.parts import SailState, Spar
 
-        if in_hand & SPAR_WORK_BUSY or any(
-            getattr(inst, "all_hands", False) for inst in getattr(runner, "instances", []) or []
-        ):
+        if self.state == "struck":
+            return None
+        instances = list(getattr(runner, "instances", []) or [])
+        if in_hand & SPAR_WORK_BUSY or any(getattr(i, "all_hands", False) for i in instances):
             return None
         # read, never made: `damage_of` would put a damage record on a ship that has none
         keeper = (getattr(ship, "extra", {}) or {}).get("damage")
         came = (getattr(keeper, "struck_by", {}) or {}).values()
         struck = max((int(t) for t in came), default=None)
-        if struck is not None and tick - struck < SPAR_WORK_QUIET_S:
+        if struck is not None and p.tick - struck < SPAR_WORK_QUIET_S:
+            return None
+        if not self._under_command(ship, p):
             return None
         spars = getattr(ship, "spars", {}) or {}
         order = {sid: i for i, sid in enumerate(spars)}
 
-        def rank(sp: Any) -> tuple[int, int, int]:
+        def rank(sp: Any) -> tuple[int, int, int, int]:
             known = sp.cls in SPAR_MEND_ORDER
             cls = SPAR_MEND_ORDER.index(sp.cls) if known else len(SPAR_MEND_ORDER)
-            return (cls, len(ship.spar_chain(sp)), order.get(sp.id, 0))
+            return (int(light_spar(ship, sp)), cls, len(ship.spar_chain(sp)), order.get(sp.id, 0))
 
         business = self._business
         hanging = sorted((w for w in wrecks(ship) if isinstance(w, Spar)), key=rank)
         if hanging:
             wreck = hanging[0]
+            if light_spar(ship, wreck) and instances:
+                return None
             # the sails that stood on it, bent again when it stands (the clearing sends a
             # whole sail down to the sail room)
+            from freesail.evolutions.scripts import wreck_root
+
             took = [
                 sail.id
                 for sail in ship.sails.values()
@@ -4878,32 +4942,94 @@ class Captain(Judgement):
             business["bend_again"] = bend + [x for x in took if x not in bend]
             name = _name(ship, wreck.id)
             return f"clear away the wreck of the {name}", f"the {name} carried away"
-        # a head sail the wreck took is bent again as soon as its spar stands: it keeps her
-        # manageable before any other spar is shifted; the rest when all are shifted
         heads = set((getattr(ship, "groups", {}) or {}).get("headsails", []) or [])
-        bend_now = self._bend_again(ship, lambda sid: sid in heads)
-        if bend_now is not None:
-            return bend_now
-        booms = parts.booms(ship)
-        for sp in sorted((x for x in spars.values() if x.wrecked and x.sent_down), key=rank):
-            if wreck_root(ship, sp) is not sp:
-                continue  # it went with another, shifted first
-            parent = ship.parent_of(sp)
-            if parent is not None and (parent.wrecked or parent.sent_down):
+        for step in (
+            lambda: self._set_again(ship, p),
+            lambda: self._bend_again(ship, lambda sid: sid in heads),
+        ):
+            got = step()
+            if got is not None:
+                return got
+        down = sorted((x for x in spars.values() if x.wrecked and x.sent_down), key=rank)
+        for light in (False, True):
+            if light:
+                # every working spar shifted: the sails bent again before any light spar,
+                # and a light spar only with nothing at all in hand
+                bent = self._bend_again(ship, lambda sid: True)
+                if bent is not None:
+                    return bent
+                if instances:
+                    return None
+            for sp in down:
+                if light_spar(ship, sp) != light:
+                    continue
+                parent = ship.parent_of(sp)
+                if parent is not None and (parent.wrecked or parent.sent_down):
+                    continue  # it stands on a spar still to be shifted, or went with it
+                name = _name(ship, sp.id)
+                if sp.cls == "mast":
+                    if spares_of(ship, "topmast") > 0:
+                        return "rig a jury mast", f"the {name} carried away"
+                    continue
+                if sp.cls == "yard" and not spare_yard_answers(ship, sp):
+                    continue
+                if spares_of(ship, sp.cls) > 0:
+                    return f"shift the {name}", f"the {name} carried away"
+        return None
+
+    def _under_command(self, ship: Any, p: Perception) -> bool:
+        """Whether she is under command for a spar's work: no manoeuvre in hand and not
+        lying to (aback, in stays, wearing, boxing off, heaving to are each a manoeuvre's),
+        headway and steerage way on (`hull.HELM_STEERAGE_SPEED`), and not with all her square
+        sail aback or shaking."""
+        from freesail.physics.hull import HELM_STEERAGE_SPEED
+
+        if str(p.manoeuvre or "none") != "none":
+            return False
+        if not p.headway or p.square_none_drawing:
+            return False
+        dyn = getattr(ship, "dyn", None)
+        return float(getattr(dyn, "u", 0.0) or 0.0) >= HELM_STEERAGE_SPEED
+
+    def _set_again(self, ship: Any, p: Perception) -> tuple[str, str] | None:
+        """`set the <sail>` for a sail he bent again to a spar shifted (`_business
+        ["set_again"]`) once it is bent: where her sail as she carries it calls for it (a
+        sail of the same kind set: a head sail beside her head sails, a topsail beside her
+        topsails), the wind under the shortening figure; struck from the list once set, or
+        where none of its kind is set (she is shortened, and it waits with them)."""
+        from freesail.ship.parts import SailState
+
+        wanting = self._business.get("set_again") or []
+        if not wanting:
+            return None
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if float(p.wind_kn or 0.0) >= float(th("shorten_sail_kn", 30.0) or 30.0):
+            return None
+        groups = getattr(ship, "groups", {}) or {}
+        for sid in list(wanting):
+            sail = ship.sails.get(sid)
+            if sail is None or sail.state is SailState.UNBENT:
+                continue  # not bent yet
+            wanting.remove(sid)
+            if sail.is_set:
                 continue
-            name = _name(ship, sp.id)
-            if sp.cls == "mast":
-                if booms.have("topmast") > 0:
-                    return "rig a jury mast", f"the {name} carried away"
-                continue
-            if booms.have(sp.cls) > 0:
-                return f"shift the {name}", f"the {name} carried away"
-        return self._bend_again(ship, lambda sid: True)
+            kin = [
+                ship.sails[o]
+                for g in groups.values()
+                if sid in g
+                for o in g
+                if o != sid and o in ship.sails
+            ]
+            if any(o.is_set for o in kin):
+                return f"set the {self._sail_name(sid)}", "bent again to its spar"
+        return None
 
     def _bend_again(self, ship: Any, which: Any) -> tuple[str, str] | None:
         """`bend the <sail>` for the first sail the wreck took (`_business["bend_again"]`,
         in the order they stood) that `which` admits and whose spars all stand again; a
-        sail no longer in the sail room is struck from the list."""
+        sail no longer in the sail room is struck from the list. A sail bent is set again
+        in its turn (`_set_again`)."""
         from freesail.evolutions.scripts import gone_spar
         from freesail.ship.parts import SailState
 
@@ -4915,6 +5041,9 @@ class Captain(Judgement):
                 continue
             if which(sid) and gone_spar(ship, sail) is None:
                 wanting.remove(sid)
+                again = self._business.setdefault("set_again", [])
+                if sid not in again:
+                    again.append(sid)
                 return f"bend the {self._sail_name(sid)}", "its spar shifted for a spare"
         return None
 

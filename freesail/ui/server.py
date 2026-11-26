@@ -280,12 +280,13 @@ class Driver:
         self._log.subscribe(self._on_event)
         # what of the game in play is kept in a save (the harbour's end of a game asks the
         # player before losing more): the World, its tick and its log's length after the
-        # last save's line (or as it was taken up), and the ship's time of that save ("" for
-        # none)
-        self.kept: tuple[Any, int, int, str] = (
+        # last save's line (or as it was taken up), the ship's time of that save or of the
+        # save it was taken up from ("" for none), and which ("saved", "taken up" or "")
+        self.kept: tuple[Any, int, int, str, str] = (
             self.world,
             self.world.clock.tick,
             len(self.world.log),
+            "",
             "",
         )
         # the channel between the player and the director (package 67): its lines to the
@@ -800,22 +801,36 @@ class Driver:
             self.world.clock.tick,
             len(self.world.log),
             self.world.clock.stamp(),
+            "saved",
         )
         return said
+
+    def taken_up_from_a_save(self) -> None:
+        """The game in play was just taken up from a save (the harbour's start of a save):
+        what is lost if it is ended is what has passed since that save's time."""
+        with self.lock:
+            w = self.world
+            self.kept = (w, w.clock.tick, len(w.log), w.clock.stamp(), "taken up")
 
     def unsaved(self) -> str | None:
         """None when nothing of the game in play would be lost by letting it go (nothing
         played or ordered since its last save, or since it was taken up); else the words
         that say what would be."""
         with self.lock:
-            world, tick, length, stamp = self.kept
+            world, tick, length, stamp, how = self.kept
             w = self.world
             if world is w and w.clock.tick == tick and len(w.log) <= length:
                 return None
-            if world is self.world and stamp:
+            if world is w and stamp and how == "taken up":
+                return (
+                    f"This game was taken up from its save at {stamp} and has not been saved "
+                    f"since; what has passed since, to {w.clock.stamp()}, is lost if it is "
+                    "ended."
+                )
+            if world is w and stamp:
                 return (
                     f"This game was last saved at {stamp}; what has passed since, to "
-                    f"{self.world.clock.stamp()}, is lost if it is ended."
+                    f"{w.clock.stamp()}, is lost if it is ended."
                 )
             return (
                 "This game has not been saved; what has passed in it, to "
@@ -955,7 +970,7 @@ class Driver:
             self._log = world.log
             self._log.subscribe(self._on_event)
             self._samples_seen = self._samples_now()
-            self.kept = (world, world.clock.tick, len(world.log), "")  # nothing played yet
+            self.kept = (world, world.clock.tick, len(world.log), "", "")  # nothing played yet
             needs = getattr(world, "needs", None)
             if needs is not None:
                 needs.listen(self._on_need)

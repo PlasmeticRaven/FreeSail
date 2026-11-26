@@ -15,7 +15,8 @@ from __future__ import annotations
 import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
-from types import SimpleNamespace
+
+import pytest
 
 from freesail.core import replay as replay_mod
 from freesail.physics import strain as ST
@@ -31,8 +32,10 @@ from tests.test_chart import SCHOONER, chart_world, high_over_the_channel
 FOG_DAY = datetime(1805, 6, 5, 7, 0)
 FOG_LINES_IN_ORDER = [
     "A fog is settling in.",
+    "The fog is thickening.",
     "The fog has shut in thick.",
     "The fog seems to be clearing.",
+    "The fog is thinning.",
     "The fog lifted.",
 ]
 
@@ -82,8 +85,13 @@ def test_truth_7_774_the_fog_comes_on_and_clears_over_a_time_and_is_said_as_it_d
     at = {e.text: e.tick for e in lines}
     settle = at["The fog has shut in thick."] - at["A fog is settling in."]
     clear = at["The fog lifted."] - at["The fog seems to be clearing."]
-    assert abs(settle - W.FOG_SETTLE_S) <= 120, settle
-    assert abs(clear - W.FOG_CLEAR_S) <= 120, clear
+    # the times as figures, not as the constants (the lead's list, B4): the settling half
+    # an hour from its first line to a cable, a mile at its half; the clearing an hour from
+    # its first opening to the fog lifted, a few miles at its half
+    assert abs(settle - 1800) <= 120, settle
+    assert abs(clear - 3600) <= 120, clear
+    assert abs(at["The fog is thickening."] - at["A fog is settling in."] - 900) <= 120
+    assert abs(at["The fog is thinning."] - at["The fog seems to be clearing."] - 1800) <= 120
     # the sight through the steps between: never from a cable to clear, or clear to a cable
     sights = [v for _, v, _ in seen]
     for a, b in zip(sights, sights[1:], strict=False):
@@ -112,7 +120,7 @@ def test_truth_7_775_the_fog_is_the_same_after_a_save_and_a_plain_function_of_it
     and the conditions of any minute asked twice, or out of order, are the same."""
     w = _fog_world()
     w.run(55 * 60)  # 07:55, in the settling
-    assert 0.0 < w.conditions.fog < 1.0 and w.conditions.visibility == "a mile"
+    assert 0.0 < w.conditions.fog < 1.0 and w.conditions.visibility == "a few miles"
     d = Path(tempfile.mkdtemp())
     path = replay_mod.save_to_file(w, d / "fog.json")
     copy, report = replay_mod.load_report(path, None)
@@ -131,6 +139,76 @@ def test_truth_7_775_the_fog_is_the_same_after_a_save_and_a_plain_function_of_it
     first = [sys.conditions_at(0.0, 0.0, t) for t in moments]
     again = [sys.conditions_at(0.0, 0.0, t) for t in reversed(moments)][::-1]
     assert first == again
+
+
+def test_truth_7_775_b_the_fog_thins_at_its_edges_and_its_sight_steps_one_at_a_time(
+    monkeypatch,
+):
+    """The lead's list of 2026-11-24, B1 to B4, at the fog's own function: in the thick of a
+    drawn fog (09:30 on the 5th off Falmouth, a cable's sight), it is thick under a wind of
+    9 knots, half thinned at 10.5 and gone at 12.5; thick 20 km from the coast, half at 27.5
+    and gone at 31; and where the air that holds it is to go in half an hour it is half
+    cleared, a minute before only just there, and gone at the moment, as where it came half
+    an hour ago and a quarter. Through a June of minutes its sight never jumps a step coming or
+    going. And the log does not say a step one way within ten minutes of a step the other."""
+    w = _fog_world()
+    sys = w.systems
+    noon = datetime(1805, 6, 5, 9, 30)
+    assert sys.fog_degree(0.0, 0.0, noon) == 1.0
+    real_geo, real_coast, real_air = sys.geostrophic_at, sys._coast, sys._fog_air
+
+    def wind(kn: float):
+        ms = kn / 1.943844 / W.SURFACE_SCALE
+        monkeypatch.setattr(sys, "geostrophic_at", lambda x, y: (ms, 0.0))
+
+    for kn, degree in ((9.0, 1.0), (10.5, 0.5), (12.5, 0.0)):
+        wind(kn)
+        assert abs(sys.fog_degree(0.0, 0.0, noon) - degree) < 0.02, (kn, degree)
+    monkeypatch.setattr(sys, "geostrophic_at", real_geo)
+    for km, degree in ((20.0, 1.0), (27.5, 0.5), (31.0, 0.0)):
+        monkeypatch.setattr(sys, "_coast", lambda x, y, km=km: (km, 0.0))
+        assert abs(sys.fog_degree(0.0, 0.0, noon) - degree) < 0.02, (km, degree)
+    monkeypatch.setattr(sys, "_coast", real_coast)
+    leaves = noon + timedelta(minutes=30)
+    monkeypatch.setattr(sys, "_fog_air", lambda x, y, t: t < leaves)
+    assert abs(sys.fog_degree(0.0, 0.0, noon) - 0.5) < 0.02
+    assert 0.0 < sys.fog_degree(0.0, 0.0, leaves - timedelta(minutes=1)) < 0.05
+    assert sys.fog_degree(0.0, 0.0, leaves) == 0.0
+    came = noon - timedelta(minutes=15)
+    monkeypatch.setattr(sys, "_fog_air", lambda x, y, t: t >= came)
+    assert abs(sys.fog_degree(0.0, 0.0, noon) - 0.5) < 0.02
+    assert sys.fog_degree(0.0, 0.0, came + timedelta(minutes=30)) == 1.0
+    monkeypatch.setattr(sys, "_fog_air", real_air)
+    # a June of minutes: every change of sight in or out of fog is one step
+    steps = W.VISIBILITY_WORDS
+    start = datetime(1805, 6, 1, 0, 0)
+    was = sys.conditions_at(0.0, 0.0, start)
+    jumps = []
+    for m in range(1, 30 * 24 * 60):
+        t = start + timedelta(minutes=m)
+        now = sys.conditions_at(0.0, 0.0, t)
+        if "fog" in (now.weather, was.weather) and now.visibility != was.visibility:
+            if abs(steps.index(now.visibility) - steps.index(was.visibility)) > 1:
+                jumps.append((t, was.visibility, now.visibility))
+        was = now
+    assert jumps == [], jumps[:5]
+    # the quiet between two steps said: a flicker of the sight is read, and not said
+    from freesail.world.weather import Conditions
+
+    seq = ["a mile", "a few miles", "a mile", "a few miles", "a mile"]
+    w2 = _fog_world()
+    said_before = len(_fog_lines(w2))
+    base = w2.conditions
+    for vis in seq:
+        c = Conditions(base.sector, base.air_mass, "thick", "", "fog", vis, base.pressure_hpa, 0.5)
+        w2._last_conditions = w2.conditions if w2.conditions.weather == "fog" else c
+        monkeypatch.setattr(
+            w2, "_observe_weather", lambda first=False, c=c: setattr(w2, "conditions", c)
+        )
+        w2._tick_weather()
+        w2.clock.tick += 60
+    said = [e.text for e in _fog_lines(w2)[said_before:]]
+    assert said == ["The fog is thinning."], said
 
 
 # -- the captain's spars --------------------------------------------------------------------
@@ -187,17 +265,19 @@ def test_truth_7_776_the_captain_clears_the_wreck_and_shifts_the_spar_for_a_spar
     n0 = len(w.log)
     w.run(5 * 3600)
     said = _captains(w, n0)
-    work = [x for x in said if any(k in x for k in ("wreck", "shifting", "bending", "jury"))]
+    keys = ("wreck", "shifting", "bending", "jury", "(bent again to its spar)")
+    work = [x for x in said if any(k in x for k in keys)]
+    by = "By the captain, keeping station: "
     assert work == [
-        "By the captain, keeping station: clearing away the wreck of the main topmast (the main "
-        "topmast carried away).",
-        "By the captain, keeping station: shifting the main topmast (the main topmast carried "
-        "away).",
-        "By the captain, keeping station: bending the jib (its spar shifted for a spare).",
-        "By the captain, keeping station: shifting the topsail yard (the topsail yard carried "
-        "away).",
-        "By the captain, keeping station: bending the topsail (its spar shifted for a spare).",
-        "By the captain, keeping station: bending the gaff topsail (its spar shifted for a spare).",
+        by + "clearing away the wreck of the main topmast (the main topmast carried away).",
+        by + "shifting the main topmast (the main topmast carried away).",
+        by + "bending the jib (its spar shifted for a spare).",
+        by + "setting the jib (bent again to its spar).",
+        by + "shifting the topsail yard (the topsail yard carried away).",
+        by + "bending the topsail (its spar shifted for a spare).",
+        by + "setting the topsail (bent again to its spar).",
+        by + "bending the gaff topsail (its spar shifted for a spare).",
+        by + "setting the gaff topsail (bent again to its spar).",
     ], work
     ship = w.ship
     assert not ship.spars["main.topmast"].wrecked and not ship.spars["topsail.yard"].wrecked
@@ -205,6 +285,29 @@ def test_truth_7_776_the_captain_clears_the_wreck_and_shifts_the_spar_for_a_spar
     assert parts.booms(ship).have("topmast") == 0 and parts.booms(ship).have("yard") == 0
     assert ship.sails["jib"].state is not parts.SailState.UNBENT
     assert [e.kind for e in w.log[n0:] if e.kind == "spar.shifted"] == ["spar.shifted"] * 2
+    assert ship.sails["jib"].is_set and ship.sails["topsail"].is_set
+    # two spars down, of two classes: the one that keeps her manageable first (the brig's
+    # main topmast before her fore topgallant mast, the wreck and the shift alike), and her
+    # one spare yard to her topsail yard, never to a lower yard
+    w = _cruising("brig")
+    _carry_away(w, "fore.topgallant_mast", "main.topmast", "main.yard")
+    n0 = len(w.log)
+    w.run(4 * 3600)
+    order = [
+        x.split(": ", 1)[1].split(" (")[0]
+        for x in _captains(w, n0)
+        if "wreck of" in x or "shifting" in x
+    ]
+    assert order[:4] == [
+        "clearing away the wreck of the main topmast",
+        "clearing away the wreck of the main yard",
+        "clearing away the wreck of the fore topgallant mast",
+        "shifting the main topmast",
+    ], order
+    assert order.index("shifting the main topsail yard") < order.index(
+        "shifting the fore topgallant mast"
+    ), order
+    assert "shifting the main yard" not in order and w.ship.spars["main.yard"].wrecked
 
 
 def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_hands_busy():
@@ -239,7 +342,9 @@ def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_h
     def asked() -> list[str]:
         n0 = len(w.log)
         cap._business.pop("repairs_tick", None)
-        cap._repairs(SimpleNamespace(tick=w.clock.tick, wind_kn=12.0))
+        from freesail.world.captains import Perception
+
+        cap._repairs(Perception.read(w))
         return [x for x in _captains(w, n0) if "wreck" in x]
 
     damage_of(ship).struck_by["a stranger"] = w.clock.tick - 60
@@ -252,6 +357,8 @@ def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_h
     runner = ship.extra["evolutions"]
     runner.instances[:] = [i for i in runner.instances if i.evo.id != "plug_shot_hole"]
     cap.state = "engaging"
+    assert asked() == []
+    cap.state = "struck"  # a prize's spars are her captor's to order, not her own captain's
     assert asked() == []
     cap.state = "keeping station"
     assert asked() == [
@@ -331,3 +438,83 @@ def test_truth_7_778_with_no_topsail_set_to_lie_a_try_under_she_heaves_to_in_the
     w.run(int(1.5 * 3600))
     assert any(e.text.startswith("Lying a-try under the topsail") for e in w.log)
     assert "By the captain, hove to for weather: lying a try." in _captains(w, 0)
+    # her topsail unbent is as her topsail furled: she heaves to
+    w = _gale("smack", 270)
+    w.ship.sails["topsail"].state = parts.SailState.UNBENT
+    w.run(int(1.5 * 3600))
+    said = _captains(w, 0)
+    assert (
+        "By the captain, hove to for weather: heaving to (no topsail set to lie a-try under)."
+        in said
+    ), said
+    # a topsail in hand, lowered for its reefs at the gale's line, is not a topsail stowed: the
+    # bilander lies a-try under it, as she did
+    w = _gale("bilander", 270)
+    w.run(int(2.5 * 3600))
+    said = _captains(w, 0)
+    assert "By the captain, hove to for weather: lying a try." in said, said
+    assert not any("no topsail set to lie a-try under" in x for x in said)
+    assert any(e.text.startswith("Lying a-try under the main topsail") for e in w.log)
+
+
+# -- the spar's work leaves her no worse off --------------------------------------------------
+
+
+def _three_hours_on(ship: str, spar: str, spar_work: bool, monkeypatch) -> dict:
+    """Her way through the third hour after a spar carried away out of action, how often she
+    was taken aback, and what the captain said, with his spar work or without it (the trunk's
+    captain, who left the spar as it fell)."""
+    from freesail.world import captains as C
+
+    if not spar_work:
+        monkeypatch.setattr(C.Captain, "_spar_work", lambda self, *a: None)
+    w = _cruising(ship)
+    _carry_away(w, spar)
+    n0 = len(w.log)
+    way: list[float] = []
+    for minute in range(180):
+        w.run(60)
+        if minute >= 120:
+            way.append(float(w.ship.dyn.u) * 1.943844)
+    monkeypatch.undo()
+    return {
+        "world": w,
+        "mean": sum(way) / len(way),
+        "least": min(way),
+        "aback": sum(1 for e in w.log[n0:] if e.kind == "ship.aback"),
+        "said": _captains(w, n0),
+    }
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    ("ship", "spar", "sail"),
+    [
+        ("cutter", "main.topmast", "jib"),  # a fore-and-after
+        ("brig", "main.topmast", "main.topsail"),  # a small square-rigger
+        ("seventy-four", "fore.topmast", "fore.topsail"),  # a ship of the line
+    ],
+)
+def test_truth_7_779_her_spar_shifted_she_makes_no_less_way_and_is_no_more_often_aback(
+    ship, spar, sail, monkeypatch
+):
+    """The lead's list of 2026-11-24 for package 126, A3: the spar's work must not leave her
+    worse off than the trunk's captain, who left the spar as it fell. A spar carried away out
+    of action, cruising off the Lizard in twelve knots: three hours on she makes no less way
+    through the third hour, and is taken aback no more often, than the same ship with the
+    same loss and no spar work; the sail that stood on the spar is bent again, set by him,
+    and drawing; he gave no spar's order while she was in a manoeuvre, and every order of the
+    work (the wreck, the shift, the bend, the set) said why."""
+    on = _three_hours_on(ship, spar, True, monkeypatch)
+    off = _three_hours_on(ship, spar, False, monkeypatch)
+    assert on["mean"] >= off["mean"], (on["mean"], off["mean"])
+    assert on["least"] > 0.0, on["least"]  # never going astern in the third hour
+    assert on["aback"] <= off["aback"], (on["aback"], off["aback"])
+    w = on["world"]
+    name = w.captain._sail_name(sail)
+    said = on["said"]
+    assert any(f"setting the {name} (bent again to its spar)" in x for x in said), said
+    assert any(f"bending the {name} (its spar shifted for a spare)" in x for x in said), said
+    assert not w.ship.spars[spar].wrecked
+    assert w.ship.sails[sail].is_set
+    assert not [x for x in off["said"] if "shifting" in x or "wreck" in x]

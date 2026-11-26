@@ -431,6 +431,7 @@ ORDER_ACTOR = "order_actor"
 
 
 class World:
+    _fog_said: tuple[int, bool, str] | None = None  # a checkpoint's from before package 126
     # The log's `wind.shift` line (package 37c, the owner's ruling of 2026-10-03, closing
     # the M5 spec's open item 11): the ten-minute mean wind, as the readings and the
     # `a wind shift` event read it, two points from where the log last put it, and held
@@ -849,6 +850,9 @@ class World:
         self.glass: Any = None
         self.conditions: Any = None  # the sky and the weather at the ship, once a minute
         self._last_conditions: Any = None
+        # the fog's last step said (tick, thicker, its words' key), for the quiet between two
+        # (`_tick_weather`); None before any, and in a checkpoint written before (the class's)
+        self._fog_said: tuple[int, bool, str] | None = None
         self.sea: Any = None  # the sea and the motion (spec M5 §4), made below
         self.motion: Any = None
         if self.scenario.systems or self.scenario.climatology:
@@ -1907,7 +1911,12 @@ class World:
         """The minute's weather lines: the sky and the weather when they change, the
         hour's line with the glass, and at the watch's change the glass's fall or rise
         since the watch before (spec M5 §5). No line names a front or a centre."""
-        from freesail.world.weather import FOG_LINES, VISIBILITY_NM, WEATHER_LINES
+        from freesail.world.weather import (
+            FOG_LINE_QUIET_S,
+            FOG_LINES,
+            VISIBILITY_NM,
+            WEATHER_LINES,
+        )
 
         self._observe_weather()
         t = self.clock.ship_time
@@ -1924,6 +1933,9 @@ class World:
             text = WEATHER_LINES.get((was.weather, now.weather)) or WEATHER_LINES[now.weather]
             if now.weather == "fog" and 0.0 < float(getattr(now, "fog", 0.0)) < 1.0:
                 text = FOG_LINES["settling"]  # it comes on by degrees
+            elif was.weather == "fog" and now.weather != "fine":
+                # gone into other weather (behind a front): it lifted, and the weather said
+                text = f"{WEATHER_LINES[('fog', 'fine')]} {text}"
             self.record(
                 Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
                 "weather.change",
@@ -1946,17 +1958,29 @@ class World:
                 if thicker
                 else ("clearing" if was.visibility == "a cable" else "thinning")
             )
-            self.record(
-                Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
-                "weather.fog",
-                FOG_LINES[key],
-                data={
-                    "weather": now.weather,
-                    "visibility": now.visibility,
-                    "was": was.visibility,
-                    "fog": float(getattr(now, "fog", 0.0)),
-                },
+            # one step is not said within `FOG_LINE_QUIET_S` of a step the other way, nor of
+            # the same words (the lead's list, B3: off Ushant "The fog is thickening." and a
+            # minute later "The fog is thinning."): the sight is read as it is, the log says
+            # the fog's turn when it has held
+            said = self._fog_said
+            quiet = (
+                said is not None
+                and self.clock.tick - int(said[0]) < FOG_LINE_QUIET_S
+                and (bool(said[1]) != thicker or said[2] == key)
             )
+            if not quiet:
+                self._fog_said = (self.clock.tick, thicker, key)
+                self.record(
+                    Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
+                    "weather.fog",
+                    FOG_LINES[key],
+                    data={
+                        "weather": now.weather,
+                        "visibility": now.visibility,
+                        "was": was.visibility,
+                        "fog": float(getattr(now, "fog", 0.0)),
+                    },
+                )
         self._last_conditions = now
         if t.minute != 0:
             return
