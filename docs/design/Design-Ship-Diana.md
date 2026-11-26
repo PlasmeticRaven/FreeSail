@@ -517,6 +517,24 @@ No lateen: B3.1 does not reach her. Her mizen carries its crossjack, so B3.4's r
 three masts square (observed); neither classing limit touches her. She heaves to with the main
 topsail aback, as the frigate does (observed, §9).
 
+**As built and measured, 2026-11-24** (her builder's report §§11 to 16; the owner's word, Decisions
+Part F, rows D-s2 and D-j3; the lead's nudges 61 to 70): **a light ship with a small rudder: in a
+fresh breeze keep her jib on her; taken in, she gripes up past her helm and will not be held until
+it is set again.**
+- **Her spanker** is the 95 m2 her own spars carry by her note's rule, not the frigate's scaled
+  111 m2. Her helm is about amidships close-hauled, and truth D is restated as measured.
+- **Under all plain sail** she stays in 12 and 15 kn, in 8 kn from one heading of three, and she is
+  slack in stays in 20 and 25 kn. In a breeze the cause is the tack script's one moment for
+  "mainsail haul", a point on the bow for every ship, which takes what swing a light, fine ship has
+  left. Hauled with the wind ahead, Luce's other reading, she stays.
+- **Shortened by the game's own order** she stays in 20 kn. In 25 kn that order takes her jib in,
+  and with it in she gripes past her rudder (the least of any committed ship's to her lateral
+  plane, 0.0245, traced from her plan). With `set the jib` again she bears away, gathers way and
+  stays.
+- **The engine's part** (the haul's moment; a jib taken in where a ship cannot be held without it)
+  is booked as package 125. When it lands she is measured again, and truth D goes back to its first
+  band if she then holds it.
+
 ### 4.4 Item 37, the generator's studding law
 
 Her studding sails are written by the generator's copy of the sail-force law (the studding class at
