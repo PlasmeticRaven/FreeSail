@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 16:44 UTC (the third pass's declaration received; PACKAGE 127 CHANGES THAT LINE OF clear for action (boats griped fast on the booms): when you merge 127 the lost boat's clause follows ITS words). Nudge number: 80.
+Latest note: 2026-11-26, 23:37 UTC (THE WEEKLY LIMIT STOPPED EVERY SESSION ON 24 NOVEMBER; IT HAS RESET; nothing merged in between; still awaited: THE DIANA's ONE COMMIT OF WORDS (nudge 78) and the third pass whole after package 127, which is at my gate now). Nudge number: 81.
