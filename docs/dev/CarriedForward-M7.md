@@ -67,7 +67,7 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
 
-Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19, 20, 21, 22 and 23 are not yet placed (22 is for the ships' session and a later package of the physics).
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are package 129, launched 27 November at the owner's word; 19, 20, 21, 22 and 23 are not yet placed (22 is for the ships' session and a later package of the physics).
 
 21. The saves a stand-down writes are named by seed and tick, and two written at one tick overwrite one another (found by package 126's builder; the desk's naming, older than the package).
 
@@ -90,7 +90,7 @@ Released across the gate by the owner on 19 November. Merged so far: the helm's 
 
 ## 7. The lead's rulings that are the owner's to overturn
 
-Each was told to him when it was made and is in the records of its package.
+Each was told to him when it was made and is in the records of its package. **On 27 November he said of those made that day and before: "your rulings stand."**
 
 - A model's station may not show, resume or stand down another's (package 117).
 - After the player's own `hold your fire`, `engage` no longer opens fire (package 115 D).
@@ -113,7 +113,7 @@ Each was told to him when it was made and is in the records of its package.
 - The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is placed in section 9, the lead's proposal.
 - The chart's work, parked; its records say where it stopped.
 - **The owner's notes of 27 November** (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`, his later notes), with the lead's proposed placing, his to change: an order of succession appointed by the captain (his note 7; decision 63 gives the command to the senior officer) with milestone 8's second half, her people; a raking fire (note 8: a shot is placed anywhere along her length whatever her aspect, and nothing rakes) with the fight's known faults in milestone 8's first half, a package of its own from the sources; fire aboard, its fighting and the magazine (note 9) with package 77, and the guns' faults, condition and care with the gunner's station of package 87; temperature (note 11; the spec's deferred section 26) in two layers, the thermometer and the fog that comes of warm air over cold water with the weather of the world that moves, the cold with the crew's health in milestone 8's second half.
-- Package 128 (the test suite) and package 129 (faults 16 to 18 above): proposed, not launched.
+- Package 128 (the test suite): proposed, not launched. (Package 129, faults 16 to 18 above: launched 27 November at his word.)
 
 ## 9. What the director's milestone (7b) left unbuilt, placed
 
