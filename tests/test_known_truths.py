@@ -24000,7 +24000,10 @@ def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
 # brig's two 20-knot tacks that fell back on her old tack and were logged "Tacked" are not
 # counted). The merchant brig, the bilander and the smack are not in it: under the truths'
 # settle their tacks never begin (the first two's small watch still setting their sail, the
-# smack not close-hauled for the runner at these headings; the report's §3). Under plain sail:
+# smack not close-hauled for the runner at these headings; the report's §3). Since the lead's
+# ruling on rule A (2026-11-27) no ship of these is slack in stays by her file, and every one is
+# hauled at the point as on the trunk: the hermaphrodite brig's rows are measured so (the report's
+# §12). Under plain sail:
 FLEET_PLAIN = {
     ("brig", 8): ((290.0, 292.5, 295.0), (130, 460), 3),
     ("brig", 12): ((290.0, 292.5, 295.0), (340, 440), 3),
@@ -24017,11 +24020,11 @@ FLEET_PLAIN = {
     ("frigate-36", 15): ((290.0, 292.5, 295.0), (310, 480), 3),
     ("frigate-36", 20): ((290.0, 292.5, 295.0), (190, 310), 3),
     ("frigate-36", 25): ((290.0, 292.5, 295.0), (200, 310), 3),
-    ("hermaphrodite-brig", 8): ((290.0, 292.5, 295.0), (260, 330), 3),
-    ("hermaphrodite-brig", 12): ((290.0, 292.5, 295.0), (160, 230), 3),
+    ("hermaphrodite-brig", 8): ((290.0, 292.5, 295.0), (360, 450), 3),
+    ("hermaphrodite-brig", 12): ((290.0, 292.5, 295.0), (230, 300), 3),
     ("hermaphrodite-brig", 15): ((290.0, 292.5, 295.0), (150, 230), 3),
-    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (150, 220), 3),
-    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (130, 210), 3),
+    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (140, 210), 3),
+    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (130, 200), 3),
     ("lugger", 8): ((290.0, 292.5, 295.0), (150, 220), 3),
     ("lugger", 12): ((290.0, 292.5, 295.0), (140, 210), 3),
     ("lugger", 15): ((290.0, 292.5, 295.0), (140, 210), 3),
@@ -24062,8 +24065,8 @@ FLEET_SHORTENED = {
     ("cutter", 25): ((290.0, 292.5, 295.0), (70, 140), 3),
     ("frigate-36", 20): ((290.0, 292.5, 295.0), (220, 300), 3),
     ("frigate-36", 25): ((290.0, 292.5, 295.0), (170, 340), 3),
-    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (150, 220), 3),
-    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (130, 200), 3),
+    ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (100, 180), 3),
+    ("hermaphrodite-brig", 25): ((290.0, 292.5, 295.0), (120, 200), 3),
     ("lugger", 20): ((290.0, 292.5, 295.0), (160, 230), 3),
     ("lugger", 25): ((290.0, 292.5, 295.0), (180, 260), 3),
     ("privateer-schooner", 20): ((290.0, 292.5, 295.0), (80, 150), 3),
@@ -24109,12 +24112,10 @@ def _fleet_tack(world, made: bool, band) -> None:
 def test_truth_7_760_no_ship_tacks_worse_than_she_did():
     """Package 125 (truth 7-760, the table's own check): in every cell of the fleet's tables, plain
     and shortened, she stays from at least as many headings as she did on the trunk before this
-    package, by what she did. The haul by her way moves no committed square-rigger's tack (every
-    one keeps 0.48 to 0.58 of her way at the point and hauls there as before); the hermaphrodite
-    brig, slack in stays (0.21 to 0.33), hauls with the wind ahead and stays as before, quicker in
-    light airs (411 to 291 s in 8 knots) and slower shortened in 20 (138 to 186 s); the two
-    schooners, slack too in 20 and 25 knots (0.17 to 0.27) but with no square after yards to
-    swing, by one or two seconds."""
+    package, by what she did. No ship of the eighteen is slack in stays by her file (the lead's
+    ruling on rule A of 2026-11-27), so every one is hauled at the point as on the trunk; the
+    hermaphrodite brig and the two schooners, whose way is under two fifths there (0.17 to
+    0.33), with the rest."""
     for table in (FLEET_PLAIN, FLEET_SHORTENED):
         for key, (made, band, trunk) in table.items():
             assert len(made) >= trunk, key
@@ -24127,8 +24128,8 @@ def test_truth_7_760_no_ship_tacks_worse_than_she_did():
 )
 def test_truth_7_761_the_fleet_goes_about_under_plain_sail(ship, wind_kn, heading):
     """Package 125 (truth 7-761): the fleet's tacks under all plain sail, 8 to 25 knots, each
-    case its outcome by the table and, made, its band. **Hauled by how she comes round, no
-    ship goes about worse than she did.**"""
+    case its outcome by the table and, made, its band. **No ship goes about worse than she
+    did.**"""
     made, band, _ = FLEET_PLAIN[(ship, wind_kn)]
     world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
     _fleet_tack(world, heading in made, band)
@@ -24152,12 +24153,15 @@ def test_truth_7_762_the_fleet_goes_about_shortened(ship, wind_kn, heading):
     _fleet_tack(world, heading in made, band)
 
 
-def _haul_moment(ship: str, wind_kn: float, heading: float) -> dict:
+def _haul_moment(ship: str, wind_kn: float, heading: float, slack: bool = False) -> dict:
     """Her head off the wind, and her way against her way at "helm's a-lee", at the tick the
-    tack's "mainsail haul" is called (the script's phase read each tick)."""
+    tack's "mainsail haul" is called (the script's phase read each tick); `slack`, her file's
+    habit of being slack in stays set in memory on the ship as loaded (no ship file sets it)."""
     from freesail.evolutions.scripts import TackScript
 
     world = close_hauled_on_starboard(f"data/ships/{ship}.yaml", knots_=wind_kn, heading=heading)
+    if slack:
+        world.ship.spec.slack_in_stays = True
     world.submit("tack ship")
     for _ in range(300):
         world.tick()
@@ -24173,20 +24177,46 @@ def _haul_moment(ship: str, wind_kn: float, heading: float) -> dict:
     raise AssertionError("no haul in 300 s")
 
 
-def test_truth_7_763_a_slack_ship_hauls_with_the_wind_ahead_a_smart_one_at_the_point():
+def test_truth_7_763_a_ship_known_slack_in_stays_hauls_with_the_wind_ahead_any_other_at_the_point():
     """Package 125 (truth 7-763), Luce 1884 p. 417's two readings: the after yards hauled "with
-    the wind ahead or a point on the bow". **A ship coming round smartly hauls at the point; one
-    slack in stays waits for the wind ahead.** The frigate in 15 knots keeps half her way and more
-    at the point (0.53 measured) and hauls there, her head 8 to 11.25 degrees off; the
-    hermaphrodite brig keeps under two fifths (0.16 there) and hauls with her head within half a
-    degree of the wind, or through it (read at the tick's end, within a degree and a half). Old:
-    both a point off (the brig 10 to 11 degrees)."""
+    the wind ahead or a point on the bow"; the second moment a habit of the ship, said in her
+    file (`ship.slack_in_stays`; the lead's ruling on rule A of 2026-11-27). **A ship whose
+    people know her slack in stays hauls with the wind ahead once her way is under two fifths;
+    any other at the point, whatever her way.** The frigate in 15 knots keeps half her way and
+    more at the point (0.53 measured) and hauls there, her head 8 to 11.25 degrees off. The
+    hermaphrodite brig keeps under two fifths (0.16 there): as her file has her (no habit),
+    hauled at the point as the frigate is; with the habit set on her in memory, with her head
+    within half a degree of the wind, or through it (read at the tick's end, within a degree
+    and a half). A rule that made every ship slack fails the first brig; one that made none,
+    the second."""
     smart = _haul_moment("frigate-36", 15.0, 292.5)
     assert smart["share"] >= 0.4 and 8.0 <= smart["off"] <= 11.25, smart
-    slack = _haul_moment("hermaphrodite-brig", 15.0, 292.5)
+    unknown = _haul_moment("hermaphrodite-brig", 15.0, 292.5)
+    assert unknown["share"] < 0.4 and 8.0 <= unknown["off"] <= 11.25, unknown
+    slack = _haul_moment("hermaphrodite-brig", 15.0, 292.5, slack=True)
     assert slack["share"] < 0.4, slack
     # read at the end of the tick the haul is called in, her head swung on by then (1.09 deg)
     assert slack["off"] <= 1.5 or slack["through"], slack
+
+
+def test_truth_7_763b_a_ship_known_slack_in_stays_is_said_so_in_the_ship():
+    """Package 125 (truth 7-763, the lead's ruling on rule A, item 4): her people know the habit,
+    and the reading `the ship` says it in one line after her class: "She is slack in stays: when
+    her way is gone in going about, the after yards are hauled with the wind ahead, not a point
+    on the bow." No ship of the eighteen has it, and none is told it."""
+    from freesail.api.readings import ship_words
+
+    line = (
+        "She is slack in stays: when her way is gone in going about, the after yards are "
+        "hauled with the wind ahead, not a point on the bow."
+    )
+    world = close_hauled_on_starboard("data/ships/hermaphrodite-brig.yaml", knots_=15.0)
+    assert "slack in stays" not in ship_words(world)
+    world.ship.spec.slack_in_stays = True
+    said = ship_words(world)
+    assert said.startswith("The ship: ") and line in said, said
+    # after her class, before her guns
+    assert said.split(line)[1].lstrip().startswith(("Her guns: ", "She carries no guns.")), said
 
 
 def test_truth_7_764_a_tack_that_falls_back_is_said_to_have_missed_stays():

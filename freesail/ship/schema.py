@@ -1179,13 +1179,26 @@ class ShipSpec:
     # package 90, stage 0: her own sweeps (`SweepsSpec`); None, she has none. Left out of the
     # pickle while None.
     sweeps: SweepsSpec | None = None
+    # package 125, the lead's ruling on rule A (2026-11-27): `ship.slack_in_stays` in her file.
+    # "Slack in stays": said of a ship slow in going about, her way gone before her head is
+    # through the wind (Falconer's Marine Dictionary, 1780, "Slack"). Luce 1884, ch. XXIV,
+    # 'Tacking', p. 417 gives the after yards hauled "with the wind ahead or a point on the bow",
+    # two moments because ships differ: true, her people haul them with the wind ahead once
+    # her way is under two fifths of what she had at "helm's a-lee"
+    # (`TackScript._time_to_haul`); false, the default, at the point whatever her way. A habit
+    # of the ship known to her people, not a reading of the deck. No ship of the eighteen
+    # sets it. Left out of the pickle while false.
+    slack_in_stays: bool = False
 
     def __getstate__(self) -> dict[str, Any]:
         """Its state for the checkpoint, the sweeps only where the file gives them (package
-        90), so that a ship without them is pickled as before them."""
+        90), and the habit of being slack in stays only where it is set (package 125), so that
+        a ship without them is pickled as before them."""
         state = dict(self.__dict__)
         if state.get("sweeps") is None:
             state.pop("sweeps", None)
+        if not state.get("slack_in_stays"):
+            state.pop("slack_in_stays", None)
         return state
 
 
@@ -1226,6 +1239,11 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         raise ShipFileError(f"{source}: 'ship.name' is missing.")
     rig = str(ship.get("rig") or "unspecified")
     era_notes = str(ship.get("era_notes") or "")
+    slack_in_stays = ship.get("slack_in_stays", False)
+    if not isinstance(slack_in_stays, bool):
+        raise ShipFileError(
+            f"{source}: 'ship.slack_in_stays' is {slack_in_stays!r}, which is not true or false."
+        )
     warnings: list[str] = []
 
     hull = _parse_hull(data.get("hull"), source)
@@ -1264,6 +1282,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         timing=_parse_timing(data["timing"], source) if data.get("timing") is not None else {},
         hands=_parse_hands(data["hands"], source) if data.get("hands") is not None else {},
         sweeps=_parse_sweeps(data["sweeps"], source) if data.get("sweeps") is not None else None,
+        slack_in_stays=slack_in_stays,
     )
     validate(spec)
     return spec

@@ -606,7 +606,9 @@ SETTEE_WORE_WORDS = (
 SETTEE_DIP_S = 120.0
 
 # The tack's "mainsail haul" a point on the bow while she keeps this share of the way she had at
-# "helm's a-lee"; under it, slack in stays, with the wind ahead (`TackScript._time_to_haul`).
+# "helm's a-lee"; under it, with the wind ahead (`TackScript._time_to_haul`). Read only for a ship
+# whose file says she is slack in stays (`ShipSpec.slack_in_stays`; the lead's ruling of
+# 2026-11-27); every other ship is hauled at the point.
 # JUDGEMENT, its ground the fleet's measure at the point (docs/design/Report-Package125.md §2):
 # every committed square-rigger keeps 0.48 to 0.58 of her way there and comes round; the light
 # corvette measured for the ships' package keeps 0.25 to 0.37, and hauled at the point her swung
@@ -2029,11 +2031,11 @@ class TackScript(Script):
 
     Helm's a-lee: the helm is ordered to a heading twelve points round, through the
     wind, the head sheets let fly and the spanker (or a fore-and-after's main) sheet
-    hauled aft, which brings her up. When her head is within a point of the wind and she
-    comes round smartly, or with the wind ahead when she is slack in stays (`_time_to_haul`,
-    package 125), "mainsail haul": the after yards swing to the new tack, over ``brace_s``, or
-    over the short ``light_after_swing_s`` when they are a schooner's light main yards
-    (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
+    hauled aft, which brings her up. When her head is within a point of the wind (or, when
+    her file says she is slack in stays and her way is gone, with the wind ahead:
+    `_time_to_haul`, package 125), "mainsail haul": the after yards swing to the new tack, over
+    ``brace_s``, or over the short ``light_after_swing_s`` when they are a schooner's light
+    main yards (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
     (Luce 1884 p. 417; `_haul_words`). When her head has passed through the wind and the
     after yards are round, "let go and haul": the head yards follow, the head sheets are
     drawn on the new tack and the helm is ordered to the new close-hauled course; with her
@@ -2839,10 +2841,18 @@ class TackScript(Script):
         wind ahead (within `WIND_AHEAD_RAD`), so that the swung yards do not take what swing
         she has left and turn her back. What the deck reads: her way through the water now and
         at the helm's a-lee, and where the wind is. Her passing through the wind hauls them in
-        any case (the caller's `self.through`)."""
+        any case (the caller's `self.through`).
+
+        The second moment is a habit of the ship, said in her file (`ShipSpec.slack_in_stays`;
+        the lead's ruling of 2026-11-27): her people know her slack in stays. A ship without it
+        is hauled at the point whatever her way, as before package 125; none of the eighteen
+        sets it."""
         off = abs(rel)
         if off > POINT:
             return False
+        spec = getattr(self.ship, "spec", None)
+        if not getattr(spec, "slack_in_stays", False):
+            return True
         if self.ship.dyn.speed >= HAUL_WAY_FRACTION * self.speed_at_helm:
             return True
         return off <= WIND_AHEAD_RAD
