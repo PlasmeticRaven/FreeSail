@@ -116,8 +116,6 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 76 (step 7): a Spanish chase signalled and read (10 s); three nations' convoys
         "test_known_truths.py::test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone",
         "test_known_truths.py::test_truth_7_433_a_nations_book_is_added_by_data_alone",
-        # package 125 (truth 7-769): two hours of a rising wind under the game's own captain
-        "test_known_truths.py::test_truth_7_769_in_a_rising_wind_the_captain_has_her_topgallants_in_before_they_go",
         # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
         # shortening run to its end before the helm goes down (6 to 8 s a case)
         *(
@@ -285,7 +283,9 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_149_a_shot_under_false_colours_is_a_pirates_act_told_once_and_witnessed",
         "test_known_truths.py::test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_straggler",
         "test_known_truths.py::test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles",
-        "test_known_truths.py::test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off",
+        "test_known_truths.py::test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_she_pays_off",
+        "test_known_truths.py::test_truth_7_788_aback_with_no_way_and_headed_the_spanker_in_she_is_boxed_off",
+        "test_known_truths.py::test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort",
         "test_known_truths.py::test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_held",
         "test_known_truths.py::test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_after_the_gale",
         "test_known_truths.py::test_truth_7_155_the_squadron_keeps_its_line_at_far_detail_and_through_the_promotion",

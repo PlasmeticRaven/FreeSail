@@ -356,6 +356,14 @@ FOG_MAX_WIND_KN = 12.0
 # inside the reach are where it is thick.
 FOG_SETTLE_S = 1800.0
 FOG_CLEAR_S = 3600.0
+# A step of the fog's sight is not said in the log within this many seconds of a step the
+# other way, nor of the same words (JUDGEMENT: ten minutes, a third of the settling; a watch
+# officer says the fog's turn when it has held, not at each breath of it).
+FOG_LINE_QUIET_S = 600
+# The fog thins within this many kilometres of the edge of the air that holds it (JUDGEMENT: as
+# its reach from the coast thins over `FOG_COAST_THIN_KM`; half an hour's sailing at six knots),
+# read a kilometre at a time.
+FOG_AIR_EDGE_KM = 5.0
 FOG_WIND_THIN_KN = 3.0
 FOG_COAST_THIN_KM = 5.0
 
@@ -416,18 +424,21 @@ def sky_block_edges(seed: int, k: int) -> tuple[float, float]:
 
 
 def fog_sight(degree: float, sky: str, visibility: str) -> tuple[str, str]:
-    """The sky and the visibility in a fog of this degree (0 to 1) over what the sky gives
-    without it: one step thicker as it first settles, the steps between closed in turn
-    as it thickens, a cable and the sky thick at its full; hazy while the sight is still a
-    few miles or more."""
+    """The sky and the visibility in a fog of this degree (0 to 1): the steps the weather
+    has from the horizon to a cable passed one by one as it thickens and as it thins (a
+    few miles as it first settles, a mile at half its degree, a cable at its full), never
+    clearer than the sky gives without it; hazy while the sight is a few miles or more. Each
+    step is passed coming and going whatever the sky beside it (the lead's list, B1: a fog
+    whose block had a hazy sky opened at once from the horizon to a mile)."""
     steps = VISIBILITY_WORDS
     clear = steps.index(visibility)
     last = len(steps) - 1
-    if degree >= 1.0 or clear >= last:
+    if degree <= 0.0:
+        at = clear
+    elif degree >= 1.0:
         at = last
     else:
-        between = last - clear  # the steps from the sky's own sight to a cable
-        at = min(last - 1, clear + 1 + int(degree * (between - 1) + 1e-9))
+        at = max(clear, min(last - 1, 1 + int(degree * (last - 1) + 1e-9)))
     words = steps[at]
     return ("thick" if VISIBILITY_NM[words] <= 1.0 else "hazy"), words
 
@@ -1709,8 +1720,7 @@ class Weather:
         found = self._coast(x_km, y_km)
         if found is None or found[0] > FOG_COAST_KM:
             return 0.0
-        sector = self.sector_at(x_km, y_km, when)
-        if sector.sector not in ("warm", "high"):
+        if not self._fog_air(x_km, y_km, when):
             return 0.0
         gx, gy = self.geostrophic_at(x_km, y_km)
         wind_kn = units.ms_to_knots(math.hypot(gx, gy) * SURFACE_SCALE)
@@ -1733,7 +1743,46 @@ class Weather:
             degree = min(degree, (end - t) / FOG_CLEAR_S)
         degree = min(degree, (FOG_MAX_WIND_KN - wind_kn) / FOG_WIND_THIN_KN)
         degree = min(degree, (FOG_COAST_KM - found[0]) / FOG_COAST_THIN_KM)
+        if degree <= 0.0:
+            return 0.0
+        # the air it lies in, come and going (the lead's list, B2: a fog went at once where she
+        # passed from under the high to behind a front): it settles over `FOG_SETTLE_S` from the
+        # moment the place came under air that holds it and thins over `FOG_CLEAR_S` to the
+        # moment it will leave it, read minute by minute at this place
+        minute = timedelta(seconds=60)
+        since = 0
+        while since * 60.0 < FOG_SETTLE_S and self._fog_air(
+            x_km, y_km, when - minute * (since + 1)
+        ):
+            since += 1
+        degree = min(degree, (since * 60.0) / FOG_SETTLE_S if since * 60.0 < FOG_SETTLE_S else 1.0)
+        until = 0  # whole minutes it is still held after this one; it leaves within the next
+        while (until + 1) * 60.0 < FOG_CLEAR_S and self._fog_air(
+            x_km, y_km, when + minute * (until + 1)
+        ):
+            until += 1
+        left = (until + 1) * 60.0
+        degree = min(degree, left / FOG_CLEAR_S if left < FOG_CLEAR_S else 1.0)
+        # and in space: thinner within `FOG_AIR_EDGE_KM` of the edge of that air, so that a
+        # ship sailing out of it, or into it, has the fog come and go by degrees (the reader of
+        # the second pass: the edge crossed at six knots took a cable's sight to the horizon in
+        # a minute), read at the points about her a kilometre apart
+        for r in range(1, int(FOG_AIR_EDGE_KM) + 1):
+            if degree <= (r - 1) / FOG_AIR_EDGE_KM:
+                break
+            ring = [
+                (x_km + r * math.sin(math.radians(b)), y_km + r * math.cos(math.radians(b)))
+                for b in range(0, 360, 45)
+            ]
+            if not all(self._fog_air(px, py, when) for px, py in ring):
+                degree = min(degree, (r - 1) / FOG_AIR_EDGE_KM)
+                break
         return max(0.0, min(1.0, degree))
+
+    def _fog_air(self, x_km: float, y_km: float, when: datetime) -> bool:
+        """Whether the air at a point holds advection fog: a stable warm sector or under a
+        high (W §1.4)."""
+        return self.sector_at(x_km, y_km, when).sector in ("warm", "high")
 
 
 # ---------------------------------------------------------------------------

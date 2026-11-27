@@ -1,10 +1,16 @@
-# Report: package 126, the harbour, the weather and the captain
+# Report: package 126, part one: the harbour and the weather
 
 **The brief.** `docs/dev/briefs/Brief-Package126.md`: four parts, three of them the owner's notes
 2, 3 and 4 from his play of gate M7 (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`), the
 fourth item 12 of section 4 of `docs/dev/CarriedForward-M7.md`, with item 6 of the same list beside
-the first. The branch is `claude/pkg-126`, cut from the trunk at 112ff819. New truths are 7-770 to
-7-778.
+the first. The branch is `claude/pkg-126`, cut from the trunk at 112ff819.
+
+**Part one** (the lead's split of 2026-11-27) holds the first two: the harbour's end of a game, with
+the stations' table, and the fog. The captain's spar work (the owner's note 4) and the `lie a-try`
+mend (item 12) are taken out whole and held for a later pass on the trunk as it then stands:
+`freesail/world/captains.py` and `freesail/evolutions/runner.py` are the trunk's, byte for byte,
+and their truths, figures and sections are gone from this hash. New truths here are 7-770 to
+7-775 (with 7-775 b).
 
 ## 1. A game ended from the harbour (the owner's note 2), and the stations' table
 
@@ -18,18 +24,23 @@ game's choices.
 
 - `Harbour.end(lose_unsaved)` and `POST /api/harbour/end`. Every door the harbour started that is
   still running is closed by `stop_door`, as the harbour closes one: its own Ctrl-C, the station
-  released at the game as before. The locks are not held while the doors stop, because a stopping
-  door asks the game to release its station. Then, under the harbour's lock and then the driver's
-  (the start's order), the World is let go for one with no game in it, as `py -m freesail` begins:
+  released at the game as before. The whole of the end holds the harbour's lock, so that no start,
+  no other end and no door begun from another page comes between the asking and the end; the
+  driver's lock is not held while the doors stop, because a stopping door asks the game to release
+  its station. Then, under the driver's lock as well (the start's order: the harbour's first, then
+  the driver's), the World is let go for one with no game in it, as `py -m freesail` begins, and
+  any door begun from a page while the doors stopped is stopped too:
   the driver's `replace_world` stops the clock, stops hearing the old log and tells the pages to
   start again. The harbour's words of the game are emptied, `started` is false and the director's
   seats' doors are forgotten. Nothing saved is touched. The game page's `/` leads to the harbour
   again, as it does before any game, and another game is begun from the same server.
 - **What is not saved is lost only on the player's word.** The driver keeps what of the game a
   save holds (`Driver.kept`: the World, its tick and its log's length after the last save's line,
-  or as it was taken up, and the ship's time of that save). `Driver.unsaved()` gives the words
+  or as it was taken up, and the ship's time and day of that save). A save written to the saves
+  place and a save handed down by `GET /api/save` (the download) are kept alike
+  (`Driver._mark_kept`, `Driver.downloaded`). `Driver.unsaved()` gives the words
   when anything has passed since. While it does, the end is refused with them ("This game has not
-  been saved; what has passed in it, to <time>, is lost if it is ended. End it all the same, or
+  been saved; what has passed in it, to <time and day>, is lost if it is ended. End it all the same, or
   save it first.", or "This game was last saved at <time>; ..."). The page then shows "end it,
   losing what is not saved", and only that sends `lose_unsaved`. A game taken up and not played,
   or saved and not played since, ends at once.
@@ -39,6 +50,10 @@ game's choices.
   state carries `games`, the count of games begun and ended from this harbour, and a game begun
   after another draws its rows as its own scenario gives them. A seat asked at the desk in the game that ended is listed by nobody after it
   (the desk lists the stations of the World in play).
+
+**The ship's time in these words** is the log's stamp with its day after it, as "Morning watch
+(05:02), 5 June 1805" (`server.dated_stamp`): the stamp alone gave no day, and a game played over
+days could not be told from its words.
 
 **As a player reads it.** The page, under the game in play: the button "end the game". With
 nothing unsaved, under it: "The game is ended.", and the page's head says "no game yet". With play
@@ -60,7 +75,8 @@ save the player made.
 none, never the one beside the other; the start's probe, applied to the end); 7-772 (in the
 browser, by the page's road: the planned door and a door chosen by hand, a next game offered its own
 stations, the end refused on its words and taken at "end it, losing what is not saved", a game begun
-after offered its own); 7-773 (a live server: the API door seated at the watcher's station is closed
+after offered its own; a game saved by the download ended without asking, and played on after it
+asked with the download's time and day); 7-773 (a live server: the API door seated at the watcher's station is closed
 by the end, its station released).
 
 ## 2. Fog comes on and clears over a time, and is said as it does (the owner's note 3)
@@ -96,10 +112,10 @@ ruled them:
 | "The fog is thinning." | the sight opens a step more | routine |
 | "The fog lifted." | the weather's change from fog, as before | routine |
 
-**One fog, first to last.** On a hazy sky (truth 7-774's) there are four lines, three of them
-notable; from a clear sky six, three notable. Before, there were two, one notable. A compressed
-clock is eased only by an urgent line (`Driver._on_event`), so a compressed passage runs on through
-a fog as before. The three notable lines are shown singly in the roll-up where routine ones are
+**One fog, first to last.** Every fog now passes each step coming and going (§4 below): six
+lines, three of them notable. Before, there were two, one notable. A compressed clock is eased
+only by an urgent line (`Driver._on_event`), so a compressed passage runs on through a fog as
+before. The three notable lines are shown singly in the roll-up where routine ones are
 rolled up. A seated model whose policy samples on notable (the watcher's default, "every glass and
 on notable and urgent events") is sampled three times in a fog where it was sampled once, and under
 the pace rule the clock is at 1x while each sample is open.
@@ -129,119 +145,96 @@ appends systems whose fog is the same function; the doubt of a ship put within t
 clear daylight" reads the same conditions at 4843). No reader was changed. Truth 7-774 reads the
 conditions, the reading served and the lookout's limit at every minute of a fog's coming and going.
 
-## 3. The game's own captain replaces a spar carried away (the owner's note 4)
+## 3. The harbour's second pass (the lead's list of 2026-11-24, C, D and F) and the end's mends of 2026-11-27
 
-**What spares a ship carries today, and where that is written.** Each ship file's
-`crew.stores.spare_spars`, by class, read by `ship/parts.py` `booms` (the `Booms` store; a shift
-takes one of its class):
+**The end's words.**
 
-| Ship file | Spare spars |
-|---|---|
-| frigate-36, razee-44, seventy-four, sixty-four | 2 topmasts, 2 stump topgallant masts, 2 topsail yards, 4 topmast studding-sail booms, 1 jib-boom (and the frigate a flying jib-boom); Luce 1866, the pairs judgement |
-| brig, hermaphrodite brig | 1 topmast, 1 stump topgallant mast, 1 topsail yard, 2 studding-sail booms, 1 jib-boom (judgement after Luce 1866; the brig's topmast Chapelle after Fincham) |
-| privateer schooner, topsail schooner | 1 topmast, 1 topsail yard, 2 studding-sail booms (judgement after Chapelle and Luce 1866) |
-| merchant brig | 1 topmast, 1 topsail yard (judgement) |
-| cutter | 1 topmast, 1 topsail yard (judgement after Luce 1866) |
-| lugger | 1 lug yard, 1 topmast (judgement) |
-| bilander, smack | 1 topsail yard (judgement) |
-| the five boats | none |
+- **The stand-downs' saves are named by the seats' own record of them** (`Seat.saves`), not by the
+  saves place's names, which a save of the same name would hide.
+- A game taken up from a save and played on is told since when: "This game was taken up from its save
+  at <the save's time> and has not been saved since; what has passed since, to <now>, is lost if it
+  is ended. End it all the same, or save it first." (`Driver.taken_up_from_a_save`, called by the
+  harbour's start of a save.)
+- **A model's door seated:** the stand-down's save is said before and named after. The refusal adds
+  "The models' stations are stood down first, and each stand-down saves the game as it stands then,
+  among your saves." The end's lines add "The models' stations were stood down, and the game as it
+  stood then was saved as <its name>, among your saves." The save is kept, as at any stand-down (the
+  record of a station's last word is the game as it stood), and is told apart by being named. Truth
+  7-773 holds both, and that the one save named is the one file the stand-down wrote.
 
-The *Renard* of *the first action* is a cutter (`data/ships/cutter.yaml`, fit "long guns"). **She
-carries no spare topgallant mast**, so in the owner's case the topgallant mast is left as it is, and
-its yard, which went with it and stands on it, waits for it. What changes in his case is that her
-people now clear the wreck (it hung to leeward for three hours in his save). The clearing's own line
-says "There is no spare topgallant mast aboard."
+- **An order given with the clock held** is play not saved: truth 7-770 gives `set plain sail` at
+  tick 0, and the end asks.
+- **A save by the download keeps the game** (2026-11-27): `GET /api/save` marks it kept as the
+  desk's save does, so the end asks nothing after it, and played on after it the words say "This
+  game was last saved at <the download's time and day>". Before, a game saved that way was still
+  warned as unsaved.
+- **The end's words give the day** (2026-11-27), as §1 says.
 
-**As it was.** The captain's repairs (`Captain._repairs`, `world/captains.py`) gave, one order every
-ten minutes in the doctrine's `damage_priority`: the shot holes plugged, the standing rigging set
-up, and out of action the running rigging rove and a sprung spar fished, then the wheel. Nothing
-cleared a wreck or shifted a spar carried away, though the work is there for a player
-(`clear_wreck.yaml`, `shift_spar.yaml`, `jury_mast.yaml`).
+**What a seat or a player is served from the files this package touches.** The primer's chapter
+1 (`docs/primer/01-the-ship.md`) gained one sentence on ending a game: "A game in play is ended from
+the harbour by *end the game*, under the game at the head of every tab; what has not been saved is
+lost only when you say so a second time." The primer is served to every seat (its 57 entries of
+what a seat reads, on every ship). The README is the player's, and gained one sentence in its
+harbour paragraph: "The game in play is ended from the harbour by *end the game* under it, the harbour
+kept: if anything has passed since it was last saved, the harbour says so and ends it only when you
+say so again." No other file the diff touches is served to a seat or a player beyond those §5 lists:
+the harbour's page and its sentences (`client/harbour.html`, `harbour.js`), and the game's lines and
+readings in a fog.
 
-**As built.** `Captain._spar_work`, last after every other repair. It is given only out of action
-(not engaging), never under fire (no shot come aboard within `SPAR_WORK_QUIET_S`, ten minutes,
-JUDGEMENT, the repairs' own interval), and only with hands to spare: no repair and no all-hands
-work in hand (`SPAR_WORK_BUSY`). The repairs' own rules stand before it (not lying to for weather,
-not in distress, the wind under the shortening figure). In turn:
+## 4. The fog's second pass
 
-1. **The wreck cleared** ("clear away the wreck of the <spar>"), the spar and every spar that went
-   with it. A hanging wreck drags and tears the sails. The sails it took, that were bent, are
-   remembered to bend again.
-2. **Each spar cleared that stands on what stands, shifted for a spare of its class** ("shift the
-   <spar>"), or **a lower mast stepped again as a jury mast** from a spare topmast ("rig a jury
-   mast"). The order is `SPAR_MEND_ORDER`, what keeps her manageable first: the bowsprit, the lower
-   masts, the jib-boom, the topmasts, the gaff and the boom, the yards (the lowest first), then the
-   topgallant masts, the flying jib-boom, the royal masts and the studding-sail booms (JUDGEMENT,
-   after Luce 1884, ch. XXXI). A spar she has no spare for is left as it is.
-3. **The sails bent again**: a head sail as soon as its spar stands, before any other spar is
-   shifted (it keeps her manageable), and the rest when all are shifted.
+**The fog, made to come and go by degrees throughout** (the lead's list of 2026-11-24, B).
 
-Each order says why, in his words: "By the captain, keeping station: shifting the main topmast (the
-main topmast carried away)."
+1. **No jump of two steps.** The sight is stepped from the horizon in every fog (`fog_sight`): a few
+   miles as it first settles, a mile at its half, a cable at its full. It is never clearer than the
+   sky gives, so each step is passed coming and going whatever the fog's block's sky. Truth 7-775 b
+   scans a June of minutes off Falmouth: no change of sight in or out of fog moves two steps.
+2. **The air it lies in comes and goes by degrees too** (`Weather._fog_air`):
+   - **In time, at the place:** read minute by minute, the fog settles over `FOG_SETTLE_S` from the
+     moment the place came under a warm sector or a high, and thins over `FOG_CLEAR_S` to the moment
+     it will leave it.
+   - **In space:** it thins within `FOG_AIR_EDGE_KM` (5 km, JUDGEMENT, as its reach from the coast
+     thins) of the edge of that air, read a kilometre at a time about her, so that a ship sailing
+     across the edge has it come and go by degrees.
+   - **Into other weather:** a fog that gives way to it is said to lift ("The fog lifted. Passing
+     showers.").
 
-**What the period sources in the repository give a vessel to carry** (searched in
-`docs/references/`, an hour at most, as the lead asked; for the owner's question, no ship's file
-changed):
+   Truth 7-775 b: where the air is to go in half an hour the fog is half cleared, a minute before
+   only just there, and gone at the moment; where it came a quarter of an hour ago, half settled;
+   six km inside the edge thick, 3.5 and 1.5 km thinner by turns, gone at 0.3; the line of its
+   lifting into showers.
+3. **No flicker said, and nothing lost.** A step of the fog's sight is put off within
+   `FOG_LINE_QUIET_S` (600 s, JUDGEMENT: a third of the settling; a watch officer says the fog's turn
+   when it has held) of a step the other way, or of the same words. It is said when the quiet is
+   over if the sight is not back where the log left it (`World._say_the_fog`, from the sight the log
+   last said). The sight itself is read as it is. The mark is the World's (`_fog_said`: the tick,
+   the way, the words and the sight said), kept by its checkpoint; truth 7-775 saves with a quiet in
+   force and the loaded game holds it. Truth 7-775 b feeds the sight a mile, a few miles, a mile, a
+   few miles, a mile, a minute apart: "The fog is thinning." once; then the sight holding at a mile,
+   "The fog is thickening." when the quiet is over.
+4. **The times pinned as figures.** Truth 7-774 holds them in seconds, not by the constants: the
+   settling 1,800 s from its first line to a cable (±120) and a mile at 900; the clearing 3,600 s from
+   its first opening to the fog lifted (±120) and a few miles at 1,800. Truth 7-775 b holds the edges
+   at the function: thick under 9 knots, half at 10.5, gone at 12.5; thick 20 km from the coast,
+   half at 27.5, gone at 31.
+5. **Another build's save taken up in a fog** (by its checkpoint) reads the fog this build has at
+   that moment. Its first step from the sight the save held is said as this build's steps go, and
+   may run the other way to the save's last line. The lead's case is "The fog seems to be clearing."
+   at once, and "The fog has shut in thick." sixteen minutes later. Nothing is owed for it.
 
-| Source | What it gives |
-|---|---|
-| Luce 1866 (1877 printing), ch. XVII, "Spare Spars, Preparing for Sea" (the OCR's page number is not legible) | A ship's booms in two piles: on the starboard side the main topmast, a stump main topgallant mast, mast-fishes, a half-yard and the main topmast studding-sail booms; on the port side the same for the fore, with the flying jib-boom; the spare fore and main topsail yards on the quarters and the spare jib-boom amidships. "Top-gallant and royal-yards and studding-sail booms are easily replaced", while a spare topsail or lower yard may save a vessel on a lee shore. This is the frigate's and the ships' of the line list today, and the source of their files'. |
-| Luce 1884, ch. XXXI, p. 496 | "Topgallant mast carried away ... send down the wreck"; sprung, "send it down and send up" another; "All sprung spars should be shifted if possible". No list by size. |
-| Fincham 1843, p. 286 | A main yard carried away is made again at sea from the spare spars: the two topmast studding-sail booms end to end, scarphed with the spare topsail and topgallant yards and woolded. No list by size. |
-| Falconer 1780, SPARE | "spare top-masts, spare sails, spare rigging": the word, no list. |
-
-**No source in the repository gives the spare spars of a vessel of a brig's, a schooner's or a
-cutter's size.** Their files' spares are judgement after Luce 1866's ship's list (the brig's and the
-hermaphrodite brig's stump topgallant mast among them; the cutter, the schooners, the merchant brig,
-the lugger, the bilander and the smack none). I stopped there.
-
-**A note only (nothing of it built): a light spar made from a spare she does carry.** The game's
-work replaces a spar only by a spare of its own class (`shift_spar`), and a lower mast by a spare
-topmast stepped as a jury mast (`jury_mast`). Nothing in it makes a topgallant mast of a spare yard
-or boom. Fincham's temporary yard of scarphed spars is that kind of work, and Luce 1866's stump
-topgallant mast is a short spar of the same kind. A "jury topgallant mast" from the cutter's spare
-topsail yard would be a new evolution: its class, its time, its rating and what it may carry, beside
-`jury_mast.yaml`. Its sail would stand on the shortened spar at a share of its strength, as the jury
-mast's does.
-
-**Truths.** 7-776 (the cutter's main topmast: the wreck, the topmast, the jib, the topsail yard, the
-topsail, the gaff topsail; the topgallant mast left for want of a spare); 7-777 (the Renard's own
-case, the wreck cleared and nothing shifted; none within ten minutes of a shot, none with a plug in
-hand, none engaging; the wreck when quiet).
-
-## 4. `lie a-try` with the wind abeam, under the game's own captain (item 12)
-
-**Reproduced on the ships in the game.** Every committed ship of the player's own was taken through
-the same probe: bound for Falmouth from 48 40 N 5 05 W, seed 7, the wind from the west (abeam) and
-again from the north-east (nearer the wind), rising from 20 to 35 knots between 04:30 and 05:30 and
-held to 08:00, under the game's own captain.
-
-- **The smack: not taken.** At the gale's line the captain orders `lie a-try`. It is refused ("The
-  topsail is not set; set it to lie a-try under it."): her topsail is furled under her plain sail
-  (item 8 of the same list). He orders nothing in its place, and she sails on at seven to nine knots
-  through the two hours of the gale, abeam and close-hauled alike. This is the captain's to mend.
-- **Every other ship lies a-try, late.** The order waits behind the shortening's reefs: the
-  frigate and the 74, 64 and razee 17 to 20 minutes, the cutter 17, the schooners 20, the brig 44, the
-  merchant brig 90 and the bilander 107 (close-hauled). Meanwhile she sails on at 8 to 11 knots. The
-  same holds close-hauled as abeam, so "abeam" is not what keeps it waiting on these ships. This is
-  the order in which sail is shortened before she is brought to, which is package 125's (how ships
-  shorten sail). It is reported, not mended here (§6).
-
-**As built.** On entering "hove to for weather" the captain reads the order's own refusals first
-(`Captain._topsail_to_lie_under`). With no topsail set to lie a-try under, he heaves to under the
-canvas she has, as a fore-and-aft vessel lies to ("By the captain, hove to for weather: heaving to
-(no topsail set to lie a-try under)."). The smack is hove to ten minutes after the line, abeam and
-close-hauled, and drifts at under two knots. A ship with her topsail set lies a-try as before.
-
-**Truth.** 7-778.
+6. **A fog shut in thick may be said clearing ten minutes later.** The quiet puts off a step the
+   other way within `FOG_LINE_QUIET_S` of the last line; at the quiet's boundary, where the sight
+   has opened again from a cable and held, "The fog seems to be clearing." follows "The fog has
+   shut in thick." by ten minutes. That is as designed: the line says the sight as it stands once
+   the quiet is over, and a fog that shuts in and opens again in a quarter of an hour is said so.
 
 ## 5. The pins moved, and the differences served
 
-**No pin moved** (`docs/dev/TuningNotes.md`, "Package 126"). The tiers on the build's hash are in
-the build report.
+**No pin moved** (`docs/dev/TuningNotes.md`, "Package 126, part one").
 
-**Today's ships, old beside new.** I ran the trunk at 41d1d1bc and this branch merged with it, in
-the same orders at seed 7, under the game's own captain:
+**Today's ships, old beside new** (this hash's code beside the trunk at f2821c7b, package 127's
+words and waits merged; measured again on it, the figures the same as beside the trunk before it
+at 64fcc565). The same orders at seed 7 under the game's own captain:
 
 - every ship file (the thirteen ships and the five boats);
 - four cases: a gale abeam and a gale close-hauled (bound for Falmouth from 48 40 N 5 05 W, the
@@ -250,32 +243,26 @@ the same orders at seed 7, under the game's own captain:
   systems' weather (six hours);
 - in every run, the whole log and the ship's end state compared.
 
-| Case | Same | Differs |
+| Case | Same in every line and the end state | Differs |
 |---|---|---|
-| gale abeam | 17 of 18 | the smack: she heaves to at the gale's line, the order said with its reason, and drifts at under two knots, where `lie a-try` was refused and she sailed on at 7 to 9 knots |
-| gale close-hauled | 17 of 18 | the smack, the same |
+| gale abeam | 18 of 18 | none |
+| gale close-hauled | 18 of 18 | none |
 | cruise | 18 of 18 | none |
-| June off Falmouth | none of 18 | the fog's coming and going (§2), on every file |
+| June off Falmouth | none of 18 | the fog's coming and going (§2, §4), on every file |
 
-In the June fog runs:
+Every case with no fog in it is the trunk's, line for line. In the June fog runs:
 
-- **The five boats** differ in the weather's lines alone; their end states are the same.
-- **The thirteen ships** under way differ in the fog's lines and in what hangs on its minutes: the
-  captain's fog signals ceased when it clears ("ceasing the fog signals (the weather clear)"), the
-  courses shaped and the allowances for the tide at the next minute, the log hove, the trims. From
-  there their positions differ by a few cables at the end of the six hours; one, the bilander, is
-  on passage at the end where she was beating.
+- **The five boats** differ in the weather's lines, and in what hangs on their minutes; they end
+  within 11 m of the trunk's.
+- **The 74, the 64, the razee, the frigate and the brig** end where the trunk's do, their logs
+  differing by the fog's lines and the soundings, bearings and fixes taken in it.
+- **The others under way** differ in the fog's lines and in what hangs on its minutes: the captain's
+  fog signals and their ceasing, the courses shaped and the tide's allowance at the next minute,
+  the log hove, the trims. They end 0.5 to 6.3 cables from the trunk's (the cutter the most).
 
 ***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
-seat): it differs by the spar work.
-
-- **The Renard, struck,** clears the wreck of her square-sail yard (6,780), shifts it for her spare
-  yard (7,380) and bends her square sail again (8,160). These are lines of her own log; a player
-  learns them only as the lookout sees her.
-- **The Sherbourne** chases her to take possession, and from 7,140 the chase's lines differ as the
-  Renard drifts otherwise (one order of `heave to` refused at 7,140 in place of the one at 6,900; the
-  chase's bearings). The log ends at 620 lines where it ended at 629, and the Sherbourne's spars at
-  the end are the same three carried away.
+seat): **the same**, line for line (633 lines in the Sherbourne's log on both; 629 before package
+127).
 
 **What a player or a model's seat is served that differs** (every such line, by kind):
 
@@ -286,21 +273,30 @@ seat): it differs by the spar work.
   hour's ("Hazy, fog; ..."), and the reading of the visibility ("a few miles", "a mile").
 - **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
   and the captain's orders that hang on them.
-- **The captain's orders of spar work** ("clearing away the wreck of the ...", "shifting the ...",
-  "rigging a jury mast", "bending the ..."), and their evolutions' lines.
-- **The smack's gale order:** "heaving to (no topsail set to lie a-try under)", where it was a
-  refusal of `lie a-try`.
-- **The harbour's page and state:** the end's button and words, and `games` in the state.
+- **Package 127's wait lines where that work queues** (`evolution.waiting`, routine): in a fog the
+  captain heaves the lead and trims at other minutes, so its waits fall at other minutes too, as
+  "'Heave the lead' will follow the same work, which the hands are still ..." (each boat, three
+  more in the six hours) and "Not hands enough on deck to trim the jib; the watch is bracing the
+  ..." (the cutter, twelve more). They are 127's lines as it says them; the fog only moves the
+  work they wait behind. No test counts them in a fog, and the recorded passages' digests hold
+  as the trunk records them (the fast tier).
+- **The fog's lifting into other weather:** "The fog lifted. <the weather's line>".
+- **The harbour's page and state:** the end's button and words (with the ship's time and its day),
+  and `games` in the state.
+- **The primer's chapter 1 and the README:** one sentence each on ending a game (§3).
 
 Nothing else moved.
 
 ## 6. Found and not mended
 
-- `lie a-try` given after `shorten sail` waits behind every reef the shortening takes (17 to 107
-  minutes by ship), and she sails on meanwhile. That is package 125's ground.
-- Under the probe's gale the captain leaves "hove to for weather" for his passage once the wind's
-  mean stands under `gale_over_kn` ten minutes. He is then refused his course ("She is hove to;
-  fill away before giving her a course.") every minute until the lie a-try he ordered is done, and
-  then fills away from it. This is the doctrine's band, and the `fill away` twice of package 122.
-- The sails bent again after a shift are furled. Whether they are set is the captain's sail
-  work, as after any bending.
+- **A stand-down's save is named** `freesail-seed<seed>-tick<tick>.json` by the desk, and overwrites
+  a save of that name: two stand-downs at one tick write one file, and an earlier file of the same
+  name is lost. The naming is the desk's and older than this package; the end now names what the
+  seats record they wrote.
+
+## 7. Held for a later pass
+
+The captain's spar work (clearing a wreck, shifting a spar for a spare, a jury mast, bending and
+setting again) and the `lie a-try` mend for a ship with no topsail to lie under, with their truths,
+figures and report, are kept on a branch of the builder's own (the second pass's hash 1f0cfa9, in
+this branch's history) for the third pass the lead has listed, on the trunk as it then stands.
