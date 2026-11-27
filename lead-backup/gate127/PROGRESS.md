@@ -7,3 +7,9 @@
 - 7-153 window: 27 probes x2 trees (3 seeds x 9 offsets)
 - FINDING D1: countermand inside `shorten sail` said in routine group line (59 main cases) or not at all (5 bilander cases)
 - FINDING D2: "She gathers headway" is notable (declared routine)
+- PART TWO 1: whole-trace on OLD/NEW of truth 77 (2 worlds), 5b thick, trial gale, trial trade thick: state hashes identical at every 60 s (2160+2880+960+1200+1200), lines = declared kinds
+- NEW tests --slow: 235 passed, 0 skipped (27 min)
+- seat probe: 18 ships x (509-510 served items + 75 orders): served differ 18 (catalogue fill_away template, R3); orders differ 93 (R1 waits/trim, R4, and FINDING D3: signal hands-wait notable line dropped)
+- mutants: 16 of package code + 7 convoy; survivors M14 (killed by captain-trial digests), C02/C06 (wrong feature; all evading transitions removed kills 7-153)
+- 7-153 window measured: passes for nearer 0.05..0.15 nm at seed 7 only
+- FINDING D4: 108 of 590 turn-wait lines name the same work twice ("'Brace the fore yard' will follow 'brace the fore yard'")
