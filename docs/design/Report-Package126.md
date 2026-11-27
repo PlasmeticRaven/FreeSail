@@ -255,8 +255,8 @@ by any road, and older than this package; the trunk's 17 were those of a ship sa
 **No pin moved** (`docs/dev/TuningNotes.md`, "Package 126"). The tiers on the build's hash are in
 the build report.
 
-**Today's ships, old beside new.** I ran the trunk at 41d1d1bc and this branch merged with it, in
-the same orders at seed 7, under the game's own captain:
+**Today's ships, old beside new** (the second pass's hash beside the trunk at ba51f24e). The same
+orders at seed 7 under the game's own captain:
 
 - every ship file (the thirteen ships and the five boats);
 - four cases: a gale abeam and a gale close-hauled (bound for Falmouth from 48 40 N 5 05 W, the
@@ -270,27 +270,21 @@ the same orders at seed 7, under the game's own captain:
 | gale abeam | 17 of 18 | the smack: she heaves to at the gale's line, the order said with its reason, and drifts at under two knots, where `lie a-try` was refused and she sailed on at 7 to 9 knots |
 | gale close-hauled | 17 of 18 | the smack, the same |
 | cruise | 18 of 18 | none |
-| June off Falmouth | none of 18 | the fog's coming and going (§2), on every file |
+| June off Falmouth | none of 18 | the fog's coming and going (§2, §7 B), on every file |
 
 In the June fog runs:
 
 - **The five boats** differ in the weather's lines alone; their end states are the same.
 - **The thirteen ships** under way differ in the fog's lines and in what hangs on its minutes: the
-  captain's fog signals ceased when it clears ("ceasing the fog signals (the weather clear)"), the
-  courses shaped and the allowances for the tide at the next minute, the log hove, the trims. From
-  there their positions differ by a few cables at the end of the six hours; one, the bilander, is
-  on passage at the end where she was beating.
+  captain's fog signals and their ceasing, the courses shaped and the tide's allowance at the next
+  minute, the log hove, the trims. From there their positions differ by a few cables at the end of
+  the six hours.
 
 ***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
-seat): it differs by the spar work.
-
-- **The Renard, struck,** clears the wreck of her square-sail yard (6,780), shifts it for her spare
-  yard (7,380) and bends her square sail again (8,160). These are lines of her own log; a player
-  learns them only as the lookout sees her.
-- **The Sherbourne** chases her to take possession, and from 7,140 the chase's lines differ as the
-  Renard drifts otherwise (one order of `heave to` refused at 7,140 in place of the one at 6,900; the
-  chase's bearings). The log ends at 620 lines where it ended at 629, and the Sherbourne's spars at
-  the end are the same three carried away.
+seat): **the same**, line for line (629 lines in the Sherbourne's log on both). Struck, the Renard
+does no spar work. The Sherbourne's carried-away spars are her square-sail yard (a lower yard, for
+which a spare topsail yard does not answer) and her topgallant mast (no spare), with its yard, so
+nothing is shifted. At the first pass the struck Renard had shifted her square-sail yard.
 
 **What a player or a model's seat is served that differs** (every such line, by kind):
 
@@ -302,10 +296,12 @@ seat): it differs by the spar work.
 - **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
   and the captain's orders that hang on them.
 - **The captain's orders of spar work** ("clearing away the wreck of the ...", "shifting the ...",
-  "rigging a jury mast", "bending the ..."), and their evolutions' lines.
+  "rigging a jury mast", "bending the ...", "setting the ... (bent again to its spar)"), their
+  evolutions' lines, and the belay of that work by a manoeuvre ("Belayed shifting the ...: ...").
 - **The smack's gale order:** "heaving to (no topsail set to lie a-try under)", where it was a
   refusal of `lie a-try`.
 - **The harbour's page and state:** the end's button and words, and `games` in the state.
+- **The primer's chapter 1 and the README:** one sentence each on ending a game (§7 C).
 
 Nothing else moved.
 
