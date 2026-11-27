@@ -169,6 +169,20 @@ def test_truth_7_792_a_passage_laid_again_reads_its_tiles_from_the_cache_and_lay
         (leg.kind, leg.words, leg.position) for leg in first
     ]
     assert len(loads) > 16  # the passage reads more tiles than sixteen
+    # the least lately read is let go: of two kept, the one read again stays
+    level = w.chart.levels[1]
+    first_three = sorted(level.paths)[:3]
+    keys = [tuple(int(x) for x in name.split("_")) for name in first_three]
+    level.cache_size = 2
+    level._cache.clear()
+    level._order.clear()
+    for key in (keys[0], keys[1], keys[0], keys[2]):
+        level.tile(*key)
+    del loads[:]
+    level.tile(*keys[0])
+    assert loads == []  # read again, kept
+    level.tile(*keys[1])
+    assert len(loads) == 1  # the least lately read, let go
 
 
 def _owners_sea(tmp_path: Path):

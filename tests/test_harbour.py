@@ -2699,6 +2699,9 @@ def test_truth_7_798_the_first_action_begun_in_the_harbour_and_saved_a_prisoner_
     sys.path.insert(0, str(ROOT / "tools"))
     import checkpoint_holders as H
 
+    # the world the server is made with keeps the place as words, as each game begun after
+    assert isinstance(port.records, Path)
+    assert isinstance(port.driver.world.consent_records_dir, str)
     begun = client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
     assert begun.status_code == 200, begun.text
     d = port.driver
