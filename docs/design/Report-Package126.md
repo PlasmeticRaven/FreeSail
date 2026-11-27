@@ -232,8 +232,9 @@ readings in a fog.
 
 **No pin moved** (`docs/dev/TuningNotes.md`, "Package 126, part one").
 
-**Today's ships, old beside new** (this hash's code beside the trunk at 64fcc565, whose code is that
-of ba51f24e, where the old runs were made). The same orders at seed 7 under the game's own captain:
+**Today's ships, old beside new** (this hash's code beside the trunk at f2821c7b, package 127's
+words and waits merged; measured again on it, the figures the same as beside the trunk before it
+at 64fcc565). The same orders at seed 7 under the game's own captain:
 
 - every ship file (the thirteen ships and the five boats);
 - four cases: a gale abeam and a gale close-hauled (bound for Falmouth from 48 40 N 5 05 W, the
@@ -260,7 +261,8 @@ Every case with no fog in it is the trunk's, line for line. In the June fog runs
   the log hove, the trims. They end 0.5 to 6.3 cables from the trunk's (the cutter the most).
 
 ***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
-seat): **the same**, line for line (629 lines in the Sherbourne's log on both).
+seat): **the same**, line for line (633 lines in the Sherbourne's log on both; 629 before package
+127).
 
 **What a player or a model's seat is served that differs** (every such line, by kind):
 
@@ -271,6 +273,13 @@ seat): **the same**, line for line (629 lines in the Sherbourne's log on both).
   hour's ("Hazy, fog; ..."), and the reading of the visibility ("a few miles", "a mile").
 - **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
   and the captain's orders that hang on them.
+- **Package 127's wait lines where that work queues** (`evolution.waiting`, routine): in a fog the
+  captain heaves the lead and trims at other minutes, so its waits fall at other minutes too, as
+  "'Heave the lead' will follow the same work, which the hands are still ..." (each boat, three
+  more in the six hours) and "Not hands enough on deck to trim the jib; the watch is bracing the
+  ..." (the cutter, twelve more). They are 127's lines as it says them; the fog only moves the
+  work they wait behind. No test counts them in a fog, and the recorded passages' digests hold
+  as the trunk records them (the fast tier).
 - **The fog's lifting into other weather:** "The fog lifted. <the weather's line>".
 - **The harbour's page and state:** the end's button and words (with the ship's time and its day),
   and `games` in the state.
