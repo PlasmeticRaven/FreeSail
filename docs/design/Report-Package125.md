@@ -1,6 +1,6 @@
 # Package 125: the moment of the haul (report)
 
-The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. On the lead's list of 2026-11-27 E is taken out (§6), and the trunk at f2821c7 (package 127) is merged in; on the lead's second list of that day (the read of a8b2c3e, §11) the trunk at f09fe283 (package 126's part one) is merged in and D is mended. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
+The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. On the lead's list of 2026-11-27 E is taken out (§6), and the trunk at f2821c7 (package 127) is merged in; on the lead's second list of that day (the read of a8b2c3e, §11) the trunk at f09fe283 (package 126's part one) is merged in and D is mended; on the lead's ruling on rule A that evening (§12), A acts only for a ship whose file says she is slack in stays, and none of today's does. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
 
 Every measure is at seed 7, made with the truths' own helpers (`close_hauled_on_starboard`: the wind from the north, no gusts, plain sail set and braced up). Tacks are from 290, 292.5 and 295 degrees, in 8, 12, 15, 20 and 25 knots. "Shortened" means the game's own `shorten sail` run to its end, then sixty seconds, then the helm put down. **S**n means stayed in n seconds; **m** means missed stays; **F** means refused; **·** means no end in 900 s.
 
@@ -336,3 +336,33 @@ The comment at the head of package 125's truths names no captain's rule now.
 - That tack's line is true. Under `keep her full and by` the cutter in 20 kn pinches up, is taken aback at 58 s, and the helm boxes her off at 231 s. Through the wind aft she is worn round on to the larboard tack.
 - `tack ship` then finds her on the larboard tack: heading 070, the wind on her larboard bow, at "helm's a-lee". She comes through the wind at 49 s and ends on the starboard tack. The matrix's "old tack" is the tack she was settled on, not the one she was on when the order came.
 - **The false line is the box-off's,** "Boxed her off; braced sharp up on the starboard tack, full and by.", said while she lies on the larboard tack. `BoxOffScript.words` names the tack she was on when the box-off began (`self.sign`), and a box-off that wears her round ends on the other. It is not C's few lines, so it is carried to the lead and not mended.
+
+## 12. The lead's ruling on rule A (2026-11-27): the moment of the haul a habit of the ship
+
+**The ruling.** At the point a slack ship and a gust-checked one cannot be told apart by her way, her swing or the wind (§11, item 1); they part only after the haul. That is a thing of the ship, her mass against her after yards, which her people know of her. So the second moment is said in her file.
+
+**Built.**
+- `ship.slack_in_stays` in the ship file's `ship:` section, read through the schema (`ShipSpec.slack_in_stays`): absent or false by default; true or false only, anything else refused in words ("'ship.slack_in_stays' is 'yes', which is not true or false."). Left out of the pickle while false, so a checkpoint of any of today's ships is as before. Its comment names the phrase (Falconer's Marine Dictionary, "Slack": slow in going about) and Luce 1884 p. 417.
+- `TackScript._time_to_haul`: a ship without the habit is hauled at the point, whatever her way, as on the trunk. A ship with it is hauled as §2.2 built: at the point while she keeps two fifths of her way, else with the wind ahead, and in any case once through the wind.
+- The reading `the ship` (`readings.ship_words`) says it in one line after her class, where the habit is set: "She is slack in stays: when her way is gone in going about, the after yards are hauled with the wind ahead, not a point on the bow." No reading said anything of a ship's handling before; this is the one that tells of the ship.
+- No ship file and not `tools/gen_ships.py`: no ship of today's eighteen sets it. The ships' session sets it for the corvette through the generator when she joins.
+
+**Today's eighteen are unmoved by A** (the reader's `tackmx.py`, 1,512 cells with the default gusts; old is the trunk at f09fe283; the reader's `tmxrule.py`): 25 cells differ from the trunk, and none by A.
+- C: 12 (the brig 8, the merchant brig 4), each a trunk "Tacked" lying on her old tack, now "Missed stays", as in §11.
+- D: 13, all shortened, as in §11 (the frigate 25 kn seed 11, 3; the brig 30 kn seed 7, 4; the hermaphrodite brig 30 kn seed 11, 3; the razee 30 kn seed 11, 3).
+- A: 0. The 65 cells A moved on bd4fa9e4 (the hermaphrodite brig's 51, the schooners' 2, item 1's 12) are the trunk's again.
+- Made (round at the end and at +300 s, the reader's measure): 786 of 1,512 against the trunk's 780, no tack lost. The six gained are D's: the brig 30 kn seed 7 shortened from 292.5, 295 and full and by (refused on the trunk), and the frigate 25 kn seed 11 shortened from every heading (round at +300 s now). The razee's and the hermaphrodite brig's D cells change between refusals and misses.
+
+**Served:** the reader's `seat.py` on bd4fa9e4 beside this hash, every ship at the officer's station: 9,168 served items and 1,350 orders' answers, none differing.
+
+**The truths of A, moved and new.**
+- 7-763 now reads both moments and a ship without the habit: the frigate in 15 kn hauls at the point (0.53 of her way); the hermaphrodite brig as her file has her (0.16) hauls at the point too, her head 8 to 11.25 degrees off; with the habit set on her in memory she hauls with the wind ahead. A mutant that makes every ship slack fails the second case, and one that makes none fails the third; both are killed by this fast test.
+- 7-763b: the line in `the ship` with the habit set, none without.
+- `tests/test_ship_loader.py`: the key's default, its refusal of 'yes', 1 and null, the pickle, and no ship of the eighteen setting it.
+- The hermaphrodite brig's rows of the fleet tables (7-761 and 7-762) are measured on the trunk's haul again (TuningNotes gives every band old beside new). The schooners' rows stand: their seconds are within one or two of the trunk's.
+
+**What the habit costs and gains, by this package's measure, for whoever sets it for a ship:**
+- The light corvette, set slack: plain sail 7 to 13 of 15 tacks, staying in 20 and 25 kn from every heading (220 to 273 s); some of her 12 and 15 kn tacks are slower, 208 to 341 s against 184 to 238 on the trunk (§2.3, §2.4).
+- The hermaphrodite brig, had she been set slack: plain 8 kn 411/405/397 to 300/296/291 s and 12 kn 267/266/263 to 198/198/196, quicker; shortened 20 kn 138/150/149 to 186/185/183 s, slower.
+- Had it been every ship's habit (the rule as built on bd4fa9e4, in gusts): the 74 and the 64 a minute to four slower in five cells (the 74 25 kn s11 from 295 shortened, 237 to 312 s; the 64 25 kn s11 from 295 shortened, 242 to 308 s; the 64 30 kn s11 from 292.5 shortened, 227 to 285 s; the 74 30 kn s7 full and by, 250 to 264 s plain and 288 to 549 s shortened), the frigate 24 s slower in one (30 kn s11 from 290 shortened, 200 to 224 s), and the 64's missed tack in 30 kn s7 full and by, plain, made in 255 s.
+- A ship whose after yards swing her through when hauled at the point (the 74, the 64) loses by it; a light one whose swung yards turn her back (the corvette) gains.

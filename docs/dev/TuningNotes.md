@@ -40107,3 +40107,15 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - D's 7 cells in 260 of `dprobe.py`, all close-hauled (none abeam);
   - the reader's passages and the lee-shore trial: identical; four beats by A and C.
 - **Carried, not mended:** the box-off's end line names the tack she was on when it began. A box-off that wears her round, as `keep her full and by`'s does for the cutter and the schooners in 20 to 30 kn, says "braced sharp up on the starboard tack" while she lies on the larboard tack. The tack after it is true (the report's §11, item 6).
+
+**The lead's ruling on rule A (2026-11-27): the haul with the wind ahead is a habit of the ship, said in her file.** The report's §12.
+- **Built:** `ship.slack_in_stays` (schema; false by default; true or false, else refused). `TackScript._time_to_haul` reads `HAUL_WAY_FRACTION` and `WIND_AHEAD_RAD` only for a ship with it; every other ship is hauled at the point, as on the trunk. The reading `the ship` says the habit in one line where it is set. No ship file sets it, and no figure moved.
+- **What moves:** nothing of today's eighteen by A. The tack matrix differs from the trunk in 25 cells, C's 12 and D's 13 (786 made against 780, the six D's). The seat's comparison against bd4fa9e4: 9,168 items and 1,350 answers, none differing.
+- **Pins moved, old beside new** (the hermaphrodite brig hauled at the point again: her bands from her trunk seconds, less and more thirty, to the ten):
+  - truth 7-761, plain: 8 kn (260, 330) -> (360, 450); 12 kn (160, 230) -> (230, 300); 20 kn (150, 220) -> (140, 210); 25 kn (130, 210) -> (130, 200); 15 kn stands at (150, 230).
+  - truth 7-762, shortened: 20 kn (150, 220) -> (100, 180); 25 kn (130, 200) -> (120, 200).
+  - truth 7-763: was "the hermaphrodite brig (no habit) hauls with the wind ahead"; it now hauls at the point as her file has her (8 to 11.25 degrees off), and with the habit set in memory, with the wind ahead. Renamed `..._a_ship_known_slack_in_stays_hauls_with_the_wind_ahead_any_other_at_the_point`.
+  - truths 7-760 and 7-761: their docstrings only.
+- **New pins:** truth 7-763b (the line in `the ship`); `tests/test_ship_loader.py::test_slack_in_stays_is_a_habit_her_file_may_give_false_by_default_and_refused_else`. The mutants "every ship slack" and "no ship slack" each fail 7-763, in the fast tier.
+- **For whoever sets the key:** the report's §12 gives the trade by this package's measure (the corvette 7 to 13 of 15; the 74 and the 64 one to four minutes slower in five cells had it been every ship's).
+- **Truth numbers:** the truths 7-768 and 7-769 are D's (the storm canvas's jib, and the bilander's jib). Rule E's truths of those numbers (the captain and a straining topgallant yard) never joined the trunk; E was taken out of this package before its first merge, and nothing anywhere carries them.
