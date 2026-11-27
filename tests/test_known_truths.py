@@ -24004,18 +24004,20 @@ def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
 # "Package 125")
 # ---------------------------------------------------------------------------
 
-# The fleet's tacks by ship and wind, measured at seed 7 by the truths' own helpers (the wind
-# from the north, no gusts): for each committed ship that tacks under the truths' settle, the
-# headings from which she stays (of 290, 292.5 and 295), the band her stays fall in (the
-# measured times less and more thirty seconds, to the ten; JUDGEMENT, a band and not the
-# seconds), and the count she made on the trunk before this package, by what she did (the
-# brig's two 20-knot tacks that fell back on her old tack and were logged "Tacked" are not
-# counted). The merchant brig, the bilander and the smack are not in it: under the truths'
-# settle their tacks never begin (the first two's small watch still setting their sail, the
-# smack not close-hauled for the runner at these headings; the report's §3). Since the lead's
-# ruling on rule A (2026-11-27) no ship of these is slack in stays by her file, and every one is
-# hauled at the point as on the trunk: the hermaphrodite brig's rows are measured so (the report's
-# §12). Under plain sail:
+# The fleet's tacks by ship and wind, measured at seed 7 by the truths' own helpers (the wind from
+# the north, no gusts): for each committed ship that tacks under the truths' settle, the headings
+# from which she stays (of 290, 292.5 and 295), the band her stays fall in (the measured times less
+# and more thirty seconds, to the ten; JUDGEMENT, a band and not the seconds), and the count she
+# made on the trunk before this package, by what she did (the brig's two 20-knot tacks that fell
+# back on her old tack and were logged "Tacked" are not counted). The corvette (the Diana, joined
+# after the rest) measured so on the trunk at 939de7d6 and on this package's tree: her plain rows
+# are alike on both (7 of 15, her own truth E), and shortened in 25 knots she made 1 on the trunk
+# (from 290, 216 s) and makes 3 with her jib kept (184 to 189 s; `tests/test_diana.py`). The
+# merchant brig, the bilander and the smack are not in it: under the truths' settle their tacks
+# never begin (the first two's small watch still setting their sail, the smack not close-hauled for
+# the runner at these headings; the report's §3). Since the lead's ruling on rule A (2026-11-27) no
+# ship of these is slack in stays by her file, and every one is hauled at the point as on the trunk:
+# the hermaphrodite brig's rows are measured so (the report's §12). Under plain sail:
 FLEET_PLAIN = {
     ("brig", 8): ((290.0, 292.5, 295.0), (130, 460), 3),
     ("brig", 12): ((290.0, 292.5, 295.0), (340, 440), 3),
@@ -24027,6 +24029,11 @@ FLEET_PLAIN = {
     ("cutter", 15): ((290.0, 292.5, 295.0), (70, 140), 3),
     ("cutter", 20): ((290.0, 292.5, 295.0), (140, 210), 3),
     ("cutter", 25): ((290.0, 292.5, 295.0), (190, 290), 3),
+    ("corvette-20", 8): ((290.0,), (320, 390), 1),
+    ("corvette-20", 12): ((290.0, 292.5, 295.0), (150, 220), 3),
+    ("corvette-20", 15): ((290.0, 292.5, 295.0), (200, 270), 3),
+    ("corvette-20", 20): ((), None, 0),
+    ("corvette-20", 25): ((), None, 0),
     ("frigate-36", 8): ((290.0, 292.5, 295.0), (200, 270), 3),
     ("frigate-36", 12): ((290.0, 292.5, 295.0), (140, 360), 3),
     ("frigate-36", 15): ((290.0, 292.5, 295.0), (310, 480), 3),
@@ -24075,6 +24082,8 @@ FLEET_SHORTENED = {
     ("brig", 25): ((290.0, 292.5, 295.0), (400, 500), 3),
     ("cutter", 20): ((290.0, 292.5, 295.0), (60, 140), 3),
     ("cutter", 25): ((290.0, 292.5, 295.0), (70, 140), 3),
+    ("corvette-20", 20): ((290.0, 292.5, 295.0), (140, 220), 3),
+    ("corvette-20", 25): ((290.0, 292.5, 295.0), (150, 220), 1),  # her jib kept (D)
     ("frigate-36", 20): ((290.0, 292.5, 295.0), (220, 300), 3),
     ("frigate-36", 25): ((290.0, 292.5, 295.0), (170, 340), 3),
     ("hermaphrodite-brig", 20): ((290.0, 292.5, 295.0), (100, 180), 3),

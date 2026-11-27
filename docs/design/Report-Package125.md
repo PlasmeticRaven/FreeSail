@@ -366,3 +366,17 @@ The comment at the head of package 125's truths names no captain's rule now.
 - The hermaphrodite brig, had she been set slack: plain 8 kn 411/405/397 to 300/296/291 s and 12 kn 267/266/263 to 198/198/196, quicker; shortened 20 kn 138/150/149 to 186/185/183 s, slower.
 - Had it been every ship's habit (the rule as built on bd4fa9e4, in gusts): the 74 and the 64 a minute to four slower in five cells (the 74 25 kn s11 from 295 shortened, 237 to 312 s; the 64 25 kn s11 from 295 shortened, 242 to 308 s; the 64 30 kn s11 from 292.5 shortened, 227 to 285 s; the 74 30 kn s7 full and by, 250 to 264 s plain and 288 to 549 s shortened), the frigate 24 s slower in one (30 kn s11 from 290 shortened, 200 to 224 s), and the 64's missed tack in 30 kn s7 full and by, plain, made in 255 s.
 - A ship whose after yards swing her through when hauled at the point (the 74, the 64) loses by it; a light one whose swung yards turn her back (the corvette) gains.
+
+## 13. The corvette joins (trunk 939de7d6): what D does for her
+
+The corvette (`corvette-20`, the Diana) is the ship D was first measured for: a light ship with the least rudder of any. Merged with her in, three of her 59 tests fail, all of them truth E's "she gripes without her jib" shortened in 25 kn, at all three headings. The game's own `shorten sail` now leaves her jib on her there. Nothing else of hers moves: not by A (her `slack_in_stays` is unset) and not by C.
+
+| | trunk 939de7d6 | this package |
+|---|---|---|
+| plain sail, 8 to 25 kn | 7 of 15 | 7 of 15, the same seconds |
+| shortened, 20 kn | 3 of 3, jib kept, 186 to 193 s | the same |
+| shortened, 25 kn | jib taken in; stays from 290 alone (235 s); gripes 30 to 62 off under 2.5 kn from 292.5 and 295 | jib left on her at 0.75 of its rating; 65 to 70 off at 6.9 to 8.1 kn with 0.4 to 2 degrees of helm; stays 3 of 3, 203 to 208 s |
+| 25 kn, the jib then taken in by order | (as the row above) | gripes: stays from 290 (233 s), misses from 292.5 (62 off, 4.9 kn), refused from 295 (39 off, 1.0 kn) |
+| 25 kn, `set the jib` after | obeyed; 3 of 3, 184 to 189 s, jib 0.68 to 0.78 | obeyed; 3 of 3, 184 to 187 s, jib 0.67 to 0.70 |
+
+The pins moved are in `docs/dev/TuningNotes.md` ("the corvette's pins moved by D"), old beside new. Her rows are added to truths 7-761 and 7-762. Her ship file, her generator, her design note and her report are untouched. When the ships' session sets her `slack_in_stays`, A acts on her plain-sail tacks in 20 and 25 kn (§12's trade). D acts on her shortened sail whatever A does.

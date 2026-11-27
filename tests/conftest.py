@@ -134,6 +134,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
             for s in (
                 "brig",
                 "cutter",
+                "corvette-20",
                 "frigate-36",
                 "hermaphrodite-brig",
                 "lugger",
