@@ -2986,7 +2986,7 @@ Nothing else moved in any case: every other reply and line is the same.
 - **On 801c309:** the main yard is warned dire "lying on the mast; she will carry it away" as it passes 1.5 again.
 - **With the line removed:** the test fails, the yard warned "working" alone.
 
-**2. Carried fault 24, the ships' class words** (`readings.ship_class_words`), mended at the cause for every file. **Words alone:** nothing a ship does moves. It is the reading's few lines: 22 in `ship_class_words`, and 4 in `ship_words`.
+**2. Carried fault 24, the ships' class words** (`readings.ship_class_words`), mended at the cause for every file. **Words alone:** nothing a ship does moves. It is the reading's few lines: in `readings.py`, 25 in and 9 out with the docstring and comments, about 15 of them code, in `ship_class_words` and `ship_words`.
 - **Her name is taken out with the "HMS" that goes with it.** Before, only her name went, and "HMS" was left at the head.
 - **Only a leading article is made small**, where any leading capital was ("hMS"). A class that opens with a word of its own keeps it and is given its article: "a Spanish xebec ..." (no committed file has one).
 - **A first clause naming her and her state, and no class, is read past to her class:**
