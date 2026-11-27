@@ -67,11 +67,13 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
 
-Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19, 20, 21 and 22 are not yet placed (22 is for the ships' session and a later package of the physics).
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19, 20, 21, 22 and 23 are not yet placed (22 is for the ships' session and a later package of the physics).
 
 21. The saves a stand-down writes are named by seed and tick, and two written at one tick overwrite one another (found by package 126's builder; the desk's naming, older than the package).
 
 22. **A wreck left hanging helps some hulls** (found by package 126's builder, 27 November, measuring the captain's spar work against the trunk). A wrecked sail gives no drive, but its windage and its spars' count three times over (`physics.sails`), and the wreck does her no harm: a topmast's wreck forward pays her off like a head sail. With the wreck cleared at the moment it falls, no hands and no time spent, the trunk's own captain makes less in seven of twenty-eight passages than with it left hanging (the 74 in 20 knots rising to 38: 0.8 miles made good against 9.6; the bilander in the same: 2.3 against 8.9), and more in the rest (the merchant brig in the rising wind 9.1 against -5.5). Nothing of the physics is changed by package 126; the captain clears a wreck as a seaman would, by the lead's ruling (section 7).
+
+23. The box off's own line can name the wrong tack: "Boxed her off; braced sharp up on the starboard tack, full and by." said with her lying on the larboard tack, after `keep her full and by` and a box off had worn her round (the cutter and both schooners in 20 to 30 knots; found by the lead's reader of package 125 and traced by its builder, 27 November; older than the package).
 
 ## 5. Booked by the owner or the lead, not launched
 
@@ -100,6 +102,9 @@ Each was told to him when it was made and is in the records of its package.
 - Milestone 7's merges over a reader's NOT PASS by the rule of the lateen hulls' list (package 90: a lateen-only fault is owed in full before any lateen hull's file joins).
 - In package 125, the rule that every captain takes in topgallants when a topgallant yard strains was built at the lead's ruling and then taken out by him: in the lee-shore trial it left her four miles further to leeward and filled her away into a gale two miles from the land. It is kept on the builder's branch with its cause.
 - The game's own captain clears a wreck as soon as he has hands for it, and does not leave it hanging where the physics makes it serve her (package 126's part two; fault 22 of section 4): so his spar work is measured against the trunk where clearing is no loss, and against the wreck cleared at once where it is.
+- The moment of the tack's "mainsail haul" is a habit of the ship, said in her file (package 125): a ship filed as slack in stays has her after yards hauled with the wind ahead when her way is gone, every other ship at the point as before. The builder showed that the slack ship and the gust-checked one cannot be told apart before the haul, and that the rule given to every ship cost the 74 and the 64 a minute to four in five cells of fifteen hundred; no ship of today's sets it, and the ships' session sets it for the *Diana*.
+- In heavy or worsening weather the game's own captain does no work on a spar, the clearing of a wreck with it, until she lies to; and where a ship with no topsail to lie under will not heave to in a gale after two tries, he gives her her course again as the trunk's captain does (package 126's part two).
+- A player's own spar work gives way to a later order of his that is short of hands, and is taken up again after (package 126's part two).
 
 ## 8. Waiting on a decision of the owner's
 
