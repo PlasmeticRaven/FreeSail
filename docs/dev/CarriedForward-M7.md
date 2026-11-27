@@ -112,6 +112,7 @@ Each was told to him when it was made and is in the records of its package. **On
 - In heavy or worsening weather the game's own captain does no work on a spar, the clearing of a wreck with it, until she lies to;; a ship with no topsail to lie under is given `heave to` (package 126's part two). Giving her her course again after two failed tries was built and did not restore her, so it was left out and the case is carried (fault 25).
 - A player's own spar work gives way to a later order of his that is short of hands, and is taken up again after (package 126's part two).
 - Package 126's part two was merged over its reader's "not pass" on one finding: the cutter, in a steady gale from the start, is brought to nineteen minutes later than the trunk's, having first taken in the light topsail the trunk's cutter lay under and lost; she ends hove to with her sail whole where the trunk's ends sailing on.
+- A ship with no spare of the spar she has lost sails on without it until a yard refits her: the *Renard*'s captain clears the wreck, says there is no spare topgallant mast aboard, and keeps her one spare topmast for the loss of her topmast. **The owner, 27 November: "I am OK with leaving it (as recommended)".** A spar made aboard from another or from rough timber is the carpenter's work, wanted with the damage control and jury work of the proposal's section on seamanship, not placed.
 
 ## 8. Waiting on a decision of the owner's
 

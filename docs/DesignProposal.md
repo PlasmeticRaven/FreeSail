@@ -485,7 +485,7 @@ Initial "must have" list, all of which are parts or evolutions:
 - **Sail handling depth**: reefing by band; close-reefed topsails; goose-winging; backing and filling; scandalising the driver; a sail "in the gear".
 - **Manoeuvres**: tacking, wearing, boxhauling, club-hauling, heaving to, lying a-try, scudding, backing the main topsail to hold station, wearing under bare poles.
 - **Ground tackle and harbour work**: bower and kedge anchors, catting and fishing, warping, kedging off, springs on the cable, mooring, towing with the boats, sweeps for small vessels.
-- **Damage control and jury work**: fothering a sail over a leak, fishing a sprung spar, jury masts from spare spars, cutting away a mast, preventer braces and backstays, chain slings in action.
+- **Damage control and jury work**: fothering a sail over a leak, fishing a sprung spar, jury masts from spare spars, a spar made aboard from another or from rough timber (a spare topmast cut down, a studding-sail boom for a light yard), cutting away a mast, preventer braces and backstays, chain slings in action.
 - **Navigation**: chip log, lead line with arming, dead reckoning, noon latitude, and as options the chronometer and lunar distance.
 - **Signals**: flag hoists with a codebook, guns, lights, and the private signal.
 - **Gunnery**: shot types, double-shotting, elevation for the roll, dismasting tactics.
