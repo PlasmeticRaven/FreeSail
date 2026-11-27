@@ -40086,3 +40086,24 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - The old-tack pin's tick count is exact (301 and the squaring's 51).
   - The in-irons pin has the whole line, the urgency and the fell-off.
 - The moved trial pin was measured after that reading. It is gone with E. The lead's reader read the hash 28375be and found the lee-shore trial's cause, and the merchant brig's and the schooners' cells undeclared; all three are declared in the report.
+
+**The lead's second list of 2026-11-27 (the read of a8b2c3e).** The trunk at f09fe283 is merged (package 126's part one; TuningNotes kept both sections). Measured with the reader's harness and default gusts; old is f09fe283. Every figure is in the report's §11.
+- **No new figure.** `HELM_IN_HAND_SHARE`, `HAUL_WAY_FRACTION` and `WIND_AHEAD_RAD` stand.
+  - A in a gust: no reading of "slack in stays" was found that tells the corvette from the 74 and the 64 checked in 25 to 30 kn. Twelve cells change undeclared on a8b2c3e; they are declared in the report's §11 and left for the lead to rule.
+- **Built (D):**
+  - A jib `shorten sail` leaves on her is marked (`storm.KEPT`, in `ship.extra`, forgotten once a tick when it is no longer set, `storm.forget_kept_jibs` from the runner). The next `shorten sail` takes it in, loaded or not.
+  - The reply adds "It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'."
+  - Its strain line (words only, in `physics/strain.py`; no load, ratio or rate read differently) ends ": take in the jib." and is said alone.
+  - The captain's `_head_sails_straining` takes a kept jib in at either of its strain lines in any wind.
+  - A jib the storm canvas will take in or shift is not kept, and its own take-in line stands (`storm.shortening_plan`, `storm.replaced_by_storm_canvas`).
+- **Pins moved, old beside new:** one, this package's own truth 7-766. Its reply assertion was "The jib is left on her: she gripes, and her helm will not hold her without it." in the text; it is now that line, then "It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'.", then the order's "Not done:".
+- **New pins:**
+  - truths 7-767b, 7-768 (the schooner abeam in 40 kn) and 7-769 (the bilander's jib, which kills the `HELM_IN_HAND_SHARE = 0` mutant). The numbers 7-768 and 7-769 were E's, which was never merged.
+  - `tests/test_evolutions.py::test_a_tack_ended_within_two_points_of_the_wind_either_side_is_in_irons` (the in-irons bound).
+  - `tests/test_captains.py::test_a_jib_kept_at_its_limit_is_taken_in_at_its_first_strain_whatever_the_wind`.
+  - `..._taken_in_by_the_captain_before_it_goes`, four hours in rising wind, in the slow tier.
+- **What moves:**
+  - the tack matrix: 90 of 1,512 cells, no tack lost (787 against 780);
+  - D's 7 cells in 260 of `dprobe.py`, all close-hauled (none abeam);
+  - the reader's passages and the lee-shore trial: identical; four beats by A and C.
+- **Carried, not mended:** the box-off's end line names the tack she was on when it began. A box-off that wears her round, as `keep her full and by`'s does for the cutter and the schooners in 20 to 30 kn, says "braced sharp up on the starboard tack" while she lies on the larboard tack. The tack after it is true (the report's §11, item 6).

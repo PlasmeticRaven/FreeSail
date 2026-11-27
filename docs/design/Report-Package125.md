@@ -1,6 +1,6 @@
 # Package 125: the moment of the haul (report)
 
-The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. On the lead's list of 2026-11-27 E is taken out (§6), and the trunk at f2821c7 (package 127) is merged in. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
+The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. On the lead's list of 2026-11-27 E is taken out (§6), and the trunk at f2821c7 (package 127) is merged in; on the lead's second list of that day (the read of a8b2c3e, §11) the trunk at f09fe283 (package 126's part one) is merged in and D is mended. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
 
 Every measure is at seed 7, made with the truths' own helpers (`close_hauled_on_starboard`: the wind from the north, no gusts, plain sail set and braced up). Tacks are from 290, 292.5 and 295 degrees, in 8, 12, 15, 20 and 25 knots. "Shortened" means the game's own `shorten sail` run to its end, then sixty seconds, then the helm put down. **S**n means stayed in n seconds; **m** means missed stays; **F** means refused; **·** means no end in 900 s.
 
@@ -134,12 +134,13 @@ Closed, nothing built (the lead's ruling).
 - **The rule** (`storm.loaded_jibs`, `storm.helm_without`):
   - her helm as she carries it, plus the jib's yaw moment about her centre of lateral resistance, taken over by her rudder at her present way (`physics.hull.rudder_forces`, read and not changed);
   - where that would be more than `HELM_IN_HAND_SHARE` (a quarter) of her rudder's travel, and the jib is under its whole rating, the jib is left set;
-  - it is said in the order's reply, and so in the log: "The jib is left on her: she gripes, and her helm will not hold her without it.";
+  - it is said in the order's reply, and so in the log: "The jib is left on her: she gripes, and her helm will not hold her without it. It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'." (§11, item 2);
   - a kept jib is not a "strained" head sail for the storm staysails clause. On the trunk the storm staysails, set in its place, would take that very jib in, and the spanker with it.
-- **When the kept jib passes its rating:**
-  - the strain model warns of it ("straining at the bolt-ropes"), and it blows out for certain at 1.8 of its rating;
-  - `shorten sail` given again takes it in (truth 7-767);
-  - the game's own captain takes it in over `shorten_sail_kn` (`_head_sails_straining`, as before).
+- **When the kept jib passes its rating** (§11, item 2):
+  - it is kept once (`storm.KEPT`): the next `shorten sail` takes it in, loaded or not (truth 7-767b);
+  - its strain's line names the order that eases it: "Jib straining at the bolt-ropes: take in the jib." (and "stretched drum-tight; it will not stand much more: take in the jib."), said alone; it blows out for certain at 1.8 of its rating;
+  - the game's own captain takes it in at its first strain's line in any wind (`_head_sails_straining`), and his own next `shorten sail` takes it in too;
+  - a jib the storm canvas will take in or shift (`storm.replaced_by_storm_canvas`) is not kept at all: its own take-in line stands, as before (truth 7-768).
 - **The player's own `take in the jib`** is an order of its own, obeyed whatever the rule thinks (truth 7-767).
 - **What moves (25 kn, shortened):**
   - the frigate keeps her jib from all three headings, 309/205/231 -> 233/252/265 s;
@@ -148,7 +149,7 @@ Closed, nothing built (the lead's ruling).
 
 ## 6. E: the captain and a straining topgallant yard (built, measured, and taken out)
 
-On the lead's list of 2026-11-27, E is taken out of this hash whole: the method `Captain._topgallant_yards_working` and its call, its truths (7-768 and 7-769), its slow-tier entry and the lee-shore trial's moved pin. Every captain-run day on today's ships is the trunk's, except by A, C and D. E is kept at 28375be, in this branch's history, and on a local branch.
+On the lead's list of 2026-11-27, E is taken out of this hash whole: the method `Captain._topgallant_yards_working` and its call, its truths (then numbered 7-768 and 7-769; the numbers now hold §11's items 3 and 4, never merged before), its slow-tier entry and the lee-shore trial's moved pin. Every captain-run day on today's ships is the trunk's, except by A, C and D. E is kept at 28375be, in this branch's history, and on a local branch.
 
 **Why he fills away sooner under E, in the lee-shore trial.**
 - With the topgallants in at 1,560 s (27 kn, both yards working), she keeps her station by the wind under less sail aloft.
@@ -210,9 +211,10 @@ The measures of E as built, kept for the rule when it is carried with its cause:
    - the hermaphrodite brig;
    - the two schooners by one or two seconds.
 2. "Missed stays: she came through the wind and fell back on her old tack." and "Missed stays: she lies in irons, her head in the wind.", urgent, where "Tacked; braced up on ..." was said of a ship that had not come round (§4). After them come the missed stay's own lines ("Squared the yards; she fell off on ..."), and never "filled away". In the measured fleet: the brig's four 20-kn cases, and the merchant brig's from 290 with her sail set.
-3. "The jib is left on her: she gripes, and her helm will not hold her without it." in the reply to `shorten sail`, and the jib left set, where a jib was taken in by its rating and her helm needs it (§5). The storm staysails are no longer set in its place on that account. A kept jib is not taken in, so no countermand or belay is said of it (package 127's rule).
+3. "The jib is left on her: she gripes, and her helm will not hold her without it. It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'." in the reply to `shorten sail`, and the jib left set, where a jib was taken in by its rating and her helm needs it (§5); never of a jib the storm canvas takes in or shifts. The storm staysails are no longer set in its place on that account. A kept jib is not taken in, so no countermand or belay is said of it (package 127's rule).
+4. A kept jib's strain line ends ": take in the jib." and is said alone (§11, item 2); the captain's "taking in the jib (straining at the bolt-ropes)" for it in any wind.
 
-Nothing else is served differently: no captain's day moves (E is out), and every other cell in §10's measure is the same to the second.
+Nothing else is served differently. Of the reader's 54 passages, 12 beats and the lee-shore trial, the passages and the trial are identical line for line and hash for hash, and the four beats that differ are A's and C's (§11).
 
 ## 10. Every cell old beside new
 
@@ -238,3 +240,99 @@ The trunk at f2821c7 is old; this hash is new. The measure covers 216 cells:
 | hermaphrodite brig | shortened 25 kn | S162 S160 S159 | S167 S166 S164 | A |
 | both schooners | plain 20 kn, 290 | S233 | S235 | A |
 | both schooners | plain 25 kn | S157 S156 S157 | S156 S155 S156 | A |
+
+## 11. The lead's second list of 2026-11-27: the read of a8b2c3e
+
+The lead's reader read a8b2c3e whole on the trunk with the default gusts, and found it sound and held it for one pass more. This section answers that list. The reader's harness (`claude/trial-6`, `lead-backup/gate125/`) is used throughout, so the cells are the gate's: `tackmx.py` (1,512 cells a tree), `dprobe.py` (with seeds 7 and 11), and `run.py` with `cases125.py`. Old is the trunk at f09fe283. New is this hash.
+
+**The tack matrix, old beside new.** 90 of 1,512 cells change, and no tack is lost: 787 come round on this hash against 780 on the trunk, with 7 gained. By rule (the reader's `tmxrule.py`):
+- A: 65 cells. The hermaphrodite brig's 51 and the schooners' 2 are declared. Twelve are not, and they are item 1's below.
+- C: 12 cells (the brig 8, the merchant brig 4). Every one is a "Tacked" said lying on her old tack on the trunk, now "Missed stays".
+- D: 13 cells, all shortened. The frigate 25 kn seed 11 (3), declared since a8b2c3e for 25 kn; and the brig 30 kn seed 7 (4), the hermaphrodite brig 30 kn seed 11 (3) and the razee 30 kn seed 11 (3), declared here (item 2's table).
+
+The cells as they stand on this hash against a8b2c3e: 13 differ, all D's above, and only in the reply's added sentence. Every end, second and line after it is the same.
+
+### Item 1: A in a gust
+
+**The twelve cells** (old, the trunk's haul at the point, beside new):
+
+| Ship | Cell | Old | New |
+|---|---|---|---|
+| brig | 30 kn s11 292.5 plain | S275 | S281 |
+| frigate-36 | 30 kn s11 290 short | S200 | S224 |
+| merchant brig | 30 kn s7 295 plain | S538 | S531 |
+| razee | 30 kn s11 290 plain | S349 | S302 |
+| razee | 30 kn s7 full and by, short | S278 | S265 |
+| 74 | 25 kn s11 295 short | S237 | S312 |
+| 74 | 30 kn s7 full and by, plain | S250 | S264 |
+| 74 | 30 kn s7 full and by, short | S288 | S549, 49 deg off at the end |
+| 64 | 25 kn s11 295 short | S242 | S308 |
+| 64 | 30 kn s11 292.5 short | S227 | S285 |
+| 64 | 30 kn s11 295 short | S299 | S294 |
+| 64 | 30 kn s7 full and by, plain | missed, 83 s | S255 |
+
+**No reading tells them from the slack ship, and so A is left as built for the lead to rule.** Measured at the first tick her head is within a point of the wind (the trunk's haul):
+
+| | Her way / her way at helm's a-lee | Mean way since / at helm's a-lee | Swing toward the wind (deg/s) | Apparent wind / at helm's a-lee |
+|---|---|---|---|---|
+| the corvette, 8 to 25 kn, plain (A made for her) | 0.25 to 0.37 | 0.63 to 0.69 | 0.38 to 0.96 | (no gusts) |
+| the twelve cells | 0.15 to 0.40 | 0.62 to 0.77 | 0.52 to 1.37 | 0.79 to 1.07 |
+
+- These cells are slack by the way, not checked for an instant. Her way falls smoothly from helm's a-lee, and the apparent wind at the point is within a few per cent of what it was (the 74 full and by, shortened: 9.0 kn at helm's a-lee to 1.37 at the point over 66 s, the apparent wind 28 to 31 kn throughout).
+- What separates them comes after the haul, and the deck cannot read it before. The corvette in 20 kn, hauled at the point under the trunk's rule: her swing falls from 0.81 to -0.22 deg/s within six seconds, and she falls back and misses. The 74, hauled at the point: her swing holds at 0.33 to 0.39, she gathers sternway with her helm a-lee, and she goes through. It is the rig's answer to the swung after yards, not her way.
+- **Tried and not taken:** the haul when she hangs (the way gone for `hang_after_s`) as a third reading. It gives back the 74's full-and-by cells (288 and 252 s, against the trunk's 288 and 250), but leaves the 74 and the 64 from 295 in 25 kn at 313 to 315 s, against 237 to 242. It costs the corvette two of her 25-kn tacks (11 of 15, against 13).
+- Lower fractions of her way lose the corvette's 20-kn tacks (§2.3). The swing rate and the mean way overlap, as in the table.
+- **For the lead:** A as built gains the corvette 6 tacks of 15 and the hermaphrodite brig a minute or two in light airs. It costs the 74 and the 64 one to four minutes in five cells and the frigate 24 s in one, and gives back the 64's full-and-by miss in 30 kn.
+
+### Item 2: where D keeps a jib, and the jib kept at its limit
+
+**The whole table** (`dprobe.py`, seeds 7 and 11, every ship with a jib, close-hauled 292.5 and abeam 270, 20 to 40 kn: 260 cells). It is kept and said in 7 cells, all close-hauled. Fifteen minutes on, old beside new:
+
+| Ship | Cell | Jib at the order | Helm wanted without it | Old: off the wind, way, helm | New |
+|---|---|---|---|---|---|
+| brig | 30 kn s7 | 0.81 | 11.0 deg | 50 off, 2.2 kn, -10.6 deg | 68 off, 9.4 kn, 4.4 deg; the jib to 1.18 |
+| frigate-36 | 25 kn s11 | 0.85 | 11.7 deg | 70 off, 8.2 kn, 7.8 deg | 70 off, 8.7 kn, 1.7 deg |
+| hermaphrodite brig | 30 kn s11 | 0.86 | 17.4 deg | 45 off, 2.0 kn, -14.3 deg | 66 off, 11.2 kn, 3.7 deg |
+| hermaphrodite brig | 35 kn s7 | 0.83 | 15.3 deg | 47 off, 2.1 kn, -13.6 deg | 70 off, 11.4 kn, 3.1 deg |
+| both schooners | 35 kn s11 | 0.77 | 25.8 deg | 69 off, 9.1 kn, 16.7 deg | 71 off, 9.4 kn, 10.8 deg |
+| razee | 30 kn s11 | 0.93 | (no way: her rudder holds nothing) | 41 off, 1.1 kn | 44 off, 1.8 kn |
+
+- Not kept with the reader's gusts at seed 7: the frigate and the razee in 25 kn. They are kept in the truths' settle without gusts (truth 7-762), and at seed 11 for the frigate.
+- Nothing abeam is kept. The reader's schooners, merchant brig and 74 abeam in 35 and 40 kn now keep nothing, because the storm canvas takes the jib in or shifts it (item 3). Their replies and lines are the trunk's.
+- **In the tack matrix:**
+  - the brig 30 kn s7 shortened: the trunk's tacks refused for want of way, or 368 s, are 186 to 288 s;
+  - the hermaphrodite brig 30 kn s11 shortened: the trunk's refused for want of way; now accepted, and missed in 35 to 36 s ("she lost her way before her head came up to the wind");
+  - the razee 30 kn s11 shortened: from 290 the trunk's miss is a miss; from 292.5 and 295 the trunk's misses in 27 to 35 s are refused for want of way.
+- **The jib at its limit, built:**
+  - the reply says so, and says what takes it in;
+  - the next `shorten sail` takes it in (`storm.KEPT`, forgotten once it is in);
+  - its strain line names "take in the jib";
+  - the captain takes it in at its first strain line, in any wind. Before, only a head sail "straining at the bolt-ropes" over `shorten_sail_kn` was taken in, and the dire line, "stretched drum-tight", never.
+- **An hour in rising wind under the game's own captain** (west of the Scillies, bound north, the wind from the north rising 12 kn in the hour, the default gusts; the cells where `shorten sail` keeps the jib there; `tests/test_captains.py`, slow tier). Each is kept at the order and taken in, never blown out:
+  - brig 30 kn s11: taken in at 495 s by his own `shorten sail` (at most 0.96 of its rating);
+  - brig 35 kn s7: its strain line at 310 s, his "taking in the jib" at 361 s, hauled down at 436 s (at most 1.04);
+  - hermaphrodite brig 30 kn s11: taken in at 226 s by his own `shorten sail` (0.85);
+  - razee 28 kn s11: its strain line at 224 s, his order at 241 s waiting behind the jib's trim for hands, hauled down at 643 s (at most 1.35).
+- The reader's 54 passages, 12 beats and the lee-shore trial are run again on this hash. The passages and the trial are identical in every line and hash; the four beats that differ are A's and C's, as the reader found.
+
+### Item 3: the false line in 40 knots
+
+- `shorten sail` now reads its lines and the jibs it leaves on her together (`storm.shortening_plan`). A jib the storm canvas will take in or shift as it is set (`storm.replaced_by_storm_canvas`: the fore-and-after's jib shifted for her storm jib, and the head sails the foremost storm staysail replaces) is not kept. Its own take-in line stands, as before.
+- No sail the order takes in or shifts is said to be left on her.
+- The schooner abeam in 40 kn is truth 7-768.
+
+### Item 4: the two surviving mutants
+
+- `HELM_IN_HAND_SHARE = 0` is now killed by truth 7-769, the bilander close-hauled in 30 kn. Her jib is at 0.89 of its rating and she would want 4.4 degrees without it, so it is taken in, the order waiting for hands.
+- The in-irons bound moved to one point is now killed by `tests/test_evolutions.py::test_a_tack_ended_within_two_points_of_the_wind_either_side_is_in_irons`: the stub frigate held 17 degrees off, either side.
+- Eight mutants of this pass's mends were run against their pins, and all eight are killed: the share, the storm canvas's exclusion, kept once, the strain line's order, the forgetting, the limit's words, the captain's any-wind answer, and the bound.
+
+### Item 5
+
+The comment at the head of package 125's truths names no captain's rule now.
+
+### Item 6: the cutter's and the schooners' "Tacked" after a box-off (answered, not mended)
+
+- That tack's line is true. Under `keep her full and by` the cutter in 20 kn pinches up, is taken aback at 58 s, and the helm boxes her off at 231 s. Through the wind aft she is worn round on to the larboard tack.
+- `tack ship` then finds her on the larboard tack: heading 070, the wind on her larboard bow, at "helm's a-lee". She comes through the wind at 49 s and ends on the starboard tack. The matrix's "old tack" is the tack she was settled on, not the one she was on when the order came.
+- **The false line is the box-off's,** "Boxed her off; braced sharp up on the starboard tack, full and by.", said while she lies on the larboard tack. `BoxOffScript.words` names the tack she was on when the box-off began (`self.sign`), and a box-off that wears her round ends on the other. It is not C's few lines, so it is carried to the lead and not mended.
