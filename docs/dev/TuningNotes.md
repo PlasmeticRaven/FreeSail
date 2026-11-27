@@ -40469,7 +40469,7 @@ lying there as the business draws her, 48 hours; layings, and where she is at th
 | San Fiorenzo, Bastia | at anchor | 5, sailed | the same, hour by hour |
 | Syracuse, Augusta | in port | 2,341, never moved | 2, aground 6.2 nm out |
 | Torbay, Dartmouth | at anchor | 1,904, never moved | 2, in port 4.7 nm on |
-| Weymouth, Poole | in port | WEYMOUTH_OLD | 2, on passage 19.0 nm on |
+| Weymouth, Poole | in port | 2,341, never moved | 2, on passage 19.0 nm on |
 | Lampedusa, St Helier | | not drawn | not drawn (every destination's plan refused by the land guard) |
 
 In port loops every minute, as at anchor (the ground report said twelve hours; it was wrong).

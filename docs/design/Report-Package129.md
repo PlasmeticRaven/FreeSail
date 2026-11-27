@@ -38,7 +38,7 @@ Ten other ports' `to_sea` tracks begin with an anchorage that is not the outer r
 | San Fiorenzo, for Bastia | 2.01 nm | at anchor | 5, sailed | 5, sailed: the same, hour by hour |
 | Syracuse, for Augusta | 1.15 nm | in port | 2,341, never moved | 2; sailed, aground 6.2 nm out (below) |
 | Torbay, for Dartmouth | 2.23 nm | at anchor | 1,904, never moved | 2; sailed, in port 4.7 nm on |
-| Weymouth, for Poole | 1.68 nm | in port | TRUNK_WEYMOUTH | 2; on passage, 19.0 nm on |
+| Weymouth, for Poole | 1.68 nm | in port | 2,341, never moved | 2; on passage, 19.0 nm on |
 | Lampedusa | | | not drawn | not drawn |
 | St Helier | | | not drawn | not drawn |
 
