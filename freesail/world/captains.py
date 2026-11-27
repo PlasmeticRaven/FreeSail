@@ -238,6 +238,14 @@ WRECK_HANDS_UP_S = 3600
 # work's quiet below: time for what stood in its way, the topsail's setting or a heave-to for the
 # lead, to be done, and not so often that the order is a line in every few minutes of the log).
 BRING_TO_AGAIN_S = 600
+# The lightest canvas a topsail she lies a-try under may be of (`Captain._topsail_to_lie_under`;
+# JUDGEMENT: No. 4. Courses and topsails are of No. 2, Luce 1884 ch. X p. 171 and Steel 1794
+# vol. I, 'Main-topsail' (`ship.parts.WORKING_CANVAS_NO`), a ship's mizen topsail of No. 4 in
+# the files; the sloop's topsail is of No. 6 or 7, Steel's 'Sloop's topsail', a light sail
+# set in fair weather: the cutter's and the smack's, each of which blew out laid to under it
+# in forty knots, the lead's list of 2026-11-27, item 2). Lighter, she heaves to instead, her
+# light square canvas taken in first (`Captain._light_canvas_aback`).
+LIE_A_TRY_CANVAS_NO = 4
 # No spar is shifted within this many seconds of a shot come aboard (JUDGEMENT: ten minutes,
 # as the repairs' own interval: the work is begun out of action, never under fire).
 SPAR_WORK_QUIET_S = 600
@@ -3242,8 +3250,7 @@ class Captain(Judgement):
                 self.give("shift the jib for the storm jib", why="to lie to in a gale")
                 self._business["lie_to_storm_lug"] = True  # hove to when the storm jib is set
                 return
-            self._business.pop("bring_to_refused", None)  # a gale afresh
-            self._business.pop("bring_to_stuck", None)
+            self._business.pop("bring_to_tries", None)  # a gale afresh
             self._bring_to_for_weather()
             return
         sailing_states = ("on passage", "beating", "running for shelter")
@@ -3319,6 +3326,7 @@ class Captain(Judgement):
             return
         kinds = {e.kind for e in events}
         self._damage_work(p)
+        self._hold_spar_work_for_weather(p)
         if self._business.get("filling") and p.manoeuvre == "hove to":
             # a sailing state entered while she was still heaving to for the weather
             # (package 40c): the fill away waits for the heave-to to finish, and is given
@@ -3585,23 +3593,52 @@ class Captain(Judgement):
             self._shape_leg(why="she has way again")
 
     def _bring_to_for_weather(self, why: str = "") -> None:
-        """Lie a-try for the gale, or, with no topsail she could ever set to lie under
-        (`_topsail_to_lie_under`: the smack's light topsail), heave to under the canvas she
-        has, as a fore-and-aft vessel lies to; the tick of it kept for the order given again
-        (`_bring_to_again`), and a refusal's words with the sail she had set when it came."""
+        """Lie a-try for the gale, or, with no topsail to lie a-try under
+        (`_topsail_to_lie_under`), heave to under the canvas she has, as a fore-and-aft vessel
+        lies to: her light square canvas set on the yards a heave-to would lay aback taken in
+        first (`_light_canvas_aback`: the smack's topsail of No. 6, set by his own sail for a
+        strong wind, blew out laid aback in forty knots, the lead's list of 2026-11-27, item
+        2), the heave-to given at the next try. Each try is counted with her sail as it was
+        (`_bring_to_again`), refused, failed or done."""
         business = self._business
         business["brought_to_at"] = int(self.world.clock.tick)
+        standing = list(self._sail_standing())
+        tries = business.get("bring_to_tries")
+        n = int(tries[1]) + 1 if tries and list(tries[0]) == standing else 1
+        business["bring_to_tries"] = [standing, n]
         if self._topsail_to_lie_under():
-            got = self.give("lie a-try", why=why)
-        else:
-            got = self.give("heave to", why=_and_why("no topsail set to lie a-try under", why))
-        if getattr(got, "kind", "") == "order.rejected":
-            said = (str(getattr(got, "text", "")), self._sail_standing())
-            business["bring_to_stuck"] = said == business.get("bring_to_refused")
-            business["bring_to_refused"] = said
-        else:
-            business.pop("bring_to_refused", None)
-            business.pop("bring_to_stuck", None)
+            self.give("lie a-try", why=why)
+            return
+        light = self._light_canvas_aback()
+        if light:
+            for sid in light:
+                self.give(
+                    f"take in the {self._sail_name(sid)}",
+                    why="to heave to under her fore-and-aft canvas",
+                )
+            return
+        self.give("heave to", why=_and_why("no topsail to lie a-try under", why))
+
+    def _light_canvas_aback(self) -> list[str]:
+        """Her square sails of light canvas (`LIE_A_TRY_CANVAS_NO`) loosed or set on the yards a
+        heave-to lays aback (`scripts.yards_to_back`), by id."""
+        ship = self.world.ship
+        try:
+            from freesail.evolutions.scripts import yards_to_back
+            from freesail.ship.parts import WORKING_CANVAS_NO, SailState
+        except ImportError:  # pragma: no cover
+            return []
+        out = []
+        for y in yards_to_back(ship):
+            sl = ship.sail_of(y)
+            if sl is None or sl.cls != "square":
+                continue
+            stowed = (SailState.FURLED, SailState.IN_THE_GEAR, SailState.UNBENT)
+            if sl.state in stowed or sl.state is SailState.BLOWN_OUT:
+                continue  # stowed, clewed up or gone: loosed or set, it would go aback
+            if int(sl.canvas_no or WORKING_CANVAS_NO) > LIE_A_TRY_CANVAS_NO:
+                out.append(sl.id)
+        return out
 
     def _sail_standing(self) -> tuple[str, ...]:
         """The sails she has set, by id, for telling whether her sail has changed."""
@@ -3613,55 +3650,63 @@ class Captain(Judgement):
         topsail not yet set, a heave-to for the lead in hand, she would not lie to), it is given
         again `BRING_TO_AGAIN_S` after the last, while nothing of the kind is in hand (the
         lead's list of 2026-11-27 for package 126, part two, item 2: a refused order to bring
-        her to is given again; on the trunk it was given once, on entering the state). Refused
-        twice in the same words with her sail as it was (a boat with no topsail; the smack with
-        no head sail set), it is not given again until her sail changes: what stands in its way
-        is nothing in hand that will be done."""
+        her to is given again; on the trunk it was given once, on entering the state). Tried
+        twice with her sail as it was (a boat with no topsail; the smack with no head sail
+        set; a heave-to that would not lie to), it is not given again until her sail changes:
+        what stands in its way is nothing in hand that will be done (item 1 of the same list:
+        given again at ten minutes, and not a third time with her sail unchanged)."""
         if self._business.get("lie_to_storm_lug") or self._lugger_storm_lug():
             return  # the lugger's storm canvas brings her to (`_work`)
         ship = self.world.ship
-        if p.manoeuvre in ("hove to", "heaving to") or "hove_to" in (ship.extra or {}):
+        if p.manoeuvre == "hove to" or "hove_to" in (ship.extra or {}):
+            self._business.pop("bring_to_tries", None)  # brought to: a try afresh hereafter
+            return
+        if p.manoeuvre == "heaving to":
             return
         runner = (ship.extra or {}).get("evolutions")
-        bringing = ("lie_a_try", "heave_to")
-        if any(i.evo.id in bringing for i in getattr(runner, "instances", []) or []):
+        bringing = {"lie_a_try", "heave_to"}
+        work = list(getattr(runner, "instances", []) or [])
+        if any(i.evo.id in bringing or i.evo.id.startswith("take_in") for i in work):
             return
         last = self._business.get("brought_to_at")
         if last is None or p.tick - int(last) < BRING_TO_AGAIN_S:
             return
-        if self._business.get("bring_to_stuck"):
-            refused = self._business.get("bring_to_refused") or ("", ())
-            if refused[1] == self._sail_standing():
-                return
-            self._business.pop("bring_to_stuck", None)
+        tries = self._business.get("bring_to_tries")
+        if tries and int(tries[1]) >= 2 and list(tries[0]) == list(self._sail_standing()):
+            return
         self._bring_to_for_weather(why="not brought to")
 
     def _topsail_to_lie_under(self) -> bool:
-        """Whether `lie a-try` is the gale's order for her: False only where the topsail it
-        keeps is one she can never set to lie under (the lead's list of 2026-11-27 for package
-        126, part two, item 2): every such topsail unbent (no sail is bent in a gale), or
-        furled and outside her plain sail (the ship file's group, what `set plain sail` and
-        the captain's sail after the gale set): the smack's light topsail, which the order
-        refuses ("The topsail is not set") and which nothing of his would set, leaving her
-        sailing on. A topsail furled in her plain sail (the cutter's, the bilander's in a gale
-        from the start, about to be set), set or in hand keeps the order, which waits for it or
-        says what it cannot do, as on the trunk; so does a ship with no such topsail."""
+        """Whether she has a topsail to lie a-try under, a fact of the sail and not of the
+        moment (the lead's list of 2026-11-27 for package 126, part two, item 2): a topsail
+        of the mast she lies to with (`scripts.yards_to_back`), on a yard and a mast that
+        stand, bent and sound, of working canvas (`LIE_A_TRY_CANVAS_NO`), with reef bands to
+        close-reef it or in her plain sail (the ship file's group: what `set plain sail` and his
+        sail after the gale set). None (the smack's light topsail and the cutter's, of No. 6; a
+        boat with no topsail; a ship whose topmast is gone with its yard), she is given `heave
+        to` under the canvas she has, as a fore-and-aft vessel lies to. A topsail furled now and
+        about to be set (the bilander's in a gale from the start) keeps `lie a-try`, which waits
+        for it or says what it cannot do, as on the trunk."""
         ship = self.world.ship
         try:
-            from freesail.evolutions.scripts import _topsails_on, yards_to_back
-            from freesail.ship.parts import SailState
+            from freesail.evolutions.scripts import _topsails_on, gone_spar, yards_to_back
+            from freesail.ship.parts import WORKING_CANVAS_NO, SailState
 
             kept = _topsails_on(ship, yards_to_back(ship))
             plain = set((getattr(ship, "groups", {}) or {}).get("plain sail", []) or [])
+
+            def can_lie_under(s: Any) -> bool:
+                if s.wrecked or s.state in (SailState.UNBENT, SailState.BLOWN_OUT):
+                    return False
+                if gone_spar(ship, s) is not None:
+                    return False
+                if int(s.canvas_no or WORKING_CANVAS_NO) > LIE_A_TRY_CANVAS_NO:
+                    return False  # light canvas: a fair-weather sail
+                return int(getattr(s, "reef_bands", 0) or 0) > 0 or s.id in plain
+
+            return any(can_lie_under(s) for s in kept)
         except (AttributeError, KeyError, TypeError, ValueError, ImportError):
             return True  # as before: the order says what it cannot do
-
-        def never_set(s: Any) -> bool:
-            if s.state is SailState.UNBENT:
-                return True
-            return s.state is SailState.FURLED and s.id not in plain
-
-        return not kept or not all(never_set(s) for s in kept)
 
     def _lugger_storm_lug(self) -> bool:
         """A lugger with her storm lug in the sail room or bent (package 58b, item 5): no
@@ -5025,7 +5070,8 @@ class Captain(Judgement):
         # a wreck that has hung `WRECK_HANDS_UP_S` with her watch never free of her own work
         # (work waiting for hands, her clearing's or another's) has the hands turned up for it
         # (the lead's ruling of 2026-11-27: a wreck is never left for good while she has
-        # hands), out of the worsening weather's way
+        # hands), in settled weather only and never as she is brought to (the lead's list of
+        # the same day, items 3 and 4)
         since = business.get("wreck_since")
         if (
             hanging_now
@@ -5033,7 +5079,10 @@ class Captain(Judgement):
             and p.tick - int(since) >= WRECK_HANDS_UP_S
             and not business.get("hands_up_for_wreck")
             and any(getattr(i, "waiting", False) for i in instances)
-            and (self.state == "hove to for weather" or getattr(self, "trend", "") != "worsening")
+            and not self._weather_against_spar_work(p)
+            and self.state != "hove to for weather"
+            and not in_hand & {"lie_a_try", "heave_to"}
+            and business.get("brought_to_at") != p.tick
         ):
             business["hands_up_for_wreck"] = True
             if not called:
@@ -5049,12 +5098,14 @@ class Captain(Judgement):
         # lying to for the weather, her hands free and her sail work done: the wreck is cut
         # away then, whatever the wind (a wreck alongside beats the side and fouls the gear; the
         # lead's ruling of 2026-11-27); the spar shifted when the gale is over
-        lying_to = self.state == "hove to for weather" and (
-            p.manoeuvre == "hove to" or "hove_to" in (getattr(ship, "extra", {}) or {})
-        )
+        lying_to = self._lying_to_for_weather(p)
         weather = self._weather_against_spar_work(p)
-        if getattr(self, "trend", "") == "worsening" and not lying_to:
-            return None  # her shortening's hands first; the wreck cleared once she is snug
+        if weather and not lying_to:
+            # at his shortening line or over it, or the weather worsening, no spar's work at
+            # all, the wreck's clearing with it, until she lies to (the lead's list of
+            # 2026-11-27, item 4: in a rising gale he is the trunk's captain until she is
+            # brought to, and the wreck is cut away lying to or when the weather has settled)
+            return None
         if not (lying_to or self._under_command(ship, p)):
             return None
         spars = getattr(ship, "spars", {}) or {}
@@ -5180,6 +5231,45 @@ class Captain(Judgement):
         th = d.threshold if d is not None else (lambda k, v=None: v)
         line = float(th("shorten_sail_kn", 30.0) or 30.0)
         return float(p.wind_kn or 0.0) >= line or getattr(self, "trend", "") == "worsening"
+
+    def _lying_to_for_weather(self, p: Perception) -> bool:
+        """Brought to for the weather: in his state for it and hove to or lying a-try."""
+        ship = self.world.ship
+        return self.state == "hove to for weather" and (
+            p.manoeuvre == "hove to" or "hove_to" in (getattr(ship, "extra", {}) or {})
+        )
+
+    def _hold_spar_work_for_weather(self, p: Perception) -> None:
+        """Each minute: with the weather against a spar's work (`_weather_against_spar_work`)
+        and her not lying to, the spar's work in hand is held, its progress kept and its hands
+        let go ("Belayed clearing away the wreck of the fore topmast: hands kept for the
+        weather."), and none is begun or taken up again (`runner.SPAR_WORK_WEATHER_HELD`) until
+        she lies to or the weather has settled (the lead's list of 2026-11-27 for package 126,
+        part two, item 4: in a rising gale he is the trunk's captain until she is brought to).
+        Struck, the work is her captor's; it is let be."""
+        from freesail.evolutions.runner import SPAR_WORK_BELAYED, SPAR_WORK_WEATHER_HELD
+
+        ship = self.world.ship
+        extra = getattr(ship, "extra", None)
+        if extra is None:
+            return
+        held = (
+            self.state != "struck"
+            and self._weather_against_spar_work(p)
+            and not self._lying_to_for_weather(p)
+        )
+        if not held:
+            extra.pop(SPAR_WORK_WEATHER_HELD, None)
+            return
+        extra[SPAR_WORK_WEATHER_HELD] = True
+        runner = extra.get("evolutions")
+        crew = extra.get("crew")
+        if runner is None or crew is None:
+            return
+        for inst in list(getattr(runner, "instances", []) or []):
+            if inst.evo.id not in SPAR_WORK_BELAYED or inst.paused or inst.waiting:
+                continue
+            runner._hold(ship, crew, inst, "hands kept for the weather", {"for": "weather"})
 
     def _under_command(self, ship: Any, p: Perception) -> bool:
         """Whether she is under command for a spar's work: no manoeuvre in hand and not

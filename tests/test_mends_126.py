@@ -529,6 +529,310 @@ orders:
 """
 
 
+def _player_bilander(all_hands: bool):
+    """The bilander under the player's orders alone, 18 knots from the west: plain sail set,
+    her fore topmast carried away at a quarter of an hour, its wreck ordered cleared, and three
+    minutes after (all hands called by his order first, or not) the mainsail ordered taken in,
+    which her watch, setting her main topsail and topgallant, is short of hands for."""
+    from freesail.api.session import make_world
+    from freesail.core.world import Scenario
+
+    w = make_world(
+        7,
+        "data/ships/bilander.yaml",
+        Scenario(
+            wind_from_deg=270,
+            wind_speed_kn=18,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=0,
+            ship_speed_kn=5,
+        ),
+    )
+    w.submit("set plain sail")
+    w.run(900)
+    _carry_away(w, "fore.topmast")
+    n0 = len(w.log)
+    assert w.submit("clear away the wreck of the fore topmast").kind == "order.accepted"
+    w.run(180)
+    if all_hands:
+        w.submit("call all hands")
+        w.run(60)
+        assert w.ship.extra["crew"].all_hands_called_by_order
+    assert w.submit("take in the mainsail").kind == "order.accepted"
+    return w, n0
+
+
+def _clearing(w):
+    return next(
+        (i for i in w.ship.extra["evolutions"].instances if i.evo.id == "clear_wreck"), None
+    )
+
+
+def test_truth_7_777_c_work_short_of_hands_belays_the_spars_work_and_has_its_hands():
+    """The spar's work is the last claimant of her hands (the lead's list of 2026-11-27 for
+    package 126, part two, items 1 and 3; the reader's mutant N01, the giving-way removed,
+    survived every tier): work short of hands or too few to begin holds the wreck's clearing in
+    hand and has its hands, said, with all hands called by order or without; and no work goes
+    on short with the wreck named as what the rest are at."""
+    for all_hands in (False, True):
+        w, n0 = _player_bilander(all_hands)
+        w.run(5400)
+        after = [(e.kind, e.text) for e in w.log[n0:]]
+        belayed = [
+            t
+            for k, t in after
+            if k == "evolution.belayed"
+            and t
+            == "Belayed clearing away the wreck of the fore topmast: hands to take in the mainsail."
+        ]
+        assert belayed, (all_hands, after)
+        named = [t for k, t in after if k == "evolution.short_handed" and "wreck" in t]
+        assert named == [], (all_hands, named)
+        kinds = [k for k, _ in after]
+        assert "wreck.cleared" in kinds, (all_hands, after[-6:])
+
+
+def test_truth_7_777_d_a_spars_work_held_is_taken_up_only_when_nothing_has_wanted_hands():
+    """A spar's work held for her working is not taken up again while other work waits for
+    hands or goes on short, nor until nothing has wanted them for five minutes (`runner.
+    SPAR_WORK_RESUME_QUIET_S`; the lead's list of 2026-11-27, item 4: twelve belays in one
+    passage is a thrash; the reader's mutant N02, the resume not waiting, survived)."""
+    from freesail.crew import hands
+    from freesail.evolutions.runner import SPAR_WORK_RESUME_QUIET_S
+
+    assert SPAR_WORK_RESUME_QUIET_S == 300
+    w, _n0 = _player_bilander(False)
+    runner = w.ship.extra["evolutions"]
+    last_want = None
+    resumed_at = None
+    was_paused = False
+    for _ in range(240):
+        w.run(15)
+        clearing = _clearing(w)
+        if clearing is None:
+            break
+        others = [i for i in runner.instances if i.evo.id != "clear_wreck" and not i.paused]
+        wanting = [
+            i
+            for i in others
+            if (i.waiting and i.waiting_for == "hands")
+            or (i.assignment is not None and i.assignment.outcome == hands.SHORT)
+        ]
+        if clearing.paused:
+            was_paused = True
+            if wanting:
+                last_want = w.clock.tick
+        elif was_paused and resumed_at is None:
+            resumed_at = w.clock.tick
+            assert not wanting, [i.evo.id for i in wanting]
+    assert was_paused and resumed_at is not None and last_want is not None
+    assert resumed_at - last_want >= SPAR_WORK_RESUME_QUIET_S, (last_want, resumed_at)
+    # at the function: held, nothing wanting hands, it waits out the five minutes and no more
+    w, _n0 = _player_bilander(False)
+    w.run(1200)
+    runner = w.ship.extra["evolutions"]
+    clearing = _clearing(w)
+    crew = w.ship.extra["crew"]
+    runner.instances[:] = [clearing]
+    now = w.clock.tick
+    clearing.wanted_at = now - SPAR_WORK_RESUME_QUIET_S + 1
+    assert runner._spar_work_waits(w.ship, clearing, crew)
+    clearing.wanted_at = now - SPAR_WORK_RESUME_QUIET_S
+    assert not runner._spar_work_waits(w.ship, clearing, crew)
+
+
+def _wrecked_cruising(
+    spar: str = "main.topmast", keep_waiting: bool = False, ship_file: str = "brig"
+):
+    from freesail.world.captains import Perception
+
+    w = _cruising(ship_file)
+    _carry_away(w, spar)
+    runner = w.ship.extra["evolutions"]
+    if not keep_waiting:
+        runner.instances[:] = [i for i in runner.instances if not i.waiting]
+    return w, w.captain, w.ship, runner, Perception.read(w)
+
+
+def test_truth_7_777_e_no_spars_work_in_heavy_weather_unless_she_lies_to():
+    """At his shortening line or over it, or with the weather worsening (the glass falling
+    fast or the wind risen by a force within the hour), no spar's work is begun, the wreck's
+    clearing with it, unless she lies to for the weather; and work in hand is held for the
+    weather and not taken up again until she lies to or the weather settles (the lead's list
+    of 2026-11-27, item 4; the reader's mutants N03, the worsening gate dropped, and N04, the
+    weather blind to the trend, survived)."""
+    import dataclasses
+
+    from freesail.evolutions.runner import SPAR_WORK_WEATHER_HELD
+
+    w, cap, ship, runner, p = _wrecked_cruising()
+    line = float(cap._th("shorten_sail_kn", 30.0))
+    cap.trend = "steady"
+    settled = dataclasses.replace(p, wind_kn=line - 1.0)
+    assert not cap._weather_against_spar_work(settled)
+    got = cap._spar_work(ship, settled, set(), runner)
+    assert got is not None and got[0] == "clear away the wreck of the main topmast", got
+    over = dataclasses.replace(p, wind_kn=line)
+    assert cap._weather_against_spar_work(over)
+    assert cap._spar_work(ship, over, set(), runner) is None
+    cap.trend = "worsening"
+    assert cap._weather_against_spar_work(settled)
+    assert cap._spar_work(ship, settled, set(), runner) is None
+    # lying to for the weather, the wreck is cleared whatever the wind
+    cap.state = "hove to for weather"
+    lying = dataclasses.replace(p, wind_kn=line + 10.0, manoeuvre="hove to")
+    got = cap._spar_work(ship, lying, set(), runner)
+    assert got is not None and got[0] == "clear away the wreck of the main topmast", got
+    # the clearing in hand, the weather turning: held, said, and kept held
+    w, cap, ship, runner, p = _wrecked_cruising()
+    cap.trend = "steady"
+    assert w.submit("clear away the wreck of the main topmast").kind == "order.accepted"
+    w.run(120)
+    clearing = _clearing(w)
+    assert clearing is not None and not clearing.paused and not clearing.waiting
+    n0 = len(w.log)
+    cap._hold_spar_work_for_weather(dataclasses.replace(_perceive(w), wind_kn=line + 5.0))
+    assert clearing.paused and ship.extra.get(SPAR_WORK_WEATHER_HELD)
+    crew = ship.extra["crew"]
+    assert runner._spar_work_waits(ship, clearing, crew)
+    w.run(1)
+    assert "Belayed clearing away the wreck of the main topmast: hands kept for the weather." in [
+        e.text for e in w.log[n0:]
+    ]
+    cap._hold_spar_work_for_weather(dataclasses.replace(_perceive(w), wind_kn=line - 5.0))
+    assert SPAR_WORK_WEATHER_HELD not in ship.extra
+
+
+def _perceive(w):
+    from freesail.world.captains import Perception
+
+    return Perception.read(w)
+
+
+def test_truth_7_777_f_all_hands_for_a_wreck_at_the_hour_in_settled_weather_and_piped_down():
+    """A wreck that has hung an hour with her watch never free has all hands turned up for it,
+    at the hour and not before, in settled weather only and never as she is brought to; and
+    the hands are piped down when it is cleared (the lead's list of 2026-11-27, items 1, 3 and
+    4; the reader's mutants N05, the call at once, N06, never, and N12, no pipe-down)."""
+    import dataclasses
+
+    from freesail.world.captains import WRECK_HANDS_UP_S
+
+    assert WRECK_HANDS_UP_S == 3600
+    w, cap, ship, runner, p = _wrecked_cruising(keep_waiting=True)
+    assert any(i.waiting for i in runner.instances), "her trims wait for hands"
+    cap.trend = "steady"
+    line = float(cap._th("shorten_sail_kn", 30.0))
+    settled = dataclasses.replace(p, wind_kn=line - 5.0)
+    cap._business["wreck_since"] = p.tick - WRECK_HANDS_UP_S + 1
+    assert cap._spar_work(ship, settled, set(), runner) is None
+    cap._business["wreck_since"] = p.tick - WRECK_HANDS_UP_S
+    for heavy in (
+        dataclasses.replace(settled, wind_kn=line),
+        settled,  # the weather worsening, below
+    ):
+        if heavy is settled:
+            cap.trend = "worsening"
+        assert cap._spar_work(ship, heavy, set(), runner) is None
+        assert not cap._business.get("hands_up_for_wreck")
+    cap.trend = "steady"
+    cap._business["brought_to_at"] = p.tick
+    assert cap._spar_work(ship, settled, set(), runner) is None
+    assert cap._spar_work(ship, settled, {"lie_a_try"}, runner) is None
+    cap._business.pop("brought_to_at")
+    got = cap._spar_work(ship, settled, set(), runner)
+    assert got == ("call all hands", "to clear away the wreck of the main topmast"), got
+    assert cap._business.get("hands_up_called")
+    # called, and the wreck cleared: piped down
+    w.submit("call all hands")
+    for _ in range(20):
+        w.run(30)
+        if ship.extra["crew"].all_hands_called:
+            break
+    assert ship.extra["crew"].all_hands_called
+    for sp in ship.spars.values():
+        if sp.wrecked:
+            sp.sent_down = True
+    got = cap._spar_work(ship, dataclasses.replace(_perceive(w), wind_kn=line - 5.0), set(), runner)
+    assert got == ("pipe down", "the wreck cleared away"), got
+
+
+def test_truth_7_777_g_the_wreck_cleared_that_took_her_head_sails_a_head_sail_is_set():
+    """The wreck cleared that took the head sails she had set, a head sail still standing is
+    set once, the order said with its reason, in settled weather (the reader's mutant N13, the
+    head sail after the clearing dropped, survived)."""
+    from freesail.ship.parts import SailState
+
+    w, cap, ship, runner, p = _wrecked_cruising("fore.topmast", ship_file="seventy-four")
+    cap.trend = "steady"
+    heads = list(ship.groups.get("headsails", []))
+    from freesail.evolutions.scripts import gone_spar
+
+    lost = [sid for sid in heads if gone_spar(ship, ship.sails[sid]) is not None]
+    standing = [sid for sid in heads if sid not in lost]
+    assert lost and standing, (lost, standing)
+    for sid in standing:
+        ship.sails[sid].state = SailState.FURLED
+    for sp in ship.spars.values():
+        if sp.wrecked:
+            sp.sent_down = True
+    cap._business["was_set"] = lost
+    runner.instances[:] = []
+    import dataclasses
+
+    settled = dataclasses.replace(p, wind_kn=float(cap._th("shorten_sail_kn", 30.0)) - 5.0)
+    got = cap._spar_work(ship, settled, set(), runner)
+    assert got is not None and got[1] == "to keep her head off, her head sails gone", got
+    assert got[0] == f"set the {cap._sail_name(standing[0])}", got
+    # once for each clearing
+    assert cap._spar_work(ship, settled, set(), runner) != got
+
+
+def test_truth_7_778_b_a_refused_bringing_to_is_given_again_at_ten_minutes_and_then_rests():
+    """Lying to for the weather and not brought to, his refused order to bring her to is given
+    again ten minutes after the last and not sooner (`BRING_TO_AGAIN_S`); refused again in the
+    same words with her sail as it was, it is not given a third time while her sail is
+    unchanged; her sail changed, it is given again (the lead's list of 2026-11-27, item 1; the
+    reader's mutants N07, never again, and N08, for ever, survived)."""
+    import dataclasses
+    import types
+
+    from freesail.world.captains import BRING_TO_AGAIN_S
+
+    assert BRING_TO_AGAIN_S == 600
+    w = _gale("cutter", 270)
+    w.run(60)
+    cap = w.captain
+    given: list[tuple[int, str]] = []
+
+    def refuse(text, why=""):
+        given.append((w.clock.tick, text))
+        return types.SimpleNamespace(kind="order.rejected", text="She will not lie to.")
+
+    cap.give = refuse
+    cap.state = "hove to for weather"
+    runner = w.ship.extra["evolutions"]
+    runner.instances[:] = []
+    w.ship.extra.pop("hove_to", None)
+    t0 = w.clock.tick
+    cap._bring_to_for_weather()
+    p = dataclasses.replace(_perceive(w), manoeuvre="none")
+    for dt in range(60, 3601, 60):
+        w.clock.tick = t0 + dt
+        cap._bring_to_again(dataclasses.replace(p, tick=t0 + dt))
+    ticks = [t - t0 for t, _ in given]
+    assert ticks == [0, BRING_TO_AGAIN_S], ticks
+    # her sail changed: given again
+    sail = next(
+        s for s in w.ship.sails.values() if not s.is_set and s.state is parts.SailState.FURLED
+    )
+    sail.state = parts.SailState.SET
+    w.clock.tick = t0 + 3660
+    cap._bring_to_again(dataclasses.replace(p, tick=t0 + 3660))
+    assert [t - t0 for t, _ in given] == [0, BRING_TO_AGAIN_S, 3660]
+
+
 def _gale(ship: str, wind: int):
     path = Path(tempfile.mkdtemp()) / "gale.yaml"
     path.write_text(GALE.format(ship=ship, wind=wind), encoding="utf-8")
@@ -546,18 +850,20 @@ def test_truth_7_778_with_no_topsail_set_to_lie_a_try_under_she_heaves_to_in_the
     the wind (from the north-east): at the gale's line the captain's `lie a-try` was refused
     ("The topsail is not set; set it to lie a-try under it.") and she sailed on at seven to
     nine knots for the two hours of the gale. She heaves to under her fore-and-aft canvas,
-    the order said with its reason, and drifts at under two and a half knots; a ship with
-    her topsail set lies a-try as before (the cutter)."""
+    the order said with its reason, and drifts at under two and a half knots. What she can lie
+    a-try under is a fact of the sail, not of the moment (the lead's list of 2026-11-27, item
+    2): a topsail of the mast she lies to with, standing, bent, of working canvas, with reef
+    bands or in her plain sail; the brig's, the frigate's and the bilander's are, the
+    cutter's of light canvas is not, and she heaves to, her topsail taken in first and kept."""
+    heaving = "By the captain, hove to for weather: heaving to (no topsail to lie a-try under)."
     for wind in (270, 55):
         w = _gale("smack", wind)
         w.run(int(1.5 * 3600))
         said = _captains(w, 0)
         refused = [e for e in w.log if e.kind == "order.rejected" and "lie a-try" in e.text]
         assert refused == [], [e.text for e in refused]
-        assert (
-            "By the captain, hove to for weather: heaving to (no topsail set to lie a-try under)."
-            in said
-        ), said
+        assert heaving in said, said
+        assert not any("lying a try" in x for x in said), said
         hove = [e for e in w.log if e.kind == "ship.hove_to"]
         assert hove and "under her fore-and-aft canvas" in hove[0].text, (wind, hove)
         assert 3540 <= hove[0].tick <= 3540 + 900
@@ -566,26 +872,53 @@ def test_truth_7_778_with_no_topsail_set_to_lie_a_try_under_she_heaves_to_in_the
             w.run(60)
             speeds.append(float(w.readings.value("speed")) * 1.943844)
         assert max(speeds) < 2.5 and w.captain.state == "hove to for weather", (wind, speeds)
+    # the cutter's topsail is of light canvas (No. 6, `LIE_A_TRY_CANVAS_NO`): laid to under it
+    # in forty knots it blew out; she takes it in and heaves to under her fore-and-aft canvas,
+    # and keeps it
     w = _gale("cutter", 270)
-    w.run(int(1.5 * 3600))
-    assert any(e.text.startswith("Lying a-try under the topsail") for e in w.log)
-    assert "By the captain, hove to for weather: lying a try." in _captains(w, 0)
+    w.run(int(2.5 * 3600))
+    said = _captains(w, 0)
+    assert not any("lying a try" in x for x in said), said
+    assert (
+        "By the captain, hove to for weather: taking in the topsail (to heave to under her "
+        "fore-and-aft canvas)." in said
+    ), said
+    assert any(x.startswith(heaving[:-2]) for x in said), said
+    hove = [e for e in w.log if e.kind == "ship.hove_to"]
+    assert hove and "under her fore-and-aft canvas" in hove[0].text, hove
+    assert not any(e.kind == "sail.blown_out" for e in w.log)
     # her topsail unbent is as her topsail furled: she heaves to
     w = _gale("smack", 270)
     w.ship.sails["topsail"].state = parts.SailState.UNBENT
     w.run(int(1.5 * 3600))
-    said = _captains(w, 0)
-    assert (
-        "By the captain, hove to for weather: heaving to (no topsail set to lie a-try under)."
-        in said
-    ), said
+    assert heaving in _captains(w, 0), _captains(w, 0)
+    # a fact of the sail: the smack's light topsail (no reef band, outside her plain sail) is
+    # never one to lie under, furled, loosed or set; nor the cutter's, of No. 6; the brig's and the
+    # bilander's (in her plain sail and reefed, of No. 2) always are, furled or set
+    w = _gale("smack", 270)
+    for state in (parts.SailState.FURLED, parts.SailState.LOOSED, parts.SailState.SET):
+        w.ship.sails["topsail"].state = state
+        assert not w.captain._topsail_to_lie_under(), state
+    for ship in ("bilander", "brig", "frigate-36"):
+        w = _gale(ship, 270)
+        assert w.captain._topsail_to_lie_under(), ship
+    w = _gale("cutter", 270)
+    assert not w.captain._topsail_to_lie_under()
+    # a boat has none; nor has a ship whose topmast is gone with its yard: the privateer with her
+    # fore topmast carried away is given `heave to`, not `lie a-try` refused over and over
+    w = _gale("boat-cutter-28", 270)
+    assert not w.captain._topsail_to_lie_under()
+    w = _gale("privateer-schooner", 270)
+    assert w.captain._topsail_to_lie_under()
+    _carry_away(w, "fore.topmast")
+    assert not w.captain._topsail_to_lie_under()
     # a topsail in hand, lowered for its reefs at the gale's line, is not a topsail stowed: the
     # bilander lies a-try under it, as she did
     w = _gale("bilander", 270)
     w.run(int(2.5 * 3600))
     said = _captains(w, 0)
     assert "By the captain, hove to for weather: lying a try." in said, said
-    assert not any("no topsail set to lie a-try under" in x for x in said)
+    assert not any("no topsail to lie a-try under" in x for x in said)
     assert any(e.text.startswith("Lying a-try under the main topsail") for e in w.log)
 
 
@@ -733,7 +1066,8 @@ PASSAGE_SPARS = {
     "brig": "main.topmast",
     "seventy-four": "fore.topmast",
 }
-PASSAGE_SEEDS = (7, 8, 9)
+# The reader's five seeds of the third read (the lead's list of 2026-11-27, item 4).
+PASSAGE_SEEDS = (3, 7, 8, 9, 11)
 FALMOUTH = (50.15, -5.07)
 
 
@@ -757,11 +1091,18 @@ def _spar_passage(ship: str, wind: str, seed: int, how: str) -> dict:
     from freesail.evolutions.scripts import wreck_root
     from freesail.world import captains as C
 
-    saved = (C.Captain._spar_work, C.Captain._bring_to_again, C.Captain._topsail_to_lie_under)
+    names = (
+        "_spar_work",
+        "_bring_to_again",
+        "_topsail_to_lie_under",
+        "_hold_spar_work_for_weather",
+    )
+    saved = {n: getattr(C.Captain, n) for n in names}
     if how in ("trunk", "instant"):
         C.Captain._spar_work = lambda self, *a, **k: None
         C.Captain._bring_to_again = lambda self, p: None
         C.Captain._topsail_to_lie_under = lambda self: True
+        C.Captain._hold_spar_work_for_weather = lambda self, p: None
     try:
         lines = "\n".join(
             f"    - {{at: 1805-06-14T{at}, from_deg: {d}, knots: {k}"
@@ -799,54 +1140,63 @@ def _spar_passage(ship: str, wind: str, seed: int, how: str) -> dict:
             "world": w,
         }
     finally:
-        C.Captain._spar_work, C.Captain._bring_to_again, C.Captain._topsail_to_lie_under = saved
+        for n, f in saved.items():
+            setattr(C.Captain, n, f)
 
 
-# The margins of "not worse" (the lead's ruling of 2026-11-27 for part two's truth): half the
-# trunk's own seed-to-seed range in the cell over `PASSAGE_SEEDS` (what one seed against its
-# neighbour moves her in that cell with no change of the code), and never under these floors
-# (JUDGEMENT: three cables made good, five minutes astern, one time aback: a tenth of an hour's
-# sailing at three knots, and the least count of the others).
-PASSAGE_FLOORS = (0.3, 5.0, 1.0)
+# "Not worse", judged seed by seed (the lead's list of 2026-11-27 for part two, item 4 (a)): on
+# each cell-seed against its yardstick, minutes astern not more than five beyond, times aback not
+# more than one beyond (JUDGEMENT: the least counts of each, as before), brought to not later
+# than five minutes after (the lead's figure), and way made good not less by more than the price
+# of the hands' work, `PASSAGE_WAY_SHARE` of the yardstick's way and never under
+# `PASSAGE_WAY_FLOOR_NM` (JUDGEMENT: the lead's "a captain who cuts a wreck away and is a mile or
+# two behind for it is a seaman", taken at its lower bound, a mile; and over a longer run a
+# tenth, the wreck's clearing, an hour of her watch's work, costing her a third of her way for
+# that hour of the three).
+PASSAGE_ASTERN_MIN = 5
+PASSAGE_ABACK = 1
+PASSAGE_BROUGHT_S = 300
+PASSAGE_WAY_SHARE = 0.10
+PASSAGE_WAY_FLOOR_NM = 1.0
 PASSAGE_CELLS = [(ship, wind) for ship in PASSAGE_SPARS for wind in PASSAGE_WINDS]
+# The cell-seeds outside the rule, each with its cause (the report's section 9 says each in a
+# sentence); the truth holds the set exactly, so that one more outside, or one of these come
+# inside, fails it.
+PASSAGE_DECLARED: dict[tuple[str, str, int], str] = {}
 
 
-def _median(xs: list[float]) -> float:
-    xs = sorted(xs)
-    return xs[len(xs) // 2]
+def _way_margin(way: float) -> float:
+    return max(PASSAGE_WAY_FLOOR_NM, PASSAGE_WAY_SHARE * abs(way))
 
 
-def _cell_verdict(trunk: list[dict], instant: list[dict], mine: list[dict]) -> dict:
-    """The cell judged on its seeds together (medians), by the lead's ruling: the yardstick
-    is the trunk, or the wreck cleared at once where that is itself worse than the trunk
-    beyond the margin in any of the three measures; mine not worse than the yardstick beyond
-    the margin in way made good, minutes astern and times aback."""
-    keys = ("made_good", "astern", "aback")
-    margin = {
-        k: max(f, (max(r[k] for r in trunk) - min(r[k] for r in trunk)) / 2)
-        for k, f in zip(keys, PASSAGE_FLOORS, strict=True)
-    }
-    med = {
-        how: {k: _median([r[k] for r in runs]) for k in keys}
-        for how, runs in (("trunk", trunk), ("instant", instant), ("mine", mine))
-    }
-    t, i, m = med["trunk"], med["instant"], med["mine"]
-    instant_worse = (
-        i["made_good"] < t["made_good"] - margin["made_good"]
-        or i["astern"] > t["astern"] + margin["astern"]
-        or i["aback"] > t["aback"] + margin["aback"]
-    )
-    y = i if instant_worse else t
-    return {
-        "by": "instant" if instant_worse else "trunk",
-        "margin": margin,
-        "medians": med,
-        "ok": {
-            "made_good": m["made_good"] >= y["made_good"] - margin["made_good"],
-            "astern": m["astern"] <= y["astern"] + margin["astern"],
-            "aback": m["aback"] <= y["aback"] + margin["aback"],
-        },
-    }
+def _worse(a: dict, b: dict) -> list[str]:
+    """How `a` is worse than `b` beyond the rule's allowances, by measure."""
+    out = []
+    if a["made_good"] < b["made_good"] - _way_margin(b["made_good"]):
+        out.append("way")
+    if a["astern"] > b["astern"] + PASSAGE_ASTERN_MIN:
+        out.append("astern")
+    if a["aback"] > b["aback"] + PASSAGE_ABACK:
+        out.append("aback")
+    return out
+
+
+def _seed_verdict(trunk: dict, instant: dict, mine: dict) -> dict:
+    """One cell-seed judged by the lead's rulings: the yardstick is the trunk, or the wreck
+    cleared at once where that is itself worse than the trunk beyond the allowances (a wreck
+    hanging pays some hulls off like a head sail: the carried list, fault 22); this tree's
+    captain no worse than the yardstick beyond them; brought to not later than five minutes
+    after it, and brought to wherever the trunk's captain is."""
+    by = "instant" if _worse(instant, trunk) else "trunk"
+    y = instant if by == "instant" else trunk
+    why = _worse(mine, y)
+    if trunk["brought_to"] is not None and mine["brought_to"] is None:
+        why.append("not brought to")
+    if y["brought_to"] is not None and (
+        mine["brought_to"] is None or mine["brought_to"] > y["brought_to"] + PASSAGE_BROUGHT_S
+    ):
+        why.append("brought to late")
+    return {"by": by, "why": why}
 
 
 @pytest.mark.slow
@@ -854,26 +1204,24 @@ def _cell_verdict(trunk: list[dict], instant: list[dict], mine: list[dict]) -> d
 def test_truth_7_779_b_her_spar_carried_away_she_does_no_worse_than_the_trunk_on_passage(
     ship, wind
 ):
-    """The lead's list of 2026-11-27 for package 126, part two, item 1, and his ruling of the
-    same day: bound for Falmouth from 48 40 N 5 05 W, a spar carried away at minute ten, three
-    hours, in twelve knots, twenty-five, twelve with the wind heading her and twenty rising to
-    thirty-eight, on the bilander, the merchant brig, a topsail schooner, the frigate, the
-    cutter, the brig and the seventy-four, on three seeds: this tree's captain makes no less
-    way, goes astern no longer and is taken aback no more often (the cell's medians, by
-    `_cell_verdict`'s margins) than the trunk's captain, or, where the wreck cleared at once is
-    itself worse than the trunk (a wreck hanging pays some hulls off like a head sail, the
-    physics giving it three times its windage and none of its harm: the carried list, fault
-    22), than that; and on every seed on which the trunk's captain lies a-try or heaves to in
-    the gale, so does this one."""
-    runs = {
-        how: [_spar_passage(ship, wind, seed, how) for seed in PASSAGE_SEEDS]
-        for how in ("trunk", "instant", "mine")
-    }
-    verdict = _cell_verdict(runs["trunk"], runs["instant"], runs["mine"])
-    assert all(verdict["ok"].values()), verdict
-    for seed, t, m in zip(PASSAGE_SEEDS, runs["trunk"], runs["mine"], strict=True):
-        if t["brought_to"] is not None:
-            assert m["brought_to"] is not None, (seed, t["brought_to"])
+    """The lead's list of 2026-11-27 for package 126, part two, items 1 and 4, and his ruling
+    of the same day: bound for Falmouth from 48 40 N 5 05 W, a spar carried away at minute ten,
+    three hours, in twelve knots, twenty-five, twelve with the wind heading her and twenty
+    rising to thirty-eight, on the bilander, the merchant brig, a topsail schooner, the
+    frigate, the cutter, the brig and the seventy-four, on five seeds: on every seed this
+    tree's captain makes no less way (by more than the price of the hands' work), goes astern
+    no longer and is taken aback no more often than the trunk's captain, or, where the wreck
+    cleared at once is itself worse than the trunk, than that (`_seed_verdict`); is brought to
+    not later than five minutes after it, and wherever the trunk's captain is. The cell-seeds
+    outside are `PASSAGE_DECLARED`'s, exactly."""
+    outside = {}
+    for seed in PASSAGE_SEEDS:
+        t, i, m = (_spar_passage(ship, wind, seed, how) for how in ("trunk", "instant", "mine"))
+        v = _seed_verdict(t, i, m)
+        if v["why"]:
+            outside[seed] = (v, {k: (t[k], i[k], m[k]) for k in ("made_good", "astern", "aback")})
+    declared = {sd for (sh, wd, sd) in PASSAGE_DECLARED if (sh, wd) == (ship, wind)}
+    assert set(outside) == declared, outside
 
 
 def test_truth_7_779_b_the_trunk_in_this_tree_is_the_trunk():

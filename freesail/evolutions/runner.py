@@ -177,6 +177,16 @@ HELD_BY_BELAY = "belay"
 # hands", the rest shifting a studding-sail boom): the hands go to working her, and the spar's
 # work is taken up again where it stood when they are free (`_try_resume`).
 SPAR_WORK_BELAYED = frozenset({"clear_wreck", "shift_spar", "jury_mast"})
+# A spar's work held for her working is taken up again only when nothing has waited for hands or
+# gone on short for this long (`Runner._spar_work_waits`; JUDGEMENT: five minutes, the lead's list
+# of 2026-11-27, item 4: "twelve belays in one passage is a thrash: resume only when nothing has
+# waited for some minutes"; a sail's handling or a trim of the braces is done within it, and a
+# wreck's clearing, an hour's work, loses little by the wait).
+SPAR_WORK_RESUME_QUIET_S = 300
+# Set in the ship's `extra` by the game's own captain while the weather forbids a spar's work and
+# she is not lying to (`world.captains.Captain._hold_spar_work_for_weather`): the spar's work in
+# hand is held and is not taken up again until he lifts it.
+SPAR_WORK_WEATHER_HELD = "spar_work_held_for_weather"
 HELD_BY_POST = "post"
 
 # How many pieces of other work a log line names before it says "at other work".
@@ -272,6 +282,13 @@ TURN_WAIT = "turn_wait"
 TURN_GROUPS_SAID = "turn_groups_said"
 
 
+def _tick_of(ship: Ship) -> int | None:
+    """The world's tick for a ship in a world, or None for a ship alone."""
+    clock = getattr(_world_of(ship), "clock", None)
+    tick = getattr(clock, "tick", None)
+    return int(tick) if tick is not None else None
+
+
 @dataclass
 class Instance:
     evo: registry.Evolution
@@ -305,6 +322,9 @@ class Instance:
     wait_line: str = ""  # the line it said when it first had to wait for hands
     given: int | None = None  # the order that started it (`Runner.giving`), for `belay that`
     held_by: str | None = None
+    # a spar's work held for her working: the last tick other work wanted hands while it was held
+    # (`Runner._spar_work_waits`, `SPAR_WORK_RESUME_QUIET_S`)
+    wanted_at: int | None = None
     # a take-in of a whole lateen aback in a strong wind has said that it waits for her to pay
     # off (package 90, A1d), at the order or when the work before it is done (the lead's nudge
     # 53, item 2)
@@ -1288,6 +1308,8 @@ class Runner:
                 continue
             if not inst.waiting:
                 continue
+            if inst.evo.id in SPAR_WORK_BELAYED and ship.extra.get(SPAR_WORK_WEATHER_HELD):
+                continue  # the game's own captain holds a spar's work for the weather
             # given first and holding a part of its, or a manoeuvre at work that it gave way to
             # on its settees alone (`_settees_only`): the work waits for the manoeuvre
             busy = any(
@@ -1754,9 +1776,7 @@ class Runner:
             posts=True,
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
-        gives_way = got.outcome == hands.TOO_FEW or (
-            got.outcome == hands.SHORT and not crew.all_hands_called_by_order
-        )
+        gives_way = got.outcome in (hands.TOO_FEW, hands.SHORT)
         if gives_way and self._spar_work_gives_way(ship, inst, crew):
             # the spar's work is the last claimant of her hands: its hands are this work's, and
             # it is taken up again when nothing else wants them (`_try_resume`)
@@ -1883,27 +1903,35 @@ class Runner:
         if not spar:
             return False
         reason = f"hands to {self._describe(inst)}"
+        now = _tick_of(ship)
         for other in spar:
             self._hold(ship, crew, other, reason, {"for": inst.evo.id})
+            other.wanted_at = now
         return True
 
-    def _spar_work_waits(self, inst: Instance, crew: Crew) -> bool:
+    def _spar_work_waits(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Whether a spar's work held is still to wait before it has its hands again: while
-        other work waits for hands or goes on short of them (`_spar_work_gives_way`). With all
-        hands called by order (the captain's for a wreck that has hung, `world.captains.
-        WRECK_HANDS_UP_S`, or the player's) the hands are up for the work: it waits only on
-        work too few to begin, and work going on short goes on with the hands there are."""
+        other work waits for hands or goes on short of them (`_spar_work_gives_way`), all hands
+        called or not (the lead's list of 2026-11-27, item 3: an all hands called for the wreck
+        does not shield the wreck's work from her working), and until nothing has wanted them
+        for `SPAR_WORK_RESUME_QUIET_S`; and while the game's own captain holds it for the
+        weather (`SPAR_WORK_WEATHER_HELD`)."""
         if inst.evo.id not in SPAR_WORK_BELAYED:
             return False
-        up = bool(crew.all_hands_called_by_order)
+        if (getattr(ship, "extra", None) or {}).get(SPAR_WORK_WEATHER_HELD):
+            return True
+        now = _tick_of(ship)
         for other in self.instances:
             if other is inst or other.paused or other.evo.id in SPAR_WORK_BELAYED:
                 continue
-            if other.waiting and other.waiting_for == WAITING_FOR_HANDS:
-                return True
             a = other.assignment
-            if a is not None and a.outcome == hands.SHORT and not up:
+            wanting = other.waiting and other.waiting_for == WAITING_FOR_HANDS
+            if wanting or (a is not None and a.outcome == hands.SHORT):
+                inst.wanted_at = now
                 return True
+        last = inst.wanted_at
+        if last is not None and now is not None and now - last < SPAR_WORK_RESUME_QUIET_S:
+            return True
         return False
 
     def _made_all_hands(self, inst: Instance) -> hands.CrewRequest:
@@ -2225,7 +2253,7 @@ class Runner:
     def _try_resume(self, ship: Ship, inst: Instance, crew: Crew) -> None:
         """A belayed instance takes up its work again when all hands are done, if it can
         have its hands; until then it stays belayed, its progress held."""
-        if self._all_hands_at_work() or self._spar_work_waits(inst, crew):
+        if self._all_hands_at_work() or self._spar_work_waits(ship, inst, crew):
             return
         got = hands.request(
             crew,
