@@ -571,7 +571,7 @@ Each with what the owner decides before it starts. **A gate in its middle and on
 - The harbour's newcomer side finished.
 - 78a, sight across land; 99, the views by the player's place.
 - 91, the viewer's light and air.
-- Packaging for a machine without Python (decision 31); the library as a proper book.
+- Packaging for a machine without Python (decision 31): **pulled forward and launched as package 130 on 27 November at the owner's word**, for Windows and Mac, friends of his waiting to try the game; the library as a proper book.
 - *He decides:* what a newcomer is told; whether a friend plays it, and on what machine.
 
 ### The old milestone 8, redistributed
