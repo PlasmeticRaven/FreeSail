@@ -9214,16 +9214,15 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     within 165 m of her station (the far station leg holds at the tolerance's edge, half a
     cable, and the lookout's rounding adds the rest).
 
-    Package 127, at the lead's ruling: a take-in now countermands the setting of its sail
+    Package 127, at the lead's rulings: a take-in now countermands the setting of its sail
     (truth 7-787), so the commodore no longer lies aback eight minutes after her tack with her
-    topgallants half set, and the convoy keeps together with no straggler at all. The Friendship
-    is given a cause a convoy meets, five minutes lying to at the start (a far plan's `lie_to`
-    step, as tests/test_captive.py gives one), and the book's signal is shown as before. Old
-    (2040, 2182, 2340, 6060), from the commodore's stall; new (1080, 1638, 1800, 3840), from
-    her lying to; with no lie-to, no straggler and no No. 20 in four hours. Every ship within
-    the 165 m from 7200, as before (93 m at the most, measured)."""
+    topgallants half set, and from her old place the privateer stood off at two miles and more:
+    no exchange and no straggler. The scenario as shipped places her a cable nearer
+    (data/scenarios/convoy-six.yaml), and she comes down: the private signal, her false reply,
+    the convoy closed round the commodore (No. 8) and, as the convoy closes, the Friendship a
+    straggler. Old (2040, 2182, 2340, 6060), from the commodore's stall; new (3360, 3442, 3540,
+    5880). Every ship within the 165 m from 7800, as before (152 m at the most, measured)"""
     w = _scenario_world(CONVOY_SIX)
-    w.vessels.get("friendship").plan.insert(0, ("lie_to", 300.0))
     sq = w.squadrons.find("the Falmouth trade")
     assert sq is not None and sq.kind == "convoy" and sq.commander == "the ship"
     assert sq.members == [
@@ -9237,8 +9236,7 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     ]
     for m in sq.others():
         v = w.vessels.get(m)
-        leg = v.plan[1] if m == "friendship" else v.plan[0]
-        assert v.under_orders_of == "the ship" and leg == ("station", "trade"), m
+        assert v.under_orders_of == "the ship" and v.plan[0] == ("station", "trade"), m
     w.run(7200)
     ordered = [e for e in w.log if e.kind == "signal.ordered" and "No. 20" in e.text]
     made = [e for e in w.log if e.kind == "signal.made" and "No. 20" in e.text]
@@ -9249,13 +9247,34 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     # package 88 (the recovery when aback, `captains.ABACK_RECOVER`): (2760, 2866, 3000, 6420)
     # before and with the switch off; 5280 for the last before 84's step 6 (the one clock)
     # package 127: (2040, 2182, 2340, 6060) from the commodore's stall, before (4)
-    assert when == (1080, 1638, 1800, 3840), when
+    assert when == (3360, 3442, 3540, 5880), when
     worst = 0.0
     for _ in range(6):
         w.run(600)
         worst = max(worst, max(_off_station_m(w, sq).values()))
     assert worst <= 165.0, worst
     assert not sq.stragglers and not sq.prizes
+
+
+def test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort():
+    """The owner's convoy as a player opens it (data/scenarios/convoy-six.yaml, seed 7): the
+    schooner comes down within signal distance under British colours, the commodore shows the
+    private signal (shown 2940, up 3011), she answers it wrong and is judged an enemy under false
+    colours (urgent, 3240), and the convoy is closed round the commodore (No. 8 ordered 3300, up
+    3371). Old, the trunk before package 127: shown 3600, up 3707, judged 3960, No. 8 ordered
+    4020, up 4966, from the commodore's eight minutes aback; package 127's first build, the
+    privateer where she lay: none of it (she looked on from 2.13 miles and more). The scenario
+    places her a cable nearer, its own cause for the day (the lead's ruling E1)."""
+    w = _scenario_world(CONVOY_SIX)
+    w.run(3600)
+    shown = [e.tick for e in w.log if e.kind == "order.accepted" and "private signal" in e.text]
+    up = [e.tick for e in w.log if e.kind == "signal.made" and "private signal" in e.text]
+    judged = [e for e in w.log if e.kind == "signal.private_judged"]
+    close = [e.tick for e in w.log if e.kind == "signal.made" and "No. 8" in e.text]
+    assert shown[:1] == [2940] and up[:1] == [3011], (shown, up)
+    assert [e.tick for e in judged] == [3240] and judged[0].severity.value == "urgent"
+    assert "false colours, an enemy" in judged[0].text
+    assert close[:1] == [3371], close
 
 
 def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles():
@@ -9266,22 +9285,23 @@ def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort
     uncovered. At seed 7 she is investigating at 600, evading by 3600 at two miles from the
     commodore, and twenty miles off by 10800.
 
-    Package 127, at the lead's ruling: a take-in now countermands the setting of its sail
-    (truth 7-787), so the commodore stalls less after her tack, and the schooner's path closes
-    only to 2.13 miles, short of where she makes out the escort (about two miles: from
+    Package 127, at the lead's rulings: a take-in now countermands the setting of its sail
+    (truth 7-787), so the commodore stalls less after her tack, and from her old place the
+    schooner's path closed only to 2.13 miles, short of where she makes out the escort (from
     investigating she evades on being overmatched, measured: with the overmatched transitions
-    taken out she evades later and outside the band, with the man-of-war-near ones taken out
-    the same as with them). She starts a cable nearer the commodore, her own
-    setup and not the scenario's, as tests/test_squadrons.py places a far vessel. Old: evading
-    by 3600 at 1.98 miles, 21 miles off at 10800. New: evading from 2940 at 1.98 miles, 1.98 at
-    3600, 17.9 miles off at 10800."""
+    taken out she evades later and outside the band). The scenario as shipped places her a
+    cable nearer (data/scenarios/convoy-six.yaml). Old: evading by 3600 at 1.98 miles, 21 miles
+    off at 10800. New: evading from 2940 at 1.98 miles, 1.98 at 3600, 17.9 miles off at 10800.
+    The window is narrow and is a fault carried (docs/dev/TuningNotes.md, package 127): a
+    promoted privateer's near lookout makes out colours at two miles without the glass her far
+    brain read them by at three, and her near investigating does not close the stranger, so
+    0.05 to 0.15 mile nearer passes, 0.2 and 0.25 end outside the band at 3600, and 0.35 and 0.5
+    never evade."""
     w = _scenario_world(CONVOY_SIX)
-    from freesail.world.geo import bearing_and_distance, destination
+    from freesail.world.geo import bearing_and_distance
 
     pv = w.vessels.find("Vengeur")
     assert pv is not None and pv.nation == "france" and pv.brain is not None
-    toward, _ = bearing_and_distance(pv.position, w.position)
-    pv.position = destination(pv.position, toward, 0.1 * units.NAUTICAL_MILE)
     w.run(600)
     assert pv.brain.state == "investigating a stranger", pv.brain.state
     took_up = None
