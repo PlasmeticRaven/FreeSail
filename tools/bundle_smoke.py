@@ -25,9 +25,11 @@ What it does, in order, as a friend's machine would:
    tiles read) and asks its chart.
 5. Reads the running interpreter's path from the system (it must lie in the unpacked
    folder), and looks for the poison's marks (there must be none).
-6. Stops the game as a player does (Ctrl+Break on Windows, which the server takes as
-   Ctrl+C; Control-C on the Mac), and reads the launcher's "FreeSail has stopped (exit
-   code 0)".
+6. Stops the game (Control-C on the Mac, as a player does; on Windows Ctrl+Break, which
+   the server takes as Ctrl+C, a runner having no window to press Ctrl+C in), and reads
+   the launcher's "FreeSail has stopped (exit code 0)" (on Windows 3, the code Windows
+   ends a process with on a break the server has re-raised after its clean shutdown),
+   and that the server no longer answers.
 7. Checks that no file in the unpacked folder is new, changed or gone, that the Mac's
    quarantine marks are cleared, and that the save lies in the user's own data folder.
 
@@ -214,8 +216,7 @@ def start(top: Path, env: dict[str, str], log: Path) -> subprocess.Popen:
             stdin=subprocess.PIPE,
             stdout=out,
             stderr=subprocess.STDOUT,
-            # a console of its own, as a double-click gives it: Ctrl+C is pressed in it
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         )
     return subprocess.Popen(
         ["/bin/bash", str(top / "FreeSail.command"), "--no-browser"],
@@ -298,33 +299,15 @@ def interpreters() -> list[tuple[str, str]]:
     return found
 
 
-# Ctrl+C pressed in the game's console, as a player presses it: a helper leaves the
-# harness's console, joins the game's, ignores the key itself, and sends it to everything
-# in that console (the launcher's cmd and the game's Python).
-CTRL_C_HELPER = """
-import ctypes, sys
-k = ctypes.windll.kernel32
-k.FreeConsole()
-if not k.AttachConsole(int(sys.argv[1])):
-    sys.exit(2)
-k.SetConsoleCtrlHandler(None, True)
-sys.exit(0 if k.GenerateConsoleCtrlEvent(0, 0) else 3)
-"""
-
-
 def stop(proc: subprocess.Popen) -> str:
     """The game stopped as a player stops it; the road said."""
     if WINDOWS:
-        pressed = subprocess.run(
-            [sys.executable, "-c", CTRL_C_HELPER, str(proc.pid)],
-            creationflags=subprocess.CREATE_NO_WINDOW,
-        ).returncode
-        road = "Ctrl+C in its window"
-        if pressed != 0:
-            # no console to press it in: the break, which the server takes as Ctrl+C but
-            # after which Windows ends the process with code 3
-            proc.send_signal(signal.CTRL_BREAK_EVENT)
-            road = f"Ctrl+Break (Ctrl+C could not be pressed: {pressed})"
+        # Ctrl+Break: a runner has no window to press Ctrl+C in, and Ctrl+C cannot be sent to
+        # a process group of its own. The server takes the break as it takes Ctrl+C (uvicorn
+        # handles both and shuts down cleanly), then raises it again once it has shut down,
+        # and Windows ends a process on a break with code 3: so 3 is this road's clean stop.
+        proc.send_signal(signal.CTRL_BREAK_EVENT)
+        road = "Ctrl+Break in its window"
         try:
             # cmd's "Terminate batch job (Y/N)?" answered N, and its pause answered: the
             # launcher goes on to say the game has stopped, as it does in a player's window
@@ -451,8 +434,17 @@ def main(argv: list[str] | None = None) -> int:
             f.fail("the game stops when asked", "still running after 90 s")
             proc.kill()
         window = log.read_text("utf-8", "replace")
+        try:
+            urllib.request.urlopen(BASE + "/harbour", timeout=3).read()
+            gone = False
+        except (urllib.error.URLError, OSError):
+            gone = True
+        f.check(gone, "the server no longer answers once stopped")
+        clean = ("FreeSail has stopped (exit code 0)",) + (
+            ("FreeSail has stopped (exit code 3)",) if WINDOWS else ()
+        )
         f.check(
-            "FreeSail has stopped (exit code 0)" in window,
+            any(c in window for c in clean),
             f"the game stops cleanly when asked ({road})",
             next((ln.strip() for ln in window.splitlines() if "has stopped" in ln), "no word"),
         )
