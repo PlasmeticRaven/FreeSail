@@ -1011,6 +1011,8 @@ class Harbour:
                 "lines": lines,
                 "plan": plan,
             }
+            if load:
+                self.driver.taken_up_from_a_save()
             self.started = True
             self.games += 1
         return {"lines": lines, "game": self.game_state()}
@@ -1032,8 +1034,20 @@ class Harbour:
             if not self.started:
                 raise HarbourError("No game is in play to end.", 409)
             lost = self.driver.unsaved()
+            seated = [d for d in self.doors.values() if d.running]
             if lost and not lose_unsaved:
-                raise HarbourError(lost + " End it all the same, or save it first.", 409)
+                words = lost + " End it all the same, or save it first."
+                if seated:
+                    # the stand-down of a seated station saves the game as it stands then,
+                    # among the player's own saves: said before, and named after
+                    words += (
+                        " The models' stations are stood down first, and each stand-down saves "
+                        "the game as it stands then, among your saves."
+                    )
+                raise HarbourError(words, 409)
+            desk = self.driver.desk
+            seats = list(getattr(desk, "seats", {}).values()) if desk is not None else []
+            before = {id(seat): len(getattr(seat, "saves", []) or []) for seat in seats}
             # the doors first, the driver's lock not held: a door stopping asks the game to
             # release its station, and the release saves the station's record as it always has
             for door in list(self.doors.values()):
@@ -1057,7 +1071,20 @@ class Harbour:
                 if door.running:
                     with contextlib.suppress(Exception):
                         self.stop_door(door.id)
-        return {"lines": ["The game is ended."], "game": self.game_state()}
+            # the saves the stand-downs wrote, by the seats' own record of them (not by the
+            # saves place's names, which a save of the same name would hide)
+            written = [
+                Path(path).stem
+                for seat in seats
+                for path in (getattr(seat, "saves", []) or [])[before.get(id(seat), 0) :]
+            ]
+        lines = ["The game is ended."]
+        if written:
+            lines.append(
+                "The models' stations were stood down, and the game as it stood then was saved "
+                f"as {', '.join(written)}, among your saves."
+            )
+        return {"lines": lines, "game": self.game_state()}
 
     def game_state(self) -> dict[str, Any]:
         from freesail.agents import director as director_mod

@@ -39958,3 +39958,36 @@ hazy sky: "A fog is settling in." (notable), "The fog has shut in thick." (notab
 "The fog seems to be clearing." (notable) an hour before the edge, "The fog lifted." (routine) at
 it; from a clear sky "The fog is thickening." and "The fog is thinning." (routine) between, six
 lines in all. The sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
+
+### Package 126, the second pass (the lead's list of 2026-11-24)
+
+**No pin moved.** The new figures, each JUDGEMENT and defined with its ground where it stands:
+
+- `weather.FOG_LINE_QUIET_S` 600 s: a step of the fog's sight is not said within ten minutes of
+  one the other way, nor of the same words. A third of the settling.
+- `captains._under_command`'s steerage way is `hull.HELM_STEERAGE_SPEED` (0.75 m/s, a knot and a
+  half), the figure the helm already learns by.
+- `captains.LIGHT_SPAR_CLASSES` (the studding-sail booms and the royal masts, and what stands on
+  one), after Luce 1866, ch. XVII ("easily replaced").
+- `captains.SPARE_YARD_ANSWERS` (a topmast: a spare yard to a topsail yard alone), after Luce 1866,
+  ch. XVII, and Fincham 1843, p. 286.
+
+**The spar's work, with it beside without it** (truth 7-779 and its probes; cruising off the Lizard
+in twelve knots, seed 7, the third hour's mean way): the cutter's main topmast 3.57 kn against
+-1.18; the brig's main topmast 4.42 against 2.92; the 74's fore topmast 4.15 against 2.48; the
+merchant brig's main topmast 4.78 against 3.83; the frigate's mainmast (her jury mast) 3.69 against
+2.39. None is taken aback more often with it.
+
+**One fog's lines now:** six, every fog alike. "A fog is settling in." (notable), "The fog is
+thickening." 15 min on (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to
+be clearing." (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on
+(routine).
+
+- `weather.FOG_AIR_EDGE_KM` 5 km (the reader's mends of the second pass): the fog thins within five
+  kilometres of the edge of the air that holds it, as its reach from the coast thins over
+  `FOG_COAST_THIN_KM`; half an hour's sailing at six knots.
+- The sails bent again after a shift are set again where she carried them set when the spar went,
+  or where a sail of their own kind is set. The cutter's main topmast case is then 3.57 kn in the
+  third hour (her topsail was loosed and her gaff topsail furled when it went, and are left so),
+  where the first version, which counted every sail as kin, made 4.97 and set what she had not
+  carried.

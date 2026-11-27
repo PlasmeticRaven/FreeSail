@@ -671,9 +671,16 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     state = client.get("/api/harbour/state").json()
     assert state["game"]["started"] is False and state["stations"] == []
     assert client.get("/", follow_redirects=False).headers["location"].startswith("/harbour")
+    # an order given with the clock held is play not saved: the end asks
+    port.harbour.start({"scenario": "data/scenarios/tender.yaml"})
+    assert port.driver.submit("set plain sail").kind != "order.rejected"
+    assert port.driver.world.clock.tick == 0
+    held = client.post("/api/harbour/end", json={})
+    assert held.status_code == 409 and "has not been saved" in held.json()["detail"]
+    assert client.post("/api/harbour/end", json={"lose_unsaved": True}).status_code == 200
     # another begun, played on and not saved: the end is refused until the player says so
     again = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
-    assert again.status_code == 200 and again.json()["game"]["games"] == 3
+    assert again.status_code == 200 and again.json()["game"]["games"] == 5
     port.driver.tick(120)
     stamp = port.driver.world.clock.stamp()
     asked = client.post("/api/harbour/end", json={})
@@ -701,8 +708,20 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     loaded = client.post("/api/harbour/start", json={"load": saved.name})
     assert loaded.status_code == 200, loaded.text
     assert port.driver.world.clock.tick == 120
-    port.driver.save("kept-again")
     assert client.post("/api/harbour/end", json={}).status_code == 200
+    assert saved.read_bytes() == written
+    # taken up and played on: the words say since when
+    assert client.post("/api/harbour/start", json={"load": saved.name}).status_code == 200
+    taken = port.driver.world.clock.stamp()
+    port.driver.tick(60)
+    asked = client.post("/api/harbour/end", json={})
+    assert asked.status_code == 409
+    assert asked.json()["detail"] == (
+        f"This game was taken up from its save at {taken} and has not been saved since; what "
+        f"has passed since, to {port.driver.world.clock.stamp()}, is lost if it is ended. End "
+        "it all the same, or save it first."
+    )
+    assert client.post("/api/harbour/end", json={"lose_unsaved": True}).status_code == 200
     assert saved.read_bytes() == written
 
 
@@ -1175,8 +1194,24 @@ def test_truth_7_773_a_game_ended_closes_the_doors_of_its_models_stations(tmp_pa
                 except AssertionError:
                     out = c.get(f"/api/harbour/doors/{d['id']}").json()["output"]
                     raise AssertionError("\n".join(out)) from None
+                # asked first: the refusal says the stand-down will save the game
+                asked = c.post("/api/harbour/end", json={})
+                assert asked.status_code == 409
+                assert asked.json()["detail"].endswith(
+                    "The models' stations are stood down first, and each stand-down saves the "
+                    "game as it stands then, among your saves."
+                )
+                before = {p.stem for p in (tmp_path / "saves").glob("*.json")}
                 ended = c.post("/api/harbour/end", json={"lose_unsaved": True})
                 assert ended.status_code == 200, ended.text
+                # and the end names the save the stand-down wrote, told apart from the player's
+                made = sorted({p.stem for p in (tmp_path / "saves").glob("*.json")} - before)
+                assert len(made) == 1, made
+                assert ended.json()["lines"] == [
+                    "The game is ended.",
+                    "The models' stations were stood down, and the game as it stood then was "
+                    f"saved as {made[0]}, among your saves.",
+                ]
                 door = c.get(f"/api/harbour/doors/{d['id']}").json()
                 assert door["state"] == "stopped"
                 assert door["output"][-1].endswith("stopped from the harbour. ==")
