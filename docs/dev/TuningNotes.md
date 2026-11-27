@@ -39976,7 +39976,7 @@ No cast or clearing line falls in these passages.
 
 The first build of the turn-waits moved six older "not hands enough for all at once" lines from routine to notable. A routine wait line between two of them reset the World's memory of the same words said again (`World.record`, `RECURRING_KINDS`). A newly said turn-wait is now marked (`runner.TURN_WAIT`) and left out of that memory.
 
-**The convoy's three truths (the lead's ruling (b)), moved by item 4, a change in what she does.** The scenario file is unchanged. The book's first `shorten sail`, a minute after `set plain sail`, now belays the topgallants still being set. Before, its take-in was refused as already furled, and they were set, worn for and taken in again. The commodore tacks at 1567 (was 1594) and stalls less.
+**The convoy's three truths (the lead's ruling (b)), moved by item 4, a change in what she does.** Item 4 left the scenario file as it was; the lead's ruling E1 then moved the privateer in it (below). The book's first `shorten sail`, a minute after `set plain sail`, now belays the topgallants still being set. Before, its take-in was refused as already furled, and they were set, worn for and taken in again. The commodore tacks at 1567 (was 1594) and stalls less.
 
 - **7-340, the recovery when aback with no way: re-measured, and renamed `..._eases_the_after_sail_and_she_pays_off` (it said "and boxes her off").**
   - Unchanged: aback with no way at 1810.

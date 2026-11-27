@@ -127,11 +127,12 @@ All of these are old beside new in `docs/dev/TuningNotes.md` under this package.
   - each end state is the same to the bit, and no line the trunk said changes its severity;
   - the lines added are named by kind and count in the notes' table;
   - truth 77 now pins the line count and end state beside each digest.
-- **The convoy's three truths, by item 4** (what she does). Each is given its cause back by its own setup, and the scenario file is unchanged:
+- **The convoy's three truths, by item 4** (what she does):
   - 7-340 is re-measured to the new day's recovery;
   - its box-off is a case of its own, 7-788, by a one-point header;
-  - 7-152's straggler: the Friendship lies to five minutes;
-  - 7-153's evasion: the privateer starts a cable nearer.
+  - 7-152's straggler and 7-153's evasion are given their cause in the scenario itself (the lead's ruling E1): `data/scenarios/convoy-six.yaml` places the privateer a cable nearer (49 48.53 N 5 06.61 W, was 49 48.6 N 5 06.5 W), and both truths read the scenario as shipped. The first build's setups in the test (the Friendship lying to five minutes, the schooner moved in the test alone) are gone.
+  - A new truth pins the exchange on the shipped day: `test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort`.
+  - 7-153's narrow window (E2) is found and recorded in the notes, not mended; the lead carries it.
 
 The new truths are:
 - 7-780 to 7-787, in `tests/test_words_and_waits.py`;
