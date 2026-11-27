@@ -26,7 +26,7 @@ echo.
 echo   To stop the game: close this window, or press Ctrl+C in it
 echo   (if it then asks "Terminate batch job (Y/N)?", press Y).
 echo.
-echo   Your saves and settings are kept in %APPDATA%\FreeSail,
+echo   Your saves and settings are kept in "%APPDATA%\FreeSail",
 echo   not in this folder: a newer download keeps them.
 echo.
 "%HERE%python\python.exe" -I -B -X utf8 -m freesail %*

@@ -14,7 +14,8 @@ name: downloads
 #    downloads beside the project's zip once their smoke tests have passed.
 # 3. A push that changes the downloads' own files (the paths below): builds and smoke-tests
 #    them, so that the macOS runners run when a download has changed and not on every push.
-#    A push whose head commit's message carries `[preview NAME]` also publishes, as 1 does.
+#    A push whose head commit's message carries `[preview NAME]` also publishes, as a DRAFT
+#    (not public): a builder's proof of the publishing, not a build for players.
 #
 # Every action is pinned by its commit (the tag it was in the comment beside it); every
 # third-party file a download carries is pinned by version and sha256 in tools/bundle.py
@@ -54,13 +55,14 @@ jobs:
     outputs:
       name: ${{ steps.name.outputs.name }}
       publish: ${{ steps.name.outputs.publish }}
+      draft: ${{ steps.name.outputs.draft }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.11"
+          python-version: "3.11.14"
       - name: The downloads' name
         id: name
         env:
@@ -71,21 +73,23 @@ jobs:
           SHA: ${{ github.sha }}
         run: |
           publish=false
+          draft=false
           if [ "$CALLED" = "true" ]; then
             name="${GIVEN/gates\//}"           # the gate's release: gate-gates/m7 -> gate-m7
           elif [ "$EVENT" = "workflow_dispatch" ]; then
             name="preview-$GIVEN"; publish=true
           elif [[ "$MESSAGE" =~ \[preview\ ([A-Za-z0-9.-]+)\] ]]; then
-            name="preview-${BASH_REMATCH[1]}"; publish=true
+            name="preview-${BASH_REMATCH[1]}"; publish=true; draft=true  # a builder's proof
           else
             name="trial-${SHA:0:12}"
           fi
           if ! [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]]; then
-            echo "::error title=downloads::the name '$name' is not letters, figures, dots and dashes"
+            echo "::error title=downloads::the name given is not letters, figures, dots and dashes"
             exit 1
           fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "draft=$draft" >> "$GITHUB_OUTPUT"
           echo "::notice title=downloads::building FreeSail-$name (publish: $publish)"
       - name: Build the Windows download
         env:
@@ -161,7 +165,7 @@ jobs:
       # the harness's own Python, which the game must never see (the smoke test hides it)
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: "3.11"
+          python-version: "3.11.14"
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: ${{ matrix.download }}
@@ -178,6 +182,10 @@ jobs:
     needs: [build, smoke]
     if: needs.build.outputs.publish == 'true'
     runs-on: ubuntu-24.04
+    # two runs of one name (a typed run and a pushed one) publish one after the other
+    concurrency:
+      group: publish-${{ needs.build.outputs.name }}
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -191,12 +199,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NAME: ${{ needs.build.outputs.name }}
+          DRAFT: ${{ needs.build.outputs.draft }}
           SHA: ${{ github.sha }}
           REF: ${{ github.ref_name }}
         run: |
           case "$NAME" in preview-*) ;; *) echo "::error::not a preview: $NAME"; exit 1 ;; esac
           gh release delete "$NAME" --cleanup-tag --yes 2>/dev/null || true
-          notes="FreeSail's downloads for Windows and the Mac, from the branch $REF at ${SHA:0:12}: a preview between gates, not a gate. Unpack the zip for your computer and read START HERE.txt in it."
-          gh release create "$NAME" dist/*.zip --prerelease --target "$SHA" \
+          # a tag of the name left without its release would hold the new one to an old commit
+          gh api -X DELETE "repos/$GH_REPO/git/refs/tags/$NAME" 2>/dev/null || true
+          if [ "$DRAFT" = "true" ]; then
+            kind=(--draft)
+            notes="A builder's proof of the downloads' publishing, from the branch $REF at ${SHA:0:12}: not a build for players."
+          else
+            kind=(--prerelease)
+            notes="FreeSail's downloads for Windows and the Mac, from the branch $REF at ${SHA:0:12}: a preview between gates, not a gate. Unpack the zip for your computer and read START HERE.txt in it."
+          fi
+          gh release create "$NAME" dist/*.zip "${kind[@]}" --target "$SHA" \
             --title "FreeSail $NAME (a preview)" --notes "$notes"
-          echo "::notice title=published::the pre-release $NAME, from $REF at ${SHA:0:12}"
+          echo "::notice title=published::$NAME (${kind[0]#--}), from $REF at ${SHA:0:12}"

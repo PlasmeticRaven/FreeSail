@@ -1,5 +1,5 @@
 """The downloads for a machine without Python (package 130; tools/bundle.py, tools/bundle/,
-.github/workflows/downloads.yml; docs/design/Report-Package130.md). Truths 7-800 to 7-804.
+.github/workflows/downloads.yml; docs/design/Report-Package130.md). Truths 7-800 to 7-806.
 
 The downloads themselves are built and proven in the cloud, on Windows and on both kinds of
 Mac (tools/bundle_smoke.py). What is held here, on every push, is what a forgetful change
@@ -275,3 +275,72 @@ def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must()
         said = [ln for ln in text.splitlines() if re.search(r"\bmodel\b", ln, re.I)]
         assert said == ["A MODEL AT A STATION"], said
         assert len(text.splitlines()) <= 50, name  # a screen
+
+
+def test_truth_7_805_from_a_download_the_consent_records_go_beside_the_settings(tmp_path):
+    """Truth 7-805 (package 130; the lead's ruling, after the proposal's decision 31): with
+    nothing naming a place, a seated model's consent record goes, from a download (its mark
+    in the game's folder, which the assembling script writes), to `consent/` beside the
+    player's settings and saves, so that nothing is written in the unpacked folder; from a
+    checkout, to the game's own `docs/agents/consent/` as ever. (A setting, or
+    `--consent-records`, still wins: they are given as `records_dir` and never reach this
+    default.) The smoke test seats no model: this is the proof."""
+    from freesail.agents import consent
+
+    assert consent.DOWNLOAD_MARK == bundle.DOWNLOAD_MARK
+    settings_file = tmp_path / "home" / "FreeSail" / "settings.yaml"
+    checkout = tmp_path / "checkout"
+    checkout.mkdir()
+    assert consent.default_records_dir(checkout, settings_file) == (
+        checkout / "docs" / "agents" / "consent"
+    )
+    download = tmp_path / "Free Sail ä" / "game"
+    download.mkdir(parents=True)
+    (download / consent.DOWNLOAD_MARK).write_text("mark", encoding="utf-8")
+    assert consent.default_records_dir(download, settings_file) == settings_file.parent / "consent"
+    # this checkout carries no mark: its default is unchanged
+    assert not (ROOT / consent.DOWNLOAD_MARK).exists()
+    assert consent.RECORDS_DIR == ROOT / "docs" / "agents" / "consent"
+    assert bundle.DOWNLOAD_MARK not in bundle.game_files()
+
+
+def test_truth_7_806_a_port_taken_is_said_in_a_plain_sentence_and_the_game_stops_as_before(
+    tmp_path,
+):
+    """Truth 7-806 (package 130; the lead's word): when the game's port is already in use
+    (a second start, or another program on it), `py -m freesail` says in one plain sentence
+    that FreeSail seems to be running already, where to look, and that a second one wants
+    `--port` and another number; and stops with the same exit as before (the server could
+    not listen: uvicorn's own code). On a free port the sentence is not said."""
+    import socket
+    import subprocess
+
+    from freesail.__main__ import port_taken_words
+
+    held = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    held.bind(("127.0.0.1", 0))
+    held.listen(1)
+    port = held.getsockname()[1]
+    try:
+        words = port_taken_words("127.0.0.1", port)
+        assert words and "FreeSail seems to be running already" in words
+        assert f"http://localhost:{port}/harbour" in words and "--port" in words
+        env = {**os.environ, "FREESAIL_SETTINGS": str(tmp_path / "settings.yaml")}
+        run = subprocess.run(
+            [sys.executable, "-m", "freesail", "--no-browser", "--port", str(port)],
+            cwd=ROOT,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        assert words in run.stdout, run.stdout + run.stderr
+        # the server's own exit when it cannot listen, as before (uvicorn's: 3 in its 0.54)
+        assert run.returncode != 0, (run.returncode, run.stderr[-2000:])
+    finally:
+        held.close()
+    free = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    free.bind(("127.0.0.1", 0))
+    port = free.getsockname()[1]
+    free.close()
+    assert port_taken_words("127.0.0.1", port) is None

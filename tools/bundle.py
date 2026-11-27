@@ -75,10 +75,11 @@ def _shipped(rel: str) -> bool:
     return rel in GAME_FILES or any(rel == d or rel.startswith(d + "/") for d in GAME_DIRS)
 
 
-def game_files(root: Path = ROOT) -> list[str]:
+def game_files(root: Path = ROOT, strict: bool = False) -> list[str]:
     """The game's files a download ships, as paths relative to the repository with `/`,
     sorted: every file git tracks under `GAME_DIRS` and the files `GAME_FILES` name. From a
-    copy that is not a git checkout (a gate's zip), every file under them."""
+    copy that is not a git checkout (a gate's zip), every file under them, unless `strict`
+    (a build), which refuses: a build is made from a checkout, and only of what git tracks."""
     root = Path(root)
     try:
         out = subprocess.run(
@@ -88,7 +89,11 @@ def game_files(root: Path = ROOT) -> list[str]:
             check=True,
         ).stdout
         names = [n.decode("utf-8") for n in out.split(b"\0") if n]
-    except (OSError, subprocess.CalledProcessError):
+    except (OSError, subprocess.CalledProcessError) as e:
+        if strict:
+            raise SystemExit(
+                f"git cannot list the game's files here ({e}); a build is made from a git checkout."
+            ) from None
         names = [f for f in GAME_FILES if (root / f).is_file()]
         for d in GAME_DIRS:
             for p in (root / d).rglob("*"):
@@ -295,18 +300,44 @@ def _text(name: str, fill: dict[str, str], crlf: bool) -> bytes:
     return text.encode("utf-8")
 
 
-def copy_game(top: Path, root: Path = ROOT) -> int:
-    names = game_files(root)
+# The mark of a download in the game's folder (freesail/agents/consent.py's DOWNLOAD_MARK):
+# a game run from it keeps the consent records beside the player's settings, not in the
+# folder a newer download replaces.
+DOWNLOAD_MARK = "FROM-A-DOWNLOAD.txt"
+
+
+def copy_game(top: Path, root: Path = ROOT, allow_changed: bool = False) -> int:
+    """The game's files into `top/game/`, as the commit has them: refused when the files
+    in the checkout differ from the commit (unless `allow_changed`, for a trial), so that a
+    download said to be of a commit is that commit."""
+    names = game_files(root, strict=True)
+    changed = subprocess.run(
+        ["git", "status", "--porcelain", "--", *GAME_DIRS, *GAME_FILES],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    if changed and not allow_changed:
+        raise SystemExit(f"The game's files differ from the commit:\n{changed}\nCommit them first.")
     for rel in names:
         dest = top / "game" / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(root / rel, dest)
+    (top / "game" / DOWNLOAD_MARK).write_bytes(
+        b"This folder is FreeSail as a download carries it (package 130): the game keeps a\r\n"
+        b"seated model's consent records beside your settings, not here.\r\n"
+    )
     return len(names)
 
 
-def licences_readme(top: Path, pins: list[Pin], dists: list[str], platform: str) -> None:
+def licences_readme(
+    top: Path, pins: list[Pin], dists: list[str], platform: str, where: str
+) -> None:
+    """LICENCES.txt at the top of the download: what it carries and where each licence is."""
     lines = [
         "The licences of what this download carries (FreeSail's package 130).",
+        "They are all in the folder licences/ beside this file; where, for each:",
         "",
         "FreeSail itself: the game in game/, under the MIT licence its pyproject.toml names.",
         "",
@@ -318,14 +349,17 @@ def licences_readme(top: Path, pins: list[Pin], dists: list[str], platform: str)
     lines += [
         "",
         f"The libraries the game uses, for {platform}, each from the Python Package Index by",
-        "version and sha256 (tools/bundle/locks/ in the game's repository); each one's",
-        "licence files are in the folder of its name here:",
+        "version and sha256 (tools/bundle/locks/ in the game's repository). Each one's",
+        f"licence files are in {where}, and in its own .dist-info folder",
+        "beside the library itself:",
     ]
     lines += [f"  {d}" for d in dists]
-    (top / "licences" / "README.txt").write_bytes(("\r\n".join(lines) + "\r\n").encode("utf-8"))
+    (top / "LICENCES.txt").write_bytes(("\r\n".join(lines) + "\r\n").encode("utf-8"))
 
 
-def build_windows(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
+def build_windows(
+    name: str, out: Path, cache: Path, root: Path = ROOT, allow_changed: bool = False
+) -> Path:
     pin = INTERPRETERS["windows"]
     sha, ts = commit_of(root)
     with tempfile.TemporaryDirectory() as tmp:
@@ -342,7 +376,7 @@ def build_windows(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
         )
         site = py / "Lib" / "site-packages"
         install_dependencies("windows", site)
-        n = copy_game(top, root)
+        n = copy_game(top, root, allow_changed)
         fill = {"NAME": name, "COMMIT": sha[:12]}
         (top / "FreeSail.cmd").write_bytes(_text("FreeSail.cmd", fill, crlf=True))
         (top / "START HERE.txt").write_bytes(_text("START-HERE-windows.txt", fill, crlf=True))
@@ -350,13 +384,15 @@ def build_windows(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
         (lic / "python").mkdir(parents=True)
         shutil.copyfile(py / "LICENSE.txt", lic / "python" / "LICENSE.txt")
         dists = dependency_licences(site, lic)
-        licences_readme(top, [pin], dists, "Windows (64-bit)")
+        licences_readme(top, [pin], dists, "Windows (64-bit)", "licences/<its name>/")
         path = write_zip(top, out / f"FreeSail-{name}-windows.zip", ts)
     print(f"{path}: the game's {n} files, Python {pin.version}, {len(dists)} libraries")
     return path
 
 
-def build_mac(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
+def build_mac(
+    name: str, out: Path, cache: Path, root: Path = ROOT, allow_changed: bool = False
+) -> Path:
     sha, ts = commit_of(root)
     pins = [INTERPRETERS["arm64"], INTERPRETERS["x86_64"]]
     with tempfile.TemporaryDirectory() as tmp:
@@ -377,7 +413,7 @@ def build_mac(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
             (site / "freesail-game.pth").write_text("../../../../game\n", encoding="utf-8")
             lic = top / "licences" / f"libraries-{arch}"
             dists += [f"{d} ({arch})" for d in dependency_licences(site, lic)]
-        n = copy_game(top, root)
+        n = copy_game(top, root, allow_changed)
         fill = {"NAME": name, "COMMIT": sha[:12]}
         launcher = top / "FreeSail.command"
         launcher.write_bytes(_text("FreeSail.command", fill, crlf=False))
@@ -389,7 +425,13 @@ def build_mac(name: str, out: Path, cache: Path, root: Path = ROOT) -> Path:
         lic.mkdir(parents=True)
         for p in sorted((HERE / "licences" / "python-build-standalone").iterdir()):
             shutil.copyfile(p, lic / p.name)
-        licences_readme(top, pins, dists, "macOS (Apple silicon and Intel)")
+        licences_readme(
+            top,
+            pins,
+            dists,
+            "macOS (Apple silicon and Intel)",
+            "licences/libraries-arm64/<its name>/ and licences/libraries-x86_64/<its name>/",
+        )
         path = write_zip(top, out / f"FreeSail-{name}-mac.zip", ts)
     print(f"{path}: the game's {n} files, Python {pins[0].version} twice, {len(dists)} libraries")
     return path
@@ -493,6 +535,11 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("--name", required=True, help="the download's name, e.g. gate-m7")
         p.add_argument("--out", default="dist", help="the folder the zip is written in")
         p.add_argument("--cache", default=str(Path(tempfile.gettempdir()) / "freesail-pins"))
+        p.add_argument(
+            "--allow-changed",
+            action="store_true",
+            help="a trial: build from the checkout's files though they differ from the commit",
+        )
     sub.add_parser("files", help="list the game's files a download ships")
     lk = sub.add_parser("lock", help="resolve the lock files again (needs uv)")
     lk.add_argument("--exclude-newer", required=True, help="a date, e.g. 2026-11-13")
@@ -510,7 +557,7 @@ def main(argv: list[str] | None = None) -> int:
     if not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789.-" for c in name.lower()):
         raise SystemExit("A download's name is letters, figures, dots and dashes.")
     build = build_windows if args.cmd == "windows" else build_mac
-    build(name, Path(args.out).resolve(), Path(args.cache))
+    build(name, Path(args.out).resolve(), Path(args.cache), ROOT, args.allow_changed)
     return 0
 
 

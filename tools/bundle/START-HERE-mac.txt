@@ -38,6 +38,8 @@ A MODEL AT A STATION
   Optional, and needs a key of your own; see the README (game/README.md).
 
 IF SOMETHING GOES WRONG
+  This Mac download was built and started by a Mac in the cloud (Apple silicon
+  and Intel), and has not yet been tried by a person: please say how it went.
   Tell the person who sent you this download what you did and what the
   Terminal window said (a screenshot will do: Shift-Command-4); or, with a
   GitHub account, open an issue at https://github.com/PlasmeticRaven/FreeSail/issues

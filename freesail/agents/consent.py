@@ -139,7 +139,27 @@ __all__ = [
 
 ROOT = Path(__file__).resolve().parents[2]
 BRIEF_PATH = ROOT / "docs" / "agents" / "ConsentBrief.md"
-RECORDS_DIR = ROOT / "docs" / "agents" / "consent"
+# The mark the downloads for a machine without Python carry in the game's folder (package
+# 130; tools/bundle.py writes it): a game run from one is run from a folder that is not the
+# player's to keep, which a newer download replaces.
+DOWNLOAD_MARK = "FROM-A-DOWNLOAD.txt"
+
+
+def default_records_dir(root: Path = ROOT, settings_file: Path | None = None) -> Path:
+    """Where a seated model's consent record goes when nothing names a place (package 130;
+    the proposal's decision 31, "consent records belong to whoever runs the game"): from a
+    checkout, the game's own `docs/agents/consent/`, as ever; from a download (its mark in
+    the game's folder), `consent/` beside the player's settings and saves, so that nothing
+    is written in the unpacked folder and a newer download loses no record. A setting of
+    the player's, or `--consent-records`, still wins over either."""
+    if (Path(root) / DOWNLOAD_MARK).is_file():
+        from freesail import settings as settings_mod
+
+        return (settings_file or settings_mod.settings_path()).parent / "consent"
+    return Path(root) / "docs" / "agents" / "consent"
+
+
+RECORDS_DIR = default_records_dir()
 
 # The one tool of the conversation (spec §14: "no tools but answer").
 CONSENT_TOOLS: tuple[str, ...] = ("answer",)

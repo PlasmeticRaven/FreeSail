@@ -3,12 +3,7 @@
 # It runs the game with the Python in this folder (Apple silicon's or Intel's, by the
 # machine) and nothing of the machine's own: the interpreter by its own path, -I (no user
 # site, no PYTHON* variables), -B (nothing written beside the code), -X utf8.
-HERE="$(cd "$(dirname "$0")" && pwd -P)"
-
-# The browser's "downloaded from the internet" mark, which the Mac's unzip gives every file
-# in the folder: once you have opened this launcher, the rest of the folder (the Python and
-# its libraries) is yours too, and is not asked about file by file.
-/usr/bin/xattr -dr com.apple.quarantine "$HERE" 2>/dev/null
+HERE="$(CDPATH= cd -- "$(/usr/bin/dirname -- "$0")" && pwd -P)"
 
 case "$(/usr/bin/uname -m)" in
     arm64) PY="$HERE/python-arm64/bin/python3.11" ;;
@@ -24,10 +19,17 @@ if [ ! -x "$PY" ] || [ ! -f "$HERE/game/freesail/__main__.py" ]; then
     exit 1
 fi
 
+# The browser's "downloaded from the internet" mark, which the Mac's unzip gives every file
+# in the folder: once you have opened this launcher, the rest of the download (the Python
+# and its libraries, the game) is yours too, and is not asked about file by file. Only the
+# download's own folders: nothing beside them.
+/usr/bin/xattr -dr com.apple.quarantine "$HERE/python-arm64" "$HERE/python-x86_64" \
+    "$HERE/game" "$HERE/licences" 2>/dev/null
+
 unset PYTHONHOME PYTHONPATH PYTHONSTARTUP PYTHONUSERBASE PYTHONEXECUTABLE __PYVENV_LAUNCHER__
 export PYTHONDONTWRITEBYTECODE=1 PYTHONNOUSERSITE=1 PYTHONUTF8=1
 
-cat <<WORDS
+/bin/cat <<WORDS
 
   FreeSail ({{NAME}}) is starting.
 

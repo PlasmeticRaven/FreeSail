@@ -35,6 +35,34 @@ ROOT = Path(__file__).resolve().parents[1]
 PATH_FLAGS = ("ship", "scenario", "load", "standing_orders", "consent_records", "saves")
 
 
+def port_taken_words(host: str, port: int) -> str | None:
+    """The plain sentence said before the server stops when its port is taken (package
+    130: a second start, or another program on it), or None when the port is free. Only
+    words: the server is started as before, and stops as before when it cannot listen."""
+    import errno
+    import socket
+
+    family = socket.AF_INET6 if ":" in host else socket.AF_INET
+    probe = socket.socket(family, socket.SOCK_STREAM)
+    try:
+        if sys.platform != "win32":
+            # as the server binds: a port left only in TIME_WAIT is free, one listened on
+            # is not (on Windows the option would let a second socket take a port in use)
+            probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        probe.bind((host, port))
+    except OSError as e:
+        if e.errno not in (errno.EADDRINUSE, getattr(errno, "WSAEADDRINUSE", -1), 10048):
+            return None
+        return (
+            f"FreeSail seems to be running already (or another program has port {port}): "
+            f"look for its other window, or open http://localhost:{port}/harbour in your "
+            "browser. To run a second one, start it with --port and another number."
+        )
+    finally:
+        probe.close()
+    return None
+
+
 def main(argv: list[str] | None = None) -> int:
     # the harbour's terminal lines are read by a test through a pipe (truth 7b-108) and by
     # the owner through a console: line-buffered, so that each line reaches its reader when
@@ -130,6 +158,9 @@ def main(argv: list[str] | None = None) -> int:
         "The clock is held until the driver says go (the game page's button, or 'go' at "
         "its order line)."
     )
+    taken = port_taken_words(args.host, args.port)
+    if taken:
+        print(taken, flush=True)
     if not args.no_browser and srv.get("open_browser", True):
         threading.Timer(1.5, webbrowser.open, args=(page,)).start()
     uvicorn.run(app, host=args.host, port=args.port, log_level="warning")

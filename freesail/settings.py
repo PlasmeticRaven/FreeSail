@@ -55,7 +55,8 @@ DEFAULTS: dict[str, Any] = {
     "places": {
         "saves": "",  # '' the settings' own place, saves/
         "scenarios": "",  # '' the settings' own place, scenarios/
-        "consent_records": "",  # '' the game's own (docs/agents/consent)
+        # '' the game's own (docs/agents/consent); from a download, consent/ beside these
+        "consent_records": "",
         "desktop_config": "",  # '' the platform's place for the desktop client's file
     },
     "doors": {
