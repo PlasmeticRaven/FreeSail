@@ -7,9 +7,9 @@ Milestone 7 was closed by the owner on 2026-11-24, **closed, with a list** (`doc
 From his play of the gate (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`):
 
 1. **The first passage teaches the time's compression**, not `tick` after `tick`, once the first `tick` has shown what one is.
-2. **A game can be ended from the harbour**, without stopping the harbour or beginning another.
-3. **Fog comes on and clears over a time**, and is said as it does ("the fog seems to be clearing", "a fog is settling in"), as far as the weather's simulation allows.
-4. **The game's own captain replaces a spar carried away.** In the first action the Renard sailed three hours with her main topgallant mast gone and never shifted it; the work exists for a player.
+2. **A game can be ended from the harbour**, without stopping the harbour or beginning another. **Mended: package 126, part one, merged 27 November at 7bc7de20.**
+3. **Fog comes on and clears over a time**, and is said as it does ("the fog seems to be clearing", "a fog is settling in"), as far as the weather's simulation allows. **Mended: package 126, part one, merged 27 November at 7bc7de20.**
+4. **The game's own captain replaces a spar carried away.** In the first action the Renard sailed three hours with her main topgallant mast gone and never shifted it; the work exists for a player. **Built and held: package 126's part two, after two reads not passed (the spar's work took the hands that work her); a third pass is in hand.**
 
 **Placed by the owner the same day (the proposal's decision 79):** the first goes with the milestone of the player's first hours; the other three open milestone 8 as its mending step, with the older faults of section 4 and package 125, the test suite's package planned beside it.
 
@@ -67,7 +67,9 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
 
-Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19 and 20 are not yet placed.
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19 and 20 are not yet placed.
+
+21. The saves a stand-down writes are named by seed and tick, and two written at one tick overwrite one another (found by package 126's builder; the desk's naming, older than the package).
 
 ## 5. Booked by the owner or the lead, not launched
 

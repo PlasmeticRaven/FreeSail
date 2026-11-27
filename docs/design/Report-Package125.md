@@ -4,7 +4,7 @@ The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the grou
 
 Every measure is at seed 7, made with the truths' own helpers (`close_hauled_on_starboard`: the wind from the north, no gusts, plain sail set and braced up). Tacks are from 290, 292.5 and 295 degrees, in 8, 12, 15, 20 and 25 knots. "Shortened" means the game's own `shorten sail` run to its end, then sixty seconds, then the helm put down. **S**n means stayed in n seconds; **m** means missed stays; **F** means refused; **·** means no end in 900 s.
 
-The light corvette of the ships' package (her file on `claude/pkg-90-diana`) was used as a probe only, in a scratch copy. Nothing of hers is committed; her figures here are what her builder will find.
+The light corvette of the ships' package was used as a probe only, in a scratch copy. Nothing of hers is committed; her figures here are what her builder will find.
 
 ## 1. The fleet on the trunk
 
