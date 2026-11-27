@@ -2642,3 +2642,45 @@ def test_truth_7_772_in_the_browser_a_game_is_ended_and_the_next_offers_its_own_
     assert master.locator(".t-door").input_value() == ""
     assert pg.inner_text("#end-words") == "" and not pg.is_visible("#end-words")
     assert errors == []
+
+
+def test_truth_7_794_a_ship_made_a_kings_ship_in_the_harbour_carries_the_private_signals(
+    port, client
+):
+    """The owner's note 10 of 27 November: the hermaphrodite brig made a King's ship in the
+    harbour's maker (`papers: {service: kings}`, the form the harbour writes) and the game begun
+    from it carries her nation's table for the month: `the private signal` reads it and `show
+    the private signal` is made. Made with no service, a King's ship by her wardroom alone, she
+    carries none, as the primer says. OLD: refused aboard the King's ship with the merchantman's
+    reason ("this ship carries none")."""
+    got = client.get(
+        "/api/harbour/scenario", params={"path": "data/scenarios/naval-cruise.yaml"}
+    ).json()
+    for service, carries in (("kings", True), (None, False)):
+        fields = dict(got["fields"], name=f"A cruise, {service}")
+        fields["ship"] = dict(fields["ship"], file="data/ships/hermaphrodite-brig.yaml")
+        papers = dict(fields.get("papers") or {})
+        papers.pop("service", None)
+        if service is not None:
+            papers["service"] = service
+        fields["papers"] = papers
+        saved = client.post(
+            "/api/harbour/scenario", json={"fields": fields, "name": f"cruise-{service}"}
+        )
+        assert saved.status_code == 200, saved.text
+        text = Path(saved.json()["path"]).read_text(encoding="utf-8")
+        assert ("service: kings" in text) == carries, text
+        r = client.post("/api/harbour/start", json={"scenario": saved.json()["path"], "seed": 1805})
+        assert r.status_code == 200, r.text
+        w = port.driver.world
+        # her captain's place gives no table (the Neufchatel's is a privateer's by the rules)
+        assert w.captain.role not in ("kings-ship", "cruiser", "commodore"), w.captain.role
+        read = w.submit("the private signal").text
+        shown = w.submit("show the private signal").text
+        if carries:
+            assert read.startswith("The private signal: by day,"), read
+            assert "carries none" not in shown, shown
+        else:
+            assert read == "The private signal: none aboard.", read
+            assert "this ship carries none" in shown, shown
+        port.harbour.end(lose_unsaved=True)
