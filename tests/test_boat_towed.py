@@ -486,8 +486,7 @@ def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_
 def test_clearing_for_action_her_boat_lost_says_no_boat_out(tmp_path):
     """Nudge 77, item 1: `clear for action` said "The boats are out and towing astern" of a ship
     whose boat was stove and cut adrift. Her boat lost, the line says so (the tartane probe
-    carries two, the other on the booms); with it, as before (that it says so of a boat left on
-    the booms is the trunk's, older)."""
+    carries two, the other on the booms), in package 127's words of where her boats are."""
     sc = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=12.0,
@@ -509,11 +508,14 @@ def test_clearing_for_action_her_boat_lost_says_no_boat_out(tmp_path):
         w.run(900)
         said[stove] = [e.text for e in w.log.all()[n0:] if "the ship is clear" in e.text.lower()]
     assert said == {
-        True: [
-            "The rest of her boats are out and towing astern, the boat lost; the ship is clear."
+        True: ["The punt griped fast on the booms; the boat lost; the ship is clear."],
+        False: [
+            "The punt griped fast on the booms; the boat towing astern on her painter; the ship "
+            "is clear."
         ],
-        False: ["The boats are out and towing astern; the ship is clear."],
-    }
+    }  # in package 127's words (the boats where they are); before it, "The rest of her boats
+    # are out and towing astern, the boat lost; ..." and "The boats are out and towing astern;
+    # ..." (nudge 83)
 
 
 def test_of_two_boats_towed_each_is_in_tow_and_one_stove_leaves_the_other(tmp_path):
@@ -557,7 +559,8 @@ def test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge(tmp_path):
 
 def test_on_a_committed_ship_clearing_for_action_with_her_boat_lost(tmp_path):
     """Nudge 79, the declaration: `clear for action` said "The boats are out and towing astern;
-    the ship is clear." with her boat cut adrift. Now the boat lost is said, by her name."""
+    the ship is clear." with her boat cut adrift. Now the boat lost is said, by her name, beside
+    package 127's "griped fast on the booms" of the rest."""
     sc = Scenario(
         wind_from_deg=0.0,
         wind_speed_kn=15.0,
@@ -575,6 +578,6 @@ def test_on_a_committed_ship_clearing_for_action_with_her_boat_lost(tmp_path):
     w.submit("clear for action")
     w.run(1200)
     said = [e.text for e in w.log.all()[n0:] if "the ship is clear" in e.text.lower()]
-    assert said == [
-        "The rest of her boats are out and towing astern, the launch lost; the ship is clear."
-    ]
+    assert said == ["The boats griped fast on the booms; the launch lost; the ship is clear."]
+    # in package 127's words; before it, "The rest of her boats are out and towing astern, the
+    # launch lost; the ship is clear." (nudge 83)

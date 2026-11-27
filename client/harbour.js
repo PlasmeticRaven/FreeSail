@@ -343,6 +343,9 @@
     $("g-pace").textContent = g.started ? (PACES[g.pace] || g.pace) + ", " + g.compression + "x" : "";
     $("game-clock").textContent = g.started ? (g.running ? "the clock runs" : "the clock is held until the driver says go") : "";
     $("to-game").hidden = !g.started;
+    $("end-game").hidden = !g.started;
+    if (!g.started) $("btn-end-sure").hidden = true;
+    if (endedAt !== null && g.games !== endedAt) { show($("end-words"), ""); endedAt = null; }
     $("in-play-line").textContent = g.started
       ? (g.title || "a ship on open water") + (g.ship ? ", " + g.ship : "") + ", " + g.stamp + "; " + g.seat
       : "no game yet";
@@ -372,6 +375,29 @@
     beginState(s);
     harbour.state = s;
   }
+
+  // -- ending the game in play (the harbour kept) ------------------------------------
+
+  var endedAt = null; // the count of games when one was ended here: its words shown till the next
+  function endGame(loseUnsaved) {
+    $("btn-end").disabled = true;
+    $("btn-end-sure").hidden = true;
+    show($("end-words"), "Ending the game...");
+    $("end-words").classList.remove("refusal");
+    return api("POST", "/api/harbour/end", { lose_unsaved: !!loseUnsaved }).then(function (r) {
+      show($("end-words"), r.lines.join("\n"));
+      endedAt = r.game.games;
+      $("btn-to-game").hidden = true;
+      return api("GET", "/api/harbour/state").then(onState);
+    }).catch(function (e) {
+      // what was played since the last save is lost only on the player's word
+      show($("end-words"), e.message);
+      $("end-words").classList.add("refusal");
+      $("btn-end-sure").hidden = e.message.indexOf("is lost if it is ended") < 0;
+    }).then(function () { $("btn-end").disabled = false; });
+  }
+  $("btn-end").addEventListener("click", function () { endGame(false); });
+  $("btn-end-sure").addEventListener("click", function () { endGame(true); });
 
   function poll() {
     api("GET", "/api/harbour/state").then(onState).catch(function () {
@@ -443,6 +469,8 @@
       ease_on_station: $("s-ease").checked,
     };
     $("btn-start").disabled = true;
+    show($("end-words"), "");
+    $("btn-end-sure").hidden = true;
     show($("start-words"), "Starting...");
     api("POST", "/api/harbour/start", body).then(function (r) {
       show($("start-words"), r.lines.join("\n"));
@@ -485,6 +513,7 @@
 
   var SHIP_STATIONS = ["captain", "officer", "master", "lookout", "passenger", "watcher"];
   var tableKey = "";
+  var tableGame = null; // the game the table's rows were drawn for (the state's `games`)
   // The models the API door can call, from the settings the page already has (the door's
   // own and those beside it), in the settings' order: the page's state carries no model's
   // name of the settings (truth 7b-110).
@@ -529,12 +558,15 @@
       if (s.doors.some(function (d) { return d.id === pendingRows[id]; })) delete pendingRows[id];
       else if (pendingRows[id] === true && s.doors.some(function (d) { return d.station === parts[0] && String(d.ship || "") === parts[1] && d.state === "running"; })) delete pendingRows[id];
     });
-    var key = JSON.stringify([g.started, g.title, g.seed, g.captains, plan, models, s.stations, s.doors.map(function (d) { return [d.id, d.state]; }), g.seat, Object.keys(pendingRows)]);
+    var key = JSON.stringify([g.games, g.started, g.title, g.seed, g.captains, plan, models, s.stations, s.doors.map(function (d) { return [d.id, d.state]; }), g.seat, Object.keys(pendingRows)]);
     if (key === tableKey) return;
     tableKey = key;
     var body = $("t-stations").querySelector("tbody");
     var kept = {};
-    body.querySelectorAll("tr").forEach(function (tr) { kept[tr.getAttribute("data-row")] = [tr.querySelector(".t-door").value, tr.querySelector(".t-model").value]; });
+    // a row's choice of door is kept while the table is drawn again for the same game; a
+    // game begun after another offers the stations as its own scenario gives them
+    if (g.games === tableGame) body.querySelectorAll("tr").forEach(function (tr) { kept[tr.getAttribute("data-row")] = [tr.querySelector(".t-door").value, tr.querySelector(".t-model").value]; });
+    tableGame = g.games;
     clear(body);
     $("t-none").hidden = !!g.started;
     $("t-stations").hidden = !g.started;

@@ -46,3 +46,21 @@ Mended first in the next milestone, by the gate's fourth rule:
 4. The game's own captain replaces a spar carried away.
 
 What else is carried forward is the lead's list: `docs/dev/CarriedForward-M7.md`.
+
+## His later notes (received 2026-11-27)
+
+After the gate closed he sent the notes of his further play on the build `m7`, a cruise in the hermaphrodite brig from off Dover as a King's ship, with three saves of it (kept with the lead; read as data and replayed through the game's own loader on the gate's tree; nothing in them run). His notes 1 to 5 are those above; the rest, as he gave them:
+
+6. Some kind of slowdown is occurring, does not seem to be from nearby ships being live from initial impressions. Saved the game and reloaded both with and without restarting the whole game, and the same slow pace remained, at about 100000 ticks, the maximum pace on my computer seems to be about 60x, even when set to a higher compression, and not ticking very quickly at that. At the start of the game, the compression ran correctly. At the later -2 save, the performance appears to have increased for a non-obvious reason. After some further play, could it be that another ship was chasing mine and I was unaware, and that ship was kept at high detail thus causing slower performance, even though it was far out of range? Performance might need a closer look, if this is not a bug.
+7. Manually appointed devolution of command for situations with multiple officers of various ranks
+8. Bow/stern raking modeling. More effective/damaging hits when raked from bow or stern. Increased lethality/chance of hitting multiple crew.
+9. Fires and fire control, powder explosion, gun faults/condition/maintenance.
+10. In the Neufchatel Cruise, the ship was set in the harbor to be a king's ship, and reads as such, but was not given the private signals automatically.
+11. Temperature.
+
+### What the lead found
+
+- **Note 6 is a fault, and his guess was near it.** The lead replayed his third save on the gate's tree with the pace timed every two thousand ticks, and profiled the slow stretch. No ship chased him. One trader of the background trade, at anchor off Le Havre more than a hundred miles from him, lays her whole passage over the chart afresh every minute of the day and never sails (`docs/dev/CarriedForward-M7.md`, section 4, fault 17). On the build machine the cruise runs four hundred to fourteen hundred ticks a second until the middle of its first afternoon, about fifty from then until dark with two traders crewed within four miles of him, three hundred and fifty to five hundred through the night (she does not weigh by night) with the same two crewed, and thirty-five to forty from the next dawn with three crewed. His "about 100000 ticks" is the second day; his quicker second save, at tick 154909, is the second night. Of 11.6 seconds for six hundred ticks of the slow stretch, 7.7 were hers.
+- **The ships kept at full detail are the design's.** A ship with a captain within four miles of the player is made a fully crewed ship, three at most at once; off Dover, with the trade bound for the Downs, the cap is often full. They cost what the design measured (about a hundred and fifty ticks a second with two awake here), which is above the sixty he plays at on the build machine and may be near it on his.
+- **Note 10 is a fault of the rule, written down as intended** (fault 18 of the same list): the harbour's King's ship is one by her papers, and the private signals are given by the captain's place or a scenario's line the harbour does not write.
+- **Notes 7, 8, 9 and 11 are things not built.** The command devolves on the senior officer by rule, with no order of the captain's to change it (the proposal's decision 63). A shot is placed anywhere along the length a ship presents, whatever her aspect, and harms the men nearest it: nothing rakes. No fire takes hold aboard, no magazine is in danger, and a gun has no faults but a shot's damage. The temperature is the spec's section 26, deferred within milestone 7. The lead's proposed placing of each is in the carried list's section 8.
