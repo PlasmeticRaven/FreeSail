@@ -39957,18 +39957,18 @@ Built by package 127's builder; each moved pin to be passed by a reader other th
 | test_known_truths, the day under systems alone (`GATE_5A_DAY_*`) | 623 | 624 | 0 | 0 | 1 (56834) |
 | the passage for gate 5b (`GATE_5B_*`) | 731 | 746 | 15 | 0 | 0 |
 | the passage in thick weather (`GATE_5B_THICK_*`) | 469 | 475 | 6 | 0 | 0 |
-| the schooner with her octant (`GATE_5B_SCHOONER_*`) | 766 | 791 | 24 | 1 | 0 |
-| the merchant passage (`GATE_5C_MERCHANT_*`; truth 77) | 3096 | 3164 | 66 | 2 | 0 |
-| the naval cruise (`GATE_5C_CRUISE_*`; truth 77) | 2242 | 2321 | 79 | 0 | 0 |
-| the schooner on an intent (`GATE_6A_INTENT_*`) | 2079 | 2147 | 66 | 2 | 0 |
-| truth 78, the fake captain (`GATE_6A_FAKE_CAPTAIN_*`) | 3108 | 3176 | 66 | 2 | 0 |
-| test_captain_trials, the gale with sea room (`TRIAL_STATION_GALE_*`) | 1722 | 1772 | 49 | 1 | 0 |
-| the lee shore (`TRIAL_STATION_LEE_SHORE_LINES`; its digest not asserted) | 1561 | 1609 | 44 | 4 | 0 |
-| the station's stranger (`TRIAL_STATION_STRANGER_*`) | 788 | 816 | 28 | 0 | 0 |
-| the trade's stranger (`TRIAL_TRADE_STRANGER_*`) | 1594 | 1642 | 48 | 0 | 0 |
+| the schooner with her octant (`GATE_5B_SCHOONER_*`) | 766 | 788 | 21 | 1 | 0 |
+| the merchant passage (`GATE_5C_MERCHANT_*`; truth 77) | 3096 | 3134 | 36 | 2 | 0 |
+| the naval cruise (`GATE_5C_CRUISE_*`; truth 77) | 2242 | 2268 | 26 | 0 | 0 |
+| the schooner on an intent (`GATE_6A_INTENT_*`) | 2079 | 2108 | 27 | 2 | 0 |
+| truth 78, the fake captain (`GATE_6A_FAKE_CAPTAIN_*`) | 3108 | 3146 | 36 | 2 | 0 |
+| test_captain_trials, the gale with sea room (`TRIAL_STATION_GALE_*`) | 1722 | 1749 | 26 | 1 | 0 |
+| the lee shore (`TRIAL_STATION_LEE_SHORE_LINES`; its digest not asserted) | 1561 | 1591 | 26 | 4 | 0 |
+| the station's stranger (`TRIAL_STATION_STRANGER_*`) | 788 | 796 | 8 | 0 | 0 |
+| the trade's stranger (`TRIAL_TRADE_STRANGER_*`) | 1594 | 1617 | 23 | 0 | 0 |
 | the trade in thick weather (`TRIAL_TRADE_THICK_*`) | 426 | 429 | 2 | 1 | 0 |
 
-The digests are re-measured beside them, each with its old value in a comment.
+The digests are re-measured beside them, each with its old value in a comment. The figures are the second pass's, a group's turn-waits said once for its order (they were one a yard or a sail: 79 lines in the naval cruise, now 26).
 
 Truth 77 now pins, beside each digest, the passage's line count and her end state: the last tick, her place to a millionth of a degree, her heading and her way. A change of words alone then reads as words.
 
@@ -39984,5 +39984,36 @@ The first build of the turn-waits moved six older "not hands enough for all at o
   - The spanker in: 1959, now 2019.
   - After it, before: the box-off at 1980, boxed off at 2110, the spanker set at 2160. Now: way again and the spanker set at 2040, and three knots at 2400.
 - **7-788, new: the box-off where the spanker in has not paid her off.** The same day with a one-point header at 2000 (the wind from 45 to 56 degrees, her head at 90). Boxing her off at 2040, boxed off at 2208, way again at 2220, three knots by 2400. With the law off, sternway until 2671.
-- **7-152, the straggler: the Friendship lies to five minutes at the start** (a far plan's `lie_to`). Without it, there is no straggler in four hours. Old (2040, 2182, 2340, 6060) came from the commodore's stall. New: No. 20 ordered 1080, up 1638, answered 1800, her station regained 3840; every ship within the 165 m from 7200 (93 m at the most).
-- **7-153, the privateer: she starts a cable nearer the commodore.** In the new day her nearest approach is 2.13 miles, short of where she makes out the escort. Old: evading by 3600 at 1.98 miles, 21 miles off by 10800. New: evading from 2940 at 1.98 miles; pinned now that she takes it up within two miles, 17.9 miles off by 10800. A quarter mile nearer fails the band at 3600, and half a mile nearer never evades.
+- **7-152 and 7-153, the straggler and the privateer: given their cause in the scenario itself** (the lead's ruling E1 on the first pass; the first build gave each its own setup in the test, the Friendship lying to five minutes and the schooner a cable nearer, and the day a player opens had lost both). In the new day, from her old place (49 48.6 N 5 06.5 W) the schooner looked on from 2.13 miles and more: no private signal, no exchange, no straggler. `data/scenarios/convoy-six.yaml` now places her a cable nearer (49 48.53 N 5 06.61 W). She comes down within two miles of the commodore, and the exchange and the straggler follow; the truths read the scenario as shipped.
+
+  | Event | Old (trunk) | New |
+  |---|---|---|
+  | Private signal shown, up | 3600, 3707 | 2940, 3011 |
+  | Judged an enemy under false colours (urgent) | 3960 | 3240 |
+  | No. 8 ordered, up | 4020, 4966 | 3300, 3371 |
+  | Straggler, No. 20 ordered | 2040 | 3360 |
+  | No. 20 up, answered | 2182, 2340 | 3442, 3540 |
+  | The Friendship regained | 6060 | 5880 |
+  | The privateer | evading by 3600 at 1.98 miles | evading from 2940 at 1.98 miles |
+
+  Station kept at the truth's six checks, 7800 to 10800: 152 m at the most. No prize. A new truth, `test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort`, pins the exchange.
+- **7-153's window, a fault carried by the lead (E2).** At seed 7 the truth passes with the schooner 0.05 to 0.15 mile nearer than her old place. At 0.2 and 0.25 she evades but ends outside the band at 3600, and at 0.35 and 0.5 she never evades; seeds 8 and 11 fail other clauses. The cause, found and not mended here:
+  - promoted to a hull of her own at about four miles (`world/ships.py`, a "full" crew no longer judged far), her near captain's lookout makes out colours at two miles without the glass her far brain used, which made them out at three (`COLOURS_MADE_OUT_NM`, `GLASS_FACTOR`);
+  - her near "investigating a stranger" names the stranger and never closes her (`captains._keep_stranger`).
+  So she judges herself overmatched only where the geometry brings her within two miles. The mend would be the near lookout's reading, which every near rules captain and the player's own ship read: not a few lines, and not this package's.
+
+
+**The first pass's list (the lead, 2026-11-27).**
+- **D1, the countermand within a group:** said once, notable, in a line of its own (`verbs._countermand_said`), on every ship. Before, it was folded into the group's routine line, or, where nothing in the group failed, said nowhere: the bilander's `shorten sail`, her sails ending otherwise with no line. Pinned on the bilander and the frigate.
+- **D3, a wait for hands beside the signal's line:** only the runner's turn-wait (`runner.TURN_WAIT`) is taken back by the signal and the ground tackle, and a wait for hands keeps its own notable line, as on the trunk. Pinned on the bilander. The fight and the damage orders lose nothing: a wait for hands is noted whatever `say_wait` is.
+- **D4, the wait's words:**
+  - Behind the same work it says "the same work" ("'Take in the main topgallant' will follow the same work, which the hands are still at."), where it named the work twice.
+  - A group's order says one line for the order ("Bracing the yards: the work waits its turn behind the same work, ..."; "Shortening sail: the work waits its turn behind 'set the fore topsail', ..."), where it said one line a yard or a sail.
+  - Moved here, a pin of this package's own: 7-780's `shorten sail`. Old, two lines ("'Reef the fore topsail' will follow ...", and the main's); new, one.
+- **Small:**
+  - Sternway under a knot is said "sternway, under a knot". It was "a knot" at 0.54; 7-781's cutter, a pin of this package's own, moved so.
+  - With a little way on her under the half knot, the line says "she has but little way on her yet", where it said "no headway".
+  - A boat's own clearing says "The boat is clear."
+  - `fill_away`'s served notes gloss `{filled}`.
+  - The turn-wait mark's place outside the World's memory has a truth of its own.
+- **D2:** "She gathers headway; filled away ..." is notable (`ship.way`), where the report said routine; pinned.

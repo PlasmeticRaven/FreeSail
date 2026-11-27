@@ -3008,7 +3008,7 @@ GATE_5B_LINES = 746  # the well's order gone, its two held lines (2026-10-21; 73
 # the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
 # package 127, words alone, the states unmoved: was 2c38f76132521e4e
 GATE_5B_DIGEST = (
-    "e0a3484cbf47468c"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
+    "e6ae51ba40745582"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3067,7 +3067,7 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
 # left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
 GATE_5B_SCHOONER_LINES = (
-    791  # 127: 24 turn-waits, 1 fill-away (766 before); the well (768 at 56, 763 at package 45)
+    788  # 127: 21 turn-waits, 1 fill-away (766 before); the well (768 at 56, 763 at package 45)
 )
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
@@ -3089,7 +3089,7 @@ GATE_5B_SCHOONER_LINES = (
 # (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
 GATE_5B_SCHOONER_DIGEST = (
     # package 127, words alone, the states unmoved: was 0fef1c52128ce9b2
-    "4a2f78b3ef48643f"
+    "0a7193d752f0d3c2"
 )
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
@@ -3108,7 +3108,7 @@ GATE_5B_THICK_LINES = 475  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
 # package 127, words alone, the states unmoved: was f119ec763d2b442e
 # (the trim's words (9ce8174ebc6948c6 at ruling 2))
-GATE_5B_THICK_DIGEST = "ee9a1b540ba24e73"
+GATE_5B_THICK_DIGEST = "8c53335d5f6d10d7"
 
 
 def the_landfall(log):
@@ -4174,7 +4174,7 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
 GATE_5C_CRUISE_LINES = (
-    2321  # 127: 79 turn-waits (2242 before); package 56, the glass (2225 at package 57)
+    2268  # 127: 26 turn-waits (2242 before); package 56, the glass (2225 at package 57)
 )
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
@@ -4193,7 +4193,7 @@ GATE_5C_CRUISE_LINES = (
 # (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
 GATE_5C_CRUISE_DIGEST = (
     # package 127, words alone, the states unmoved: was bdd6ce8a97a33140
-    "499b097a46b814e8"
+    "e82ff12060620796"
 )
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
@@ -4323,8 +4323,8 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
 # package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
 # before)
-# package 127: 66 turn-waits, 2 fill-away (3096 before), the states unmoved
-GATE_5C_MERCHANT_LINES = 3164  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 127: 36 turn-waits, 2 fill-away (3096 before), the states unmoved
+GATE_5C_MERCHANT_LINES = 3134  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4344,7 +4344,7 @@ GATE_5C_MERCHANT_LINES = 3164  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
 GATE_5C_MERCHANT_DIGEST = (
     # package 127, words alone, the states unmoved: was 8259996fb122428e
-    "b40d5d0e5adad124"
+    "524f4ba5fbc3a987"
 )
 
 
@@ -4796,8 +4796,8 @@ GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
 GATE_6A_INTENT_SOLD_TICK = None
 # package 65, step 3: the boat away for the prices at 111619 is reported to the master below
 # a minute later (one line more, every tick the same)
-# package 127: 66 turn-waits, 2 fill-away (2079 before), the states unmoved
-GATE_6A_INTENT_LINES = 2147  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
+# package 127: 27 turn-waits, 2 fill-away (2079 before), the states unmoved
+GATE_6A_INTENT_LINES = 2108  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
@@ -4817,7 +4817,7 @@ GATE_6A_INTENT_LINES = 2147  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # before; TuningNotes, "Package 90, A2")
 GATE_6A_INTENT_DIGEST = (
     # package 127, words alone, the states unmoved: was 7239b1a1ed45736f
-    "23dc6d0a2a8c5bbc"
+    "6e0dabb35a9e4276"
 )
 
 
@@ -4842,8 +4842,8 @@ def test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_name
 
     Package 127, at the lead's ruling: beside each digest her line count and her end state
     (the tick, her position to a millionth of a degree, her heading and her way), so that a
-    change of words alone is read as words: the digests moved with 66 and 79 lines of waits
-    said (3096 to 3164 and 2242 to 2321 lines), her end state the same to the bit."""
+    change of words alone is read as words: the digests moved with 36 and 26 lines of waits
+    said (3096 to 3134 and 2242 to 2268 lines), her end state the same to the bit."""
     ends = {
         "merchant": (GATE_5C_MERCHANT_LINES, 129600, (48.328859, -4.496049), (5.833137, -0.088528)),
         "cruise": (GATE_5C_CRUISE_LINES, 172800, (48.687572, -5.580345), (6.238577, 1.281860)),
@@ -5028,7 +5028,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # TuningNotes, "Package 90, A2")
 GATE_6A_FAKE_CAPTAIN_DIGEST = (
     # package 127, words alone, the states unmoved: was 50529f09d4de955e
-    "1789990b5ca1912b"
+    "4d5c721461dbd955"
 )
 
 
