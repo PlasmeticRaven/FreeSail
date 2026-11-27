@@ -92,7 +92,7 @@ Released across the gate by the owner on 19 November. Merged so far: the helm's 
 
 ## 7. The lead's rulings that are the owner's to overturn
 
-Each was told to him when it was made and is in the records of its package. **On 27 November he said of those made that day and before: "your rulings stand."**
+Each was told to him when it was made and is in the records of its package. **On 27 November he said of those made that day and before: "your rulings stand."** **And later that day, of the rulings on package 126's part two merged over its reader, on consent records kept in a player's own data folder when the game runs from a download, and on the plainer word when the game is already running: "the rulings are good."**
 
 - A model's station may not show, resume or stand down another's (package 117).
 - After the player's own `hold your fire`, `engage` no longer opens fire (package 115 D).
@@ -114,7 +114,7 @@ Each was told to him when it was made and is in the records of its package. **On
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
 - The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is placed in section 9, the lead's proposal.
 - The chart's work, parked; its records say where it stopped.
-- **The owner's notes of 27 November** (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`, his later notes), with the lead's proposed placing, his to change: an order of succession appointed by the captain (his note 7; decision 63 gives the command to the senior officer) with milestone 8's second half, her people; a raking fire (note 8: a shot is placed anywhere along her length whatever her aspect, and nothing rakes) with the fight's known faults in milestone 8's first half, a package of its own from the sources; fire aboard, its fighting and the magazine (note 9) with package 77, and the guns' faults, condition and care with the gunner's station of package 87; temperature (note 11; the spec's deferred section 26) in two layers, the thermometer and the fog that comes of warm air over cold water with the weather of the world that moves, the cold with the crew's health in milestone 8's second half.
+- **The owner's notes of 27 November** (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`, his later notes), with the lead's proposed placing, his to change: an order of succession appointed by the captain (his note 7; decision 63 gives the command to the senior officer) with milestone 8's second half, her people; a raking fire (note 8: a shot is placed anywhere along her length whatever her aspect, and nothing rakes) with the fight's known faults in milestone 8's first half, a package of its own from the sources; fire aboard, its fighting and the magazine (note 9) with package 77, and the guns' faults, condition and care with the gunner's station of package 87; temperature (note 11; the spec's deferred section 26) in two layers, the thermometer and the fog that comes of warm air over cold water with the weather of the world that moves, the cold with the crew's health in milestone 8's second half. **Settled the same day, as proposed ("The bookings read right to me"): packages 131 and 132 booked, packages 77 and 87 widened, temperature placed in its two layers; written into the proposal's roadmap.**
 - Package 128 (the test suite): proposed, not launched. (Package 129, faults 16 to 18 above: launched 27 November at his word.)
 
 ## 9. What the director's milestone (7b) left unbuilt, placed
