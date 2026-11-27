@@ -1754,9 +1754,10 @@ class Runner:
             posts=True,
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
-        if got.outcome in (hands.TOO_FEW, hands.SHORT) and self._spar_work_gives_way(
-            ship, inst, crew
-        ):
+        gives_way = got.outcome == hands.TOO_FEW or (
+            got.outcome == hands.SHORT and not crew.all_hands_called_by_order
+        )
+        if gives_way and self._spar_work_gives_way(ship, inst, crew):
             # the spar's work is the last claimant of her hands: its hands are this work's, and
             # it is taken up again when nothing else wants them (`_try_resume`)
             hands.release(crew, inst.inst_id)
@@ -1886,18 +1887,22 @@ class Runner:
             self._hold(ship, crew, other, reason, {"for": inst.evo.id})
         return True
 
-    def _spar_work_waits(self, inst: Instance) -> bool:
+    def _spar_work_waits(self, inst: Instance, crew: Crew) -> bool:
         """Whether a spar's work held is still to wait before it has its hands again: while
-        other work waits for hands or goes on short of them (`_spar_work_gives_way`)."""
+        other work waits for hands or goes on short of them (`_spar_work_gives_way`). With all
+        hands called by order (the captain's for a wreck that has hung, `world.captains.
+        WRECK_HANDS_UP_S`, or the player's) the hands are up for the work: it waits only on
+        work too few to begin, and work going on short goes on with the hands there are."""
         if inst.evo.id not in SPAR_WORK_BELAYED:
             return False
+        up = bool(crew.all_hands_called_by_order)
         for other in self.instances:
             if other is inst or other.paused or other.evo.id in SPAR_WORK_BELAYED:
                 continue
             if other.waiting and other.waiting_for == WAITING_FOR_HANDS:
                 return True
             a = other.assignment
-            if a is not None and a.outcome == hands.SHORT:
+            if a is not None and a.outcome == hands.SHORT and not up:
                 return True
         return False
 
@@ -2220,7 +2225,7 @@ class Runner:
     def _try_resume(self, ship: Ship, inst: Instance, crew: Crew) -> None:
         """A belayed instance takes up its work again when all hands are done, if it can
         have its hands; until then it stays belayed, its progress held."""
-        if self._all_hands_at_work() or self._spar_work_waits(inst):
+        if self._all_hands_at_work() or self._spar_work_waits(inst, crew):
             return
         got = hands.request(
             crew,

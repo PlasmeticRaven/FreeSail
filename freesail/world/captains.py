@@ -226,6 +226,13 @@ SPAR_MEND_ORDER: tuple[str, ...] = (
     "royal_mast",
     "studdingsail_boom",
 )
+# A wreck that has hung this long with her watch never free of her own work (her sail orders
+# waiting for hands the whole while: the bilander's and the merchant brig's watch of seven) has
+# all hands turned up to clear it, and piped down when it is cleared (`Captain._spar_work`;
+# JUDGEMENT: an hour, the watch's own work drained within it in every other cell of the lead's
+# probe of 2026-11-27; and a wreck alongside beats the side and fouls the gear, so that it is cut
+# away as soon as there are hands for it, the lead's ruling of the same day).
+WRECK_HANDS_UP_S = 3600
 # A refused or failed order to bring her to for the weather is given again this long after the
 # last (`Captain._bring_to_again`; JUDGEMENT: ten minutes, as the repairs' interval and the spar
 # work's quiet below: time for what stood in its way, the topsail's setting or a heave-to for the
@@ -3235,6 +3242,8 @@ class Captain(Judgement):
                 self.give("shift the jib for the storm jib", why="to lie to in a gale")
                 self._business["lie_to_storm_lug"] = True  # hove to when the storm jib is set
                 return
+            self._business.pop("bring_to_refused", None)  # a gale afresh
+            self._business.pop("bring_to_stuck", None)
             self._bring_to_for_weather()
             return
         sailing_states = ("on passage", "beating", "running for shelter")
@@ -3579,19 +3588,35 @@ class Captain(Judgement):
         """Lie a-try for the gale, or, with no topsail she could ever set to lie under
         (`_topsail_to_lie_under`: the smack's light topsail), heave to under the canvas she
         has, as a fore-and-aft vessel lies to; the tick of it kept for the order given again
-        (`_bring_to_again`)."""
-        self._business["brought_to_at"] = int(self.world.clock.tick)
+        (`_bring_to_again`), and a refusal's words with the sail she had set when it came."""
+        business = self._business
+        business["brought_to_at"] = int(self.world.clock.tick)
         if self._topsail_to_lie_under():
-            self.give("lie a-try", why=why)
+            got = self.give("lie a-try", why=why)
         else:
-            self.give("heave to", why=_and_why("no topsail set to lie a-try under", why))
+            got = self.give("heave to", why=_and_why("no topsail set to lie a-try under", why))
+        if getattr(got, "kind", "") == "order.rejected":
+            said = (str(getattr(got, "text", "")), self._sail_standing())
+            business["bring_to_stuck"] = said == business.get("bring_to_refused")
+            business["bring_to_refused"] = said
+        else:
+            business.pop("bring_to_refused", None)
+            business.pop("bring_to_stuck", None)
+
+    def _sail_standing(self) -> tuple[str, ...]:
+        """The sails she has set, by id, for telling whether her sail has changed."""
+        sails = getattr(self.world.ship, "sails", {}) or {}
+        return tuple(sorted(sid for sid, sl in sails.items() if getattr(sl, "is_set", False)))
 
     def _bring_to_again(self, p: Perception) -> None:
         """Lying to for the weather and not brought to: his order refused or failed (the
         topsail not yet set, a heave-to for the lead in hand, she would not lie to), it is given
         again `BRING_TO_AGAIN_S` after the last, while nothing of the kind is in hand (the
         lead's list of 2026-11-27 for package 126, part two, item 2: a refused order to bring
-        her to is given again; on the trunk it was given once, on entering the state)."""
+        her to is given again; on the trunk it was given once, on entering the state). Refused
+        twice in the same words with her sail as it was (a boat with no topsail; the smack with
+        no head sail set), it is not given again until her sail changes: what stands in its way
+        is nothing in hand that will be done."""
         if self._business.get("lie_to_storm_lug") or self._lugger_storm_lug():
             return  # the lugger's storm canvas brings her to (`_work`)
         ship = self.world.ship
@@ -3604,6 +3629,11 @@ class Captain(Judgement):
         last = self._business.get("brought_to_at")
         if last is None or p.tick - int(last) < BRING_TO_AGAIN_S:
             return
+        if self._business.get("bring_to_stuck"):
+            refused = self._business.get("bring_to_refused") or ("", ())
+            if refused[1] == self._sail_standing():
+                return
+            self._business.pop("bring_to_stuck", None)
         self._bring_to_for_weather(why="not brought to")
 
     def _topsail_to_lie_under(self) -> bool:
@@ -4883,9 +4913,7 @@ class Captain(Judgement):
         # the rigging is mended when the weather serves (the carpenter's and the boatswain's
         # reports say as much): never lying to for weather, in distress, or with the wind at
         # the shortening figure and above
-        if self.state in ("hove to for weather", "in distress"):
-            return
-        if float(p.wind_kn or 0.0) >= float(self._th("shorten_sail_kn", 30.0) or 30.0):
+        if self.state == "in distress":
             return
         runner = ship.extra.get("evolutions")
         in_hand = (
@@ -4893,6 +4921,17 @@ class Captain(Judgement):
             if runner is not None
             else set()
         )
+        if self.state == "hove to for weather" or float(p.wind_kn or 0.0) >= float(
+            self._th("shorten_sail_kn", 30.0) or 30.0
+        ):
+            # out of the weather's way the rest waits; but a wreck is cut away as soon as there
+            # are hands for it, the gale or no (the lead's ruling of 2026-11-27 for package 126):
+            # its clearing alone, the spar shifted when the weather serves
+            got = self._spar_work(ship, p, in_hand, runner, wreck_only=True)
+            if got is not None:
+                self._business["repairs_tick"] = tick
+                self.give(got[0], why=got[1])
+            return
         keeper = ship.extra.get("damage")
         holes = [
             h
@@ -4937,7 +4976,7 @@ class Captain(Judgement):
         self.give(text, why=why)
 
     def _spar_work(
-        self, ship: Any, p: Perception, in_hand: set[str], runner: Any
+        self, ship: Any, p: Perception, in_hand: set[str], runner: Any, wreck_only: bool = False
     ) -> tuple[str, str] | None:
         """The next work on a spar carried away, as (the order, why), or None.
 
@@ -4963,20 +5002,60 @@ class Captain(Judgement):
 
         if self.state == "struck":
             return None
+        from freesail.crew.model import Crew
+
         instances = list(getattr(runner, "instances", []) or [])
-        if in_hand & SPAR_WORK_BUSY or any(getattr(i, "all_hands", False) for i in instances):
-            return None
-        if any(getattr(i, "waiting", False) for i in instances):
-            return None  # an order of his or the watch's waits: it has the hands first
-        if self._weather_against_spar_work(p):
-            return None
+        business = self._business
+        hanging_now = [w for w in wrecks(ship) if isinstance(w, Spar)]
+        crew = (getattr(ship, "extra", {}) or {}).get("crew")
+        called = isinstance(crew, Crew) and bool(crew.all_hands_called)
+        if hanging_now:
+            business.setdefault("wreck_since", int(p.tick))
+        else:
+            business.pop("wreck_since", None)
+            business.pop("hands_up_for_wreck", None)
+            if business.pop("hands_up_called", None) and called:
+                return "pipe down", "the wreck cleared away"
         # read, never made: `damage_of` would put a damage record on a ship that has none
         keeper = (getattr(ship, "extra", {}) or {}).get("damage")
         came = (getattr(keeper, "struck_by", {}) or {}).values()
         struck = max((int(t) for t in came), default=None)
         if struck is not None and p.tick - struck < SPAR_WORK_QUIET_S:
             return None
-        if not self._under_command(ship, p):
+        # a wreck that has hung `WRECK_HANDS_UP_S` with her watch never free of her own work
+        # (work waiting for hands, her clearing's or another's) has the hands turned up for it
+        # (the lead's ruling of 2026-11-27: a wreck is never left for good while she has
+        # hands), out of the worsening weather's way
+        since = business.get("wreck_since")
+        if (
+            hanging_now
+            and since is not None
+            and p.tick - int(since) >= WRECK_HANDS_UP_S
+            and not business.get("hands_up_for_wreck")
+            and any(getattr(i, "waiting", False) for i in instances)
+            and (self.state == "hove to for weather" or getattr(self, "trend", "") != "worsening")
+        ):
+            business["hands_up_for_wreck"] = True
+            if not called:
+                business["hands_up_called"] = True
+                name = _name(ship, hanging_now[0].id)
+                return "call all hands", f"to clear away the wreck of the {name}"
+        if in_hand & SPAR_WORK_BUSY or any(getattr(i, "all_hands", False) for i in instances):
+            return None
+        if any(getattr(i, "waiting", False) for i in instances) and not (
+            hanging_now and business.get("hands_up_for_wreck")
+        ):
+            return None  # an order of his or the watch's waits: it has the hands first
+        # lying to for the weather, her hands free and her sail work done: the wreck is cut
+        # away then, whatever the wind (a wreck alongside beats the side and fouls the gear; the
+        # lead's ruling of 2026-11-27); the spar shifted when the gale is over
+        lying_to = self.state == "hove to for weather" and (
+            p.manoeuvre == "hove to" or "hove_to" in (getattr(ship, "extra", {}) or {})
+        )
+        weather = self._weather_against_spar_work(p)
+        if getattr(self, "trend", "") == "worsening" and not lying_to:
+            return None  # her shortening's hands first; the wreck cleared once she is snug
+        if not (lying_to or self._under_command(ship, p)):
             return None
         spars = getattr(ship, "spars", {}) or {}
         order = {sid: i for i, sid in enumerate(spars)}
@@ -4986,7 +5065,6 @@ class Captain(Judgement):
             cls = SPAR_MEND_ORDER.index(sp.cls) if known else len(SPAR_MEND_ORDER)
             return (int(light_spar(ship, sp)), cls, len(ship.spar_chain(sp)), order.get(sp.id, 0))
 
-        business = self._business
         hanging = sorted((w for w in wrecks(ship) if isinstance(w, Spar)), key=rank)
         if hanging:
             wreck = hanging[0]
@@ -5010,10 +5088,14 @@ class Captain(Judgement):
             business["was_set"] = carried + [
                 x for x in took if ship.sails[x].state is SailState.SET and x not in carried
             ]
+            business.pop("head_sail_for_wreck", None)
             name = _name(ship, wreck.id)
             return f"clear away the wreck of the {name}", f"the {name} carried away"
+        if wreck_only or weather or not self._under_command(ship, p):
+            return None  # the spar shifted, its sails bent and set, with the gale over
         heads = set((getattr(ship, "groups", {}) or {}).get("headsails", []) or [])
         for step in (
+            lambda: self._head_sail_for_the_wreck(ship, p, heads),
             lambda: self._set_again(ship, p),
             lambda: self._bend_again(ship, lambda sid: sid in heads),
         ):
@@ -5045,6 +5127,45 @@ class Captain(Judgement):
                     continue
                 if spares_of(ship, sp.cls) > 0:
                     return f"shift the {name}", f"the {name} carried away"
+        return None
+
+    def _head_sail_for_the_wreck(
+        self, ship: Any, p: Perception, heads: set[str]
+    ) -> tuple[str, str] | None:
+        """The wreck cleared that took head sails she had set (`_business["was_set"]`): a head
+        sail still standing, bent and stowed, is set in their place, the first of her
+        `headsails` that stands on what stands, so that she keeps her head off while the spar
+        is shifted (JUDGEMENT: the head sails' pressure forward is what pays her off; a wreck
+        hanging over the bow does as much by its windage, `physics.sails._sail_windage_area`,
+        and cleared, she gripes up and is taken aback: the lead's probe of 2026-11-27, the
+        seventy-four's fore topmast in twenty-five knots, aback seventeen times against nine
+        with the wreck left hanging). Once for each clearing; none over his shortening line."""
+        from freesail.evolutions.scripts import gone_spar
+        from freesail.ship.parts import SailState
+
+        carried = set(self._business.get("was_set") or [])
+        lost = [sid for sid in carried if sid in heads]
+        if not lost or self._business.get("head_sail_for_wreck"):
+            return None
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        if float(p.wind_kn or 0.0) >= float(th("shorten_sail_kn", 30.0) or 30.0):
+            return None
+        if any(ship.sails[sid].is_set for sid in heads if sid in ship.sails and sid not in lost):
+            self._business["head_sail_for_wreck"] = True
+            return None  # a head sail of hers stands set already
+        order = list((getattr(ship, "groups", {}) or {}).get("headsails", []) or [])
+        for sid in order:
+            sail = ship.sails.get(sid)
+            if sail is None or sid in lost or sail.wrecked:
+                continue
+            if sail.state not in (SailState.FURLED, SailState.LOOSED):
+                continue
+            if gone_spar(ship, sail) is not None:
+                continue
+            self._business["head_sail_for_wreck"] = True
+            return f"set the {self._sail_name(sid)}", "to keep her head off, her head sails gone"
+        self._business["head_sail_for_wreck"] = True
         return None
 
     def _weather_against_spar_work(self, p: Perception) -> bool:
