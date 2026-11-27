@@ -1,6 +1,6 @@
 # 28. The ships
 
-Every ship in the game is a file of her own under `data/ships/`, drawn from her lines and the accounts of her day, and any of them may be yours: name her file to the console as the introduction names the frigate's, or in a scenario's `ship:`, and the orders of this book are hers by the parts she has. Chapter 1 named the parts of the frigate, the schooner, the cutter and the brig, and chapter 2 the lugger's and the smack's. This chapter is the whole list, with the ships of two decks, the razee, the hermaphrodite brig and the bilander, which the earlier chapters do not name; and the trades a hull serves under another name, which a scenario chooses.
+Every ship in the game is a file of her own under `data/ships/`, drawn from her lines and the accounts of her day, and any of them may be yours: name her file to the console as the introduction names the frigate's, or in a scenario's `ship:`, and the orders of this book are hers by the parts she has. Chapter 1 named the parts of the frigate, the schooner, the cutter and the brig, and chapter 2 the lugger's and the smack's. This chapter is the whole list, with the ships of two decks, the razee, the hermaphrodite brig, the bilander and the corvette, which the earlier chapters do not name; and the trades a hull serves under another name, which a scenario chooses.
 
 ```
 python -m freesail.ui.console data/ships/seventy-four.yaml --seed 7 --wind 0,15 --heading 293
@@ -25,6 +25,7 @@ Each ship as she comes, her guns her file's first fit; a scenario's `fit:` names
 | `seventy-four.yaml` | the *Bellerophon*, a seventy-four | 590, 111 marines | 28 long 32-pounders, 28 long 18-pounders, 18 long 9-pounders, 8 carronades (`arrogant class 1793`: the long guns alone; `as the bellona 1812`: 8 long 12-pounders for her 9s, and 14 carronades) | a ship of the line; a seventy-four, a ship of the line, fourteen ports a tier |
 | `hermaphrodite-brig.yaml` | the *Prince de Neufchatel*, an American privateer | 130, 16 marines | 16 12-pounder carronades, 2 long 6-pounders | a brig; a hermaphrodite brig, a brig's foremast and a schooner's main, long and low, pierced for eleven guns a side |
 | `bilander.yaml` | the *Hopewell*, a coasting bilander | 9 | none (`armed merchant`: 4 long 3-pounders and 4 half-pounder swivels) | a bilander; a bilander, a merchantman under a settee main, deep laden |
+| `corvette-20.yaml` | the *Diana*, a Spanish corvette, the Danish light frigate of 1804 | 167, 50 of them soldiers | 20 30-pounder carronades (`danish 1807`: 16 30-pounder carronades and 4 long 8-pounders; `as captured 1809`: 20 24-pounder carronades; `1817`: 12 long 12-pounders, 8 30-pounder carronades and 4 3-pounder carronades) | a ship; a corvette, flush-decked, eleven ports a side |
 
 ## The ships of two decks: the sixty-four and the seventy-four
 
@@ -84,6 +85,16 @@ take in the mainsail
 set the mainsail
 dip the mainsail
 furl the mainsail
+```
+
+## The *Diana*
+
+A light frigate of the Danish navy, built at Copenhagen in 1804, taken by Spain at Cartagena in September 1809 and kept as a corvette to 1832: flush-decked, ship-rigged, one tier of eleven ports a side in a small hull, and her lines are the Spanish navy's plan of her of 1809-1810. She comes as the plan draws her, with twenty 30-pounder carronades. Her fits are her years': `danish 1807` under the Dannebrog, `as captured 1809` with twenty 24-pounder carronades, and `1817` with twelve long 12-pounders among her carronades. Her company is a Spanish corvette's, a hundred and sixty-seven, fifty of them the navy's soldiers, and her people are Spanish where a scenario names no nation.
+
+Her Danish captain of 1807 found her stiff, and said she steered splendidly and ran ten to eleven knots with the wind two or three points abaft the beam in a fresh breeze; she does. She is a light ship with a small rudder. Under all plain sail she stays in a working breeze, but in a fresh breeze she is slack in stays: shorten sail and she stays. In a fresh breeze keep her jib on her, for taken in she gripes up past her helm and will not be held until it is set again. Her lee ports shut at eighteen and a half degrees of heel, so her carronades fight in any breeze she carries topgallants in. At the rig's distance the tops call her "a ship", as they would a frigate; within a mile and a half she is "a corvette", and a scenario names her by "corvette" or "ship-sloop".
+
+```
+python -m freesail.ui.console data/ships/corvette-20.yaml --seed 7 --wind 0,12 --heading 293
 ```
 
 ## The trades a hull serves
