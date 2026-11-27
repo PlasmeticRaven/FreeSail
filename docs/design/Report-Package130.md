@@ -65,7 +65,14 @@ The game already keeps them in the player's own folder (`freesail/settings.py`),
 - **Windows**: `%APPDATA%\FreeSail\settings.yaml`, the saves in `%APPDATA%\FreeSail\saves\` (on the runner `C:\Users\runneradmin\AppData\Roaming\FreeSail\saves\smoke-proof.json`).
 - **macOS**: `~/Library/Application Support/FreeSail/settings.yaml`, the saves in `~/Library/Application Support/FreeSail/saves/`.
 
-So a newer download is unpacked beside the old one and the old folder deleted, and nothing of his is lost. One thing written inside the folder remains, outside the smoke test's road: with no setting, a seated model's **consent record** goes to the game's own `docs/agents/consent/` (`freesail/agents/consent.py`), so into the unpacked folder, and is lost with it at the next download (the model is then simply asked its consent again). It is the game's code, not this package's; it is put to the lead below.
+So a newer download is unpacked beside the old one and the old folder deleted, and nothing of his is lost. The **consent records** go there too (the lead's ruling, below): from a download, a seated model's record goes by default to `.../FreeSail/consent/`, beside the settings and the saves.
+
+## The two changes to the game's behaviour
+
+The package's only changes to the game's own code, each at the lead's word (2026-11-27):
+
+1. **The consent records' default place, from a download** (`freesail/agents/consent.py`, `default_records_dir`; a comment in `freesail/settings.py`). The assembling script writes a mark into the download's game folder (`game/FROM-A-DOWNLOAD.txt`). Where the mark lies and nothing names a place, a seated model's consent record goes to `consent/` beside the player's settings file (`%APPDATA%\FreeSail\consent\`, `~/Library/Application Support/FreeSail/consent/`), after the proposal's decision 31 ("consent records belong to whoever runs the game"), so that nothing is written in the unpacked folder and a newer download loses no record. A setting of the player's, or `--consent-records`, still wins as before; from a checkout (no mark) the default stays `docs/agents/consent/`, where the owner's own records live; what is asked of a model, what is recorded and the brief's text are untouched; the launcher passes no flag. **The smoke test seats no model**, so its "nothing written in the unpacked folder" does not reach this road: truth 7-805 is the proof, of both cases.
+2. **A port already taken** (`freesail/__main__.py`, `port_taken_words`): before the server starts, the port is tried as the server will bind it; if it is in use, one sentence is said, "FreeSail seems to be running already (or another program has port 8000): look for its other window, or open http://localhost:8000/harbour in your browser. To run a second one, start it with --port and another number." Then the server is started as before and stops as before when it cannot listen (uvicorn's own words and exit status, 3 in its 0.54). Words alone. Truth 7-806.
 
 ## The smoke test
 
@@ -85,7 +92,24 @@ Each finding is said in one `::notice::` annotation listing every check that pas
 
 `.github/workflows/downloads.yml` runs in three ways. **By hand**, "Run workflow" on any branch with a name typed: builds, smoke-tests, and publishes the pre-release `preview-NAME` (an earlier one of that name replaced), for handing to friends between gates. (GitHub offers "Run workflow" only for a workflow on the default branch, so this appears once the file is on the trunk.) **Called by the gate's release**, which attaches both downloads beside the project's zip once their smoke tests have passed. **On a push that changes the downloads' own files** (`tools/bundle.py`, `tools/bundle/**`, `tools/bundle_smoke.py`, the workflow): builds and smoke-tests, so that the macOS runners run when a download has changed and not on every push; a push whose head commit carries `[preview NAME]` also publishes, which is how the publishing was proven on this branch.
 
-What a stranger's machine runs is pinned: each interpreter by version and sha256 (`bundle.INTERPRETERS`), each library by version and sha256 in its lock file and installed with `--require-hashes --no-deps --only-binary=:all:`, the locks resolved with nothing newer than two weeks before (`--exclude-newer 2026-11-13`); every action by its commit, with the tag beside it, in both workflows (release.yml's own `checkout@v4`, `setup-python@v5` and `action-gh-release@v2` are now pinned to those majors' present commits). No pull request runs either workflow, so no code of one runs with the token; the token is `contents: read` everywhere but the one publishing job, and checkouts keep no credentials. Text an outsider could write (a commit message, a typed name) reaches the scripts through the environment, never spliced into them, and a name is refused unless it is letters, figures, dots and dashes. The publish uses the `gh` command on the runner and deletes nothing but a `preview-` release of the same name.
+The build job's Python is setup-python's CPython 3.11.14 exactly (the harness's too): it runs pip and writes the zip, so it is pinned to a patch release rather than "3.11"; its download is setup-python's own (not checksummed by us), and every byte it puts in a zip is checked against a pin. The build refuses to start if the game's files in the checkout differ from the commit, and refuses a copy that is not a git checkout, so that a download said to be of a commit is that commit.
+
+What a stranger's machine runs is pinned: each interpreter by version and sha256 (`bundle.INTERPRETERS`), each library by version and sha256 in its lock file and installed with `--require-hashes --no-deps --only-binary=:all:`, the locks resolved with nothing newer than two weeks before (`--exclude-newer 2026-11-13`); every action by its commit, with the tag beside it, in both workflows (release.yml's own `checkout@v4`, `setup-python@v5` and `action-gh-release@v2` are now pinned to those majors' present commits). No pull request runs either workflow, so no code of one runs with the token; the token is `contents: read` everywhere but the one publishing job, and checkouts keep no credentials. Text an outsider could write (a commit message, a typed name) reaches the scripts through the environment, never spliced into them, and a name is refused unless it is letters, figures, dots and dashes. The publish uses the `gh` command on the runner, deletes nothing but a `preview-` release (and its tag) of the same name, and two runs of one name publish one after the other. A typed run publishes a **pre-release** (public, for friends); a `[preview NAME]` push publishes a **draft** (not public), whose notes say it is a builder's proof and not a build for players.
+
+**`release.yml`, line by line.** Nothing changed in it but the call to the downloads' workflow (a job `downloads`, the `release` job's `needs` and its attached files, one download step, a paragraph of its opening comment) and these pins, each the same major's commit as the tag resolved to on 2026-11-27:
+
+| was | now |
+|---|---|
+| `actions/checkout@v4` (three times) | `actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0` |
+| `actions/setup-python@v5` (twice) | `actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0` |
+| `softprops/action-gh-release@v2` | `softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2` |
+| (new) | `actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2` |
+
+The reader of the workflows found, in `release.yml` as it was before this package and left as it is (the lead's word: change nothing else in it), three things for whoever next touches it: the gate's name (typed, or the branch's) is spliced into its shell scripts as `${{ ... }}` rather than passed through the environment, so a branch named `gates/$(...)` would run a command; its `contents: write` is given to the whole workflow, so the lint and the suite's six shards (which install from PyPI unpinned) run with a token that can write, and their checkouts keep it; and a second run for a gate whose tag already exists updates that release in place.
+
+## The licences
+
+At the top of each download, `LICENCES.txt` says what it carries and where each licence lies, all under `licences/`: Python's (`licences/python/`: python.org's `LICENSE.txt` on Windows; on the Mac python-build-standalone's notices, those of CPython and of every library it is built with, taken from the full archive of the same release and kept in `tools/bundle/licences/python-build-standalone/`), and each library's, copied from its `.dist-info` (where pip keeps it, and where it stays too).
 
 ## The `agents` extra
 
@@ -95,12 +119,14 @@ It adds the MCP SDK (the desktop client's bridge), httpx (the local runner), ggu
 
 Nothing is built for either. **Windows**: an Authenticode code-signing certificate from a public authority costs roughly US$200 to $500 a year (since 2023 its key must live on a hardware token or a cloud signing service, which a workflow can use); Microsoft's own cloud signing service is cheaper (about $10 a month) where its eligibility rules admit an individual. A signed launcher and signed libraries replace "unknown publisher" by the owner's name, and satisfy Smart App Control; SmartScreen's "Windows protected your PC" still appears for a new publisher until enough downloads have built a reputation (an EV certificate no longer skips that). The launcher would need to become a small signed `.exe`, as a `.cmd` file cannot carry a signature. **Mac**: the Apple Developer Program costs US$99 a year; with a Developer ID certificate every executable and library in the download is signed and the zip notarised by Apple, and Gatekeeper then opens the download with only its ordinary "downloaded from the internet, are you sure?" box, with no Control-click, no System Settings and no clearing of the quarantine. It wants the launcher made into an `.app` (a `.command` cannot be notarised as an app) and a Mac in the workflow, which the cloud's runners are. Both are the owner's money and decisions; the figures are as of this writing and his to check.
 
-## Truths 7-800 to 7-804
+## Truths 7-800 to 7-806
 
 - **7-800** everything the game opens lies in what the downloads ship (the audit-hook measurement above, in process, about 14 s).
 - **7-801** the game's files ship by their rule (every ship, scenario and chart; the consent brief and the README), and not the owner's consent records, the tests, the tools, the other documents or any compiled file.
 - **7-802** the libraries are the game's own (its base, `server` and `agents`, none of `dev`'s alone), each lock pinning every library by version with its sha256.
 - **7-803** every interpreter pinned by version and sha256 at its maker's place; every action in both workflows by its commit; no pull request trigger; one job that may write; no outsider's text spliced into a script.
+- **7-805** from a download the consent records' default place is beside the settings; from a checkout it is as before.
+- **7-806** a port already taken is said in a plain sentence, and the game stops as before; a free port says nothing.
 - **7-804** the launchers run the folder's own interpreter isolated and writing nothing, and the "start here" pages say each thing the brief asks, and of a model only that it is optional and needs a key of one's own.
 
 ## The cloud's runs
@@ -109,7 +135,7 @@ Nothing is built for either. **Windows**: an Authenticode code-signing certifica
 
 ## What is put to the lead, and to the owner
 
-1. **The consent records** written inside the unpacked folder when a model is seated, by the game's default (above). A one-line change in the game's code would put them beside the settings by default; the launcher could instead pass `--consent-records`, which would win over the player's own setting. Not done: it is the game's code.
-2. **A clearer word when the port is taken** (a second start, or another program on 8000): uvicorn says "address already in use" in its own words, and the window then says the game has stopped. Not done: it is `freesail/__main__.py`.
-3. **Where a friend is told to report a fault**: the pages say "tell the person who sent you this download", or open an issue on the repository with a GitHub account. That is the owner's to word.
-4. **The pre-release `preview-pkg-130`**, made on this branch to prove the publishing: to be removed when the lead or the owner wishes.
+1. **Where a friend is told to report a fault**: the pages say "tell the person who sent you this download", or open an issue on the repository with a GitHub account. That is the owner's to word.
+2. **The draft `preview-pkg-130`**, made on this branch to prove the publishing (not public): to be removed when the lead or the owner wishes.
+3. **The lock files name the API door's library by its package name**, as `pyproject.toml` does: they cannot ship that door without it. No model's name is in them.
+4. **`release.yml`'s three older faults** (above), for whoever next touches it.
