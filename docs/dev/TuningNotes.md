@@ -39932,13 +39932,11 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
 
-## Package 126: the harbour, the weather and the captain (2026-11-24)
+## Package 126, part one: the harbour and the weather (2026-11-24 to 2026-11-27)
 
-**No pin moved.** The fast tier whole on the four parts before their truths were written
-(4f63d86, 89 min on four workers): 8,702 passed, 1 failed, 8 skipped, 1 xfailed; the one failure
-truth 7-284's timing pin on the tide's blend under the load of four workers (0.0169 s against 1.25
-x 0.0124 s), code not touched, passing alone three times of three. The new figures, each
-JUDGEMENT and defined with its ground where it stands:
+**No pin moved.** The captain's spar work and the `lie a-try` mend are not in this hash (held for a
+later pass), so no figure of theirs stands here. The new figures, each JUDGEMENT and defined with
+its ground where it stands:
 
 - `weather.FOG_SETTLE_S` 1,800 s and `FOG_CLEAR_S` 3,600 s: advection fog rolls in off the cold
   water on a light air within the half hour, and is lifted and thins over an hour or so as the wind
@@ -39946,48 +39944,17 @@ JUDGEMENT and defined with its ground where it stands:
   ones, the same seeded draw, so every fog of the old weather is one of the new, at the same edges.
 - `weather.FOG_WIND_THIN_KN` 3 kn and `FOG_COAST_THIN_KM` 5 km: thick three knots under the 12 kn
   that lifts it and a few miles inside its 30 km reach; thinning between, where it stopped at once.
-- `captains.SPAR_MEND_ORDER` (after Luce 1884, ch. XXXI, p. 496: the wreck sent down first, "All
-  sprung spars should be shifted if possible"; Luce 1866, ch. XVII: "Top-gallant and royal-yards and
-  studding-sail booms are easily replaced", the topsail and lower yards the ones that save a ship
-  on a lee shore) and `SPAR_WORK_QUIET_S` 600 s (the repairs' own interval: never under fire).
+- `weather.FOG_AIR_EDGE_KM` 5 km: the fog thins within five kilometres of the edge of the air that
+  holds it, as its reach from the coast thins over `FOG_COAST_THIN_KM`; half an hour's sailing at
+  six knots.
+- `weather.FOG_LINE_QUIET_S` 600 s: a step of the fog's sight is not said within ten minutes of
+  one the other way, nor of the same words, and is said when the quiet is over if it has held. A
+  third of the settling. At its boundary a fog shut in thick may be said clearing ten minutes later.
 
 **One fog's lines, old beside new** (off Falmouth under the June high, seed 7, the morning of the
 5th; truth 7-774): old, "Fog came down." (notable) at the block's edge and "The fog lifted."
-(routine) at the next, the sight from the horizon to a cable and back at one minute each. New, on a
-hazy sky: "A fog is settling in." (notable), "The fog has shut in thick." (notable) 30 min later,
-"The fog seems to be clearing." (notable) an hour before the edge, "The fog lifted." (routine) at
-it; from a clear sky "The fog is thickening." and "The fog is thinning." (routine) between, six
-lines in all. The sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
-
-### Package 126, the second pass (the lead's list of 2026-11-24)
-
-**No pin moved.** The new figures, each JUDGEMENT and defined with its ground where it stands:
-
-- `weather.FOG_LINE_QUIET_S` 600 s: a step of the fog's sight is not said within ten minutes of
-  one the other way, nor of the same words. A third of the settling.
-- `captains._under_command`'s steerage way is `hull.HELM_STEERAGE_SPEED` (0.75 m/s, a knot and a
-  half), the figure the helm already learns by.
-- `captains.LIGHT_SPAR_CLASSES` (the studding-sail booms and the royal masts, and what stands on
-  one), after Luce 1866, ch. XVII ("easily replaced").
-- `captains.SPARE_YARD_ANSWERS` (a topmast: a spare yard to a topsail yard alone), after Luce 1866,
-  ch. XVII, and Fincham 1843, p. 286.
-
-**The spar's work, with it beside without it** (truth 7-779 and its probes; cruising off the Lizard
-in twelve knots, seed 7, the third hour's mean way): the cutter's main topmast 3.57 kn against
--1.18; the brig's main topmast 4.42 against 2.92; the 74's fore topmast 4.15 against 2.48; the
-merchant brig's main topmast 4.78 against 3.83; the frigate's mainmast (her jury mast) 3.69 against
-2.39. None is taken aback more often with it.
-
-**One fog's lines now:** six, every fog alike. "A fog is settling in." (notable), "The fog is
-thickening." 15 min on (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to
-be clearing." (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on
-(routine).
-
-- `weather.FOG_AIR_EDGE_KM` 5 km (the reader's mends of the second pass): the fog thins within five
-  kilometres of the edge of the air that holds it, as its reach from the coast thins over
-  `FOG_COAST_THIN_KM`; half an hour's sailing at six knots.
-- The sails bent again after a shift are set again where she carried them set when the spar went,
-  or where a sail of their own kind is set. The cutter's main topmast case is then 3.57 kn in the
-  third hour (her topsail was loosed and her gaff topsail furled when it went, and are left so),
-  where the first version, which counted every sail as kin, made 4.97 and set what she had not
-  carried.
+(routine) at the next, the sight from the horizon to a cable and back at one minute each. New, six
+lines, every fog alike: "A fog is settling in." (notable), "The fog is thickening." 15 min on
+(routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to be clearing."
+(notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
+sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
