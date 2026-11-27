@@ -243,7 +243,7 @@ The trunk at f2821c7 is old; this hash is new. The measure covers 216 cells:
 
 ## 11. The lead's second list of 2026-11-27: the read of a8b2c3e
 
-The lead's reader read a8b2c3e whole on the trunk with the default gusts, and found it sound and held it for one pass more. This section answers that list. The reader's harness (`claude/trial-6`, `lead-backup/gate125/`) is used throughout, so the cells are the gate's: `tackmx.py` (1,512 cells a tree), `dprobe.py` (with seeds 7 and 11), and `run.py` with `cases125.py`. Old is the trunk at f09fe283. New is this hash.
+The lead's reader read a8b2c3e whole on the trunk with the default gusts, and found it sound and held it for one pass more. This section answers that list. The reader's harness (the scratch branch the lead named, `lead-backup/gate125/`) is used throughout, so the cells are the gate's: `tackmx.py` (1,512 cells a tree), `dprobe.py` (with seeds 7 and 11), and `run.py` with `cases125.py`. Old is the trunk at f09fe283. New is this hash.
 
 **The tack matrix, old beside new.** 90 of 1,512 cells change, and no tack is lost: 787 come round on this hash against 780 on the trunk, with 7 gained. By rule (the reader's `tmxrule.py`):
 - A: 65 cells. The hermaphrodite brig's 51 and the schooners' 2 are declared. Twelve are not, and they are item 1's below.
