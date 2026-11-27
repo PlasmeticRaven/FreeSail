@@ -436,12 +436,13 @@ def _warn(
     key = part.id if pressed is None else f"{pressed[0]}:{part.id}"
     dire = ratio > CARRY_AWAY_RATIO
     if pressed is not None:
-        # a whole lateen's cause keeps its own rule, one a part and its cause in ten minutes
-        # whatever it is (the lead's choice at nudge 56); no committed ship's part is pressed so
-        last = st.last_warning_s.get(key)
-        if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
+        # a whole lateen's cause counted by package 127's rule, as every part is (`warning_due`):
+        # one a part and its cause in ten minutes, and the dire one said whatever lesser one came
+        # within them (package 90, the lead's nudge 77, item 2: the xebec's main yard carried
+        # away 334 s after its shift's order, warned before the order alone); its plain strain
+        # counted as said with it. No committed ship's part is pressed so
+        if not warning_due(st, key, dire):
             return
-        st.last_warning_s[key] = st.elapsed_s
         st.last_warning_s[part.id] = st.elapsed_s
     elif not warning_due(st, key, dire):
         return
@@ -495,9 +496,11 @@ def _causes_come(st: StrainState, pressed: dict[str, tuple[str, str, float]]) ->
     let fly, on the bad hand and warned, and aback and on the bad hand again within the ten
     minutes, was silent the second time, at 1.59 of its rating, till its yard carried away."""
     last = getattr(st, "pressed_by", None) or {}
+    dire = _last_dire_s(st)
     for part_id, mark in pressed.items():
         if last.get(part_id) != mark[0]:
             st.last_warning_s.pop(f"{mark[0]}:{part_id}", None)
+            dire.pop(f"{mark[0]}:{part_id}", None)  # and its dire one, by package 127's count
     st.pressed_by = {part_id: mark[0] for part_id, mark in pressed.items()}
 
 

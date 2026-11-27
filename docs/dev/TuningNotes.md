@@ -40069,3 +40069,20 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to be clearing."
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
+
+## Package 90, the lateen hulls' list, its third pass with package 127: item 2 by 127's rule, the boats' line in 127's words (the lead's nudge 83, 2026-11-27)
+
+`…/pkg-90` merged at e87714d7 (package 127 on the trunk at 572133ac). Old is e87714d7.
+
+- **Item 2, a spar lost while its shift waits: the dire step, by package 127's rule.** A whole lateen's cause is counted by `strain.warning_due`, as every part is: one warning a part and its cause in ten minutes, and the dire one said whatever lesser one came within them (`last_dire_s`). A cause that comes again begins its dire count afresh too (`_causes_come`). At e87714d7 the cause kept its own old rule (the lead's choice at nudge 56), and 127 left it so.
+  - The xebec in 40 kn, the wind through her bow, her sheets let fly onto the bad hand, the wind then to 56 kn: her mizzen yard warned "working" at 1.05 at 613 s.
+  - Old: nothing more, and carried away at 1,080 s.
+  - New: "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; she will carry them away: shift the mizen." at 1.77 at 701 s, and carried away at 1,080 s as before. No load moves.
+  - The xebec in 50 kn on the bad hand: her main yard warned "working" at 1.28 at once, and now "bending like a whip ...; she will carry it away: shift the mainsail." as it passes 1.5.
+- **The boats' line of `clear for action`, in 127's words:** her boats griped fast on the booms, or towing astern on their painters where her file tows them. Her boat lost is not among them, and is said lost by her file's name (`action_scripts._boats_cleared_words`, 127's one function; the third pass's own, at the end of the file, removed in the merge).
+  - A ship with boats on the booms and one lost, the brig, her launch cut adrift: "The boats griped fast on the booms; the launch lost; the ship is clear.".
+  - The bilander, her one boat lost: "The long-boat lost; the ship is clear.".
+  - The tartane probe, her boat towed and stove, her punt on the booms: "The punt griped fast on the booms; the boat lost; the ship is clear.".
+- **A wait said once, routine, marked** (127's `TURN_WAIT`): the third pass's line for an order to a whole lateen waiting behind work (nudge 60's item 2) is 127's line for every order now, said once, routine and marked. The third pass's own branch is gone in the merge.
+  - The strain's "when the hands are done trimming the mainsail" is a clause of the strain's warning, under the strain's count, and not a wait note.
+  - The shift or box then ordered says its own wait by 127's road.

@@ -3203,8 +3203,9 @@ def test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning
     """Nudges 60 and 76, item 3 and item 1: on the bad hand the words name its yard shifted, which
     eases it at once, and nothing that does not (the dire line names only what eases at once).
     The xebec in 50 kn, her lateens put on the bad hand, her main yard warned at once at 1.28,
-    "... the mainsail lying on the mast: shift the mainsail.", and at 1.57 30 s on (within the
-    cause, the ten minutes' rule, the lead's choice at nudge 56): shifted, under half within a
+    "... the mainsail lying on the mast: shift the mainsail.", and dire as it passes 1.5 within
+    the same cause (package 127's rule, nudge 77, item 2; before, unsaid till the ten minutes
+    were out, the lead's choice at nudge 56), at 1.57 30 s on: shifted, under half within a
     minute (measured: a second). Taken in, it eases nothing for two minutes, held at 1.57 to 1.60
     (measured: under half 169 s on), so it is not named; before nudge 76, "shift it or take it
     in.". Not named either, the sheet let fly, which raises it (this case: 1.57 to 1.71)."""
@@ -3212,9 +3213,12 @@ def test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning
     n0 = len(world.log.all())
     _on_the_bad_hand(world)
     world.run(30)
-    (said,) = _warned(_after(world, n0), "main.lateen_yard")
-    assert said.text.endswith("the mainsail lying on the mast: shift the mainsail."), said.text
-    assert ("take" in said.text) is False
+    said = _warned(_after(world, n0), "main.lateen_yard")
+    assert said[0].text.endswith("the mainsail lying on the mast: shift the mainsail.")
+    assert said[-1].text.endswith(
+        "the mainsail lying on the mast; she will carry it away: shift the mainsail."
+    ), [e.text for e in said]
+    assert not any("take" in e.text for e in said)
     at_order = _pressing(world, "main.lateen")
     assert at_order > strain.CARRY_AWAY_RATIO, at_order
     assert world.submit(order).kind == "order.accepted"
@@ -3518,3 +3522,35 @@ def test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out(
     world.run(300)
     kinds = [e.kind for e in _after(world, n0)]
     assert "ship.boxed_off" in kinds and "evolution.failed" in kinds
+
+
+def test_within_one_cause_a_yard_risen_to_dire_is_warned_before_it_goes(xebec_in_40):
+    """Nudge 77, item 2, by package 127's rule (`strain.warning_due`): a lateen's yard warned
+    "working" in its cause and risen past 1.5 within the ten minutes was not warned again, and
+    carried away (the lead's reader: the xebec's main yard, 334 s after its shift's order,
+    warned before the order alone). The xebec in 40 kn, the wind through her bow, her sheets let
+    fly onto the bad hand (the mizzen yard warned "working" at 1.05), the wind then to 56 kn:
+    warned "bending like whips ... she will carry them away" at 1.77 as it rises past 1.5, before
+    its loss (measured in the like run of `n60l/seq.py`: warned 88 s after "working", lost 467 s
+    after it). Before, the loss with no second line."""
+    world = _from(xebec_in_40)
+    _shift_the_wind(world, -8.0)
+    world.run(10)
+    for mast in ("fore", "main", "mizzen"):
+        world.submit(f"let fly the {mast} lateen sheet")
+        world.run(1)
+    n0 = len(world.log.all())
+    world.run(87)
+    world.wind.follow(world.wind.base_direction, units.knots_to_ms(56.0))
+    world.scenario.wind_speed_kn = 56.0
+    world.run(600)
+    after = _after(world, n0)
+    said = _warned(after, "mizzen.lateen_yard")
+    gone = [
+        e.tick for e in after if e.kind == "spar.carried_away" and e.subject == "mizzen.lateen_yard"
+    ]
+    dire = [e for e in said if e.data["ratio"] > strain.CARRY_AWAY_RATIO]
+    assert dire and "lying on the mast; she will carry them away" in dire[0].text, [
+        e.text for e in said
+    ]
+    assert not gone or dire[0].tick < gone[0]
