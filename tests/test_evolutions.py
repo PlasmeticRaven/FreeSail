@@ -929,6 +929,22 @@ def test_a_tack_ended_by_the_steady_timeout_with_her_head_in_the_wind_is_in_iron
     assert kinds(notes)[-1] == "ship.fell_off"
 
 
+@pytest.mark.parametrize("lie_deg", [73.0, 107.0], ids=["old side", "new side"])
+def test_a_tack_ended_within_two_points_of_the_wind_either_side_is_in_irons(lie_deg):
+    """Package 125, C, its bound (the lead's list of 2026-11-27, item 4): her head held a point
+    and a half off the wind at the timeout (17 degrees, the wind from 90), on the side she lay on
+    before the order or the other, is within two points of it and lies in irons: "Missed stays:
+    she lies in irons, her head in the wind." A bound of one point would have this case "Tacked"
+    on the new side, and on the old side named the tack she lies on."""
+    _, notes, _ = _tack_held_at_the_end(lie_deg)
+    said = dict(zip(kinds(notes), texts(notes), strict=True))
+    assert "ship.tacked" not in kinds(notes)
+    assert said["ship.missed_stays"] == (
+        "Missed stays: she lies in irons, her head in the wind. Up helm; square the yards."
+    )
+    assert kinds(notes)[-1] == "ship.fell_off"
+
+
 def test_a_tack_ended_by_the_steady_timeout_on_the_new_tack_names_where_she_lies():
     """The lead's ruling (3) of 2026-11-07 (B3.4b) and package 115 D4, as they stand for a tack
     that has come round: ended by the timeout on the new tack, not steady on her course (here 100

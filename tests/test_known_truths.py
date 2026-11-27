@@ -23987,9 +23987,9 @@ def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
 
 
 # ---------------------------------------------------------------------------
-# Package 125: the moment of the haul, a failed tack's words, the jib she cannot be held
-# without, and the captain's answer to a straining topgallant yard (truths 7-760 to 7-769;
-# docs/design/Report-Package125.md; docs/dev/TuningNotes.md, "Package 125")
+# Package 125: the moment of the haul, a failed tack's words, and the jib she cannot be held
+# without (truths 7-760 to 7-769; docs/design/Report-Package125.md; docs/dev/TuningNotes.md,
+# "Package 125")
 # ---------------------------------------------------------------------------
 
 # The fleet's tacks by ship and wind, measured at seed 7 by the truths' own helpers (the wind
@@ -24258,8 +24258,9 @@ def test_truth_7_766_the_jib_she_cannot_be_held_without_is_left_on_her_and_said(
     world = _settled_for_shortening("frigate-36", 25.0, 292.5)
     reply = world.submit("shorten sail")
     assert (
-        "The jib is left on her: she gripes, and her helm will not hold her without it."
-        in reply.text
+        "The jib is left on her: she gripes, and her helm will not hold her without it. It is "
+        "carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'. Not "
+        "done:" in reply.text
     ), reply.text
     assert "storm staysail" not in reply.text, reply.text  # not called for in its place
     world.tick()
@@ -24289,3 +24290,119 @@ def test_truth_7_767_a_jib_over_its_rating_is_taken_in_and_the_players_order_obe
     for _ in range(300):
         world.tick()
     assert not jib.is_set
+
+
+def test_truth_7_767b_a_kept_jib_is_kept_once_at_its_limit_and_its_strain_names_its_order():
+    """Package 125 (truth 7-767, the lead's list of 2026-11-27, item 2): a jib `shorten sail` left
+    on her is carried at its limit, and the deck says what takes it in. **Its strain's line names
+    the order that eases it** ("Jib straining at the bolt-ropes: take in the jib.", said alone;
+    "stretched drum-tight; it will not stand much more: take in the jib." past the carrying away),
+    **and the next `shorten sail` takes it in**, as its reply said, though its load and her helm
+    are as they were. Once it is in, it is forgotten. Old: no jib kept; a jib's strain named no
+    order."""
+    from freesail.orders import storm
+    from freesail.physics import strain
+
+    world = _settled_for_shortening("frigate-36", 25.0, 292.5)
+    jib = world.ship.sails["jib"]
+    world.submit("shorten sail")
+    world.tick()
+    _idle_125(world, 1500)
+    assert jib.is_set and world.ship.extra.get(storm.KEPT) == {"jib": True}
+    # her helm wants it as much as it did, and it is the mark that takes it in
+    stop = world.ship.hull.spec.rudder.max_angle_deg
+    assert math.degrees(storm.helm_without(world.ship, [jib])) > storm.HELM_IN_HAND_SHARE * stop
+    assert storm.loaded_jibs(world.ship) == ([jib], [])
+    n = len(world.ship.notes)  # the deck's notes, logged at the next tick
+    strain._warn(world.ship, strain.StrainState(), jib, 1.1)
+    strain._warn(world.ship, strain.StrainState(), jib, 1.7)
+    said = [note[2] for note in world.ship.notes[n:] if note[1] == "strain.warning"]
+    assert said == [
+        "Jib straining at the bolt-ropes: take in the jib.",
+        "Jib stretched drum-tight; it will not stand much more: take in the jib.",
+    ], said
+    reply = world.submit("shorten sail")
+    assert "left on her" not in reply.text, reply.text
+    for _ in range(600):
+        world.tick()
+    assert not jib.is_set
+    assert storm.KEPT not in world.ship.extra  # forgotten once it is in
+    n = len(world.ship.notes)
+    strain._warn(world.ship, strain.StrainState(), jib, 1.1)
+    assert [note[2] for note in world.ship.notes[n:]] == ["Jib straining at the bolt-ropes."]
+
+
+def _settled_as_the_gate(ship: str, wind_kn: float, heading: float):
+    """The lead's reader's settle (seed 7, the default gusts): plain sail set and braced sharp up
+    on the starboard tack with her head at `heading` (or trimmed), run to the end of it, trimmed,
+    run to the end of that and a minute more."""
+    world = make_world(
+        7,
+        f"data/ships/{ship}.yaml",
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=wind_kn,
+            ship_heading_deg=heading,
+            ship_speed_kn=4.0,
+        ),
+    )
+    world.submit("set plain sail")
+    world.submit("brace sharp up on the starboard tack" if heading > 280.0 else "trim sails")
+    for limit in (4000, 600):
+        for _ in range(limit):
+            runner = world.ship.extra.get("evolutions")
+            if not getattr(runner, "instances", None):
+                break
+            world.tick()
+        if limit == 4000:
+            world.submit("trim sails")
+    for _ in range(60):
+        world.tick()
+    return world
+
+
+def test_truth_7_768_a_jib_the_storm_canvas_shifts_is_taken_in_as_before_and_never_said_kept():
+    """Package 125 (truth 7-768, the lead's list of 2026-11-27, item 3): in forty knots with the
+    wind abeam the schooner's jib is loaded to three quarters of its rating and her helm would
+    want it, but `shorten sail` sets her storm jib, bent in the jib's place: **the jib is shifted
+    for it, its take-in ordered as before, and it is never said to be left on her**. Before this
+    item her reply said "The storm jib to be set as soon as it is bent. The jib is left on her:
+    she gripes, and her helm will not hold her without it." and the jib was shifted for the storm
+    jib all the same; before package 125, the reply of this hash."""
+    from freesail.orders import storm
+
+    world = _settled_as_the_gate("topsail-schooner", 40.0, 270.0)
+    jib = world.ship.sails["jib"]
+    assert 0.75 <= jib.load_kn / jib.effective_cloth_rating_kn < 1.0
+    assert storm.loaded_jibs(world.ship)[1] == [jib]  # her helm alone would keep it
+    lines, kept = storm.shortening_plan(world.ship, storm.true_wind_kn(world.ship))
+    assert kept == [] and "take in the jib" in lines and storm.STORM_LINE in lines
+    reply = world.submit("shorten sail")
+    assert "The storm jib to be set as soon as it is bent." in reply.text, reply.text
+    assert "left on her" not in reply.text, reply.text
+    assert storm.KEPT not in world.ship.extra
+
+
+def test_truth_7_769_a_loaded_jib_her_helm_can_do_without_is_taken_in():
+    """Package 125 (truth 7-769, the lead's list of 2026-11-27, item 4): the bilander close-hauled
+    in thirty knots has her jib loaded to 0.89 of its rating, and taken in she would want four
+    degrees and a half of helm, an eighth of her rudder's travel, under `HELM_IN_HAND_SHARE` of
+    it: **`shorten sail` takes it in**, the order waiting for hands behind the topgallant and the
+    reef ("Not hands enough on deck to take in the jib"), and says nothing of keeping it."""
+    from freesail.orders import storm
+
+    world = _settled_as_the_gate("bilander", 30.0, 292.5)
+    jib = world.ship.sails["jib"]
+    assert 0.75 <= jib.load_kn / jib.effective_cloth_rating_kn < 1.0
+    wanted = math.degrees(storm.helm_without(world.ship, [jib]))
+    stop = world.ship.hull.spec.rudder.max_angle_deg
+    assert 0.0 < wanted < storm.HELM_IN_HAND_SHARE * stop, wanted
+    assert storm.loaded_jibs(world.ship) == ([jib], [])
+    n = len(world.log)
+    reply = world.submit("shorten sail")
+    assert "left on her" not in reply.text, reply.text
+    world.tick()
+    assert storm._work_on(world.ship, "jib")
+    assert any(
+        e.text.startswith("Not hands enough on deck to take in the jib") for e in world.log[n:]
+    ), [e.text for e in world.log[n:]]

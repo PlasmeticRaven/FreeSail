@@ -116,6 +116,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 76 (step 7): a Spanish chase signalled and read (10 s); three nations' convoys
         "test_known_truths.py::test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone",
         "test_known_truths.py::test_truth_7_433_a_nations_book_is_added_by_data_alone",
+        # package 125 (D, the lead's list of 2026-11-27): an hour in rising wind under the
+        # game's own captain, the jib kept at its limit (a minute or two a case)
+        *(
+            f"test_captains.py::test_a_jib_kept_at_its_limit_is_taken_in_by_the_captain_before_it_goes[{c}]"
+            for c in ("brig-30.0-11", "brig-35.0-7", "hermaphrodite-brig-30.0-11", "razee-44-28.0-11")
+        ),
         # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
         # shortening run to its end before the helm goes down (6 to 8 s a case)
         *(
