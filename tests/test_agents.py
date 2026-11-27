@@ -1873,7 +1873,8 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
     line and the parties; 11,210 with package 37f's sentence that `loose` sets a sail; 11,370
     with package 57's on the royals set flying; 11,280 since package 85 cut the build's
     notes from the chapter; 11,330 since package 90's item 37 re-recorded the studding
-    booms' scene in 15 knots) is the rule's."""
+    booms' scene in 15 knots; 11,480 since package 126 said who keeps the hands when the
+    last claimant lets them go) is the rule's."""
     world = frigate_world()
     contents = lib(world)
     assert tools.CHARS_PER_TOKEN == 4 and tools.tokens("abcde") == 2
@@ -1885,7 +1886,7 @@ def test_the_contents_says_what_each_topic_costs_measured_from_the_text_served()
         assert f"    primer {n}: {name}, {size} in " in contents
         assert whole.startswith(f"primer {n}: ") and f"the whole chapter: {size}." in whole
     three = (ROOT / "docs/primer/03-making-and-shortening-sail.md").read_text(encoding="utf-8")
-    assert tools.size_words(tools.tokens(three)) == "about 11,330 tokens"
+    assert tools.size_words(tools.tokens(three)) == "about 11,480 tokens"
     grammar = lib(world, topic="grammar", section="all").split("\n\n", 1)[1]
     # package 58a: a fourth part, the world orders (3 parts before)
     # six parts: the order language, the readings, the standing dialect, the voice, the
@@ -1955,7 +1956,7 @@ def test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its
     )
     # the primer itself: its introduction in sections, and the chapters with their sizes
     primer = lib(world, topic="primer")
-    assert "  primer 3: making and shortening sail, about 11,330 tokens" in primer
+    assert "  primer 3: making and shortening sail, about 11,480 tokens" in primer
     assert lib(world, topic="primer", section="where to start").startswith("## Where to start")
 
 
