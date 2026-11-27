@@ -702,6 +702,19 @@ def test_truth_7_777_e_no_spars_work_in_heavy_weather_unless_she_lies_to():
     ]
     cap._hold_spar_work_for_weather(dataclasses.replace(_perceive(w), wind_kn=line - 5.0))
     assert SPAR_WORK_WEATHER_HELD not in ship.extra
+    # held, it stands in no one's way: a lie a-try given after, sharing its main topsail, begins
+    # (the brig of the rising wind waited behind it and was never brought to); and it is not
+    # taken up again while that work is in hand
+    cap._hold_spar_work_for_weather(dataclasses.replace(_perceive(w), wind_kn=line + 5.0))
+    assert w.submit("lie a-try").kind == "order.accepted"
+    lie = next(i for i in runner.instances if i.evo.id == "lie_a_try")
+    assert lie.holds & clearing.holds
+    runner.instances[:] = [clearing, lie]
+    w.run(5)
+    assert not lie.waiting, [e.text for e in w.log[-4:]]
+    ship.extra.pop(SPAR_WORK_WEATHER_HELD, None)
+    clearing.wanted_at = None
+    assert runner._spar_work_waits(ship, clearing, crew)
 
 
 def _perceive(w):
