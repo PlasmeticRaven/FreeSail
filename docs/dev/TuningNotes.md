@@ -39932,6 +39932,283 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
 
+## Package 90, the Diana: her file, her tuning and the pins she moves (2026-11-20)
+
+Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D). Her file, `data/ships/corvette-20.yaml`, is new, written by `tools/ships/diana.py` through the generator; every other ship file comes out byte for byte. Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `under_plain_sail`, `close_hauled_on_starboard`, `until`, `wear`, `hove_to`), on her file with each figure changed in a scratch copy.
+
+**Her two tuned figures, old beside new** (Dia-D §2 gives both as judgement to be tuned: GM by her captain's "stiff" against the frigate-36, decision 4 and truth C; `clr_x_m` by Meyer's "steers splendidly", truth D):
+
+| figure | old (her design's) | new | why |
+|---|---|---|---|
+| `gm_m` | 1.5 | **1.75** (1.6 at 133ccb3, 1.65 at e561b0d) | at 1.5, on her measured hull and her rig, she heeled 1.17 times the frigate close-hauled and 1.20 abeam in 22 kn under plain sail (8.59 against 7.34 degrees, 13.60 against 11.30), over truth C's 1.15, where her design's probe (no profile, the frigate's rig scaled) had 1.12 and 1.14; at 1.6, 1.10 and 1.13 with her headsails as first cut, and 1.14 and 1.15 once they were raised to her own tacks (below); at 1.65, 1.11 and 1.12 (8.12 and 12.62) on the table's mass; at 1.75 on her drawn mass (below), 1.10 and 1.12 (8.10 and 12.61) |
+| `clr_x_m` | 2.5 | **2.8** (2.6 at 133ccb3) | at 2.5 her weather helm close-hauled in 15 kn was 0.57 degrees (0.45 at GM 1.5), the foot of truth D's 0.5 to 3; 2.6 gave 0.91 and 1.85 abeam with her headsails as first cut, and 0.24 and 1.70 once they were raised, their centre of effort higher forward; at 2.8, 0.80 close-hauled and 2.02 abeam beside the frigate's 1.31 and 1.99; at 3.0 she fell aback once lying to and filled away in 152 s |
+
+**The sweep, at GM 1.6, her headsails as first cut (133ccb3)** (her rudder as measured, 3.0 m2 at 3 deg/s; each cell tacked from 290, 292.5 and 295 degrees in seconds, then the weather helm close-hauled and abeam in 15 kn):
+
+| `clr_x_m` | tacks (s) | helm (deg) |
+|---|---|---|
+| 2.5 | 206, 217, 226 | 0.57, 1.68 |
+| 2.6 | 200, 211, 218 | 0.91, 1.85 |
+| 2.75 | 190, 206, 213 | 2.40, 2.09 |
+| 2.9 | 185, 200, missed stays | 3.29, 2.33 |
+| 3.0 | 183, 197, 200 | 2.25, 2.48 |
+| 3.5 | 178, missed stays, none in 900 s | 3.52, 3.25 |
+
+**The headsails' mend (the review lenses on 50afd35, lens 2: sailing).** Her bowsprit is rooted on her stem head (5.09 m above her water) and steeved 21.5 degrees, which puts the ends of her bowsprit, jib-boom and flying jib-boom 8.43, 10.93 and 12.53 m above her water; her headsails' centres had been the frigate-36's heights scaled from the frigate's deck, 8.0, 9.6 and 11.3 m, each at or below the spar end its tack is on, a triangle no stay could set. The cause was the head re-rooted on her plan while the sails stayed on the probe's scaling from the deck. Mended at the cause: each centre stands above its tack's spar end by the frigate-36's own height there (2.2, 2.2 and 3.2 m above its bowsprit's, jib-boom's and flying jib-boom's ends) scaled by her chain: **10.2, 12.7 and 15.2 m** (old 8.0, 9.6 and 11.3); their areas and places unchanged. Her plain-sail heeling moment rises and her weather helm falls with it, so her two figures were set again (above). Re-swept at GM 1.65:
+
+| `clr_x_m` | tacks (s) | helm (deg) | hove to, filled away |
+|---|---|---|---|
+| 2.6 | 209, 221, 231 | 0.22, 1.70 | 137 s, 60 deg, never aback; 59 s |
+| 2.7 | 203, 218, 220 | 0.37, 1.86 | 133 s, never aback; 59 s |
+| **2.8** | 197, 212, 218 | 0.80, 2.02 | 130 s, 56 to 58 deg, never aback; 59 s, settled 160 s |
+| 2.9 | 192, 207, 213 | 1.14, 2.18 | 127 s, never aback; 59 s |
+| 3.0 | 189, 200, 206 | 1.47, 2.34 | 125 s, aback once; 152 s |
+
+At GM 1.6, 1.65 and 1.7 with `clr_x_m` 2.6 her heel in 22 kn was 8.36, 8.11 and 7.87 degrees close-hauled and 13.00, 12.62 and 12.26 abeam. 2.8 taken: within truth D with a margin either side, and short of the figure at which she falls aback lying to.
+
+**Her mass, by the lead's ruling of 2026-11-20 (nudge 30), old beside new.** Her `displacement_kg` is her body as drawn, outside the plank, at her line as drawn, every other figure of her file being reckoned to that line: one figure of her measured 465.6 to 473.6 t (3 to 4 pulgadas of plank, JUDGEMENT), the middle at 3.5 pulgadas, 469.6 t, filed **470,000 kg** (old **498,000 kg**, the table's 540 toneladas 691 libras at the book's libra, now recorded beside it in her note with its unit and the line it was most likely reckoned on, level at her after draught: `pages-diana.md` §4.4). What it moved, measured on her file at e561b0d's figures and again at the new GM:
+
+| measure | at 498 t, GM 1.65 (e561b0d) | at 470 t, GM 1.65 | at 470 t, **GM 1.75** (as committed) |
+|---|---|---|---|
+| heel in 22 kn, close-hauled and abeam (the frigate 7.34, 11.30) | 8.12, 12.62 (1.11, 1.12) | 8.59, 13.35 (1.17, 1.18: over truth C's 1.15) | 8.10, 12.61 (1.10, 1.12) |
+| weather helm in 15 kn, close-hauled and abeam | 0.80, 2.02 | 0.83, 2.02 | 0.82, 2.02 |
+| tacks from 290, 292.5 and 295 (s; ground) | 197, 212, 218 (-15, -31, -42 m) | 207, 215, missed stays from 295 | 206, 215, 216 (-28, -42, -46 m) |
+| wear (s) | 492 | 493 | 492 |
+| hove to; filled away | 130 s, never aback; 59 s, settled 160 s | 126 s, never aback; 59 s, settled 156 s | the same |
+| Meyer's case (kn) | 10.28 to 11.28 | not run | 10.28 to 11.29 |
+| polar's best in 8, 15, 25 kn | 4.61, 8.01, 11.18 | the same (the polar reads no mass) | the same |
+| the generator's drawn hull against the filed | 448 t against 498 (-10%) | 448 against 470 (-5%) | the same |
+
+So her GM goes from 1.65 to **1.75**, her stiffness kept where her captain's word and truth C set it: the righting moment is her mass times her GM, 470 t at 1.75 near 498 t at 1.65. Nothing of hers is merged, so no pin of the trunk's moves; her own tests moved their figures (truth 7-660's mass and the table's beside it; the report's line; the docstrings' measured figures).
+
+**Her going about: truth E's band is not reached by her helm or her rudder** (Plan §8.4: "to be tuned by her helm and rudder"). Truth 10's 285 to 600 s is Luce's five to ten minutes for a frigate. The frigate-36 shoots through stays with way on and then spends most of her 340 to 450 s griping up on the new tack with too little way for her helm; she hangs in stays, is boxed off by her head yards, and settles on the new tack at once. More weather helm takes her round sooner (above). Her rudder, at GM 1.6 and `clr_x_m` 2.5 with her headsails as first cut, tacks from the three headings in:
+
+| rudder | tacks (s) |
+|---|---|
+| 3.0 m2, 3 deg/s (measured; the frigate's rate) | 206, 217, 226 |
+| 3.0 m2, 2 deg/s | 217, 230, 231 |
+| 3.0 m2, 1.5 deg/s | 233, 239, 243 |
+| 3.0 m2, 1 deg/s | 251, 263, 259 |
+| 2.5 m2 | 232, 237, 238 |
+| 2.0 m2 | 244, 237, 214 |
+| 3.3 m2 (the measuring's upper bound) | 168, 206, 219 |
+| 3.84 m2 (the frigate's scaled, her design's probe) | 164, 172, 205 |
+| 4.5 m2 | 298, 164, 180 |
+| 5.5 m2 | 284, 303, 161 |
+
+No figure within her sources brings all three into 285 to 600 s; a knife-edge, the one figure moving one heading's tack longer and another's shorter. Her rudder is kept as measured and her truth E (7-664) drafted with her own band, three to ten minutes (180 to 600 s: JUDGEMENT, for the lead), on her measured 206, 215 and 216 s as committed (200, 211 and 218 at 133ccb3; 197, 212 and 218 at e561b0d); she wears in 492 s, within truth 11's band. Each of her three tacks loses ground (28, 42 and 46 m), where truth 10 has the frigate's three gain together: recorded, not asserted.
+
+**Her other figures, measured on the file as committed** (for her testing report): her polar's best 4.61, 8.01 and 11.18 kn in 8, 15 and 25 kn (the frigate-36's 4.62, 8.19 and 11.63; 4.59, 7.98 and 11.15 at 133ccb3); Meyer's case, the wind 112 to 124 degrees off in 24 to 27 kn under plain sail (her book's below 30 kn), 10.28 to 11.29 kn (truth B's 9.5 to 11.5); hove to from 5 kn close-hauled in 126 s, lying 56 to 57 degrees off at 1.1 kn, never aback (the frigate's 220 s, 58 to 62 degrees, 1.4 kn), filled away in 59 s and close-hauled at three knots in 156 s (the frigate's 59 and 161).
+
+**Her truth F, old beside new** (Dia-D §14). Her design: "the midship lee port shuts at 21.1 deg ± 0.5 (L2's rule on her triple)". 21.1 degrees is the heel at which that port's sill, 1.72 m over 4.46 m, comes to the water (atan; the lead's ruling 6). L2's rule (`tests/test_lee_ports.py` `shut_heel`, `combat/shot.py` `PORT_SHUT_M`) shuts a lee port a foot short of the water, at 18.50 degrees for her. Truth 7-665 holds both: the dip at 21.1 and the shut at 18.50, with ports 5, 7 and 4 (18.67, 19.08, 19.45) shut a degree above it. For the lead: which the truth's figure is to be.
+
+**Plain sail from furled, explained** (Dia-D §9 left it to her builder): her watch sets it in 12.8 minutes and all hands in 16.4 (the frigate's 16.4 and 5.6). With all hands up her eight square sails are begun at once, each wanting twelve hands aloft: 96 against her 91 seamen (her fifty soldiers and her idlers go aloft to none), so the last, the mizzen topgallant, begins with seven of twelve, short-handed, and is set at 1,074 s, every other sail by 665 s. A numbered job begun short is not topped up when other jobs' hands come free (`crew/hands.py`, `top_up` serves all-hands work alone); her watch, too few for all at once, takes the sails in turn, each with its hands. The engine's rule, found and not mended (not a file of hers): for the lead.
+
+**Every evolution's want against her watches** (Dia-D §6.2): her watches are 71 and 70 (46 and 45 seamen, 25 soldiers each; package 119's rule for the odd hands); asked of either watch alone through the muster's request, the 83 numbered evolutions are manned whole and the 27 others are all hands' work by their files; none calls all hands for too few and none waits. The request takes any idle hand on deck, its stations ranked first, so her design's "the anchor's twelve forecastle hands against her watch's seven" is made up from the watch's other hands (`tests/test_diana.py`).
+
+**The pins her file moves** (Plan-Package90.md §10.4, "each hull: the guards that count ship files"; the card's "the counts that grow by a file"), each old beside new, found by running every test file that ranges over `data/ships` on her tree:
+
+| test | old | new | why |
+|---|---|---|---|
+| `tests/test_profile.py`, `MODULE_FILES["ships.diana"]` (the hook test) | `[]`, a stub | `["corvette-20.yaml"]` | her module writes her file and no other |
+| `tests/test_probes_90.py::test_the_five_modules_follow_the_four_and_each_stub_writes_nothing` | the five stubs each a docstring and a `build` writing nothing | the four still stubs so; `FILLED = ("diana",)` held by the hook test above | her builder filled her stub |
+| `tests/test_schooner_mast.py::test_the_guard_reads_eighteen_files_...` | `len(SHIP_FILES) == 18`, the name saying eighteen | `== 19`, renamed `..._reads_nineteen_files_...` | her file the nineteenth; the rule names none of her parts (her mizen crosses its dry crossjack) |
+| `tests/test_lee_ports.py`, `LOWEST_LEE_PORT` (truth 7-190's rows) | nine rows | ten: `(DIANA, "carronadas de a 30 1810", "upper", 18.50, 4)` | her default fit carries guns in ports; her lowest, the midship port, shuts at 18.50 degrees, ports 5, 7 and 4 within the next degree (truth 7-665) |
+| `tests/test_known_truths.py::test_truth_7_190_covers_every_armed_file` | `len(armed) == 9` | `== 10` | the same row; the parametrized truth gains her line, passing; its docstring names her figure and count |
+| `tests/test_known_truths.py::test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart` | every file of the tree a row of `_MUSTERED_BEFORE_119` (eighteen) | the eighteen and `_MUSTERED_AFTER_119 = {"corvette-20.yaml": (71, 70)}`, her watches held | package 119's truth over every file: she was made after the rule, her watches 71 and 70 |
+| `tests/test_known_truths.py::test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were` | every file of the tree, by glob | the eighteen files of `_MUSTERED_BEFORE_119` | a file made after the rule has no muster before it to be held to |
+| `tests/test_neufchatel.py::test_her_row_sails_by_her_first_role_and_no_other_row_moves` | `ROLE_BY_INTENT` and the files' own first roles without her | her row, `["kings-ship"] * 4 + _TAIL` as the 74's, and `"corvette-20.yaml": "kings-ship"` | the table holds every row of `DESCRIPTIONS`; hers sails as a King's ship at every intent's kind but the tail's |
+
+Nothing else of those files moved: `tests/test_harbour.py`, `test_subtypes.py`, `test_people.py`, `test_wardroom.py`, `test_hull_form.py`, `test_check_viewer_guns.py`, `test_ship_particulars.py`, `test_catalogue.py` and the rest of the sixteen pass with her file as they stand (917 tests, 3 failing before these moves).
+
+**Found on the way, for the lead, not mended (none is a file of hers):**
+- **The drawn top of the side and a stem head over the rail's end** (`freesail/ship/form.py`, `_top_at` and `check`): her stem head, read by eye at (17.30, 5.09), stands directly over the rail's last point (17.30, 3.59), and the drawing then gives that x two tops and refuses the rail's point. She files the head a centimetre forward, 17.31, within its reading (+-0.05 m); the cause is the drawing's, which draws the side's top straight to the stem head beyond the rail's last point.
+- **The staysails between the masts keep the frigate's stays** (`gen_ships.between_the_masts`, its fixed sizes: the main staysail stay 9 in, the mizen's 6, the mizen topmast stay 4.5 and the rest), where her other stays and lines are the frigate-36's by her rope's scale (0.816): those lines rate about half again as strong as hers would by it (her main staysail stay 125.5 kN, the frigate-36's the same). The brig-sloop's file takes the same helper, unscaled, for the staysails between her two masts. Left as the shared helper has them.
+- **Her measured ports' gap check passes by construction**: each of ports 1 to 10's body-plan readings at the sill is one of her `sections_m` points, so the drawn side passes through it; the check holds the drawing to the readings and not the readings to an independent line. Her `sections_m` is marked `judged` for the water's half-breadths carried there between stations, where her design marked every line but the lights `sourced`.
+- **A numbered job begun short is not topped up** when other hands come free (above, plain sail by all hands): the engine's rule, which her company of 91 seamen meets when all hands set her eight square sails at once.
+- **Her rail began at the bulwark rail's after end** (-18.82, 3.52) on her first four commits, where every other drawn hull's `rail_m` begins at its taffrail's top, `stern_m`'s last point (Build-Ships.md §5.1, "the top of the side, taffrail to stem head"); found by `tests/test_view_geometry.py`'s test that the side's top runs through every rail point. Mended at the cause: her `rail_m` begins at her taffrail's top (-18.63, 4.03); the bulwark rail's after end, 0.25 m abaft her upright upper stern at its height (the stern's reading not closing, Pages §5.5), is in her note.
+
+**Three things her fast and slow tiers need that are not hers to edit (the stop rule):**
+- **`tests/test_view_geometry.py`, the viewer's** (Plan §7.1): her rows in its per-file tables (`BOWSPRIT_DRAWN`, `TIERS_IN_THE_SIDE`, `CHORD_OFF_THE_SIDE_M`, `LINES_ON_THE_RAIL`, `STEM_TACKED`, `BOOM_SAIL`), her file in `RIGHTLY_WITHOUT["gallery"]` (she has no quarter galleries), and two of its tests assume every square stern files `round_up_m` and `galleries_m`, which her measuring read neither of: 14 of its tests fail on her file, each a `KeyError` or a set without her.
+- **`tests/test_magazine.py::test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_table`**: the rule that every new ship's charges are Table No. 29's (`freesail/ship/charges.py`'s `CHARGE_TABLE_LB`) meets the owner's decision 9 (each gun's pounds as her navy named them): her 30-pounder carronade, long 8 and 3-pounder are not in the table, and `charge_lb` gives each its kind's share. How a foreign gun's charge is reckoned is the lead's.
+- **`tools/range/audit-known.yaml` and truth 7-590's count**: the ranges audit finds `v-fit-ahead:corvette-20:carronadas de a 30 1810` (her default fit, of 1810, on a far corvette's days before it), as it finds the frigate's, the brig's, the 74's and the rest; her entry in the known list and the truth's mechanical count, 60 to 61, are wanted.
+
+### The Diana: the lead's rulings of nudge 32, and what they moved (2026-11-20)
+
+The three stops above are answered: the lead widened her row to `tests/test_view_geometry.py`, ruled a foreign gun's charge its kind's share, and asked her entry in the ranges audit's known list. Each move below is old beside new, measured on her file as committed with them.
+
+**Her viewer rows** (`tests/test_view_geometry.py`), each measured by the case's own probe on her file, none invented: the 14 failing cases on her file (a `KeyError` or a set without her) pass, 58 of her cases in all (59 here before, a miscount of mine: the count mended at her report's §8).
+
+| table | her row | what it reads |
+|---|---|---|
+| `BOWSPRIT_DRAWN` | `(2.014, 32.13)` | her end 2.01 m forward of B5.1's rule; drawn 32.13 degrees steeved, her file's 21.5 (below) |
+| `TIERS_IN_THE_SIDE` | `set()` | no band drawn: `BAND_UNDRAWN`, below |
+| `CHORD_OFF_THE_SIDE_M` | `0.004` | her main wale's chord, within 4 mm of her side (no band drawn) |
+| `LINES_ON_THE_RAIL` | the frigate-36's | her lines come down to her side as the frigate's do: the mizen's three braces, the courses' sheets and the three head sails' |
+| `STEM_TACKED`, `STEM_TACK_Z_M` | `{"fore.storm_staysail"}`, `5.11` | her storm staysail on the fore stay, its tack 2 cm over her stem head's top |
+| `BOOM_SAIL` | `"mizzen.spanker"` | her spanker on its boom, as the frigate's |
+| `FRAME_MOVED_OLD_M`, `SHEET_END_X_M` | `4.86`, `(-24.05, -18.63)` | with no profile the frame moved 4.86 m; the sheet's end at her taffrail, x -18.63, where it stood at -24.05 |
+| `BOOM_OVER_TAFFRAIL_M` | `(0.20, 0.58)` | her boom 0.20 m over her taffrail level at its jaws' height, 0.58 m topped up |
+| `NO_GALLERY_OR_LIGHT` (into `RIGHTLY_WITHOUT["gallery"]` and `["light"]`) | her file | no quarter gallery and no stern lights filed (the ruling on her lights, below) |
+| `ROUND_UP_UNREAD` (new; the transom case) | her file | her transom's foot filed straight, no round-up read on her body plan; drawn straight across at her knuckle with no tuck |
+
+The two cases that held every square stern to `round_up_m` and `galleries_m` name her with her reason and no other file: `ROUND_UP_UNREAD` beside the transom case's new branch (a square stern that files none and is not named raises "a square stern files its round-up, or is named with its reason"), and her place in `NO_GALLERY_OR_LIGHT`. A throwaway copy of the frigate-36's file with its `round_up_m` and `galleries_m` (and their marks) taken out, not committed, still fails both, and the closed-hull case on its gallery.
+
+**Two recorded departures in that file, for the lead (not mended: the cause is the viewer's, `client/projection.js`, which is not in her row):**
+- **No port band on her** (`BAND_UNDRAWN`, joined to `RIGHTLY_WITHOUT["band"]` as `WALE_UNREAD` is to the wale's). Her eleven ports a side are cut in her side, their middles 0.56 to 0.68 m under her rail, but her one tier also holds the 1817 fit's place over the rail by the mizen, its middle 0.28 m over it. The viewer reads a tier's ports as cut in the side only when every one of them is (`portsInSide`), so it draws her no band. The 64's and the 74's places over the rail stand in tiers of their own; a flush-decked ship has no other deck word for hers. The mend would be the viewer reading a tier's band by its ports alone (`viewer_guns.is_port`'s own test), or a ruling filing her place over the rail otherwise.
+- **Her stem head stands 1.50 m over her rail's fore end** (5.09 against 3.59 m at x 17.30: measured, Pages §5.4), where every other file's stands within 0.14 m of its rail or under it. The viewer roots the bowsprit and the fore stay at the lower of the two, so that it draws her bowsprit 32.13 degrees steeved against her file's 21.5 from her stem head's top, lands her fore stay 1.5 m under that top, and raises her storm staysail's tack 10.6% up the stay to keep its foot over her stem head (`TACK_UP_HER_STAY`, where every other file's is under 4%), 0.53 m off the top of her side (her row of `TACK_OFF_HER_SIDE_M`, beside the *Neufchatel*'s 0.20).
+
+**Her guns' charges** (`tests/test_magazine.py`). Old: every charge of the ships after the eight was Table No. 29's, and the test held them so. New, the lead's ruling: a gun the table does not name takes its kind's share (`parts.charge_lb`), no reader changed; the test holds every new ship's charge to `parts.charge_lb` for its kind and calibre, the table's figure where the table names the gun and the share where it does not, and keeps the guard that every gun of the table gets the table's figure. Hers outside the table: the 30-pounder carronade (2 lb 8 oz), the Danish long 8 (2 lb 11 oz) and the 3-pounder obús carried as a carronade (4 oz), each written in the pounds her navy named it (the owner's decision 9). 54 pass.
+
+**Found, for the lead, not mended: the pounds differ.** The Spanish libra is 0.4608 kg (Winfield et al. 2023, pp. 41-46), the English pound 0.4536 kg, and a Danish 30-pounder fires about 33 English pounds (Dia-D §17.1 question 2), so the Danish pund is about a tenth heavier than the English. Every reader takes a gun's `pounder` as English pounds: her charges, her ranges and her weight of broadside read a Spanish gun 1.6% light and a Danish one about 9% light (30 for 33), the Danish further than decision 9's "a little light".
+
+**The ranges audit** (`tools/range/audit-known.yaml`, truth 7-590). Her entry, `v-fit-ahead:corvette-20:carronadas de a 30 1810` (1792 to 1809, mechanical, a data fault for milestone 7c, at most 1), as the other hulls' default fits have; truth 7-590's mechanical count 60 to 61, the old count beside the new in its docstring and its comment. The slow sweeps (`tests/test_range_audit.py`) found three counts over their ceilings with her file, each measured by the sampled sweep: `u-ships` 19 against 18 (every ship file, the schema having no year: an engine fault, her file the nineteenth) and `x-words:ship-words` 18 against 17 (her `era_notes` date her building, her taking and her service, as the other files' do), each ceiling raised by one with its reason, old beside new; and `x-words:people-words` 12 against 10, two histories of her people file naming a year ("after the peace of 1802", "at Toulon in 1793"), my outlines' and not a source's, so mended at the cause: rewritten without the year ("after the last peace", "in the last war"), the ceiling left at 10. The sampled sweep then: nothing unlisted, nothing gone, nothing over its ceiling, 67 mechanical and 38 reference findings. And `tests/test_range_audit.py::test_the_known_list_holds_each_finding_owned` counts the list's entries by owner: the data's 28 to 29 with her entry (the engine's 38 unmoved), the old count beside the new in its comment (the card's "the counts that grow by a file").
+
+**Her truth E** (7-664). Old: her own band, 180 to 600 s (JUDGEMENT, for the lead). New, the lead's ruling: 180 to 330 s, the floor JUDGEMENT (a small ship quick in stays), the ceiling about half again her slowest tack as measured (216 s; JUDGEMENT). Her three tacks, 206, 215 and 216 s from 290, 292.5 and 295 degrees, unchanged; what was tried is above (her weather helm by GM and `clr_x_m`, her rudder's area from 2.0 to 5.5 m2 and its rate from 3 to 1 deg/s, her headsails mended; "2.0 to 4.5 m2" here before, a slip of mine against the table above), her rudder kept as measured, 3.0 m2 at 3 deg/s; the ground each tack loses, 28, 42 and 46 m, recorded and not asserted.
+
+**Her 1817 fit's ports** (the measuring note's numbering, port 1 aftmost). Old: the twelve long 12s in ports 1 to 6 and the eight 30-pounder carronades in 7 to 10. New, the lead's ruling: the long 12s forward and amidships, ports 5 to 10, the carronades in the after ports, 1 to 4 (JUDGEMENT either way; her note says so); the obuses where they were, the bow ports and the place over the rail. At quarters (`tests/test_diana.py` `QUARTERS["1817"]`) twelve crews of 62 still, every one manned, 20 of her soldiers at its carronades and obuses and 30 kept in their division, where they were 21 and 29.
+
+**Her stern lights.** Old: a judged band of four, `[3.25, 3.85, 4, 1.50]`, by Steel 1805 p. 240's "the great cabin windows only", marked `judged`. New, the lead's ruling: none filed, as for the flush-decked brig, until the owner's sheets show them (JUDGEMENT); her note and her module say so. Her marks are `sourced` but `sections_m` and `form.fullness`.
+
+**Held as designed, the ruling's word:** her rank at the rig's distance, her truth F with both figures (the dip at 21.1 and L2's shut at 18.50), her `keel_m` at K. Nothing to do on the engine's faults found above.
+
+### The Diana on the package's branch at 329648e9: her rows in its tables (2026-11-23)
+
+The package's branch merged into hers at 329648e9 (the lead's nudge 58), as `defc026`. Its new tables over every file take her row, each read off her file as committed by the test's own reader; no other ship's row or figure moved.
+
+| table | old | new | read off her file |
+|---|---|---|---|
+| `COMMITTED_YARD_LEVELS` (`tests/test_yard_level.py`), held both ways | no row; 91 yards in the table | her row, 103 yards | `ship.yard_level` of her twelve yards: the fore's and the main's four at 0 to 3, the mizen's topsail, topgallant and royal at 1 to 3 and her crossjack at 0, as the frigate-36's; the old formula by its spar the same |
+| `BRACES_SQUARE_SET` (`tests/test_rig_words.py`), named and not globbed | eighteen rows, eight with after braces | nineteen, nine: her row `"after braces"` | four head yards on the fore, eight after yards on the main and the mizen; her after braces manned and worked as filed and with every square sail set; not one-masted |
+| her evolutions against her watches (`tests/test_diana.py`) | the registry's 110: 83 numbered, manned whole by either watch, and 27 all hands' work | 113: 85 and 28 | the package's `take_in_pole` and `furl_pole` (A5 and A6), numbered and manned whole; `change_lateen` (A1a), all hands' work by its file; every other evolution's answer as before, read one by one against her branch at 0305040 |
+
+Stage 0's `KEY_CARRIERS` (`tests/test_probes_90.py`, held both ways) takes no row of hers: she carries none of the four keys, as its case on her file holds (no `helm` in her hull, so the wheel by default, which `tests/test_helm_kind.py`'s case holds; no sweeps; no boat towed; no whole lateen). The package's other cases over every file pass on her file as committed (`tests/test_pole_mast.py`, `tests/test_boat_towed.py`, `tests/test_lateen_whole.py`'s five).
+
+### The Diana's review lenses at ff5bfc0, and the fixer's mends (2026-11-23)
+
+The eight lenses (Plan-Package90.md §10.2, Build-Ships.md §17) read on her merged hash by a reviewer who is not her builder. Nothing blocks her gate. Lenses 3 (the generator), 6 (the engine's keys) and 7 (names, pace, checkpoints) found nothing.
+
+**Mended, words only** (her file regenerated by the generator; it moved by its notes alone, her figures and the eighteen unmoved):
+- her length's ratio (`length_waterline_m`'s note): old "124 pies x 0.99", a wrong ratio (124 x 0.99 pies is 34.21 m); new "123.7 pies, 0.998 of the table's 124" (11,886.8 px at 96.1 a pie). The filed 34.47 m is the measuring note's and unmoved. The same words stand in her measuring note (`docs/design/ships-design/pages-diana.md:216`, step 1's, not in her row): recorded, not edited;
+- what her design puts in her note and her file did not say (Dia-D §3.3, §13): her hawse holes, the chains' deadeyes at the rail, the small square openings read as sweep ports (JUDGEMENT) with no sweeps filed, and her paint by the 1809 drawing; now in her profile's note beside the hammock rail. Old: the hammock rail alone;
+- her rank at the rig's distance, "the lead's to rule" in three places (her description's note, `freesail/world/ships.py`'s comment, her test's docstring); new "held as designed by the lead's nudge 32";
+- three persons named by "his" in her lines (Adye, Steel, Meyer); new, each named.
+
+**Recorded, for the lead:**
+- **Her spanker is the frigate-36's scaled, not cut on her own spars** (lenses 2 and 8: the cause her headsails were mended for, in e561b0d, and the spanker not looked at then). Its area and centre are the frigate's scaled from the deck, 111 m2 at 7.8 m, where her boom was raised to 2.9 m to clear her taffrail. Cut by her note's rule on her own boom and gaff it would be 95 m2 with its centroid at 9.7 m (the reviewer's reckoning); the frigate's own filed figure stands at 106% of its cut, its centre 1.75 m under its centroid. A variant at the frigate's ratios, 101 m2 at 8.3 m, sailed at seed 7 by the truths' helpers: her weather helm in 15 kn close-hauled 0.82 to **0.00** deg and abeam 2.02 to 1.80; her tacks from 290, 292.5 and 295 degrees 206, 215 and 216 s to **223 s, missed stays, missed stays**; her wear 492 s unmoved; her heel in 22 kn 8.10 and 12.61 to 8.10 and 12.59 deg (6.79 to 6.74 kn close-hauled); hove to in 126 to 127 s. So the mend would fail truths D and E and want `clr_x_m` tuned again: not made at her gate, for the lead to rule.
+- **Her bow port stands 0.24 m outside her drawn side at its sill** (lenses 4 and 5): its half-breadth, 2.1 m (JUDGEMENT +-0.2), beyond the judgement's own band. The generator reports it ("-0.24 m; more than 0.05 m at x 15.96, reported and never moved") and her test holds it (`tests/test_diana.py`); the viewer draws the 1817 fit's two bow obuses there, outboard of her planking (`freesail/api/viewer_guns.py`, the muzzle at the triple's half-breadth); `check_viewer_guns` checks only that the side is there.
+- **Truth 9 on her file, measured, not asserted** (lens 2; the truth's cases are the frigate-36's and the schooner's): in 20 kn under plain sail for 20 minutes nothing carries away, no line parts and no strain warning is raised; in 35 kn under all sail her main royal yard, her fore and mizzen royal masts and her fore topgallant yard carry away, each urgent, with 44 strain warnings.
+- **Two audit ceilings moved beyond nudge 32's wording** (4dec517: `u-ships` 18 to 19, `x-words:ship-words` 17 to 18), each old beside new with its reason, as every file's era notes carry their years: the ruling named only her entry and truth 7-590's count.
+
+### The Diana: the lead's rulings of nudge 59 on her four records (2026-11-23)
+
+**1. Her spanker cut on her own spars: STOPPED, as the ruling says, for she will not hold truths D and E together with it.** Not filed; her file keeps the spanker as it stood (111 m2 at 7.8 m), for the lead's word.
+- **The cut**, by her note's rule worked afresh on her spars as filed: the boom 10.9 m at 2.9 m above the deck, the gaff 8.7 m with its jaws at 11.8 m, both heights above her deck of 1.33 m as the physics reads them; foot 0.9 of the boom, head 0.9 of the gaff peaked 40 degrees, luff the hoist from boom to jaws. **95.0 m2, its centroid 9.71 m above her water**, and 4.35 m abaft the mast, the note's own "0.4 of the boom" (4.36), so the rule closes on itself; filed it would be 95 m2 at 9.7 m, x -16.6 (old -16.1). With the mizen's 6-degree rake taken into the cut, which the rule does not name: 92.7 m2 at 9.65 m (recorded, not used).
+- **What it moves in her file, by the generator:** the spanker's area, centre and x, its cloth's rating 35.5 to 30.4 kn, her plain sail 1,054 to 1,038 m2 and so her rope's scale 0.816 to 0.810, and 56 ratings through it and her spars' design wind; the eighteen unmoved.
+- **Her helm tuned against it** (`clr_x_m`, GM 1.75 and her rudder as measured, seed 7, the truths' helpers; truth D: weather helm in 15 kn 0.5 to 3 deg close-hauled and 1 to 3 abeam; truth E: each of three tacks 180 to 330 s):
+
+| `clr_x_m` | helm close-hauled, abeam (deg) | tacks from 290, 292.5, 295 (s) | D | E |
+|---|---|---|---|---|
+| 2.0 | -2.44, 0.44 | 263, 266, 263 | no | yes |
+| 2.4 | -1.19, 1.12 | 245, 248, 247 | no | yes |
+| 2.6 | -0.48, 1.46 | 235, 238, 241 | no | yes |
+| 2.7 | -0.18, 1.62 | 229, 232, missed stays | no | no |
+| 2.75 | -0.10, 1.70 | 226, 229, 229 | no | yes |
+| 2.8 (as filed) | 0.12, 1.78 | 223, 226, missed stays | no | no |
+| 2.9 | 0.42, 1.95 | 215, missed stays, missed stays | no | no |
+| 2.94 | 0.56, 2.01 | 213, missed stays, missed stays | yes | no |
+| 3.0 | 0.73, 2.11 | 210, missed stays, missed stays | yes | no |
+| 3.2 to 3.6 | 1.14 to 2.54, 2.41 to 3.02 | missed stays from all three | yes | no |
+| 3.8 to 4.2 | 3.50 to 4.22, 3.31 to 3.89 | missed from two; from 295 not round in 900 s | no | no |
+
+  So **with the spanker she can carry, her helm close-hauled is lee helm until `clr_x_m` about 2.93, and from there she misses stays from 292.5 and 295 degrees**: no figure holds both bands. Each miss is said 79 to 91 s after the order. Her heel in 22 kn stays 8.16 and 12.63 deg throughout (truth C's band held), her wear 492 s at 2.6 and 2.94 (truth 11's), hove to in 135 and 123 s. The cut is not filed: it is `spanker_figures` working those four corners from the boom and gaff her rig files, to be filed when the lead rules how the truth is restated (her report's §10.1).
+- **Her viewer's picture would not move with it:** the viewer draws a gaff sail with a boom between its spars' ends (`client/projection.js`, the gaff sail with no `corners_m`), not from its area or centre, and her boom and gaff are unchanged. What the owner saw ("she looks right to me") is the sail as her spars draw it.
+
+**2. Her bow port on her drawn side: filed.** Old: its half-breadth 2.1 m, JUDGEMENT +-0.2, 0.24 m outside her drawn side at its sill. New: **1.86 m, her drawn side's at its sill** (x 15.96, sill 2.38: `freesail/ship/form.py`'s `half_breadth_at` on her drawn lines, 1.861; computed). Her drawn hull is unmoved by it (448 t, 3.26 m deep: the bow port is not among the sections it is drawn from), and the generator now holds all eleven ports within 0.05 m of the drawn side (old: the ten, the bow port reported). The 1817 fit's two bow obuses stand in her side, 0.24 m inboard of where they were drawn. Her file moved by that triple and its note alone; the eighteen unmoved. Her test's ports and her report's line moved with it, old beside new.
+- **`check_viewer_guns` is left as it is**: the rule "a gun in a port or over the rail whose half-breadth stands more than 0.05 m (the generator's `PORT_GAP_M`) outside the drawn side at its sill", run over every committed file, fails five committed ships, so by the ruling it is not added. Their most outboard: the brig +0.051 m (the Diligence fit's guns 2); the hermaphrodite brig +0.153 m (her 1814 fit's bow chasers; seven ports over); the razee +0.350 m (her bow chasers of 1796; ports 3 to 7 +0.05 to +0.18); the 74 +0.180 m (her quarterdeck's ports 2 to 7 and her lower and upper ports 14); the 64 +0.097 m (her lower ports 4 to 7 and upper 3 to 6). None of the others: the bilander, the cutter, the frigate-36, the lugger, the merchant brig, the privateer schooner, the smack, the topsail schooner, and her own at +0.015 m (her place over the rail).
+
+**3. Truth 9 on her file:** noted by the lead as measured, as a ship of her force should be (above, the lenses' record).
+
+**4. The two audit ceilings** (`u-ships` 18 to 19, `x-words:ship-words` 17 to 18): allowed by the lead, old beside new with their reasons as filed in 4dec517.
+
+### The Diana: her spanker as her spars carry it (the owner's decision D-s2; the lead's nudges 61 to 64, 2026-11-23)
+
+The owner's word, Decisions Part F, row D-s2: "Let's go with (a), as told to the lead." It supersedes row D-s ("Steel's boom, then measure"), and the lead's nudge 64 withdraws nudge 63. So: the spanker her spars carry, cut on them by her note's rule; her tacks kept; truth D restated as measured; `clr_x_m` chosen by the wide table.
+
+**Her boom's and gaff's ground, as it is.** Her boom, 10.9 m, is half her main mast by Luce's chain: a rule, not a source. Steel's 20-gun ship of 429 tons, her near comparator (Steel 1794 vol. I p. 50: Pages §7), lists a driver boom of 45 ft 6 in (13.9 m), 28% longer: known, and not used, by the owner's word. Her gaff, 8.7 m, is Luce's 4/5 of the boom and the length of Steel's mizen yard, 28 ft 6 in. Both notes say so. (Measured before D-s2 came, at one seed and not used: on Steel's boom her rule cuts 114 m2 at 9.6 m, x -17.8.)
+
+**The spanker, old beside new.** Old: the frigate-36's 167 m2 at 9.8 m scaled by her chain, 111 m2 at 7.8 m above her water, x -16.1. New: **95 m2 at 9.7 m, x -16.6**, cut on her boom and gaff by her note's rule (`spanker_figures` and `spanker_spars`: the method in the nudge 59 section above). Through the generator: the spanker's cloth rating 35.5 to 30.4 kn, her plain sail 1,054 to 1,038 m2, her rope's scale 0.816 to 0.810, and 56 ratings with it; her spars unmoved, and the eighteen unmoved.
+
+**The wide table** (the lead's nudges 61 and 62). Her tacks from 290, 292.5 and 295 degrees in 8, 12, 15, 20 and 25 kn at seeds 1 to 8, each settled as the truths' helpers settle her, and her helm close-hauled (66 degrees) and abeam (90) at each wind and seed. **The eight seeds give the same result to the tick in every cell**: the truths' scenario has no gusts and no shifts of wind, so a seed reaches nothing her going about reads. The spread is across the winds and headings.
+
+| `clr_x_m` | stayed of 120 | 8 kn | 12 kn | 15 kn | 20, 25 kn | helm close-hauled, 8 to 25 kn | abeam, 8 to 25 kn |
+|---|---|---|---|---|---|---|---|
+| 2.600 | 56 | from 290 alone, 338 s | all three, 184 to 187 s | all three, 235 to 241 s | none | -0.63 to -0.31 | 1.27 to 2.30 |
+| 2.625 | 56 | 290 alone, 343 s | all three, 184 to 187 | all three, 233 to 240 | none | -0.55 to -0.22 | 1.30 to 2.35 |
+| **2.650** | **56** | **290 alone, 351 s** | **all three, 184 to 187** | **all three, 232 to 238** | **none** | **-0.47 to -0.14** | **1.34 to 2.41** |
+| 2.675 | 56 | 290 alone, 355 s | all three, 183 to 187 | all three, 231 to 237 | none | -0.39 to -0.05 | 1.38 to 2.46 |
+| 2.700 | 48 | 290 alone, 355 s | all three, 183 to 187 | 290 and 292.5; **missed stays from 295** | none | -0.32 to +0.03 | 1.41 to 2.51 |
+| 2.725 | 56 | 290 alone, 359 s | all three, 183 to 187 | all three, 228 to 231 | none | -0.24 to +0.12 | 1.45 to 2.57 |
+| 2.750 | 56 | 290 alone, 362 s | all three, 183 to 187 | all three, 226 to 229 | none | -0.16 to +0.11 | 1.48 to 2.62 |
+| **the sail as it was filed**, 111 m2 at 2.8 | 56 | 290 alone, 393 s | all three, 186 to 303 | all three, 206 to 216 | none | +0.69 to +1.13 | 1.77 to 2.99 |
+
+Every tack not made is a missed stay, said 59 to 107 s after the order: from 292.5 and 295 in 8 kn, and from all three in 20 and 25 kn, **with either sail**. The frigate-36 from 292.5 in 20 and 25 kn stays, in 232 and 248 s. So the larger sail bought her weather helm close-hauled (+0.7 to +1.1 degrees, inside the old band) and quicker tacks in 15 kn (by 22 to 26 s); it bought her no tack the smaller sail does not make, in any wind measured. Her missing stays in 20 and 25 kn under plain sail is her file's, not the sail's: for the lead.
+
+**The figure, 2.65 (JUDGEMENT).** From 2.6 to 2.675 she stays in every cell the band has (and below 2.6 her tacks held at seed 7 down to 2.0, the nudge 59 scan); at 2.7 she misses from 295 in 15 kn; 2.725 and 2.75 are a narrow island between that miss and the one at 2.8. In the broad band, 2.65 is the lowest figure whose helm close-hauled is within half a degree of amidships at every wind measured (-0.47 to -0.14), 0.05 short of the miss at 2.7; at 2.625 it is -0.55 in 8 kn. Old: 2.8, with the frigate's spanker scaled.
+
+**Truth D restated as measured** (truth 7-663, `tests/test_diana.py`). Old: close-hauled in 15 kn 0.5 to 3 degrees of weather helm and abeam 1 to 3, Meyer's "steers splendidly" (0.82 and 2.02 at 2.8, with the frigate's spanker). New: **close-hauled her helm within half a degree of amidships, abeam 1 to 3 degrees of weather helm: -0.33 and 1.54 at 2.65.** Why: the spanker her spars carry is 95 m2, and with it no `clr_x_m` gives her that weather helm close-hauled and her tacks too (the nudge 59 section above); the owner chose the sail and her tacks, the lead recommending it (nudge 61: "a tenth of a degree of lee helm close-hauled is a helm amidships to anyone steering her").
+
+**Her other truths, measured again** (seed 7, the truths' helpers; old with the frigate's spanker scaled):
+- truth B (7-661), Meyer's speed, 9.5 to 11.5 kn: 10.30 to 11.26 (10.28 to 11.29);
+- truth C (7-662), heel in 22 kn within 1.15 times the frigate-36's: 8.17 and 12.63 degrees, 1.11 and 1.12 (8.10 and 12.61, 1.10 and 1.12);
+- truth E (7-664), each tack 180 to 330 s: 232, 235 and 238 s, losing 34, 44 and 56 m (206, 215 and 216 s; 28, 42 and 46 m); the wear 492 s (492), truth 11's 360 to 720;
+- truth F (7-665) and truth 7-660: unmoved (her ports and particulars);
+- hove to in 133 s, lying 59.8 to 60.1 degrees off at 1.16 kn, never aback; filled away in 59 s and settled in 140 s (126 s, 56.3 to 57.4 degrees, 1.12 kn; 59 and 156 s);
+- truth 9, measured and not asserted: nothing carries away in 20 kn under plain sail, no line parts, no warning; in 35 kn under all sail her main, mizzen and fore royal masts and her fore topgallant yard carry away, each urgent, with 50 strain warnings (her main royal yard, fore and mizzen royal masts and fore topgallant yard, 44 warnings).
+
+**Her viewer's picture does not move.** The viewer draws a gaff sail with a boom between its spars' ends (`client/projection.js`), reading neither its area nor its centre, and her boom and gaff are unchanged. Her rows in `tests/test_view_geometry.py` (the boom's frame, the sheet's end and the boom over the taffrail) hold as they stood.
+
+### The Diana: why she misses stays in a breeze, measured, nothing moved (the lead's nudge 65, 2026-11-23)
+
+Measured, and nothing filed: the mend the measure points to is her displacement (the lead's ruling of nudge 30) and her rig against it, neither a JUDGEMENT figure of hers, so it goes to the lead first (her report's §12, with every table). Each figure below is a probe on a scratch copy of her file through the engine as it stands.
+- **Her plain figures beside every committed square-rigged ship:** displacement to old-rule burthen 1.05 (the others 1.31 to 1.62, the hermaphrodite brig 0.88); plain sail as the game sets it 2.21 m2 a tonne (the frigate-36 1.25, the brig 1.85); rudder to lateral plane 0.025, the least of the ships; block coefficient to K 0.39 (the frigate 0.55, the brig 0.50).
+- **Her missed tack in 20 kn from 292.5, beside the frigate-36's:** at "mainsail haul", her head 9.9 degrees off for both, she has 1.86 kn and swings 0.72 degrees a second, the frigate 3.30 kn and 1.18; the after yards then give -272 kN m at the most against her yaw inertia of 5.24e7 kg m2 (the frigate's -337 against 2.08e8), so her swing stops in 4 s and she falls back two points, missing stays at 68 s, 8.1 degrees off at her closest; the frigate carries through and tacks in 232 s. Her square sails' moment about her centre of lateral resistance, per unit of yaw inertia, is 2.5 times the frigate's aft and 2.4 times forward, the sails' centre in the same place about it.
+- **What moves it** (her tacks from three headings in 8 to 25 kn, seed 7, `clr_x_m` 3.0): her mass alone at 597 to 611 t makes her stay from every heading in 8, 12 and 15 kn, with truth D's first band held (0.64 to 0.74 degrees close-hauled, 2.1 abeam), but not in 20 or 25; by mass alone she would want about 800 t to stay in 20 kn and 1,100 t in 25. Her lateral plane at the frigate's fill (108 m2) changes nothing; a quarter less square sail with 611 t stays in 20 kn but not in 25; her topgallants taken in, as filed, she stays in 20 kn from all three headings and in 25 from one.
+- **Her drawn body** floats at 448.4 t at her line (470 with her plank); 588 to 611 t, the brig's and the frigate's ratio on her 449 tons, would float her 0.46 to 0.55 m deeper, 4.24 to 4.33 m to K against her filed 3.78.
+
+### The Diana: hers or every square-rigger's, and the haul's moment, measured, nothing moved (the lead's nudge 66, 2026-11-23)
+
+Probes only, nothing filed (her report's §13, every table). Under plain sail in 20 and 25 kn she alone of the square-riggers that tack misses (seven of fifteen; the frigate-36, the brig and the hermaphrodite brig fifteen, the razee and the 64 thirteen and the 74 twelve, their misses all in 8 kn; the merchant brig and the bilander never tack within 900 s under their books' sail). After the game's own "shorten sail" she stays in 20 kn from three headings and in 25 from two, the third with her mizzen topgallant not yet in. The tack script calls "mainsail haul" at `abs(rel) <= POINT or self.through` for every ship: for her in 20 kn at 9.9 degrees off with 0.72 degrees a second of swing, for the frigate at 9.9 with 1.18. With that one condition rewritten in a probe's process alone, the haul with the wind ahead (Luce 1884 p. 417's other reading) or a point past, she stays in 20 and 25 kn from every heading (thirteen of fifteen; her 8-kn misses untouched), and the frigate stays in all fifteen either way. Her rudder is traced from her plan (3.0 m2, Pages §5.5); its ratio to her lateral plane went from 0.0287 to 0.0245 with the plane's re-measure, 104.4 to 122.2 m2 (the lead's ruling 4). The engine's one yaw inertia, read and not changed.
+
+### The Diana's gate for "Join now" (the owner's decisions D-j and D-j3; the lead's nudges 67 and 70, 2026-11-24)
+
+**Truth E (7-664) restated as a count across the winds, old beside new.** Old: three tacks in 15 kn, each 180 to 330 s, and her wear, in one test. New, one case each (`tests/test_diana.py`), at seed 7 by the truths' helpers:
+- **under all plain sail** (`TACK_PLAIN`): stayed in 12 and 15 kn from 290, 292.5 and 295 (184 to 238 s, band 180 to 330); in 8 kn from 290 alone (351 s, band 300 to 420), missed from 292.5 and 295; missed stays from every heading in 20 and 25 kn. 7 of 15. The wear its own case, 360 to 720 s (492);
+- **shortened by the game's `shorten sail`, run to its end before the helm is put down:** in 20 kn stayed from every heading (186 to 193 s; her jib left on her); in 25 kn and no more, from 290 her way held and she stayed (235 s), from 292.5 and 295 she gripes without her jib, 30 to 62 degrees off at under 2.5 kn, and the tack is refused for want of way (or missed): 1 of 3; in 25 kn with `set the jib` given after the shortening, stayed from every heading (184 to 189 s), the jib under its rating through the tack (0.68 to 0.78 measured) and not blown out.
+
+**Truth D (7-663)** as restated under (a), `clr_x_m` 2.65; **owed with package 125** (the moment of the haul): her `clr_x_m` and her helm measured again, and truth D back to its first band if she then holds it.
+
+**Her rudder's note** (her file): traced from her plan, the least of any committed ship's against her lateral plane, the cause of her griping when the game's shortening takes in her jib in a fresh breeze, and not of her missed stays under all plain sail.
+
+**Her truths split by case under the five-second line** (the lead's nudges 34 and 69): B (7-661) a case a wind, 4.2 to 4.9 s alone; D a case a heading off the wind, about 4 s; E's plain-sail cases 3.5 to 4.2 s. **Still over it, named for the lead** (no guard fails; none marked slow): truth C's two cases, about 8 s each (each sails the frigate-36 beside her), and E's nine shortened cases, 6.0 to 7.6 s (the game's shortening of her runs 800 to 900 s of her time before the helm may be put down).
+
+**The game's own captain in a rising wind** (one measure before anything was pinned): the wind from 20 kn rising to 35 over an hour and held an hour, gustiness and variability 0.3 as the captain's trials, seed 7, bound for Falmouth from 40 miles south of it, under plain sail, no order given after; the frigate-36 beside her.
+- **With the wind abeam she keeps her course**: 8.8 to 10.9 kn at 76 to 88 degrees off through the second hour, her helm 6 to 11 degrees. Her captain shortens sail at 1,860 s; **her main and mizzen topgallant yards carry away in the slings at 31 kn (2,038 and 2,091 s)** before his shortening takes them in; ordered to lie a-try at 3,240 s, she sails on at 10.7 kn. The frigate keeps her spars and lies a-try from 4,613 s.
+- **Close-hauled (Falmouth dead to windward)** she beats under plain sail to 27.6 kn at 9.9 kn; her captain shortens at 1,860 s, her jib hauled down at 2,043 s, and she gripes up (to 37 degrees off at 1 to 2 kn, her rudder at its stop), is taken aback at 2,592 s, is paid off (spanker and fore topmast staysail taken in, boxed off), heaves to for weather at 3,240 s, fails one wear at 3,974 s ("she would not come round"), and lies a-try at 59 to 66 degrees off and 4.8 to 7.3 kn; filling away at 6,900 s she gripes again. **The frigate-36 does the same in kind**: her jib down at 1,993 s, griping to 26 degrees off at 1.15 kn, taken aback twice, paid off, worn, hove to and lying a-try at 1 to 2.5 kn, griping again as she fills away. Not unmanageable beyond the frigate: the engine's part, a jib taken in where a ship cannot be held without it (package 125).
+
+**Her own words where they are served:** none to add to. Of her file, the game serves her era note's first clause as her class words (`api/readings.py`, `ship_class_words`) and her description's "what" as the glass's words; neither is a place for "she wants her jib in a breeze", so it is left to her design note (her report's §16).
+
+### The Diana's topgallant yards and the shortening's figure: probed, nothing filed (the lead's nudge 72, 2026-11-24)
+
+The King's ship book's `shorten_sail_kn` (30 kn, shared by the brig, the cutter, the frigate-36, the 74 and the Diana; no ship's file overrides a doctrine's threshold) set to 24, 26 and 28 kn in a probe's process alone, in §16.1's rising wind under the game's own captain. Her first shortening comes at 1,860 s, 29.2 kn, by the captain's own rule of the glass falling and the wind risen within the hour, whatever the figure (the standing order at the same moment with 24 or 26, at 1,945 s with 28, at 2,106 s with 30); with the wind abeam her main and mizzen topgallant yards carry away at 2,038 and 2,091 s under every figure, her watch's shortening not yet at them; close-hauled she keeps them under every figure; her handling in the second hour the same under each. So no figure from 24 to 28 keeps her spars, and nothing is filed: to package 125 with the rest (her report's §17).
+
+### The Diana's reading, her words and the primer (the lead's nudge 78, 2026-11-24)
+
+Words alone; no figure of her sailing moved and no pin of another ship's.
+- **Her ship reading's first line, old beside new.** Old, her era note opening "The Diana, a light frigate ...": `ship_class_words` took her name out and made "the" "a", so the reading said "The ship: Diana, a a light frigate of the Danish navy ...", to the player and in every station's brief. New, the note opening "Diana, a light frigate ..." (her generator; her file by it): "The ship: Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken by Spain at Cartagena in September 1809 and kept as a corvette to 1832, ship-rigged; a ship of the Spanish navy." Pinned whole under her own colours, and every committed file's class words checked for a doubled article (none; hers was the one).
+- **"a Spanish ship sloop", old beside new:** old, no description (the tail "ship sloop" in no row, hers holding "a ship sloop" alone, where the brig-sloop's hold both forms); new, "corvette", by the bare row "ship sloop" beside it. "a ship-sloop", "a Spanish ship-sloop" and "a French corvette" resolved before and do now.
+- **Truth E's docstring and her design note** carry the lead's reader's measure, said and not pinned: put about before her sail is set and her way is on her (600 s after `set plain sail`, in the game's default gusts, 2 to 3.5 kn of way) she stayed in none of nine in 12 and 15 kn, where settled she stays in 11 of 12.
+
 ## Package 127: words and waits on today's ships (2026-11-24)
 
 Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words and item 4 in what she does, at the lead's ruling (`docs/design/Report-Package127.md`); item 5 is not pursued, and the cutter's going astern after filling away is carried forward. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-787, in `tests/test_words_and_waits.py`.
@@ -40048,3 +40325,88 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to be clearing."
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
+
+## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
+
+**One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
+of the hands (`docs/primer/03-making-and-shortening-sail.md`), so `tests/test_agents.py`'s
+`test_the_contents_says_what_each_topic_costs_measured_from_the_text_served` and
+`test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number` move.
+Old: "about 11,330 tokens". New: "about 11,480 tokens". The history is kept in the first test's
+docstring. No other pin moved.
+
+The new figures, each JUDGEMENT and defined with its ground where it stands:
+
+- `world.captains.BRING_TO_AGAIN_S` 600 s: a refused or failed order to bring her to for the
+  weather is given again ten minutes after the last (the trunk gave it once, on entering the
+  state); tried twice with her sail unchanged, refused, failed or done and not hove to, it is not
+  given again until her sail changes.
+- `world.captains.LIE_A_TRY_CANVAS_NO` No. 4: the lightest canvas of a topsail she lies a-try under
+  (courses and topsails of No. 2; the sloop's topsail of No. 6 or 7, the cutter's and the smack's,
+  a fair-weather sail that blew out laid to under it in forty knots). With none she heaves to.
+- `world.captains.WRECK_HANDS_UP_S` 3,600 s: a wreck that has hung an hour with her watch never free
+  of its own work has all hands turned up for it, in settled weather only and never as she is
+  brought to; piped down when it is cleared.
+- `evolutions.runner.SPAR_WORK_RESUME_QUIET_S` 300 s: a spar's work held for her working is taken up
+  again only when nothing has waited for hands or gone on short for five minutes.
+- `world.captains.SPAR_WORK_QUIET_S` 600 s, `SPAR_MEND_ORDER`, `LIGHT_SPAR_CLASSES` and
+  `SPARE_YARD_ANSWERS` as before (under fire, the order of the work, the light spars last, a spare
+  yard to a topsail yard alone).
+- The passage truth 7-779 b (`tests/test_mends_126.py`), judged seed by seed over seeds 3, 7, 8, 9
+  and 11: `PASSAGE_ASTERN_MIN` 5 minutes, `PASSAGE_ABACK` 1, `PASSAGE_BROUGHT_S` 300 s,
+  `PASSAGE_WAY_SHARE` 0.10 and `PASSAGE_WAY_FLOOR_NM` 1.0 nm (the price of the hands' work in way
+  made good). They replace the package's own unmerged `PASSAGE_FLOORS` (0.3 nm, 5 min, 1, the
+  floors of a median margin of half the trunk's range), which moved no pin of the trunk's.
+
+**For the ships' session: a wreck left hanging pays some hulls off** (the carried list, fault 22).
+The physics gives a wrecked sail no drive but three times its windage, and its wrecked spars three
+times theirs (`physics.sails._sail_windage_area`, `_spar_windage_area`, `WRECK_MULTIPLIER`), and no
+harm. A topmast's wreck forward acts as a head sail. On the lead's probe (bound for Falmouth from
+48 40 N 5 05 W, the spar carried away at minute ten, three hours, seeds 3, 7, 8, 9 and 11) the
+trunk's own captain with the wreck cleared at the moment it fell, no hands spent, is worse than with
+it left hanging on 44 of the 140 cell-seeds, and there the captain of package 126 is measured
+against that clearing (the lead's rulings of 2026-11-27). The cells where it is so on most seeds,
+made good nm / minutes astern / times aback / tick brought to, trunk (wreck left hanging) beside the
+wreck cleared at once beside package 126, with the spar work's belays and the verdict (every
+bilander's and 74's cell-seed where the wreck cleared at once is the yardstick):
+
+| Ship (fore topmast) | Wind | Seed | Trunk | Wreck cleared at once | Package 126 | Belays | |
+|---|---|---|---|---|---|---|---|
+| bilander | 12 kn | 3 | 10.63 / 0 / 0 / - | -0.21 / 171 / 2 / - | 10.86 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 7 | 9.94 / 0 / 1 / - | 9.88 / 22 / 1 / - | 10.19 / 0 / 1 / - | 4 | inside |
+| bilander | 12 kn | 8 | 9.40 / 0 / 0 / - | 8.68 / 22 / 1 / - | 9.58 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 9 | 10.86 / 0 / 0 / - | -0.22 / 171 / 2 / - | 10.27 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn | 11 | 9.94 / 0 / 0 / - | -0.11 / 171 / 2 / - | 10.47 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 3 | 16.10 / 0 / 0 / - | 3.90 / 85 / 5 / - | 15.88 / 5 / 0 / - | 6 | inside |
+| bilander | 25 kn | 7 | 3.23 / 89 / 2 / - | 5.00 / 58 / 6 / - | 3.23 / 89 / 2 / - | 0 | inside |
+| bilander | 25 kn | 8 | 15.02 / 0 / 0 / - | 12.74 / 36 / 2 / - | 15.87 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 9 | 9.26 / 29 / 4 / - | 1.13 / 107 / 5 / - | 16.46 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 11 | 15.41 / 0 / 0 / - | 0.90 / 114 / 2 / - | 17.50 / 0 / 0 / - | 2 | inside |
+| bilander | 12 kn, heading | 3 | 5.99 / 0 / 0 / - | -1.29 / 172 / 2 / - | 6.09 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 7 | 2.62 / 76 / 0 / - | -1.10 / 168 / 2 / - | 3.01 / 81 / 1 / - | 6 | inside |
+| bilander | 12 kn, heading | 8 | 5.64 / 0 / 0 / - | -0.57 / 170 / 2 / - | 5.75 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 9 | 5.91 / 0 / 0 / - | -1.26 / 173 / 2 / - | 5.99 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn, heading | 11 | 6.01 / 0 / 0 / - | -1.18 / 171 / 2 / - | 6.13 / 0 / 0 / - | 4 | inside |
+| bilander | 20 to 38 | 3 | 14.24 / 0 / 0 / 6889 | 0.64 / 154 / 1 / 6751 | 14.24 / 0 / 0 / 6889 | 1 | inside |
+| bilander | 20 to 38 | 7 | 8.90 / 21 / 1 / 6123 | 2.28 / 141 / 1 / 6247 | 8.90 / 21 / 1 / 6123 | 3 | inside |
+| bilander | 20 to 38 | 8 | 11.87 / 0 / 1 / 7103 | 0.56 / 160 / 1 / 7086 | 11.87 / 0 / 1 / 7103 | 1 | inside |
+| bilander | 20 to 38 | 9 | 14.32 / 0 / 0 / 6340 | -0.71 / 163 / 1 / 6140 | 14.32 / 0 / 0 / 6340 | 1 | inside |
+| bilander | 20 to 38 | 11 | 14.28 / 0 / 1 / 6502 | 0.49 / 147 / 1 / 6653 | 14.28 / 0 / 1 / 6502 | 0 | inside |
+| 74 | 12 kn | 3 | 0.06 / 161 / 2 / - | -0.53 / 176 / 2 / - | 0.06 / 161 / 2 / - | 0 | inside |
+| 74 | 12 kn | 8 | 9.25 / 0 / 0 / - | 4.17 / 104 / 1 / - | 11.18 / 0 / 0 / - | 0 | inside |
+| 74 | 25 kn | 7 | 6.51 / 96 / 9 / - | 1.88 / 111 / 20 / - | 2.98 / 117 / 14 / - | 6 | declared: way, astern, aback |
+| 74 | 25 kn | 9 | 25.50 / 8 / 1 / - | 1.51 / 120 / 21 / - | 26.28 / 8 / 1 / - | 1 | inside |
+| 74 | 12 kn, heading | 3 | -1.06 / 162 / 3 / - | -1.51 / 176 / 2 / - | -1.06 / 162 / 3 / - | 0 | inside |
+| 74 | 12 kn, heading | 7 | 0.62 / 131 / 2 / - | 0.56 / 143 / 2 / - | 0.41 / 144 / 2 / - | 3 | inside |
+| 74 | 12 kn, heading | 9 | 0.48 / 136 / 2 / - | 0.50 / 144 / 2 / - | 0.31 / 142 / 2 / - | 4 | inside |
+| 74 | 12 kn, heading | 11 | 1.04 / 136 / 2 / - | 0.86 / 143 / 2 / - | 0.79 / 143 / 2 / - | 4 | inside |
+| 74 | 20 to 38 | 3 | 8.58 / 52 / 4 / 5351 | 11.17 / 97 / 0 / 5496 | 7.30 / 97 / 3 / 5349 | 1 | declared: way, astern |
+| 74 | 20 to 38 | 7 | 9.56 / 43 / 0 / 5018 | 0.82 / 144 / 8 / 4932 | 3.99 / 116 / 1 / 4916 | 1 | inside |
+| 74 | 20 to 38 | 8 | 13.03 / 59 / 1 / 5856 | 11.93 / 92 / 0 / 5806 | 11.84 / 89 / 0 / 5840 | 1 | inside |
+| 74 | 20 to 38 | 9 | 13.88 / 25 / 0 / 5380 | 11.16 / 90 / 0 / 5318 | 10.83 / 86 / 0 / 5359 | 1 | inside |
+| 74 | 20 to 38 | 11 | 13.67 / 34 / 0 / 5527 | 11.57 / 97 / 0 / 5462 | 11.54 / 87 / 0 / 5503 | 1 | inside |
+
+The bilander's fore topmast and the 74's are forward of her centre of effort;
+cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
+against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
+wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.

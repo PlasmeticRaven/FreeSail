@@ -9,7 +9,7 @@ Start it with `py -m freesail` and the **harbour** opens in the browser: *begin*
 ## What is simulated
 
 - **The ship,** as her own parts: every spar, sail, line, gun and fitting, each with its load and its condition, worked by **her people one by one**, in watches, with their stations. Sail carried too long strains, warns and carries away; damage is repaired by named work.
-- **Thirteen vessels and five boats:** the cutter, the smack, the lugger, the bilander, the brig, the merchant brig, the hermaphrodite brig, the topsail schooner, the privateer schooner, the frigate of 36, the razee of 44, the 64 and the 74. A ship may be bought, and changed in play.
+- **Fourteen vessels and five boats:** the cutter, the smack, the lugger, the bilander, the brig, the merchant brig, the hermaphrodite brig, the topsail schooner, the privateer schooner, the corvette *Diana* (joined 27 November, after the gate), the frigate of 36, the razee of 44, the 64 and the 74. A ship may be bought, and changed in play.
 - **The sea:** the Channel, Biscay, Portugal, the Strait, the Atlantic islands and Morocco, and the western Mediterranean to Sicily and Tunis; 127 ports by file, with tides, currents, pilots and prices; weather by systems, with the glass, fog and the sea breeze.
 - **Navigation** by reckoning, sights and the chronometer; anchoring; boats sent ashore; **trade** by cargo bought and sold; the smack's fishing.
 - **Other ships** under captains of their own by their calling (King's ships, cruisers, privateers, merchants, packets, fishermen), alone or in convoys, squadrons and a blockade; hails and **signals** in five nations' codes, drawn as flags.

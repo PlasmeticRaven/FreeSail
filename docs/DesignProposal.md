@@ -540,8 +540,8 @@ Each with what the owner decides before it starts. **A gate in its middle and on
 
 - **First, the mending step** (decision 79): from the gate's list, a game ended from the harbour, fog that comes on and clears over a time, and the game's own captain replacing a spar carried away; the older faults on today's ships (`docs/dev/CarriedForward-M7.md`, section 4); and **package 125, the moment of the haul**. The test suite's package is planned beside it. *Packages 125, 126 (the harbour, the weather and the captain) and 127 (words and waits on today's ships) launched on 24 November at his word.*
 
-- **77, the fight's and damage control's evolutions**, "clear for action" made true, the chain pumps. *Approved 11 November; he says when it launches.*
-- **87, the warrant officers' stations**: gunner first, then surgeon, carpenter, sailmaker, boatswain, each one a person or a model may hold (the owner, 27 October). *Its brief, after 77; all five at once (decision 79).*
+- **77, the fight's and damage control's evolutions**, "clear for action" made true, the chain pumps. *Approved 11 November; he says when it launches. **Widened 27 November: fire aboard, the fighting of it, and the magazine in danger** (the owner, 27 November: "The bookings read right to me").*
+- **87, the warrant officers' stations**: gunner first, then surgeon, carpenter, sailmaker, boatswain, each one a person or a model may hold (the owner, 27 October). *Its brief, after 77; all five at once (decision 79). **With the gunner's station, from 27 November: the guns' faults, their condition and their care** (the owner, 27 November: "The bookings read right to me").*
 - **78b, fine control of the sails, and the gybe by hand**: spilling the wind by vangs and sheets, a yard dropped with the sail still set, the gybe. *His list of 10 November, and whatever else is desirable, interesting or falls out of the work (decision 79).*
 - **The rest of package 60**: a ship left and taken up again; the two bodies of a ship. *The lead's design statement of the near and far ship, read first.*
 - **The crew made true**: skill aloft read, or the line struck; the fatigue of work aloft charged in full; morale per man, or the line struck. *Each, build or strike; and whether ordinary hands stay "numbers only" (decision 6). **Decided, 24 November (decision 79):** a man's own skill read in the work; the fatigue of work aloft charged in full, per man; morale the company's one figure, carried beyond the fight (victuals, hard driving, losses, prizes) and said in the log, with a man's own part drawn from it where an event calls for one; ordinary hands stay "numbers only".*
@@ -550,6 +550,9 @@ Each with what the owner decides before it starts. **A gate in its middle and on
 - **Package 90's ships** (the tartane, the polacre, the xebec, the corvette *Diana* and the three-decker), building now; released across the gate by the owner on 19 November. Their corsair fits are held for the corsair's package (decision 76).
 - **A first design for a ship made by a player** (decision 72): a note, no build. *What the sheet holds, and whether a model's help is a station of the game or done outside it.*
 - **The fight's known faults** from the gate (`give chase`; the cutter aback when handed back), if the verdict carries them.
+- **Package 132, a raking fire** (the owner, 27 November: "The bookings read right to me"): a shot from ahead or astern goes the length of her, so that more of her people and her gear lie in its road; a package of its own, from the gunnery's sources. *To the middle gate, with the fight's known faults; booked, not launched.*
+- **Package 131, an order of succession appointed by the captain** (the owner, 27 November: "The bookings read right to me"): the command devolves by the order he has named, where today it goes to the senior officer by rule (decision 63). *To the end gate, with her people; booked, not launched.*
+- **The cold**, the second layer of temperature (the owner, 27 November: "The bookings read right to me"): rain to snow, spray freezing on the rigging, the watch tiring faster. *To the end gate, with the crew's health.*
 
 **Beside it, the structural work** (decision 75): **a cheaper and truer test suite** (tests that pass with the game broken mended or removed; pins that say why they hold; timing tests out of the ordinary tiers), and **the boundary between the simulation and what drives or shows it** (a test that counts today's crossings and fails at one more, then the worst of them). Neither changes play. *He agrees their cards; no design is his.*
 
@@ -564,6 +567,7 @@ Each with what the owner decides before it starts. **A gate in its middle and on
 - The leaders' offices (decision 53).
 - Package 96's deeper layer, the ship's configuration; data that refuses unknown keys first.
 - Careening, with the ports that mend a ship (decision 79).
+- **Temperature's first layer** (the owner, 27 November: "The bookings read right to me"): the thermometer as a reading, and the fog that comes of warm air over cold water, with the weather of this milestone.
 - *Decided (decision 79):* supply and demand, so that the world can work of itself; a career persists across saves; the land carried as far as the sea's simulation needs, by a design package of its own.
 
 **The player's first hours.**
