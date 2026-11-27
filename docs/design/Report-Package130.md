@@ -131,7 +131,19 @@ Nothing is built for either. **Windows**: an Authenticode code-signing certifica
 
 ## The cloud's runs
 
-(Filled in at the report: the run ids, and what each smoke test said.)
+Read through the public API (`/actions/runs/<id>/jobs` and each job's annotations). The run that proved the downloads as they now are, at `14192b3` (the downloads' own files have not changed since; the hash reported carries the trunk merged in and this report, and its own run is named in the report to the lead):
+
+**Run 46079578966**, all green:
+
+- **build both downloads** (job 140775176775): `FreeSail-preview-pkg-130-windows.zip` 428 MB, sha256 `c606ea2c...d9773f`; `FreeSail-preview-pkg-130-mac.zip` 503 MB, sha256 `f4256b86...c09a5`; each built twice, the same bytes.
+- **smoke test on Windows** (`windows-2025`, job 140775863655): 22 of 22. Unpacked to `C:\Users\runneradmin\Free Sail Proof ä\...` (10,294 entries); the server answered after 7 s; the harbour's page and its mark, its state, its first game *A first passage* begun, the game's page and ship, tick 0 to 60, the primer's chapter 7, the harbour's chart, *The tender*'s minute and chart; the game on `...\python\python.exe` inside the folder; no poison's mark; stopped (Ctrl+Break) with "FreeSail has stopped (exit code 3)", the server silent after, no traceback; nothing in the folder new, changed or gone; the save at `C:\Users\runneradmin\AppData\Roaming\FreeSail\saves\smoke-proof.json`. 79 s from the launcher to the stop.
+- **smoke test on a Mac with Apple silicon** (`macos-15`, job 140775863564): 24 of 24. The unpacked files carried the quarantine mark (20,424 files); the game on `.../python-arm64/bin/python3.11`; stopped (Control-C) with "FreeSail has stopped (exit code 0)"; the quarantine cleared in the download's folders (the launcher, the two pages and the folder itself keep theirs); the save at `/Users/runner/Library/Application Support/FreeSail/saves/smoke-proof.json`. 21 s.
+- **smoke test on a Mac with Intel** (`macos-15-intel`, job 140775863547): 24 of 24, as the other Mac, on `.../python-x86_64/bin/python3.11`. 51 s.
+- **publish** (job 140777531662): the draft `preview-pkg-130`, "a builder's proof ... not a build for players".
+
+**What the earlier runs found and mended**: the first (46072756789) was cancelled in the queue, superseded. The second (46073511628): setup-python has no 3.11.14 for Windows or the Mac (the harness now takes 3.11.9 there), and the publishing word matched the commit's own prose (now a line of its own, in small letters). The third (46075728015): on Windows the break ended the process with code 3 after the server's clean shutdown; on the Macs four files at the top kept their quarantine, as the launcher now means them to. The fourth (46078457483): the Macs green; on Windows Ctrl+C pressed in a console of the game's own lost the window's text and cmd's question to that console, and the game was not seen to stop.
+
+**What is not proven in the cloud**, so that it is not taken as proven: the warnings each system gives a person on the first opening (a runner has no desktop; Windows' Expand-Archive passes no mark of the web), Smart App Control, Terminal's question about the Downloads folder, and on Windows the stop by Ctrl+C itself (the stop proven is the break, which the server takes the same way; the Mac's Control-C is proven). No person has yet tried the Mac download, which its page says.
 
 ## What is put to the lead, and to the owner
 

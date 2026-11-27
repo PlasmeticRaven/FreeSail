@@ -13,7 +13,8 @@ name: downloads
 # 2. Called by the gate's release (.github/workflows/release.yml), which attaches both
 #    downloads beside the project's zip once their smoke tests have passed.
 # 3. A push that changes the downloads' own files (the paths below): builds and smoke-tests
-#    them, so that the macOS runners run when a download has changed and not on every push.
+#    them (and when pyproject.toml, whose dependencies the locks follow, changes), so that
+#    the macOS runners run when a download has changed and not on every push.
 #    A push whose head commit's message has a line of its own `[preview name]` (the name in
 #    small letters, figures, dots and dashes) also publishes, as a DRAFT
 #    (not public): a builder's proof of the publishing, not a build for players.
@@ -45,6 +46,8 @@ on:
       - "tools/bundle/**"
       - "tools/bundle_smoke.py"
       - ".github/workflows/downloads.yml"
+      # the dependencies the lock files are resolved from
+      - "pyproject.toml"
 
 permissions:
   contents: read
