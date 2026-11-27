@@ -117,3 +117,7 @@ Each mend taken out in a worktree of the hash, the truths that read it run. All 
 | the place a path in the server's first world | 7-798 (its first-world check, added when this one first survived) |
 | the place a path in a world taken up | 7-798 |
 | the names' reader forgets the memo | 7-799 |
+
+## The trunk merged
+
+The trunk was merged at 93cf624c (nineteen ship files, the corvette Diana; package 126's second part, its `captains.py`, `runner.py` and `scripts.py`). One conflict, in `docs/dev/TuningNotes.md`, where both sides had added a section at the end: both kept whole, 126's second part first, then this package's. No code conflicted; `captains.py` was not touched here. Nothing of this package counts the ship files: 7-797 takes every scenario the trunk ships, as it finds them. The tiers were run on the merged hash.
