@@ -120,7 +120,12 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # game's own captain, the jib kept at its limit (a minute or two a case)
         *(
             f"test_captains.py::test_a_jib_kept_at_its_limit_is_taken_in_by_the_captain_before_it_goes[{c}]"
-            for c in ("brig-30.0-11", "brig-35.0-7", "hermaphrodite-brig-30.0-11", "razee-44-28.0-11")
+            for c in (
+                "brig-30.0-11",
+                "brig-35.0-7",
+                "hermaphrodite-brig-30.0-11",
+                "razee-44-28.0-11",
+            )
         ),
         # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
         # shortening run to its end before the helm goes down (6 to 8 s a case)

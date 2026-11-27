@@ -636,7 +636,8 @@ def test_a_jib_kept_at_its_limit_is_taken_in_by_the_captain_before_it_goes(ship,
     her, carried at its limit, is taken in by the game's own captain on passage in the hour after,
     the wind rising twelve knots: by his own next `shorten sail`, or at its strain's line ("Jib
     straining at the bolt-ropes: take in the jib."). It never blows out (at 1.8 of its rating; it
-    was at 0.85 to 1.35 at the most, measured). Old: the jib taken in by the first `shorten sail`."""
+    was at 0.85 to 1.35 at the most, measured). Old: the jib taken in by the first
+    `shorten sail`."""
     from freesail import units
     from freesail.physics import strain
 
