@@ -1157,11 +1157,13 @@ def _spar_passage(ship: str, wind: str, seed: int, how: str) -> dict:
             setattr(C.Captain, n, f)
 
 
-# "Not worse", judged seed by seed (the lead's list of 2026-11-27 for part two, item 4 (a)): on
-# each cell-seed against its yardstick, minutes astern not more than five beyond, times aback not
-# more than one beyond (JUDGEMENT: the least counts of each, as before), brought to not later
-# than five minutes after (the lead's figure), and way made good not less by more than the price
-# of the hands' work, `PASSAGE_WAY_SHARE` of the yardstick's way and never under
+# "Not worse", judged seed by seed (the lead's list of 2026-11-27 for part two, item 4 (a), and
+# his ruling of the same afternoon on the rule's own fault): on each cell-seed against the trunk,
+# or against its yardstick where that is the wreck cleared at once: minutes astern not more than
+# five beyond, times aback not more than one beyond (JUDGEMENT: the least counts of each, as
+# before), brought to not later than five minutes after (the lead's figure), and way made good
+# not less by more than the price of the hands' work, `PASSAGE_WAY_SHARE` of the yardstick's way
+# and never under
 # `PASSAGE_WAY_FLOOR_NM` (JUDGEMENT: the lead's "a captain who cuts a wreck away and is a mile or
 # two behind for it is a seaman", taken at its lower bound, a mile; and over a longer run a
 # tenth, the wreck's clearing, an hour of her watch's work, costing her a third of her way for
@@ -1194,21 +1196,29 @@ def _worse(a: dict, b: dict) -> list[str]:
     return out
 
 
-def _seed_verdict(trunk: dict, instant: dict, mine: dict) -> dict:
-    """One cell-seed judged by the lead's rulings: the yardstick is the trunk, or the wreck
-    cleared at once where that is itself worse than the trunk beyond the allowances (a wreck
-    hanging pays some hulls off like a head sail: the carried list, fault 22); this tree's
-    captain no worse than the yardstick beyond them; brought to not later than five minutes
-    after it, and brought to wherever the trunk's captain is."""
-    by = "instant" if _worse(instant, trunk) else "trunk"
-    y = instant if by == "instant" else trunk
+def _short_of(mine: dict, y: dict) -> list[str]:
+    """How this tree's captain falls short of a yardstick: worse beyond the allowances, or
+    brought to more than five minutes after it."""
     why = _worse(mine, y)
-    if trunk["brought_to"] is not None and mine["brought_to"] is None:
-        why.append("not brought to")
     if y["brought_to"] is not None and (
         mine["brought_to"] is None or mine["brought_to"] > y["brought_to"] + PASSAGE_BROUGHT_S
     ):
         why.append("brought to late")
+    return why
+
+
+def _seed_verdict(trunk: dict, instant: dict, mine: dict) -> dict:
+    """One cell-seed judged by the lead's rulings of 2026-11-27: she passes where she is not
+    worse than the trunk; or, where the wreck cleared at once is the yardstick (itself worse
+    than the trunk beyond the allowances: a wreck hanging pays some hulls off like a head sail,
+    the carried list, fault 22), where she is not worse than that. And wherever the trunk's
+    captain brings her to, so does this one, without exception."""
+    by = "instant" if _worse(instant, trunk) else "trunk"
+    why = _short_of(mine, trunk)
+    if why and by == "instant" and not _short_of(mine, instant):
+        why = []
+    if trunk["brought_to"] is not None and mine["brought_to"] is None:
+        why.append("not brought to")
     return {"by": by, "why": why}
 
 
