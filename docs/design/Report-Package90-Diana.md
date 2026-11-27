@@ -97,6 +97,17 @@ by hand, TuningNotes, at its end). Her fast tier whole against a base on b35aaab
 outcome: 9,138 passed, 8 skipped, 1 xfailed. The slow tier of her files, run again because the
 list moved the physics her slow truths read, has 210 passed and 8 xfailed.
 
+**Her hash for the gate (§19): `504c520`**, the lead's nudge 78 as one commit (`23f467f`):
+- her reading's first line with one article;
+- her row and section in the primer's chapter 28;
+- "a Spanish ship sloop" made a corvette;
+- the lead's reader's measure in truth E and her design note.
+
+The package's branch is merged on it twice, at 86fa56d and at e87714d. Each time her branch
+conflicted with the trunk in TuningNotes alone, and her sections now stand before package 127's.
+Her fast tier whole against a base on e87714d changes no outcome: 9,178 passed, 8 skipped, 1
+xfailed. The slow tier of her files has 212 passed and 8 xfailed.
+
 ## 0. The branch and the merges
 
 - Her branch, `…/pkg-90-diana`, as N1 to N3 left it at 04aa24a6, **fast-forwarded to the package's
@@ -1913,3 +1924,150 @@ As §16.9 sets it out, with §17's probe:
 - **Named for the lead:**
   - truths C's and E's cases over the five-second line (allowed, nudge 72);
   - the a-try ordered abeam and not taken (the lead's own list).
+
+## 19. Her reading, her words and the primer: one commit for the gate (2026-11-27)
+
+The lead's nudge 78 (the trunk at b547cf88), restated by nudges 81 to 83: one commit on her branch,
+nothing else in it, and the trunk not merged again unless it conflicts. **Her hash for the gate is
+`504c520`:**
+- **`23f467f`**, the one commit (§19.1), on `2a272d4`;
+- **`b51d913`**, the package's branch merged at 86fa56d;
+- **`504c520`**, the package's branch merged at e87714d.
+
+Each merge was made only because her branch did not merge cleanly with the trunk (§19.2). The tiers
+are in §19.3. The report commit on top of them adds only this section and its paragraph in "In
+short".
+
+### 19.1 What the commit holds
+
+| Item | Old | New | Where |
+|---|---|---|---|
+| **1. Her ship reading's first line** | "The ship: Diana, a a light frigate of the Danish navy ...", to the player and in every station's brief | "The ship: Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken by Spain at Cartagena in September 1809 and kept as a corvette to 1832, ship-rigged; a ship of the Spanish navy." | her era note at her generator (`tools/ships/diana.py`), her file by it |
+| **2. The primer's chapter 28** | no row or section for her | her row in the list, her section after the bilander's, and her name in the chapter's opening list | `docs/primer/28-the-ships.md` |
+| **3. "a Spanish ship sloop"** | no description | "corvette" | her words rows (`freesail/world/ships.py`) |
+| **4. The lead's reader's measure** | | one line, said and not pinned | truth E's docstring; `docs/design/Design-Ship-Diana.md` §4.3 |
+
+**Item 1, the cause.** `ship_class_words` takes the era note's first clause, takes her name out of
+it, and makes a leading "the" "a". Her note opened "The Diana, a light frigate": her name taken out
+left "The a light frigate", and "The" made "a" read "a a". The note now opens "Diana, a light
+frigate ...", as the lugger's opens "L'Éclair, a French gun-lugger ...". Its years are kept, so the
+ranges audit reads the same.
+- **Pinned:** `test_her_reading_names_her_once_and_her_class_with_one_article` pins the first line
+  whole under her own colours, through `ship_words` and the reading `the ship`.
+- **Every committed ship:** `test_no_committed_ships_reading_holds_a_doubled_article` checks the
+  nineteen files' class words. Hers was the one doubled.
+- **Seen on the way, not mine and not a doubled article (for the lead):** the razee, the 64 and the
+  74 read "hMS as razeed, 1795", "hMS as built, a 64-gun ship of the Ardent class" and "hMS a 74-gun
+  ship of the Arrogant class": the leading capital made small takes "HMS" to "hMS". The smack reads
+  "a Navy's smack".
+
+**Item 2, the chapter's own form.**
+- **Her row:** her file, "the *Diana*, a Spanish corvette, the Danish light frigate of 1804", 167
+  with 50 soldiers, her default fit and the other three by name, and what the tops make of her.
+- **Her section:** her history, her fits, her company, her handling as her truths measure it (her
+  captain's stiff, steering and speed; stays in a working breeze, slack in stays in a fresh one,
+  shorten sail and she stays, keep her jib on her), her lee ports' 18.5 degrees, and her
+  made-out words. A console line starts her, as the chapter's opening line starts the 74.
+- **No `orders` block for her.** The primer's test runs each block against its own list of ship
+  files (`tests/test_primer.py`, `SHIP_FILES`), which has no row for her. That file is neither my
+  row's nor the card's, so her section carries none. If the lead wants one, it is a row in that list
+  and a block such as the bilander's.
+
+**Item 3, the cause.** `description_key` tries the words whole, then their longest tail that names
+a description. "a Spanish ship sloop" has the tail "ship sloop", and her rows held "a ship sloop"
+alone where the brig-sloop's hold both forms. The bare row "ship sloop" is added beside it. Her
+description test now also asks "ship sloop", "a Spanish ship sloop", "a Spanish ship-sloop" and "a
+French corvette". Each resolves to "corvette", and her rank by the words is 2 either way.
+
+**Item 4, the line**, in truth E's docstring and her design note §4.3, as the lead gave it: put about
+before her sail is set and her way is on her (600 s after `set plain sail`, in the game's default
+gusts, 2 to 3.5 kn of way), she stayed in none of nine in 12 and 15 kn, where settled she stays in
+11 of 12. It is the lead's reader's measure, said and not pinned.
+
+**Old beside new** is in TuningNotes, "The Diana's reading, her words and the primer". No figure of
+her sailing moved, and no pin of another ship's.
+
+### 19.2 The merges: why, and what each brought
+
+**Her branch did not merge cleanly with the trunk.** `git merge-tree` of `608830d` (the hash the
+lead's reader passed), of `2a272d4` and of `23f467f` with the trunk at b547cf88 each conflicts in
+`docs/dev/TuningNotes.md` alone. Since b35aaaba (§18) the package's branch had added sections at
+the file's end, and her sections stood at the same place. The conflict was there before her commit,
+and nothing in her commit causes it. By the nudge's own exception and the owner's standing
+permission, the package's branch was merged (`b51d913`, 24 November) and tiered.
+
+**The account's weekly limit then stopped every session, about 19:50 UTC on 24 November, before her
+push.** Her tiers on `b51d913` had run by then. By 27 November the trunk had taken packages 127 and
+126 (part one), at e87714d, and `b51d913` conflicted again in TuningNotes alone, the same way. So
+the package's branch was merged again (`504c520`). This time her sections are placed as one block
+before package 127's, not at the file's end, so that a section the trunk adds at its end later
+merges cleanly.
+
+| Merged | As | Brought | By hand |
+|---|---|---|---|
+| **the package's branch at 86fa56d** (in the trunk at b547cf88) | `b51d913` | the lateen list's second pass (`combat/hits.py`, `orders/navigation.py`, `physics/strain.py`, `world/boats.py`, `world/dealings.py`, `tests/test_boat_towed.py`, `tests/test_lateen_whole.py`), the director's unbuilt list, the records | **`docs/dev/TuningNotes.md` alone**: both sides only added at its end; the package's file kept whole, then hers whole |
+| **the package's branch at e87714d** (the trunk) | **`504c520`** | packages 127 (words and waits on today's ships) and 126 part one (the harbour's end and the fog), with `tests/test_words_and_waits.py` and `tests/test_mends_126.py`, and the records | **`docs/dev/TuningNotes.md` alone**: both sides only added at its end; the trunk's file kept whole, her sections one block before package 127's |
+
+At `504c520`:
+- **TuningNotes:** the trunk's file is hers with her block taken out. `git diff e87714d 504c520`
+  of the file adds her sections and removes nothing, and no conflict marker is left.
+- **Clean merges:** her branch merges cleanly into the package's branch and into the trunk at
+  e87714d (`git merge-tree`, no conflict).
+- **The probe of a later section** (a section added at the trunk's end, made as a loose commit and
+  never pushed): it merges cleanly with `504c520`, and conflicts with `b51d913`, where her sections
+  stood at the end.
+- **The generator** writes 19 of 19 files byte for byte; `git diff e87714d 504c520 -- data/ships`
+  names her file alone.
+- `ruff check .` and `ruff format --check .` are clean, and no Python line her commit adds is over
+  100 characters.
+
+### 19.3 The tiers
+
+Each fast tier whole ran as four pytest runs (`-n 4`, each with its own `--junitxml`). Each base is
+the merged tree's package side, in a worktree of its own.
+
+| Set | Tree | Result |
+|---|---|---|
+| Her one commit: the fast tier whole | `23f467f` | 9,140 passed, 8 skipped, 1 xfailed (9,149); no failure |
+| The base | 86fa56d | 8,996 passed, 8 skipped, 1 xfailed (9,005); no failure |
+| Her fast tier whole | `b51d913` | 9,145 passed, 8 skipped, 1 xfailed (9,154); no failure |
+| The slow tier of her files, pace excepted | `b51d913` | 210 passed, 8 xfailed; no failure |
+| **The base** | **e87714d** | 9,029 passed, 8 skipped, 1 xfailed (9,038); no failure |
+| **Her fast tier whole** | **`504c520`** | 9,178 passed, 8 skipped, 1 xfailed (9,187); no failure |
+| **The slow tier of her files**, pace excepted (`--slow -m "slow and not pace"`: `tests/test_known_truths.py`, `tests/test_neufchatel.py`, `tests/test_range_audit.py`, `tests/test_rig_words.py`) | **`504c520`** | 212 passed, 8 xfailed; no failure |
+| The 13 pace tests | | not run: the coordinator's |
+
+**`23f467f` against the base of §18.2 (b35aaaba), test by test:** no outcome changed. Beside
+`608830d`'s tier, the only differences are:
+- her two new tests;
+- the primer's five `orders` blocks of chapter 28. A block's test id is its fence's line, and her
+  row in the list moves each of them down by one line, so the same five appear under new ids. All
+  five pass.
+
+**`b51d913` against 86fa56d, test by test:** no outcome changed.
+- **Only in her tree, 155, all passed:**
+  - her own 59 (`tests/test_diana.py`, her two new tests among them);
+  - her 90 cases of the tests over every file;
+  - the schooner-mast guard renamed "nineteen files";
+  - the primer's five blocks, by their new line numbers.
+- **Only in the base, 6:** that guard's old name, and the five blocks by their old line numbers.
+
+**`504c520` against e87714d, test by test:** no outcome changed. The differences are those of
+`b51d913`:
+- **Only in her tree, 155, all passed:** her own 59, her 90 cases of the tests over every file, the
+  guard renamed "nineteen files", and the primer's five blocks by their new line numbers.
+- **Only in the base, 6:** that guard's old name, and the five blocks by their old line numbers.
+
+**The slow tier of her files on `504c520` beside `b51d913`'s:** no outcome changed, and the 8
+xfailed are the same. It has 212 passed where `b51d913`'s had 210. The trunk's merge brought the
+difference, and each passes:
+- truth 7-153 (cb87db7), new;
+- truth 7-788 (c36f979), new;
+- truth 7-340 under the name the trunk gave it (62085a1), its old name gone.
+
+### 19.4 Noted by the lead, not owed (package 125's)
+
+- Under the game's captain with the wind abeam she griped twenty minutes in the second hour.
+- Under plain sail in 28 knots gusting abeam she lost a fore topgallant yard the frigate kept.
+
+Both go with §17's topgallant yards to package 125. Nothing is filed for them.
