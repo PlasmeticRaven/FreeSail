@@ -219,6 +219,15 @@ HELM_VERBS = (
 # ---------------------------------------------------------------------------
 
 
+def unsaid(runner: Any, text: str) -> str:
+    """The runner's words for work an order started, for the order's own line: nothing where
+    the runner said them in the log itself, as it says work queued behind other work
+    (`Runner.start`, its `WAIT_SAID` mark), so that the wait is said once."""
+    from freesail.evolutions.runner import WAIT_SAID
+
+    return "" if getattr(runner, "__dict__", {}).get(WAIT_SAID) else text
+
+
 def runner_of(ship: Ship) -> Any:
     """The evolution runner (package 7), or a sentence if none is fitted."""
     runner = ship.extra.get("evolutions")
@@ -363,7 +372,36 @@ def _sail_evolution(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
+    # a take-in or a furl countermands the setting of its sail in hand or waiting: belayed first,
+    # said once; a sail it leaves furled is done, one half set is taken in from where it is
+    countermanded = _countermand_the_set(ship, sails, verb, vocab)
     checks = {sail.id: _sail_check(ship, sail, verb, order, mapping, vocab) for sail in sails}
+    belayed_words = ""
+    if countermanded:
+        from freesail.orders.work import _line as belay_line
+
+        belayed_words = belay_line("belay", countermanded)
+        done_ids = {
+            b["subject"]
+            for b in countermanded
+            if ship.sails[b["subject"]].state is SailState.FURLED
+        }
+        sails = [sl for sl in sails if sl.id not in done_ids]
+        if not sails or all(checks[sl.id] for sl in sails):
+            # nothing left to take in (the rest furled already): the countermand is the order's
+            # whole work and its line
+            data = {
+                "verb": verb,
+                "level": 1,
+                "object": res.name,
+                "side": res.side,
+                "subjects": sorted(done_ids),
+                "belayed": countermanded,
+                "failed": [],
+            }
+            return _countermand_said(ship, group, belayed_words, countermanded, data)
+        ship.note("notable", "work.belayed", belayed_words, None, {"belayed": countermanded})
+        checks = {sail.id: checks[sail.id] for sail in sails}
     if all(checks.values()):
         # Nothing to start: refuse on the merits before asking for the runner.
         reasons = [r for r in checks.values() if r]
@@ -394,7 +432,7 @@ def _sail_evolution(
         if verb == "reef" and order.modifiers.get("close"):
             p["reefs"] = sail.reef_bands - sail.reefs  # every band still out: close reefed
         try:
-            texts.append(runner.start(ship, evo, sail.id, p))
+            texts.append(unsaid(runner, runner.start(ship, evo, sail.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, sail.id), e))
             failed_ids.append(sail.id)
@@ -402,6 +440,28 @@ def _sail_evolution(
         started.append({"evolution": evo, "subject": sail.id, "params": p})
     _settle_call(ship, call, bool(started))
 
+    if not started and countermanded:
+        # the setting belayed and nothing begun: the belay is the order's line, with what was not
+        # done, and its note (made when work was still to begin) is not said again
+        notes = getattr(ship, "notes", None)
+        if isinstance(notes, list):
+            notes[:] = [n for n in notes if not (n[1] == "work.belayed" and n[2] == belayed_words)]
+        not_done = " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "." if failed else ""
+        data = {
+            "verb": verb,
+            "level": 1,
+            "object": res.name,
+            "side": res.side,
+            "subjects": [b["subject"] for b in countermanded],
+            "belayed": countermanded,
+            "failed": failed,
+        }
+        if group is not None:
+            # within a group's order, the belay is said by its own line (`_countermand_said`)
+            # and what was not done by the group's
+            data["failed"] = failed
+            return _countermand_said(ship, group, belayed_words, countermanded, data, not_done)
+        return "work.belayed", belayed_words + not_done, data
     if not started:
         if len(failed) == 1:
             raise OrderError(failed[0][0].upper() + failed[0][1:].rstrip(".") + ".")
@@ -466,6 +526,51 @@ def _sail_params(order: Order) -> dict[str, Any]:
         if order.modifiers.get("close"):
             params["close"] = True
     return params
+
+
+def _countermand_said(
+    ship: Ship,
+    group: str | None,
+    words: str,
+    belayed: list[dict[str, Any]],
+    data: dict[str, Any],
+    not_done: str = "",
+) -> Result:
+    """The countermand is said once, notable, by whatever order made it: given alone, it is the
+    order's own line (`work.belayed`, its reply); within a group's order (`shorten sail`, `take in
+    all sail`), a line of its own, since the group's line is routine and is not written at all
+    when nothing in it failed (the World leaves a started order's line to the runner), and its
+    part of the group's line is nothing. Before, within a group it was folded into the group's
+    routine line, or said nowhere: the bilander's `shorten sail`, her sails ending otherwise with
+    no line to say why."""
+    if group is None:
+        return "work.belayed", words + not_done, data
+    ship.note("notable", "work.belayed", words, None, {"belayed": belayed})
+    return "evolution.started", not_done.strip(), data
+
+
+def _countermand_the_set(
+    ship: Ship, sails: list[Sail], verb: str, vocab: Vocabulary
+) -> list[dict[str, Any]]:
+    """A take-in or a furl given while the setting of its sail is in hand or waiting belays that
+    setting (`Runner.belay`, the captain's own belay): the later order countermands the earlier,
+    and returns what was belayed and how it was left, for one line ("Belayed setting the main
+    topsail; nothing done, it was waiting for hands."). Before, a furled sail whose set was
+    waiting was refused as "already furled" and its set then went on, and one being loosed was
+    taken in only after it was set: the brig in a gale, `take in all sail` given while `set
+    plain sail` was going up, stood under her main topsail, topgallants and spanker."""
+    if verb not in ("take in", "furl"):
+        return []
+    runner = ship.extra.get("evolutions")
+    instances = list(getattr(runner, "instances", None) or [])
+    if not instances:
+        return []
+    sets = set(vocab.evolutions.get("set", {}).values())
+    ids = {sl.id for sl in sails}
+    setting = [i for i in instances if i.evo.id in sets and i.subject_id in ids]
+    if not setting:
+        return []
+    return runner.belay(ship, setting)
 
 
 def _sail_check(
@@ -640,7 +745,7 @@ def _summarise(
         body = body.replace(" and 1 more", " and one more")
     if failed:
         body += " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "."
-    return body
+    return body.strip()  # the runner's words alone said in the log already (`unsaid`): none
 
 
 # ---------------------------------------------------------------------------
@@ -814,7 +919,9 @@ def _brace(
             **extra,
         }
         try:
-            texts.append(runner.start(ship, vocab.evolutions["brace"], yard.id, params))
+            texts.append(
+                unsaid(runner, runner.start(ship, vocab.evolutions["brace"], yard.id, params))
+            )
         except OrderError as e:
             failed.append(_refused(name, e))
             failed_ids.append(yard.id)
@@ -2280,7 +2387,7 @@ def _haul_bowlines(
     texts: list[str] = []
     for ln in to_haul:
         try:
-            texts.append(runner.start(ship, evo, ln.id, dict(extra)))
+            texts.append(unsaid(runner, runner.start(ship, evo, ln.id, dict(extra))))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, ln.id), e))
             failed_ids.append(ln.id)
@@ -2366,7 +2473,7 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     for mast, gain in todo:
         params = {"gain": gain, **extra}
         try:
-            texts.append(runner.start(ship, evo, mast.id, params))
+            texts.append(unsaid(runner, runner.start(ship, evo, mast.id, params)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, mast.id), e))
             failed_ids.append(mast.id)
@@ -2377,7 +2484,7 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
     text = " ".join(t.strip() for t in texts if t)
     if failed:
-        text += " Not done: " + "; ".join(failed) + "."
+        text = (text + " Not done: " + "; ".join(failed) + ".").strip()
     data = {
         "verb": order.verb,
         "level": 1,
@@ -2754,7 +2861,7 @@ def _boom_evolution(
             failed_ids.append(boom.id)
             continue
         try:
-            texts.append(runner.start(ship, evo, boom.id, dict(extra)))
+            texts.append(unsaid(runner, runner.start(ship, evo, boom.id, dict(extra))))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, boom.id), e))
             failed_ids.append(boom.id)
@@ -2893,7 +3000,7 @@ def _reeve(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             continue
         params = {"line": line.id, "splice": splice, **extra}
         try:
-            texts.append(runner.start(ship, evo, line.id, params))
+            texts.append(unsaid(runner, runner.start(ship, evo, line.id, params)))
         except OrderError as e:
             failed.append(_refused(name, e))
             failed_ids.append(line.id)
@@ -2959,7 +3066,10 @@ def reeve_every_parted_line(ship: Ship, order: Order) -> Result:
             continue
         try:
             texts.append(
-                runner.start(ship, "reeve_line", line.id, {"line": line.id, "splice": False})
+                unsaid(
+                    runner,
+                    runner.start(ship, "reeve_line", line.id, {"line": line.id, "splice": False}),
+                )
             )
         except OrderError as e:
             failed.append(_refused(name, e))
@@ -3048,7 +3158,7 @@ def _clear_wreck(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         if send_down:
             p["send_down"] = True
         try:
-            texts.append(runner.start(ship, CLEAR_WRECK, subject.id, p))
+            texts.append(unsaid(runner, runner.start(ship, CLEAR_WRECK, subject.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, subject.id), e))
             failed_ids.append(subject.id)
@@ -3172,7 +3282,7 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     for spar in spars:
         p = dict(extra, part=spar.id)
         try:
-            texts.append(runner.start(ship, SHIFT_SPAR, spar.id, p))
+            texts.append(unsaid(runner, runner.start(ship, SHIFT_SPAR, spar.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, spar.id), e))
             failed_ids.append(spar.id)

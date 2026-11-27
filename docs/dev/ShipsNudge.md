@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 09:32 UTC (THE LIST IS MERGED at da356b76 by 111b1b57; THE DIANA MAY MERGE THE TRUNK AND TIER; FIVE STILL OWED before the tartane's file: take it in on the bad hand eases nothing for minutes; shift them refused as worded; a towed boat stove on the booms; four pins; the dire step within one cause by package 127's rule when it lands). Nudge number: 76.
+Latest note: 2026-11-27, 07:11 UTC (PACKAGE 127 IS ON THE TRUNK at 572133ac: THE THIRD PASS CAN COME, whole, on one reported hash, the trunk merged first; the boats line is now "The boats griped fast on the booms; the ship is clear."; THE DIANA's ONE COMMIT OF WORDS (nudge 78) is still awaited). Nudge number: 83.

@@ -108,12 +108,12 @@ from freesail.evolutions.scripts import (
     _world_of,
     helm_lost,
     helm_words,
-    is_whole_lateen,
     keep_full_and_by,
     keep_lying_to,
     lateen_party,
     lateen_take_in_waits,
     lying_to_hands_off,
+    watch_filled_away,
 )
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, LineState, Part, Sail, SailState, Spar
@@ -246,6 +246,25 @@ class _SafeDict(dict):
 # ---------------------------------------------------------------------------
 # A running (or waiting) evolution
 # ---------------------------------------------------------------------------
+
+# The runner's mark, set by `Runner.start` on the order that queued work and said so in the log,
+# read by an order's own line (`orders.verbs.unsaid`) and gone again at the next start or tick;
+# kept in the runner's `__dict__` only while it is set, so that a checkpoint is as it was.
+WAIT_SAID = "wait_said"
+# A wait behind other work is a routine line, every such wait one rule: behind any work, behind
+# the yards a belay handed on, and a whole lateen aback that will not come in till she pays off
+# (notable before). A notable line eases a compressed passage for the player and wakes a seat
+# that samples on notable lines; a wait for its turn is neither danger nor news, and the work's
+# own first line says when it begins. A wait for hands keeps its severity (`_take_hands`).
+TURN_WAIT_SEVERITY = "routine"
+# The mark in a turn-wait's data, newly said by this package's rule: the World leaves such a line
+# out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
+# for all at once" said twice with a turn-wait between is routine the second time, as before.
+TURN_WAIT = "turn_wait"
+# The groups of the orders being given whose wait for their turn is said already, by (the order,
+# the group), with the works they wait behind and the note that says it (`Runner._group_turn_wait`);
+# in the runner's `__dict__` from the order to the next tick only.
+TURN_GROUPS_SAID = "turn_groups_said"
 
 
 @dataclass
@@ -410,10 +429,21 @@ class Runner:
         evolution_id: str,
         subject_id: str,
         params: dict[str, Any] | None = None,
+        say_wait: bool = True,
     ) -> str:
         """Begin an evolution, or queue it behind one already at work on the same
         parts. Returns the log sentence. Raises OrderError with the reason if
-        the evolution does not apply or a precondition fails."""
+        the evolution does not apply or a precondition fails.
+
+        Work queued behind other work says so in the log, at the order, in the words it
+        returns ("'Furl the main topsail' will follow 'take in the main topsail', which the
+        hands are still at."), and the runner's `WAIT_SAID` mark says it was said, so that an
+        order's own line does not say it again (`orders.verbs.unsaid`). Before, the World left
+        the started kind's text to the runner and the runner said such a wait only behind the
+        yards a belay handed on or of a whole lateen aback, and a sail's order or a whole-ship
+        order queued behind other work was told in the order's reply and in no line of the log.
+        `say_wait` False is for a caller that writes the words as a line of its own."""
+        self.__dict__.pop(WAIT_SAID, None)
         evo = registry.get(evolution_id)
         if evo is None:
             raise OrderError(f"There is no such evolution as '{evolution_id}'.")
@@ -450,31 +480,42 @@ class Runner:
             self.instances.append(inst)
             handed = [b for b in blockers if b.params.get(HANDED_ON)]
             first = (handed or blockers)[0]
-            words = (
-                f"'{self._describe(inst).capitalize()}' will follow "
-                f"'{self._describe(first)}', which the hands are still at."
-            )
-            if handed:
+            mine, theirs = self._describe(inst), self._describe(first)
+            # the same work behind the same work (a second brace of a yard being braced, a sail
+            # set again): "the same work", where naming it twice told nothing apart
+            behind = "the same work" if mine == theirs else f"'{theirs}'"
+            words = f"'{mine.capitalize()}' will follow {behind}, which the hands are still at."
+            said = False
+            if handed and say_wait:
                 # behind the yards a belay handed on (they hold the ship as the manoeuvre
                 # did): said here, at the order, since a whole-ship order's line is the
                 # runner's started line and this one would go unsaid (the lead's nudge 51,
                 # item 1: "it waits behind that work, and says so")
-                ship.note("notable", "evolution.waiting", words, sid)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
+                said = True
             if lateen_take_in_waits(ship, evo.verb, subject):
                 # a whole lateen aback in a strong wind will not come in till she pays off,
                 # whatever work is before it: said at the order, as with none (the lead's nudge
                 # 53, item 2: behind `trim sails` the player read only the order, and waited
                 # 69 s)
                 words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
-                ship.note("notable", "evolution.waiting", words, sid)
+                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
                 inst.lateen_wait_said = True
-            elif not handed and isinstance(subject, Sail) and is_whole_lateen(subject):
-                # an order to a whole lateen waiting its turn behind other work is said at the
-                # order, as behind work handed on (the lead's nudge 60, item 2: `take in the
-                # mainsail` behind `shift the mainsail` waited over two minutes with only
-                # "Order: take in the mainsail." said). Of every other sail the reply alone says
-                # it, as on the trunk
-                ship.note("notable", "evolution.waiting", words, sid)
+                said = True
+            elif say_wait and not said:
+                # behind any other work: said at the order, as the two above are, and once;
+                # marked, so that the World's memory of the same words said again is not moved
+                # by it (`World.record`, `TURN_WAIT`); of a group's order (the yards braced, the
+                # sails of `reef topsails`), one line for the order, by the first that waits
+                group = inst.params.get("group")
+                mark = {TURN_WAIT: True}
+                if not group:
+                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, mark)
+                else:
+                    self._group_turn_wait(ship, group, behind, sid, mark)
+                said = True
+            if said and say_wait:
+                self.__dict__[WAIT_SAID] = True
             return words
         # Free to begin now: a failing precondition rejects the order outright.
         reason = self._failing_condition(ship, inst, evo.preconditions + evo.requires)
@@ -485,7 +526,8 @@ class Runner:
             # 90, A1d): the work waits, and begins when it fills or is drawn over
             self.instances.append(inst)
             words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, sid))
-            ship.note("notable", "evolution.waiting", words, sid)  # said once, at the order
+            # said once, at the order
+            ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid)
             inst.lateen_wait_said = True
             return words
         self.instances.append(inst)
@@ -493,9 +535,49 @@ class Runner:
             return inst.wait_line
         return self._format(inst, evo.on_start.log)
 
+    def _group_turn_wait(
+        self, ship: Ship, group: str, behind: str, sid: str, mark: dict[str, Any]
+    ) -> None:
+        """A group's order (`params["group"]`: the yards of a brace, the sails of `shorten
+        sail`) says its wait for its turn in one line for the order, naming every work its
+        members wait behind: "Shortening sail: some of it waits its turn, behind 'set the fore
+        topsail' and 'set the main topsail', which the hands are still at." The line is the
+        first member's note, its words widened as each later member of the same order waits
+        behind other work (the notes are the tick's, not yet in the log). Keyed by the order and
+        the group, so that another order of the same words in the same tick says its own."""
+        from freesail.orders.errors import join_names
+
+        groups = self.__dict__.setdefault(TURN_GROUPS_SAID, {})
+        key = (self._giving, group)
+        entry = groups.get(key)
+        head = f"{group[:1].upper()}{group[1:]}"
+
+        def line(behinds: list[str]) -> str:
+            named = join_names(behinds, "and", limit=len(behinds))
+            return (
+                f"{head}: some of it waits its turn, behind {named}, which the hands are still at."
+            )
+
+        notes = getattr(ship, "notes", None)
+        if entry is not None and isinstance(notes, list):
+            if behind in entry["behind"]:
+                return
+            at = next((i for i, n in enumerate(notes) if n is entry["note"]), None)
+            if at is not None:
+                entry["behind"].append(behind)
+                was = notes[at]
+                notes[at] = (was[0], was[1], line(entry["behind"]), *was[3:])
+                entry["note"] = notes[at]
+                return
+        ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", line([behind]), sid, mark)
+        if isinstance(notes, list) and getattr(ship, "notes", None) is notes and notes:
+            groups[key] = {"behind": [behind], "note": notes[-1]}
+
     def step(self, ship: Ship, dt: float, wind: Wind) -> None:
         """Advance every running evolution by one tick, then start any that were
         waiting and are now free. Call once per tick, before the physics."""
+        self.__dict__.pop(WAIT_SAID, None)  # the mark is the order's, read as it is given
+        self.__dict__.pop(TURN_GROUPS_SAID, None)  # the groups whose wait an order has said
         self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
         motion = ship.extra.get("motion")
         self._roll_deg = float(motion.roll_deg) if motion is not None else 0.0
@@ -520,6 +602,8 @@ class Runner:
             keep_lying_to(ship, dt, wind, self)
         # full and by, aback or in irons two minutes: the helm has her boxed off (37p)
         keep_full_and_by(ship, self, dt)
+        # filled away, her way watched and said once: gathered, or lost again (package 127)
+        watch_filled_away(ship, self, dt)
         # the true wind's mean as the deck has it, for `shorten sail`'s storm line; and a
         # storm staysail being bent, set when it is (package 37p, `orders.storm`)
         ship.extra["true_wind_kn"] = units.ms_to_knots(float(getattr(wind, "base_speed", 0.0)))
@@ -1224,7 +1308,7 @@ class Runner:
                 if not inst.lateen_wait_said:
                     inst.lateen_wait_said = True
                     words = LATEEN_ABACK_WAITS_WORDS.format(sail=part_name(ship, inst.subject_id))
-                    ship.note("notable", "evolution.waiting", words, inst.subject_id)
+                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, inst.subject_id)
                 continue
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
@@ -1955,8 +2039,18 @@ class Runner:
         ship.note("routine", "evolution.short_handed", text, inst.subject_id, data)
 
     def _waiting_line(self, ship: Ship, inst: Instance, got: hands.Assignment) -> str:
+        """The line of work that waits for hands: the other work the watch is at, or that there
+        are none (or but so many) to spare. Where the watch on deck is too few for it even with
+        every hand at other work counted (`hands.too_few_on_deck`, as `request` judges too few),
+        the other work is not why it waits, and the line says what it waits for: the watch
+        relieved, or all hands. Before, it named the other work, and when that work was done the
+        wait went on with nothing said (the smack's `set the topsail` by her larboard watch of
+        two, taken up at the next watch's relief)."""
         others = self._other_work(inst)
         crew = self._crew(ship)
+        few = self._watch_too_few_for(inst, crew) if crew is not None else None
+        if few is not None:
+            return f"Not hands enough on deck to {self._describe(inst)}; {few}."
         if others:
             called = crew is not None and crew.all_hands_called
             rest = f"{'the hands are' if called else 'the watch is'} {others}"
@@ -1968,6 +2062,26 @@ class Runner:
                 else f"there are but {number_words(spare)} to spare"
             )
         return f"Not hands enough on deck to {self._describe(inst)}; {rest}."
+
+    def _watch_too_few_for(self, inst: Instance, crew: Crew) -> str | None:
+        """'the watch on deck has but two hands for it, and it waits for the watch to be relieved
+        or all hands called': the deck too few for this work whatever else it is at
+        (`hands.too_few_on_deck`, the hands at other work counted), all hands not up; else
+        None."""
+        if crew.all_hands_called:
+            return None
+        want = self._want(inst)
+        aloft = self._aloft(inst)
+        deck = self._pool(crew, inst)
+        if not hands.too_few_on_deck(crew, deck, want, aloft, posts=True):
+            return None
+        fit = sum(1 for s in deck if hands.can_work(s, aloft, posts=True))
+        has = "has no hand" if fit == 0 else f"has but {number_words(fit)}"
+        has += "" if fit == 0 else (" hand" if fit == 1 else " hands")
+        return (
+            f"the watch on deck {has} for it, and it waits for the watch to be relieved or all "
+            "hands called"
+        )
 
     def _group_waiting_line(self, ship: Ship, inst: Instance, group: str) -> str:
         """'Setting plain sail: not hands enough for all at once; the watch takes the sails

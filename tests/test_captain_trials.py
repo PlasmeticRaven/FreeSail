@@ -78,14 +78,16 @@ TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; neve
 # the game's tick, where her World's clock, counted from her promotion, stood behind the tick
 # the private signal broke out at and never showed it her; she answers it now (a reply at
 # 9840, one line more), the states, the books and the chase as before (TuningNotes, step 6)
-TRIAL_STATION_STRANGER_LINES = 788  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
+# package 127: 8 turn-waits (788 before), the states unmoved
+TRIAL_STATION_STRANGER_LINES = 796  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
 # package 75, SW-4: the brig-sloop made out "ten ports a side" (RMG ZAZ4491, read), where the
 # words had sixteen; every tick and line the same, proved by bisection (the word put back gives
 # d56963daf49d566a again; docs/dev/TuningNotes.md, SW-4)
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives c1d54413006885aa; TuningNotes)
-TRIAL_STATION_STRANGER_DIGEST = "d1a7b668bec784ff"  # the trim's words (c1d54413006885aa at SW-4)
+# package 127, words alone, the states unmoved: was d1a7b668bec784ff
+TRIAL_STATION_STRANGER_DIGEST = "0e39292a7c3de4ff"  # the trim's words (c1d54413006885aa at SW-4)
 
 
 @pytest.fixture(scope="module")
@@ -169,10 +171,14 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # turns for half an hour (36 lines of sails backed and filled, 4 before) before she wears
 # package 58b: 864 lines and 4cb58e9ec1ab55c0, aground at 41415; the tree before it
 # (872aa61) gives 857 and cefe2cf5136fb4d9, aground at 44332 (the pin was stale before 58b)
-TRIAL_STATION_GALE_LINES = 1722  # package 88 (1014 on c168c51, aground 42394; 909 at 57)
+# package 127: 26 turn-waits, 1 fill-away (1722 before), the states unmoved
+TRIAL_STATION_GALE_LINES = 1749  # package 88 (1014 on c168c51, aground 42394; 909 at 57)
 # 75's words, passed by the lead by its lines (04f2fcd0fe9023a4 before); package 88
 # (93274bb5f658a34f on c168c51)
-TRIAL_STATION_GALE_DIGEST = "b12065ef819367b3"
+TRIAL_STATION_GALE_DIGEST = (
+    # package 127, words alone, the states unmoved: was b12065ef819367b3
+    "71a65daa6511cb52"
+)
 
 
 @pytest.fixture(scope="module")
@@ -219,48 +225,35 @@ def test_in_a_gale_with_sea_room_she_heaves_to_and_claws_off_a_lee_shore_by_turn
 # longer sets plain sail in thirty knots; at package 45 on passage at 23040, hove to again
 # at 28500 and beating from 30900), then keeping station; sail made again by steps (topsails 14:45,
 # reefs and jib 20:29 with the masts waiting for sea room, plain sail 20:44); never aground
-# package 125 (E, the captain's answer to a straining topgallant yard): the topgallant yards
-# working in 27 knots at 1502 and 1503, the captain takes the topgallants in at 1560 ("taking
-# in the topgallants (the topgallant yards working)"), and her day runs otherwise from there:
-# filled away from her first a-try at 26760 (30780), on passage and the station at 26820
-# (30840), hove to at 32220 (32160), on passage and beating at 38340 and 38400 as before; the
-# second a-try of 41880 is not entered, and she beats from 38400 to the station at 67200
-# (on passage 51480 and beating 51540 to the end before). Never aground, nothing carried away
-# or blown out; aback 32 times in the day (9 before) and five missed stays (one), beating the
-# gale's tail off the land (docs/dev/TuningNotes.md and docs/design/Report-Package125.md §6,
-# for the lead). The history within the list before it:
-# package 57: on passage and the station again at 30780 and 30840 (27240 and 27300),
-# hove to again at 41880, on passage and beating from 51480, and the station at 68940:
-# lying to longer under her new rig, never aground (docs/dev/TuningNotes.md, 57)
-# package 43b: beating and keeping station in the one minute at 27300 before, the
-# beating rule's two verdicts by turns; the verdict's dwell leaves the station alone
-# the lead's judgement of 58b's gale book (2026-10-24), read from the trials' logs and not
-# played live (the owner's ruling): hove to again at 41940 (41880 at 57), the station at
-# 71340 (68940); the book lies her to never aback, and the expected failure is lifted
-# package 88 (items 1 and 2; every package-88 switch off gives the old list again): boxed
-# off at 12514 and 15157 by the recovery where she lay aback with sternway in the gale's
-# first hours (9 lines aback in the day, 29 before), hove to again at 32160, on passage,
-# beating and the station at 38340 and 38400, hove to at 41880 (41940 before), beating
-# from 51540 to the end (the station at 71340 before); put about for the land on her bow
-# by night, where under item 1 alone she stood on onto the Four at 61021; never aground
-# and the list before it:
-#   (300, "keeping station"), (9720, "hove to for weather"), (11940, "on passage"),
-#   (12060, "keeping station"), (15060, "hove to for weather"), (30780, "on passage"),
-#   (30840, "keeping station"), (32160, "hove to for weather"), (38340, "on passage"),
-#   (38400, "beating"), (38400, "keeping station"), (41880, "hove to for weather"),
-#   (51480, "on passage"), (51540, "beating")
 TRIAL_STATION_LEE_SHORE_STATES = [
     (300, "keeping station"),
     (9720, "hove to for weather"),  # 9000 before package 57
     (11940, "on passage"),
     (12060, "keeping station"),
     (15060, "hove to for weather"),
-    (26760, "on passage"),  # package 125 (30780 at 57; 27240 at 43b, 23040 at package 45)
-    (26820, "keeping station"),  # package 125 (30840; 27300 at 43b)
-    (32220, "hove to for weather"),  # package 125 (32160 at 88)
+    # package 57: on passage and the station again at 30780 and 30840 (27240 and 27300),
+    # hove to again at 41880, on passage and beating from 51480, and the station at 68940:
+    # lying to longer under her new rig, never aground (docs/dev/TuningNotes.md, 57)
+    (30780, "on passage"),  # 27240 at 43b, 23040 at package 45, then by turns to 30900
+    # package 43b: beating and keeping station in the one minute at 27300 before, the
+    # beating rule's two verdicts by turns; the verdict's dwell leaves the station alone
+    (30840, "keeping station"),  # 27300 at 43b
+    # the lead's judgement of 58b's gale book (2026-10-24), read from the trials' logs and not
+    # played live (the owner's ruling): hove to again at 41940 (41880 at 57), the station at
+    # 71340 (68940); the book lies her to never aback, and the expected failure is lifted
+    # package 88 (items 1 and 2; every package-88 switch off gives the old list again): boxed
+    # off at 12514 and 15157 by the recovery where she lay aback with sternway in the gale's
+    # first hours (9 lines aback in the day, 29 before), hove to again at 32160, on passage,
+    # beating and the station at 38340 and 38400, hove to at 41880 (41940 before), beating
+    # from 51540 to the end (the station at 71340 before); put about for the land on her bow
+    # by night, where under item 1 alone she stood on onto the Four at 61021; never aground
+    (32160, "hove to for weather"),
     (38340, "on passage"),
     (38400, "beating"),
-    (67200, "keeping station"),  # package 125 (keeping station at 38400 and beating to the end)
+    (38400, "keeping station"),
+    (41880, "hove to for weather"),  # 41940 before package 88
+    (51480, "on passage"),
+    (51540, "beating"),  # keeping station at 71340 before package 88
 ]
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was 1669 "4720693ca65bc67b"
 # package 58b (item 5, the gale book's mending; the judgement waits for the lead's
@@ -273,10 +266,8 @@ TRIAL_STATION_LEE_SHORE_STATES = [
 # package 88: 1561 lines and 6e88e97cbdffac7b; the trunk before it (c168c51) gives 1597 and
 # 7fad0ce7e46ba366, its pinned ed48ca3d61e52f20 stale before this package (the lead to
 # measure the trunk's figure in the cloud: a digest is the build machine's)
-# package 125: 1940 lines (1561 at 88), the day run otherwise as above: more trims, put-abouts
-# and the aback and filled lines of the gale's tail (ship.aback 9 -> 32, sail.backed 2 -> 42)
-TRIAL_STATION_LEE_SHORE_LINES = 1940  # package 125 (1561 at 88; 1597 at 58b; 57: 1669)
-# package 125: 02f37aef18207781 on this builder's container (not asserted)
+# package 127: 26 turn-waits, 4 fill-away (1561 before), the states unmoved
+TRIAL_STATION_LEE_SHORE_LINES = 1591  # package 88 (1597 at 58b, judged 2026-10-24; 57: 1669)
 TRIAL_STATION_LEE_SHORE_DIGEST = "6e88e97cbdffac7b"  # 88, the builder's container; the cloud
 # 1ecbc08a61efb132 on the merged tree (ed48ca3d61e52f20 at 58b, stale); not asserted, see the test
 
@@ -369,7 +360,8 @@ TRIAL_TRADE_STRANGER_ANCHORED_TICKS: list[int] = []  # 88 ([51849] at 70; [53669
 # package 73: the butcher's bill said once after the brig's fire ("nobody hurt"), and the
 # brig-sloop's captain serving out the small arms on entering the action, so that her fire on
 # the schooner falls differently (the same lines, other texts); docs/dev/TuningNotes.md, 73
-TRIAL_TRADE_STRANGER_LINES = 1594  # package 88 (1247 at 73; 1246 at 71; 1248 at 70; 1407 at 58b)
+# package 127: 23 turn-waits (1594 before), the states unmoved
+TRIAL_TRADE_STRANGER_LINES = 1617  # package 88 (1247 at 73; 1246 at 71; 1248 at 70; 1407 at 58b)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
@@ -391,7 +383,8 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # the build machine, 2026-11-07)
     # 75's words, passed by the lead by its lines (aa04702e062bc64b before); package 76, item 8
     # (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
-    "323b8966ceab6857"
+    # package 127, words alone, the states unmoved: was 323b8966ceab6857
+    "7aafdf0eda574cd7"
     # 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
     # package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose
     # yards are head yards alone, mans her head braces to heave to and fill away (11094, 12493,
@@ -461,7 +454,8 @@ TRIAL_TRADE_THICK_STATES = [
     (12900, "in port"),  # 14820 at 45
 ]
 TRIAL_TRADE_THICK_ANCHORED_TICK = 12850  # package 58b (14775 at 45, 17688 at package 37p)
-TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
+# package 127: 2 turn-waits, 1 fill-away (426 before), the states unmoved
+TRIAL_TRADE_THICK_LINES = 429  # package 58b (489 at 56, the glass; 482 at 45)
 # decision 45, the pilot's news: 50901cf162ea95aa before; package 37p (10fee882c789666e before)
 # package 45c: every tick and the lines as they were; a line's words moved (the pilot's
 # conn and the weather's sky, both this package's)
@@ -477,7 +471,10 @@ TRIAL_TRADE_THICK_LINES = 426  # package 58b (489 at 56, the glass; 482 at 45)
 # (3901 and 5323: "Hands to the after braces; heave to." and "Fill away; man the after braces."
 # before); two lines' words, the 426 lines, every tick and every kind and the states the same
 # (506bf46eaa6d66fe before; TuningNotes, "Package 90, A2")
-TRIAL_TRADE_THICK_DIGEST = "f2f52d500f050950"
+TRIAL_TRADE_THICK_DIGEST = (
+    # package 127, words alone, the states unmoved: was f2f52d500f050950
+    "87ddf99e007efcde"
+)
 
 
 @pytest.fixture(scope="module")

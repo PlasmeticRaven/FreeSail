@@ -404,3 +404,62 @@ def test_a_towed_boats_two_timings_are_the_ports_figures(eid):
     timing = load_directory()[eid].timing
     assert timing["haul_alongside_s"] == ports.BOAT_HAUL_ALONGSIDE_S
     assert timing["veer_astern_s"] == ports.BOAT_VEER_ASTERN_S
+
+
+def test_a_boat_towed_too_fast_is_said_at_her_hull_speed_and_again_only_under_nine_tenths():
+    """Nudge 76, item 4: the towed boat's threshold and re-arming at their figures
+    (`boats.TOWED_TOO_FAST_REARM`): said as the ship's way passes the boat's hull speed, not
+    again while it stays over nine tenths of it, and again once it has fallen under that and
+    risen past her hull speed once more; nothing at her hull speed itself."""
+    from types import SimpleNamespace
+
+    hull = load_ship("data/ships/boat-yawl-16.yaml").hull
+    v = hull.hull_speed
+    boat = SimpleNamespace(id="boat")
+    notes = []
+    ship = SimpleNamespace(dyn=SimpleNamespace(u=0.0), note=lambda *a: notes.append(a), extra={})
+    state = SimpleNamespace(boat_name="the boat")
+    said = []
+    for u in (v, 1.01 * v, 1.2 * v, 0.95 * v, 1.05 * v, 0.89 * v, 0.95 * v, 1.01 * v):
+        ship.dyn.u = u
+        B._towed_too_fast(ship, ship.extra, [(boat, hull)], state)
+        said.append(len(notes))
+    assert B.TOWED_TOO_FAST_REARM == 0.9
+    assert said == [0, 1, 1, 1, 1, 1, 1, 2]
+    assert notes[0][1] == "boat.towed_too_fast"
+
+
+def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_path):
+    """Nudge 76, item 3: a boat towed astern was "stove on the booms by a shot" and stayed in
+    tow. Stove where she tows (`combat.hits._deck_hit`, its draw the boats' as before: here a
+    shot amidships and the boats' share drawn), she fills and her painter is cut: in tow no
+    longer, her drag gone, and her reading says so. The probe as filed, her boat on deck, is
+    stove on the booms as before."""
+    from types import SimpleNamespace
+
+    from freesail.combat import hits
+
+    class _Draw:
+        def random(self):
+            return 0.0
+
+    said = {}
+    for towed in (True, False):
+        w = at_anchor_in(CARRICK_ROAD, ship=_probe(tmp_path, towed=towed))
+        assert ("boat_in_tow" in w.ship.extra) is towed
+        n0 = len(w.log.all())
+        keeper = SimpleNamespace(minute=[])
+        hits._deck_hit(
+            w.ship, keeper, None, None, None, 0.0, "starboard", 1.0, False, _Draw(), w.clock.tick
+        )
+        w.run(2)
+        said[towed] = [e.text for e in w.log.all()[n0:] if e.kind == "boat.stove"]
+        assert "boat_in_tow" not in w.ship.extra
+        if towed:
+            assert w.readings.words("boat") == "the boat stove by a shot and cut adrift"
+    assert said == {
+        True: [
+            "The boat is stove by a shot as she tows astern; she fills, and her painter is cut."
+        ],
+        False: ["The boat is stove on the booms by a shot."],
+    }

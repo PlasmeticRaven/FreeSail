@@ -3213,7 +3213,6 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
-            self._topgallant_yards_working(p, events)
             self._lateen_work(p)  # package 90, A1c: nothing on a hull with no whole lateen
         if ABACK_RECOVER and state in ABACK_RECOVER_STATES and self._aback_with_no_way(p, kinds):
             return  # boxing her off: the state's own work waits for her way
@@ -3482,35 +3481,6 @@ class Captain(Judgement):
         if self._stimulus("lee shore", p):
             return "to claw off the land under her lee"
         return "to give her way, the wind still strong"
-
-    def _topgallant_yards_working(self, p: Perception, events: list[Any]) -> None:
-        """A topgallant yard reported straining under the press of sail ("working", or worse),
-        in a wind over the worsening line (`shorten_sail_kn` less `worsening_sooner_kn`, the
-        line his glass brings the shortening down to), is answered at once by taking in the
-        topgallants, before the rest of the shortening (package 125, E; the same kind of answer
-        as he gives a head sail straining at its bolt-ropes, `_head_sails_straining`). The
-        loftiest and weakest first is the practice; a light ship's watch, taking the sails in
-        turn, reached her topgallants after their yards had carried away in a wind rising from
-        twenty to thirty-five knots in the hour, where this answer keeps them (docs/design/
-        Report-Package125.md §6). Every captain's, by his own doctrine's two figures; not under
-        the line, nor with the yards quiet; once until the wind has fallen under the line."""
-        d = self.doctrine
-        th = d.threshold if d is not None else (lambda k, v=None: v)
-        line = float(th("shorten_sail_kn", 30)) - float(th("worsening_sooner_kn", 6))
-        if p.wind_kn < line:
-            self._business.pop("topgallants_in", None)
-            return
-        if self._business.get("topgallants_in") is not None:
-            return
-        for e in events:
-            if e.kind != "strain.warning":
-                continue
-            parts = list((getattr(e, "data", None) or {}).get("parts") or [e.subject])
-            # a part id `<mast>.topgallant.yard`, read by its last two words
-            if any(str(pid).split(".")[-2:] == ["topgallant", "yard"] for pid in parts):
-                self._business["topgallants_in"] = p.tick
-                self.give("take in the topgallants", why="the topgallant yards working")
-                return
 
     def _head_sails_straining(self, p: Perception, events: list[Any]) -> None:
         """A head sail straining at its bolt-ropes in a wind over `shorten_sail_kn` is taken
