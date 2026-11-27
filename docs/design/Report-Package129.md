@@ -1,6 +1,6 @@
 # Package 129: the trader at the Little Road, the harbour's King's ship, the prisoner's checkpoint
 
-The design and report of package 129: faults 16, 17 and 18 of `docs/dev/CarriedForward-M7.md`, section 4, two of them found by the owner in his own play (his notes of 27 November). Each was reproduced first, its cause found, and mended at the cause. New truths 7-790 to 7-799: 7-790 to 7-793, 7-795 and 7-796 in `tests/test_weigh_signals_checkpoint.py`, 7-794 and 7-798 in `tests/test_harbour.py`, 7-797 and 7-799 in `tests/test_checkpoint.py`. No pin of before moved.
+The design and report of package 129: faults 16, 17 and 18 of `docs/dev/CarriedForward-M7.md`, section 4, two of them found by the owner in their own play (their notes of 27 November). Each was reproduced first, its cause found, and mended at the cause. New truths 7-790 to 7-799: 7-790 to 7-793, 7-795 and 7-796 in `tests/test_weigh_signals_checkpoint.py`, 7-794 and 7-798 in `tests/test_harbour.py`, 7-797 and 7-799 in `tests/test_checkpoint.py`. No pin of before moved.
 
 ## Fault 17: a far trader at anchor never sails, and costs the game its pace
 
@@ -36,8 +36,8 @@ Ten other ports' `to_sea` tracks begin with an anchorage that is not the outer r
 | Portsmouth, for the Havre | 4.22 nm | at anchor | 1,887, never moved | 2; sailed, in the Havre's road at 18 h, aground going in (below) |
 | Trapani, for Favignana | 0.62 nm | in port | 1,556, never moved | 3; sailed, in port at Favignana, home again |
 | San Fiorenzo, for Bastia | 2.01 nm | at anchor | 5, sailed | 5, sailed: the same, hour by hour |
-| Syracuse, for Augusta | 1.15 nm | in port | TRUNK_SYRACUSE | 2; sailed, aground 6.2 nm out (below) |
-| Torbay, for Dartmouth | 2.23 nm | at anchor | TRUNK_TORBAY | 2; sailed, in port 4.7 nm on |
+| Syracuse, for Augusta | 1.15 nm | in port | 2,341, never moved | 2; sailed, aground 6.2 nm out (below) |
+| Torbay, for Dartmouth | 2.23 nm | at anchor | 1,904, never moved | 2; sailed, in port 4.7 nm on |
 | Weymouth, for Poole | 1.68 nm | in port | TRUNK_WEYMOUTH | 2; on passage, 19.0 nm on |
 | Lampedusa | | | not drawn | not drawn |
 | St Helier | | | not drawn | not drawn |
@@ -50,7 +50,7 @@ San Fiorenzo's trader did not loop on the trunk and sails the same on both. Lamp
 - Portsmouth for the Havre: in the Havre's Great Road at 18 h; going in for the Little Road at 27 h, aground some 2.7 nm on, and there to the end.
 - Trapani for Favignana: aground 0.4 nm out at 6 h, off again by 15 h, and her voyage made.
 
-Their courses are the planner's tracks and the body's beating, both unchanged by this package (the same legs are laid, 7-792; no route changes). None of the shipped scenarios draws such a ship within thirteen hours (below). A player in sight of one would see a far ship aground where, on the trunk, he saw a ship at anchor that never weighed.
+Their courses are the planner's tracks and the body's beating, both unchanged by this package (the same legs are laid, 7-792; no route changes). None of the shipped scenarios draws such a ship within thirteen hours (below). A player in sight of one would see a far ship aground where, on the trunk, they saw a ship at anchor that never weighed.
 
 ### The tile cache
 
@@ -79,7 +79,7 @@ Their courses are the planner's tracks and the body's beating, both unchanged by
 
 ## Fault 16: the first action's checkpoint refused
 
-**Seen** (the owner's): a game of the first action, begun from the harbour's page, the colours struck and his parole given aboard the Renard, saved by the game's own save; loaded, the checkpoint was refused ("names pathlib.PosixPath") and the game replayed.
+**Seen** (the owner's): a game of the first action, begun from the harbour's page, the colours struck and the parole given aboard the Renard, saved by the game's own save; loaded, the checkpoint was refused ("names pathlib.PosixPath") and the game replayed.
 
 **Two walls, both on this road.**
 
