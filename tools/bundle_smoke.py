@@ -158,9 +158,10 @@ def unpack(zip_path: Path, dest: Path, f: Findings) -> Path:
     return tops[0]
 
 
-def quarantined(top: Path) -> list[str]:
+def quarantined(top: Path, inside: tuple[str, ...] = ()) -> list[str]:
+    places = [str(top / p) for p in inside] if inside else [str(top)]
     out = subprocess.run(
-        ["xattr", "-r", "-l", str(top)], capture_output=True, text=True, errors="replace"
+        ["xattr", "-r", "-l", *places], capture_output=True, text=True, errors="replace"
     ).stdout
     return [line.split(":")[0] for line in out.splitlines() if "com.apple.quarantine" in line]
 
@@ -213,7 +214,8 @@ def start(top: Path, env: dict[str, str], log: Path) -> subprocess.Popen:
             stdin=subprocess.PIPE,
             stdout=out,
             stderr=subprocess.STDOUT,
-            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+            # a console of its own, as a double-click gives it: Ctrl+C is pressed in it
+            creationflags=subprocess.CREATE_NEW_CONSOLE,
         )
     return subprocess.Popen(
         ["/bin/bash", str(top / "FreeSail.command"), "--no-browser"],
@@ -296,9 +298,33 @@ def interpreters() -> list[tuple[str, str]]:
     return found
 
 
-def stop(proc: subprocess.Popen) -> None:
+# Ctrl+C pressed in the game's console, as a player presses it: a helper leaves the
+# harness's console, joins the game's, ignores the key itself, and sends it to everything
+# in that console (the launcher's cmd and the game's Python).
+CTRL_C_HELPER = """
+import ctypes, sys
+k = ctypes.windll.kernel32
+k.FreeConsole()
+if not k.AttachConsole(int(sys.argv[1])):
+    sys.exit(2)
+k.SetConsoleCtrlHandler(None, True)
+sys.exit(0 if k.GenerateConsoleCtrlEvent(0, 0) else 3)
+"""
+
+
+def stop(proc: subprocess.Popen) -> str:
+    """The game stopped as a player stops it; the road said."""
     if WINDOWS:
-        proc.send_signal(signal.CTRL_BREAK_EVENT)
+        pressed = subprocess.run(
+            [sys.executable, "-c", CTRL_C_HELPER, str(proc.pid)],
+            creationflags=subprocess.CREATE_NO_WINDOW,
+        ).returncode
+        road = "Ctrl+C in its window"
+        if pressed != 0:
+            # no console to press it in: the break, which the server takes as Ctrl+C but
+            # after which Windows ends the process with code 3
+            proc.send_signal(signal.CTRL_BREAK_EVENT)
+            road = f"Ctrl+Break (Ctrl+C could not be pressed: {pressed})"
         try:
             # cmd's "Terminate batch job (Y/N)?" answered N, and its pause answered: the
             # launcher goes on to say the game has stopped, as it does in a player's window
@@ -306,8 +332,9 @@ def stop(proc: subprocess.Popen) -> None:
             proc.stdin.close()
         except OSError:
             pass
-    else:
-        os.killpg(proc.pid, signal.SIGINT)
+        return road
+    os.killpg(proc.pid, signal.SIGINT)
+    return "Control-C in its window"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -417,7 +444,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         left = sorted(p.name for p in marks.iterdir())
         f.check(not left, "nothing of the runner's Python was read", ", ".join(left) or "no mark")
-        stop(proc)
+        road = stop(proc)
         try:
             proc.wait(timeout=90)
         except subprocess.TimeoutExpired:
@@ -426,7 +453,7 @@ def main(argv: list[str] | None = None) -> int:
         window = log.read_text("utf-8", "replace")
         f.check(
             "FreeSail has stopped (exit code 0)" in window,
-            "the game stops cleanly when asked",
+            f"the game stops cleanly when asked ({road})",
             next((ln.strip() for ln in window.splitlines() if "has stopped" in ln), "no word"),
         )
         f.check("Traceback" not in window, "no traceback in the game's window")
@@ -446,11 +473,14 @@ def main(argv: list[str] | None = None) -> int:
             or f"{len(after)} entries as unpacked",
         )
         if MAC:
-            marked = quarantined(top)
+            # the download's own folders, which the launcher clears; the launcher itself, the
+            # pages beside it and the folder keep theirs (the player opened the launcher)
+            marked = quarantined(top, ("python-arm64", "python-x86_64", "game", "licences"))
+            kept = sorted({Path(m).name for m in quarantined(top)} - {Path(m).name for m in marked})
             f.check(
                 not marked,
-                "the launcher cleared the quarantine on its folder",
-                f"{len(marked)} left",
+                "the launcher cleared the quarantine on the download's folders",
+                f"{len(marked)} left in them; still marked at the top: {', '.join(kept) or 'none'}",
             )
         saved = saves / f"{SAVE_NAME}.json"
         f.check(saved.is_file(), "the save lies in the user's data folder", str(saved))
