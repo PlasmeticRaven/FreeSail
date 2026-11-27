@@ -2871,3 +2871,101 @@ The runs are against 86fa56d3, whose code is b88f3bc's, so its runs are b88f3bc'
 - **A2's harness:** 270 runs, byte for byte.
 
 4ec821b, after it (the declaration and its three mends), is not tiered: its code moves again with 127's merge, and the tiers run on that hash.
+
+## The third pass whole, with package 127 (nudge 83): `…/pkg-90` merged at e87714d7, item 2 by 127's rule; the hash 801c309, tiered whole against e87714d7 (2026-11-27)
+
+**The hash to send: 801c309** on **`…/pkg-90-lateen3`**, pushed. **The commit after it touches this report alone.** It is two commits on fed9e3a (the record of 5b122eb):
+- **d73a4bd**, the merge of `…/pkg-90` at **e87714d7** (package 127 on the trunk at 572133ac); its parents fed9e3a and e87714d7.
+- **801c309**, item 2 by 127's rule: its pin, two pins moved, and the notes (`docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list, its third pass with package 127").
+
+Old, everywhere below, is **e87714d7**, the merged trunk's code.
+
+**The lines resolved by hand in the merge:**
+- **`docs/dev/TuningNotes.md`**, the one conflict git found: both sides added sections at the end. Each is kept whole, the third pass's first and 127's after it, with one blank line before "## Package 127: words and waits on today's ships".
+- **`freesail/evolutions/action_scripts.py`**, merged by git with no conflict, but holding two `_boats_cleared_words`: 127's, and the third pass's own at the end of the file.
+  - The third pass's is removed. Her lost boat is folded into 127's one function: left out of the boats griped or towing, and said lost by her file's name.
+  - `_lost_boat` is added beside it. It is guarded for a ship with no World about her, which 127's truth 7-786 passes.
+- **`freesail/evolutions/runner.py`**: `heave_to_in_hand` imported beside 127's names.
+- **`tests/test_boat_towed.py`**: the two clearing pins moved to 127's words, old beside new in each pin's comment.
+  - `test_clearing_for_action_her_boat_lost_says_no_boat_out`
+  - `test_on_a_committed_ship_clearing_for_action_with_her_boat_lost`
+
+**Taken by git from 127's side, not by hand:** the list's branch for an order to a whole lateen waiting its turn (nudge 60's item 2, said at the order and notable) is gone in the merge. 127 had replaced it on the trunk with its `TURN_WAIT` line, said for every order and routine. The notes at 801c309 call it "the third pass's own branch". It is the list's first pass's, and is corrected here.
+
+**The equations are read, not changed.**
+
+**What 127 brings, item by item:**
+
+1. **A wait is said once, routine, and marked (`TURN_WAIT`).** Item 3's "when the hands are done trimming the mainsail" is a clause of the strain's warning. The strain's count rules it (`warning_due`), as every strain warning is notable. It is not a wait note: it is not marked, and neither signals nor ground tackle take it back. The order then given says its own wait by 127's road. The tartane in 40 kn, her lateens put on the bad hand while her watch is at her trims:
+   - **Unordered:** at 726 s, 1.51, "Main lateen yard bending like a whip, the mainsail aback against the mast; she will carry it away: shift the mainsail or box her off when the hands are done trimming the mainsail." (old: "... shift the mainsail or box her off.").
+   - **The shift and the box ordered at 640 s and 641 s:** each wait is said once, routine and marked:
+     - "'Shift the mainsail' will follow 'trim the mainsail', which the hands are still at."
+     - "'Box off' will follow 'trim the mainsail', which the hands are still at."
+   - **The warning at 726 s** then says "...: its shift waits its turn.", and the shift begins at 812 s.
+2. **A take-in or a furl countermanding a setting in hand is said notable.** This is 127's own code (`verbs._countermand_the_set`), and the third pass touches no line of `orders/verbs.py`. It was measured on the lateen probes, old beside new, the same line for line:
+   - **The xebec, `take in the mainsail` with her mainsail half set:** "Belayed setting the mainsail; the mainsail left loosed and hanging from the yard." (notable). It is then brailed in from where it is: "Took in the mainsail; brailed up to its yard."
+   - **The xebec, `furl the foresail`, and the tartane, `take in the mainsail`, with the setting waiting:** "Belayed setting the foresail; the foresail left furled." and "Belayed setting the mainsail; the mainsail left furled.", each the order's own reply and notable.
+   - **Inside `shorten sail`:** no lateen hull's shorten sail takes in a lateen, so it has nothing of the lateen's to countermand. The polacre's group is the studdingsails and the flying jib taken in, and the main topsail reefed. It is the same both sides.
+3. **Item 2, a spar lost while its shift waits: the dire step by 127's rule.** A whole lateen's cause is counted by `strain.warning_due`, as every part is: one warning a part and its cause in ten minutes, and the dire one said whatever lesser one came within them (`last_dire_s`). A cause that comes again begins its dire count afresh (`_causes_come`). At e87714d7 the cause kept its own old rule (the lead's choice at nudge 56), and 127 left it so.
+   - **The xebec in 40 kn,** the wind through her bow, her sheets let fly onto the bad hand, the wind then to 56 kn: her mizzen yard is warned "working" at 1.05 at 613 s.
+     - Old: nothing more, and carried away at 1,080 s.
+     - New: "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; she will carry them away: shift the mizen." at 1.77 at 701 s, then carried away at 1,080 s as before. **No load moves.**
+   - **The pin:** `test_within_one_cause_a_yard_risen_to_dire_is_warned_before_it_goes`.
+   - **One pin moved, its two cases,** old beside new in its docstring: `test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning_names`. The xebec's main yard, warned at once at 1.28, is now warned dire as it passes 1.5 within the same cause. Before, nothing was said till the ten minutes were out.
+   - **Run against its fault** (the cause's old rule put back in `_warn`): all three fail.
+   - **Not pinned: the dire count begun afresh when a cause comes again** (`_causes_come`'s one added line). With it removed, `tests/test_lateen_whole.py` passes whole, 279. It matters where a cause said dire gives way to another and comes back within the ten minutes. Measured on the probe after the tiers began, on the hash and with the line removed (`n83/seqsev.py` in the session's scratch):
+     - **The case:** the xebec in 50 kn, her lateens on the bad hand at 600 s, the wind eight points through her bow at 620 s and back at 660 s.
+     - **Where both agree:** every yard is warned dire "lying on the mast" at 601 s to 604 s, then dire "aback against the mast" at 621 s, then "working ... lying on the mast" again at 688 s to 690 s.
+     - **On the hash:** at 715 s the three yards are warned "bending like a whip ... lying on the mast; she will carry it away" at 1.51.
+     - **Without the line:** nothing more, the yards at 1.57 to 1.60 to the run's end at 900 s.
+     - No spar is lost in either, and no load moves.
+
+     **For the lead:** a pin of this case in the next hash, if wanted. It is not added here, so that the hash tiered is the hash sent.
+4. **The boats' line of `clear for action`, in 127's words.** "The boats griped fast on the booms; the ship is clear." for a ship, and "The boat is clear." for a boat. The lost boat's clause follows them.
+   - **A ship with boats on the booms and one lost** (the brig, her launch cut adrift): **"The boats griped fast on the booms; the launch lost; the ship is clear."**
+   - Her one boat lost (the bilander): "The long-boat lost; the ship is clear."
+   - The tartane probe, her towed boat stove, her punt on the booms: "The punt griped fast on the booms; the boat lost; the ship is clear."
+5. **The convoy of six's privateer, a cable nearer:** no run of mine uses the convoy of six (the gales, the harness, the declaration, the probes). In the tiers, `test_known_truths` and `test_the_ship_herself` use her, the same both sides, the base carrying her where 127 put her.
+
+**The declaration's table 3, restated on the merged tree.** The case: `cut the boat adrift`, then `clear for action`, at sea in 15 kn. Old is e87714d7, new 801c309. 13 ships moved, every one with a boat, on the one line of the boats and at the same second:
+
+| Ship | Old (the merged trunk) | New |
+|---|---|---|
+| the brig, the frigate, the razee, the 74, the 64 | "The boats griped fast on the booms; the ship is clear." | "The boats griped fast on the booms; the launch lost; the ship is clear." |
+| the hermaphrodite brig, the privateer schooner, the topsail schooner | the same | "The yawl griped fast on the booms; the long-boat lost; the ship is clear." |
+| the merchant brig | the same | "The jolly boat griped fast on the booms; the long-boat lost; the ship is clear." |
+| the cutter | the same | "The punt griped fast on the booms; the boat lost; the ship is clear." |
+| the bilander (one boat) | "The long-boat griped fast on the booms; the ship is clear." | "The long-boat lost; the ship is clear." |
+| the lugger, the smack (one boat) | "The boat griped fast on the booms; the ship is clear." | "The boat lost; the ship is clear." |
+
+On the old side, a boat cut adrift is still said to be griped fast on the booms, though she is gone. Every tick is the same; the line alone moves.
+
+**Checked on 801c309:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return in the diff from e87714d7;
+- no line of the diff's Python over 100 characters;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers, whole on 801c309, test by test against e87714d7** (each run in a worktree of its own exact hash):
+- **Fast tier:** 9,051: 9,042 passed, 8 skipped, 1 xfailed, **0 failed** (59 min 36 s). The base: 9,038: 9,029 passed, 8 skipped, 1 xfailed (1 h 0 min 27 s).
+  - Every test of the base is there with the same outcome, and none is gone.
+  - **13 new, all passed**, the third pass's own: `tests/test_lateen_whole.py` 9 and `tests/test_boat_towed.py` 4. They are the third pass's first pins (6), the declaration's (4 tests, the box's in 3 cases), and item 2's.
+- **Slow tier:** 571: 560 passed, 11 xfailed, **0 failed** (1 h 6 min 45 s), and the base the same (1 h 7 min 33 s). Every one has the same outcome; none is new or gone.
+- **The eighteen in gales:** 360 runs, **byte for byte**. That is 6,532 events and 64,800 part samples: 1,973 strain warnings, 412 sails blown out, 47 spars carried away and 4 lines parted, each the same.
+- **A2's harness:** 270 runs, **byte for byte**.
+
+**The declaration's three changes, measured again: old e87714d7 (the merged trunk) beside new 801c309** (`n77/declare.py`, every committed ship in each case, as at 86fa56d3). Of 72 cases, 33 are the same and **39 moved, the same ships as at 86fa56d3**: the kedge 13, the box 9, the lie a-try 4, and the clearing 13. Each moved case was read line by line, and each moved only as follows.
+1. **A lost boat lays out no kedge** (13 ships, every one with a boat). Old: "Order: lay out a kedge.", then the boat cut adrift hoisted out with the kedge. On ten she laid it out within the 900 s, "The kedge let go from the launch ninety fathoms to the SW by S." (the frigate); on three she was still at it. New: "Order not carried out ('lay out a kedge'): the launch is lost: cut adrift on the 10th", by her boat's name.
+2. **A box given while she comes to is refused at the order:**
+   - `heave to` then `box her off`: 9 ships, the same nine as at 86fa56d3.
+     - Old: "Order: box her off.", then 127's "'Box off' will follow 'heave to', which the hands are still at." at 2 s, then "Could not box her off: She is hove to; fill away first, or wear." (the frigate, 172 s; the lugger "She has no head yards to brace abox.", 82 s).
+     - New: refused at the order, "She is heaving to; she will not box off while she comes to." (the lugger: "She has no head yards to brace abox.").
+     - **127's wait line goes with the box:** the old side says one line more than it did at 86fa56d3, where that wait was not said.
+   - `lie a-try` then `box her off`: 4 ships, the same four.
+     - The same as above.
+     - On each of the four, one line more: "Piped down; the starboard watch has the deck.", as she lies a-try with no box waiting on her hands (the 74, at 280 s).
+3. **`clear for action` with her boat lost:** table 3 above.
+
+Nothing else moved in any case: every other reply and line is the same.
+
+**For the coordinating session:** the hash to send is **801c309** on **`…/pkg-90-lateen3`**, tiered whole above. The commit after it, this section's, touches this report alone. One thing waits on the lead's word: a pin for the dire count begun afresh (item 3 above), in the next hash if wanted.
