@@ -1311,9 +1311,14 @@ class Runner:
             if inst.evo.id in SPAR_WORK_BELAYED and ship.extra.get(SPAR_WORK_WEATHER_HELD):
                 continue  # the game's own captain holds a spar's work for the weather
             # given first and holding a part of its, or a manoeuvre at work that it gave way to
-            # on its settees alone (`_settees_only`): the work waits for the manoeuvre
+            # on its settees alone (`_settees_only`): the work waits for the manoeuvre. A spar's
+            # work held for her working stands in no one's way (the lead's list of 2026-11-27,
+            # item 4: the brig's lie a-try waited behind her wreck's clearing held for the
+            # weather, and she was never brought to); it is taken up again only when nothing in
+            # hand shares its parts (`_spar_work_waits`)
             busy = any(
                 other is not inst
+                and not (other.paused and other.evo.id in SPAR_WORK_BELAYED)
                 and self._in_the_way(ship, inst, other)
                 and (
                     (other.order < inst.order and not self._settees_only(ship, inst, other))
@@ -1914,8 +1919,9 @@ class Runner:
         other work waits for hands or goes on short of them (`_spar_work_gives_way`), all hands
         called or not (the lead's list of 2026-11-27, item 3: an all hands called for the wreck
         does not shield the wreck's work from her working), and until nothing has wanted them
-        for `SPAR_WORK_RESUME_QUIET_S`; and while the game's own captain holds it for the
-        weather (`SPAR_WORK_WEATHER_HELD`)."""
+        for `SPAR_WORK_RESUME_QUIET_S`; while work begun meanwhile shares its parts (a held
+        spar's work stands in no one's way, `_start_waiting`); and while the game's own captain
+        holds it for the weather (`SPAR_WORK_WEATHER_HELD`)."""
         if inst.evo.id not in SPAR_WORK_BELAYED:
             return False
         if (getattr(ship, "extra", None) or {}).get(SPAR_WORK_WEATHER_HELD):
@@ -1924,6 +1930,9 @@ class Runner:
         for other in self.instances:
             if other is inst or other.paused or other.evo.id in SPAR_WORK_BELAYED:
                 continue
+            if not other.waiting and self._in_the_way(ship, inst, other):
+                inst.wanted_at = now
+                return True  # work begun while it was held shares its parts
             a = other.assignment
             wanting = other.waiting and other.waiting_for == WAITING_FOR_HANDS
             if wanting or (a is not None and a.outcome == hands.SHORT):
