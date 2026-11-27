@@ -11274,9 +11274,10 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
     `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
     digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
     14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
-    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18 and the 74's lower deck's 10.35 degrees
-    (±0.05). With no roll, no port of that deck shut half a degree below that heel, and that port
-    shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3 and 6 of the deck's lee ports; with a
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18, the 74's lower deck's 10.35 and the
+    Diana's 18.50 degrees (±0.05; hers since package 90's file). With no roll, no port of that deck
+    shut half a degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1,
+    6, 6, 3, 6 and 4 of the deck's lee ports; with a
     roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
     amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
     port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
@@ -11352,10 +11353,11 @@ def test_truth_7_190_covers_every_armed_file():
     """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
     in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
     carries none, so that a ship file added or rearmed is not passed by in silence. Today the
-    nine: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
-    razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), and the 74
-    (package 75, B7; old: eight files); the bilander's guns are her armed fit's, not her default
-    (unarmed). Drafted in `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
+    ten: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), the 74 (package 75,
+    B7; old: eight files), and the Diana (package 90, her builder; old: nine files); the
+    bilander's guns are her armed fit's, not her default (unarmed). Drafted in
+    `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
     from freesail.combat import ports
     from freesail.ship.loader import load_ship
     from tests.test_lee_ports import LOWEST_LEE_PORT
@@ -11366,7 +11368,7 @@ def test_truth_7_190_covers_every_armed_file():
         if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
     }
     assert armed == {row[0] for row in LOWEST_LEE_PORT}
-    assert len(armed) == 9
+    assert len(armed) == 10  # old: 9, before the Diana's file (package 90)
 
 
 def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside():
@@ -19868,9 +19870,10 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
     names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 60 mechanical (61 until package 116 moved the cruiser's prize keys under
-    `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the code's own
-    years and the one finding only a whole world
+    other: 61 mechanical (60 before the Diana's file, package 90, whose default fit of 1810 is
+    `v-fit-ahead:corvette-20` as the other hulls' are; 61 until package 116 moved the cruiser's
+    prize keys under `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the
+    code's own years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
@@ -19884,7 +19887,8 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     assert not A.unlisted(audit, known)
     cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
     assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 60  # 61 before package 116 (the cruiser's keys)
+    # 60 before the Diana's file (package 90); 61 before package 116 (the cruiser's keys)
+    assert len(audit.keys(A.MECHANICAL)) == 61
     assert len(audit.keys(A.REFERENCE)) == 38
     for foe in ("france", "spain", "batavian-republic"):
         pair = "+".join(sorted(("britain", foe)))
@@ -22804,6 +22808,11 @@ _MUSTERED_BEFORE_119 = {
     "smack.yaml": (8, "Isaac Matthews", 0.5709136896467344),
     "topsail-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
 }
+# The ship files made after package 119, which have no muster before the rule to be held to:
+# their watches at seed 7, starboard and larboard, held by truth 7-700 beside the eighteen. The
+# Diana's (package 90, her builder): 71 and 70, her odd main top, mizzen top and afterguard
+# watched by turns. Old: none.
+_MUSTERED_AFTER_119 = {"corvette-20.yaml": (71, 70)}
 
 
 def _mustered(path, seed=7):
@@ -22836,13 +22845,15 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     watches are equal or one apart, and so is each station's share of them; the merchant brig's
     ten are five and five (old seven and three), the razee's 288 are 144 and 144 (old 146 and
     142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
-    were: no other one had more than one odd station."""
+    were: no other one had more than one odd station. And every file made after the rule
+    (`_MUSTERED_AFTER_119`), the Diana's 141 seamen and soldiers 71 and 70 (package 90; old: the
+    eighteen files alone, every file of the tree)."""
     import glob
 
     from freesail.crew.model import Watch
 
     files = sorted(glob.glob("data/ships/*.yaml"))
-    assert [Path(p).name for p in files] == sorted(_MUSTERED_BEFORE_119)
+    assert [Path(p).name for p in files] == sorted({*_MUSTERED_BEFORE_119, *_MUSTERED_AFTER_119})
     split = {}
     for path in files:
         for seed in (7, 1805):
@@ -22856,6 +22867,7 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
             split[Path(path).name] = (st, lar)
     assert split["merchant-brig.yaml"] == (5, 5)
     assert split["razee-44.yaml"] == (144, 144)
+    assert {k: split[k] for k in _MUSTERED_AFTER_119} == _MUSTERED_AFTER_119
     assert split["seventy-four.yaml"] == (265, 265)
     assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
 
@@ -22869,14 +22881,14 @@ def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
     first) but for the odd last hands of the second, fourth, ... odd stations, which go to the
     larboard: two of the merchant brig's (her fore top's and her afterguard's, the boy), two of
     the razee's (fore top, waisters), three of the seventy-four's (fore top, afterguard, the
-    marines); none of any other file's."""
-    import glob
-
+    marines); none of any other file's. The eighteen are the files of before the rule
+    (`_MUSTERED_BEFORE_119`): a file made after it has no before, and truth 7-700 holds its
+    watches (the Diana's, package 90; old: every file of the tree, then the eighteen)."""
     from freesail.crew.model import WATCHES
 
     moved_by_file = {}
-    for path in sorted(glob.glob("data/ships/*.yaml")):
-        name = Path(path).name
+    for name in sorted(_MUSTERED_BEFORE_119):
+        path = f"data/ships/{name}"
         crew, after = _mustered(path)
         assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]
         moved = []
