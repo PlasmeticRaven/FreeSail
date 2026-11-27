@@ -172,11 +172,6 @@ _TRUNK_HANDS_CALLED_FOR = "hands_called_for"
 # 80e703c7, engine-1: `scripts._belay_held_work` and the reading 'the work in hand' were written
 # when a hold could only be a manoeuvre's, and read a post's as one).
 HELD_BY_BELAY = "belay"
-# The scripted work on a spar carried away that a manoeuvre belays as it belays the step-list work
-# in hand (the lead's list of 2026-11-24 for package 126, A3: the 74 boxed off with "only 391
-# hands", the rest shifting a studding-sail boom): the hands go to working her, and the spar's
-# work is taken up again where it stood when they are free (`_try_resume`).
-SPAR_WORK_BELAYED = frozenset({"clear_wreck", "shift_spar", "jury_mast"})
 HELD_BY_POST = "post"
 
 # How many pieces of other work a log line names before it says "at other work".
@@ -2023,9 +2018,7 @@ class Runner:
         reason = self._format(inst, inst.evo.on_start.log).strip().rstrip(".!")
         reason = reason[:1].lower() + reason[1:]
         for other in sorted(self.instances, key=lambda i: i.order):
-            if other is inst or other.waiting or other.paused:
-                continue
-            if other.script is not None and other.evo.id not in SPAR_WORK_BELAYED:
+            if other is inst or other.waiting or other.paused or other.script is not None:
                 continue
             if other.all_hands:
                 continue  # two all-hands evolutions serialise by their holds, as before

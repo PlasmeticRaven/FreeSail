@@ -682,7 +682,9 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     again = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
     assert again.status_code == 200 and again.json()["game"]["games"] == 5
     port.driver.tick(120)
-    stamp = port.driver.world.clock.stamp()
+    stamp = _dated(port.driver.world)
+    assert stamp.startswith(port.driver.world.clock.stamp() + ", ")
+    assert stamp.endswith(" 1805")  # the day, as the log's stamp gives it
     asked = client.post("/api/harbour/end", json={})
     assert asked.status_code == 409
     assert asked.json()["detail"] == (
@@ -712,17 +714,45 @@ def test_truth_7_770_a_game_is_ended_from_the_harbour_and_another_begun(port, cl
     assert saved.read_bytes() == written
     # taken up and played on: the words say since when
     assert client.post("/api/harbour/start", json={"load": saved.name}).status_code == 200
-    taken = port.driver.world.clock.stamp()
+    taken = _dated(port.driver.world)
     port.driver.tick(60)
     asked = client.post("/api/harbour/end", json={})
     assert asked.status_code == 409
     assert asked.json()["detail"] == (
         f"This game was taken up from its save at {taken} and has not been saved since; what "
-        f"has passed since, to {port.driver.world.clock.stamp()}, is lost if it is ended. End "
+        f"has passed since, to {_dated(port.driver.world)}, is lost if it is ended. End "
         "it all the same, or save it first."
     )
     assert client.post("/api/harbour/end", json={"lose_unsaved": True}).status_code == 200
     assert saved.read_bytes() == written
+    # saved by the download: kept as any save is, so ended without asking; played on after
+    # it, the words say since when
+    again = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
+    assert again.status_code == 200
+    port.driver.tick(90)
+    down = client.get("/api/save")
+    assert down.status_code == 200 and down.json()["seed"] == port.driver.world.seed
+    at = _dated(port.driver.world)
+    assert client.post("/api/harbour/end", json={}).status_code == 200
+    again = client.post("/api/harbour/start", json={"scenario": "data/scenarios/tender.yaml"})
+    port.driver.tick(90)
+    assert client.get("/api/save").status_code == 200
+    at = _dated(port.driver.world)
+    port.driver.tick(30)
+    asked = client.post("/api/harbour/end", json={})
+    assert asked.status_code == 409
+    assert asked.json()["detail"] == (
+        f"This game was last saved at {at}; what has passed since, to "
+        f"{_dated(port.driver.world)}, is lost if it is ended. End it all the same, or save it "
+        "first."
+    )
+    assert client.post("/api/harbour/end", json={"lose_unsaved": True}).status_code == 200
+
+
+def _dated(world) -> str:
+    """The ship's time as the end's words give it: the log's stamp, then its day."""
+    t = world.clock.ship_time
+    return f"{world.clock.stamp()}, {t.day} {t.strftime('%B')} {t.year}"
 
 
 def _ended_while_a_page_asks(port) -> list[dict]:
