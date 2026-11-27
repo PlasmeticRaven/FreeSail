@@ -725,7 +725,38 @@ way), 7-777 f (all hands at the hour, in settled weather, never as she is brough
 minutes and resting after the second try with her sail unchanged). **The mutation check** (each
 mutant alone on a copy of this hash; the fast tests of `tests/test_mends_126.py`, `-x`):
 
-{MUT}
+| Mutant | | Whose | Killed by (fast tier) |
+|---|---|---|---|
+| N01 | the giving-way removed (the spar's work never yields its hands) | the reader's | 7-777 c, 7-777 d |
+| N02 | the resume not waiting (`_spar_work_waits` dropped from `_try_resume`) | the reader's | 7-777 d |
+| N03 | the weather gate dropped | the reader's | 7-777 e |
+| N04 | `_weather_against_spar_work` blind to the trend | the reader's | 7-777 e |
+| N05 | all hands for the wreck at once | the reader's | 7-777 |
+| N06 | all hands never called for the wreck | the reader's | 7-777 f |
+| N07 | the bring-to never given again | the reader's | 7-778 b |
+| N08 | the bring-to given again for ever | the reader's | 7-778 b |
+| N09 | `_topsail_to_lie_under` always true | the reader's | 7-778 |
+| N10 | a light spar's wreck sorted first (M03) | the reader's | 7-777 b |
+| N11 | a spar's work begun while an order waits | the reader's | 7-777 |
+| N12 | no pipe-down | the reader's | 7-777 f |
+| N13 | the head sail after the clearing dropped | the reader's | 7-777 g |
+| N14 | no quiet before the spar's work is taken up again | this pass | 7-777 d |
+| N15 | the hold for the weather not given from his work | this pass | 7-777 e |
+| N16 | work merely short does not take the spar's hands (the exemption) | this pass | 7-777 c |
+| N17 | all hands for the wreck in heavy weather | this pass | 7-777 f |
+| N18 | all hands for the wreck as she is brought to | this pass | 7-777 f |
+| N20 | the runner begins a waiting spar's work held for the weather | this pass | 7-777 e |
+| N21 | the resume blind to the weather's hold | this pass | 7-777 e |
+| N22 | a held spar's work in the way of later work | this pass | 7-777 e |
+| N23 | taken up again under work in hand that shares its parts | this pass | 7-777 e |
+| N24 | her light canvas not taken in before heaving to | this pass | 7-778 |
+| N25 | the canvas not read (a light topsail lain to under) | this pass | 7-778 |
+
+**All 24 killed.** N15, N16, N20 and N23 survived the first run of the check and are killed by the
+truths as strengthened (7-777 c at the function, `Runner._short_of_hands`; 7-777 e through his
+work each minute, a waiting clearing whose hands come free, and the resume with nothing but the
+parts in its way). A nineteenth of this pass's, the topsail on a mast gone, was an equivalent
+mutant: a yard carried away with its mast is none of `yards_to_back`'s, and the check is gone.
 
 ## 11. The differences on today's ships, and the player's orders
 

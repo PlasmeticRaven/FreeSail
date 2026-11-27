@@ -591,6 +591,14 @@ def test_truth_7_777_c_work_short_of_hands_belays_the_spars_work_and_has_its_han
         assert named == [], (all_hands, named)
         kinds = [k for k, _ in after]
         assert "wreck.cleared" in kinds, (all_hands, after[-6:])
+    # at the function: short of hands, or too few, gives way, all hands called by order or not
+    from freesail.crew import hands
+    from freesail.evolutions.runner import Runner
+
+    assert w.ship.extra["crew"].all_hands_called_by_order
+    for outcome, gives in ((hands.SHORT, True), (hands.TOO_FEW, True), (hands.ENOUGH, False)):
+        got = hands.Assignment(inst_id="x", wanted=8, outcome=outcome)
+        assert Runner._short_of_hands(got) is gives, outcome
 
 
 def test_truth_7_777_d_a_spars_work_held_is_taken_up_only_when_nothing_has_wanted_hands():
@@ -714,7 +722,40 @@ def test_truth_7_777_e_no_spars_work_in_heavy_weather_unless_she_lies_to():
     assert not lie.waiting, [e.text for e in w.log[-4:]]
     ship.extra.pop(SPAR_WORK_WEATHER_HELD, None)
     clearing.wanted_at = None
+    lie.assignment = None  # neither waiting nor short: only its parts keep the clearing held
     assert runner._spar_work_waits(ship, clearing, crew)
+    runner.instances[:] = [clearing]
+    clearing.wanted_at = None
+    assert not runner._spar_work_waits(ship, clearing, crew)
+    # his work each minute holds it: the weather against her and not lying to
+    w, cap, ship, runner, p = _wrecked_cruising()
+    cap.trend = "steady"
+    assert w.submit("clear away the wreck of the main topmast").kind == "order.accepted"
+    w.run(120)
+    clearing = _clearing(w)
+    assert clearing is not None and not clearing.paused and not clearing.waiting
+    cap.state = "on passage"
+    cap._work(dataclasses.replace(_perceive(w), wind_kn=line + 5.0), [])
+    assert clearing.paused and ship.extra.get(SPAR_WORK_WEATHER_HELD)
+    # held for the weather, a spar's work waiting for hands is not begun when they come free
+    w, cap, ship, runner, p = _wrecked_cruising(keep_waiting=True)
+    cap._hold_spar_work_for_weather = lambda p: None  # his hold stands as set here
+    assert w.submit("clear away the wreck of the main topmast").kind == "order.accepted"
+    w.run(5)
+    clearing = _clearing(w)
+    assert clearing is not None and clearing.waiting, "her watch at her trims"
+    ship.extra[SPAR_WORK_WEATHER_HELD] = True
+    from freesail.crew import hands
+
+    for other in runner.instances:
+        if other is not clearing:
+            hands.release(ship.extra["crew"], other.inst_id)  # her trims done
+    runner.instances[:] = [clearing]
+    w.run(30)
+    assert clearing.waiting
+    ship.extra.pop(SPAR_WORK_WEATHER_HELD)
+    w.run(30)
+    assert not clearing.waiting
 
 
 def _perceive(w):

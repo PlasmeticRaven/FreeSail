@@ -1781,8 +1781,7 @@ class Runner:
             posts=True,
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
-        gives_way = got.outcome in (hands.TOO_FEW, hands.SHORT)
-        if gives_way and self._spar_work_gives_way(ship, inst, crew):
+        if self._short_of_hands(got) and self._spar_work_gives_way(ship, inst, crew):
             # the spar's work is the last claimant of her hands: its hands are this work's, and
             # it is taken up again when nothing else wants them (`_try_resume`)
             hands.release(crew, inst.inst_id)
@@ -1894,6 +1893,13 @@ class Runner:
             and not i.waiting
             and i.assignment is not None
         ]
+
+    @staticmethod
+    def _short_of_hands(got: hands.Assignment) -> bool:
+        """Whether work asking for its hands is short of them or too few to begin, all hands
+        called or not (the lead's list of 2026-11-27, item 3): then the spar's work in hand gives
+        way to it (`_spar_work_gives_way`)."""
+        return got.outcome in (hands.TOO_FEW, hands.SHORT)
 
     def _spar_work_gives_way(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
         """Work short of hands, or too few to begin, that is not itself a spar's (her sails

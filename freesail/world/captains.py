@@ -3677,19 +3677,19 @@ class Captain(Judgement):
         self._bring_to_for_weather(why="not brought to")
 
     def _topsail_to_lie_under(self) -> bool:
-        """Whether she has a topsail to lie a-try under, a fact of the sail and not of the
-        moment (the lead's list of 2026-11-27 for package 126, part two, item 2): a topsail
-        of the mast she lies to with (`scripts.yards_to_back`), on a yard and a mast that
-        stand, bent and sound, of working canvas (`LIE_A_TRY_CANVAS_NO`), with reef bands to
-        close-reef it or in her plain sail (the ship file's group: what `set plain sail` and his
-        sail after the gale set). None (the smack's light topsail and the cutter's, of No. 6; a
-        boat with no topsail; a ship whose topmast is gone with its yard), she is given `heave
-        to` under the canvas she has, as a fore-and-aft vessel lies to. A topsail furled now and
-        about to be set (the bilander's in a gale from the start) keeps `lie a-try`, which waits
-        for it or says what it cannot do, as on the trunk."""
+        """Whether she has a topsail to lie a-try under, a fact of the sail and not of the moment
+        (the lead's list of 2026-11-27 for package 126, part two, item 2): a topsail of the mast
+        she lies to with (`scripts.yards_to_back`, whose yards stand: one carried away with its
+        mast is none of them), bent and sound, of working canvas (`LIE_A_TRY_CANVAS_NO`), with
+        reef bands to close-reef it or in her plain sail (the ship file's group: what `set plain
+        sail` and his sail after the gale set). None (the smack's light topsail and the
+        cutter's, of No. 6; a boat with no topsail; a ship whose topmast is gone with its yard),
+        she is given `heave to` under the canvas she has, as a fore-and-aft vessel lies to. A
+        topsail furled now and about to be set (the bilander's in a gale from the start) keeps
+        `lie a-try`, which waits for it or says what it cannot do, as on the trunk."""
         ship = self.world.ship
         try:
-            from freesail.evolutions.scripts import _topsails_on, gone_spar, yards_to_back
+            from freesail.evolutions.scripts import _topsails_on, yards_to_back
             from freesail.ship.parts import WORKING_CANVAS_NO, SailState
 
             kept = _topsails_on(ship, yards_to_back(ship))
@@ -3697,8 +3697,6 @@ class Captain(Judgement):
 
             def can_lie_under(s: Any) -> bool:
                 if s.wrecked or s.state in (SailState.UNBENT, SailState.BLOWN_OUT):
-                    return False
-                if gone_spar(ship, s) is not None:
                     return False
                 if int(s.canvas_no or WORKING_CANVAS_NO) > LIE_A_TRY_CANVAS_NO:
                     return False  # light canvas: a fair-weather sail
