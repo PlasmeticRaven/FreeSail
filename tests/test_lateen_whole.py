@@ -3554,3 +3554,28 @@ def test_within_one_cause_a_yard_risen_to_dire_is_warned_before_it_goes(xebec_in
         e.text for e in said
     ]
     assert not gone or dire[0].tick < gone[0]
+
+
+def test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes(xebec_in_50):
+    """The lead's nudge 84, on nudge 83's open line: a whole lateen's cause that gives way to
+    another and comes again begins its dire count afresh, as its lesser one does
+    (`strain._causes_come`, package 127's `last_dire_s`). The xebec in 50 kn, her lateens put on
+    the bad hand, each yard warned dire "lying on the mast" at once; the wind eight points through
+    her bow 20 s on, each warned dire "aback against the mast"; the wind back 40 s after, the bad
+    hand come again: each warned "working ... lying on the mast", then dire again as it passes 1.5
+    (measured in the like run of `n83/seqsev.py`: at 1.51, 55 s after the wind came back). With
+    the dire count kept from the cause's first time, nothing more to the run's end, the yards at
+    1.57 to 1.60."""
+    world = _from(xebec_in_50)
+    _on_the_bad_hand(world)
+    world.run(20)
+    _shift_the_wind(world, -8.0)
+    world.run(40)
+    n0 = len(world.log.all())
+    _shift_the_wind(world, 8.0)
+    world.run(240)
+    said = _warned(_after(world, n0), "main.lateen_yard")
+    dire = [e for e in said if e.data["ratio"] > strain.CARRY_AWAY_RATIO]
+    assert dire and "lying on the mast; she will carry it away" in dire[0].text, [
+        e.text for e in said
+    ]

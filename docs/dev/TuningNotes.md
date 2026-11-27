@@ -40363,3 +40363,30 @@ sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
 - **A wait said once, routine, marked** (127's `TURN_WAIT`): the third pass's line for an order to a whole lateen waiting behind work (nudge 60's item 2) is 127's line for every order now, said once, routine and marked. The third pass's own branch is gone in the merge.
   - The strain's "when the hands are done trimming the mainsail" is a clause of the strain's warning, under the strain's count, and not a wait note.
   - The shift or box then ordered says its own wait by 127's road.
+
+## Package 90, after the staged third pass: the dire count's pin, and the ships' class words (carried fault 24; the lead's nudge 84, 2026-11-27)
+
+`…/pkg-90` merged at 939de7d6 (the Diana). Old is 939de7d6.
+
+- **The dire count begun afresh when a cause comes again** (`strain._causes_come`, at 801c309) is pinned: `test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes`.
+  - The case: the xebec in 50 kn, her lateens on the bad hand, the wind eight points through her bow 20 s on and back 40 s after.
+  - The main yard is warned dire "lying on the mast; she will carry it away" as it passes 1.5 again, 55 s after the wind came back.
+  - With the count kept from the cause's first time: nothing more, the yards at 1.57 to 1.60.
+  - No load moves; the line is 801c309's.
+- **The ships' class words** (`readings.ship_class_words`, the first clause of a file's era note, served in the ship reading and every station's brief). Mended at the cause for every file; **words alone**, nothing a ship does moves.
+  - **Her name is taken out with the "HMS" that goes with it.** Before, only the name went, and "HMS" was left at the head.
+  - **Only a leading article is made small.** Before, whatever capital led was made small ("hMS"). A class that opens with a word of its own keeps it and is given its article: "a Spanish xebec ..." (no committed file).
+  - **A first clause naming her and her state, and no class, is read past to her class:** the class after its comma ("HMS Indefatigable as built, a 64-gun ship ..."), or else the next clause's, after its colon ("HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a frigate ...").
+  - **"the" before a possessive is kept**, where it was made "a" ("a Navy's smack"). An "a" made from "the" before a vowel is "an".
+  - **"the Navy's" goes where she is not a King's ship, as "H.M." does** (`readings.ship_words`).
+
+  | Ship | Old | New |
+  |---|---|---|
+  | the razee | "hMS as razeed, 1795, ship-rigged" | "an Ardent-class 64 of 1784 cut down to a frigate by the Navy Office's draught of September 1794, ship-rigged" |
+  | the 64 | "hMS as built, a 64-gun ship of the Ardent class" | "a 64-gun ship of the Ardent class" |
+  | the 74 | "hMS a 74-gun ship of the Arrogant class" | "a 74-gun ship of the Arrogant class" |
+  | the smack | "a Navy's smack" | "the Navy's smack" |
+  | the smack out of Falmouth, a merchantman (`smack-falmouth`) | "The ship: Culloden, a Navy's smack; a merchantman of Britain." | "The ship: Culloden, a smack; a merchantman of Britain." |
+
+  - The other ten committed ships' class words are the same, byte for byte, and of the 49 committed scenarios' ship sentences only the smack's moves.
+  - Pinned over every committed file: `test_every_committed_ships_class_words_read_as_her_class` (an article or "H.M." at the head, no word made small at it, no article before a possessive, none doubled; the four by their words); `test_a_class_opening_with_a_name_of_its_own_keeps_its_capital_and_takes_an_article`; `test_the_navys_smack_under_a_merchants_papers_is_a_smack`. Each of the mend's eight parts undone fails one of them.
