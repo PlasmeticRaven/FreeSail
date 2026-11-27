@@ -278,6 +278,21 @@ def spares_of(ship: Any, cls: str) -> int:
     return parts.booms(probe).have(cls)
 
 
+# A sail's own kind, by the ship file's groups, for setting again a sail bent again (`Captain.
+# _set_again`): it is set where a sail of its kind is set. The files' groups of every sail ("all
+# sail", "plain sail", "square sails", "light sails") are not a kind.
+SAIL_KINDS: tuple[str, ...] = (
+    "courses",
+    "topsails",
+    "topgallants",
+    "royals",
+    "headsails",
+    "jibs",
+    "staysails",
+    "studdingsails",
+    "gaff sails",
+)
+
 # The work in hand that leaves no hands to spare for a spar's.
 SPAR_WORK_BUSY = frozenset(
     {
@@ -4940,6 +4955,11 @@ class Captain(Judgement):
             ]
             bend = list(business.get("bend_again") or [])
             business["bend_again"] = bend + [x for x in took if x not in bend]
+            # and those she carried set when it went, set again when they stand
+            carried = list(business.get("was_set") or [])
+            business["was_set"] = carried + [
+                x for x in took if ship.sails[x].state is SailState.SET and x not in carried
+            ]
             name = _name(ship, wreck.id)
             return f"clear away the wreck of the {name}", f"the {name} carried away"
         heads = set((getattr(ship, "groups", {}) or {}).get("headsails", []) or [])
@@ -4993,10 +5013,11 @@ class Captain(Judgement):
 
     def _set_again(self, ship: Any, p: Perception) -> tuple[str, str] | None:
         """`set the <sail>` for a sail he bent again to a spar shifted (`_business
-        ["set_again"]`) once it is bent: where her sail as she carries it calls for it (a
-        sail of the same kind set: a head sail beside her head sails, a topsail beside her
-        topsails), the wind under the shortening figure; struck from the list once set, or
-        where none of its kind is set (she is shortened, and it waits with them)."""
+        ["set_again"]`) once it is bent, the wind under the shortening figure: where she
+        carried it set when its spar went (`_business["was_set"]`), or where her sail as she
+        carries it calls for it, a sail of its own kind set (`SAIL_KINDS`: a head sail beside
+        her head sails, a topsail beside her topsails, never by a group of every sail). It
+        waits on the list while neither holds and is struck from it once set."""
         from freesail.ship.parts import SailState
 
         wanting = self._business.get("set_again") or []
@@ -5009,19 +5030,23 @@ class Captain(Judgement):
         groups = getattr(ship, "groups", {}) or {}
         for sid in list(wanting):
             sail = ship.sails.get(sid)
-            if sail is None or sail.state is SailState.UNBENT:
-                continue  # not bent yet
-            wanting.remove(sid)
-            if sail.is_set:
+            if sail is None or sail.is_set:
+                wanting.remove(sid)
+                carried = self._business.get("was_set") or []
+                if sid in carried:
+                    carried.remove(sid)
                 continue
+            if sail.state is SailState.UNBENT:
+                continue  # not bent yet
             kin = [
                 ship.sails[o]
-                for g in groups.values()
-                if sid in g
-                for o in g
+                for kind in SAIL_KINDS
+                if sid in (groups.get(kind) or [])
+                for o in groups[kind]
                 if o != sid and o in ship.sails
             ]
-            if any(o.is_set for o in kin):
+            carried = sid in (self._business.get("was_set") or [])
+            if carried or any(o.is_set for o in kin):
                 return f"set the {self._sail_name(sid)}", "bent again to its spar"
         return None
 

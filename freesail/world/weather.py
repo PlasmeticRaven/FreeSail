@@ -360,6 +360,10 @@ FOG_CLEAR_S = 3600.0
 # other way, nor of the same words (JUDGEMENT: ten minutes, a third of the settling; a watch
 # officer says the fog's turn when it has held, not at each breath of it).
 FOG_LINE_QUIET_S = 600
+# The fog thins within this many kilometres of the edge of the air that holds it (JUDGEMENT: as
+# its reach from the coast thins over `FOG_COAST_THIN_KM`; half an hour's sailing at six knots),
+# read a kilometre at a time.
+FOG_AIR_EDGE_KM = 5.0
 FOG_WIND_THIN_KN = 3.0
 FOG_COAST_THIN_KM = 5.0
 
@@ -1759,6 +1763,20 @@ class Weather:
             until += 1
         left = (until + 1) * 60.0
         degree = min(degree, left / FOG_CLEAR_S if left < FOG_CLEAR_S else 1.0)
+        # and in space: thinner within `FOG_AIR_EDGE_KM` of the edge of that air, so that a
+        # ship sailing out of it, or into it, has the fog come and go by degrees (the reader of
+        # the second pass: the edge crossed at six knots took a cable's sight to the horizon in
+        # a minute), read at the points about her a kilometre apart
+        for r in range(1, int(FOG_AIR_EDGE_KM) + 1):
+            if degree <= (r - 1) / FOG_AIR_EDGE_KM:
+                break
+            ring = [
+                (x_km + r * math.sin(math.radians(b)), y_km + r * math.cos(math.radians(b)))
+                for b in range(0, 360, 45)
+            ]
+            if not all(self._fog_air(px, py, when) for px, py in ring):
+                degree = min(degree, (r - 1) / FOG_AIR_EDGE_KM)
+                break
         return max(0.0, min(1.0, degree))
 
     def _fog_air(self, x_km: float, y_km: float, when: datetime) -> bool:

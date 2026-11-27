@@ -431,7 +431,7 @@ ORDER_ACTOR = "order_actor"
 
 
 class World:
-    _fog_said: tuple[int, bool, str] | None = None  # a checkpoint's from before package 126
+    _fog_said: tuple[Any, ...] | None = None  # a checkpoint's from before package 126
     # The log's `wind.shift` line (package 37c, the owner's ruling of 2026-10-03, closing
     # the M5 spec's open item 11): the ten-minute mean wind, as the readings and the
     # `a wind shift` event read it, two points from where the log last put it, and held
@@ -850,9 +850,9 @@ class World:
         self.glass: Any = None
         self.conditions: Any = None  # the sky and the weather at the ship, once a minute
         self._last_conditions: Any = None
-        # the fog's last step said (tick, thicker, its words' key), for the quiet between two
-        # (`_tick_weather`); None before any, and in a checkpoint written before (the class's)
-        self._fog_said: tuple[int, bool, str] | None = None
+        # the fog's last step said (tick, thicker, its words' key, the sight said), for the quiet
+        # between two (`_say_the_fog`); None before any, and in a checkpoint written before
+        self._fog_said: tuple[int, bool, str, str] | None = None
         self.sea: Any = None  # the sea and the motion (spec M5 §4), made below
         self.motion: Any = None
         if self.scenario.systems or self.scenario.climatology:
@@ -1907,16 +1907,53 @@ class World:
             if self.glass is not None:
                 self.glass.mark_watch()  # the reference for the first change of the watch
 
+    def _say_the_fog(self, now: Any, was: Any) -> None:
+        """The fog's sight closing or opening, said a step at a time from the sight the log
+        last said of it (`_fog_said`). A step is put off within `FOG_LINE_QUIET_S` of a step
+        the other way, or of the same words (the lead's list, B3: off Ushant "The fog is
+        thickening." and a minute later "The fog is thinning."), and said when the quiet is
+        over if the sight is not back where the log left it: the sight is read as it is, and
+        the log says the fog's turn once it has held."""
+        from freesail.world.weather import FOG_LINE_QUIET_S, FOG_LINES, VISIBILITY_NM
+
+        said = self._fog_said
+        if said is not None and len(said) < 4:  # a mark from before it kept the sight
+            said = (*said, was.visibility)
+        last = str(said[3]) if said is not None else str(was.visibility)
+        if last not in VISIBILITY_NM or now.visibility == last:
+            return
+        thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[last]
+        # notable where the sight a ship is handled by has changed: shut in thick, or first
+        # opening from a cable; the steps between are routine
+        key = (
+            ("thick" if now.visibility == "a cable" else "thickening")
+            if thicker
+            else ("clearing" if last == "a cable" else "thinning")
+        )
+        if (
+            said is not None
+            and self.clock.tick - int(said[0]) < FOG_LINE_QUIET_S
+            and (bool(said[1]) != thicker or said[2] == key)
+        ):
+            return  # put off: said when the quiet is over, if it has held
+        self._fog_said = (self.clock.tick, thicker, key, now.visibility)
+        self.record(
+            Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
+            "weather.fog",
+            FOG_LINES[key],
+            data={
+                "weather": now.weather,
+                "visibility": now.visibility,
+                "was": last,
+                "fog": float(getattr(now, "fog", 0.0)),
+            },
+        )
+
     def _tick_weather(self) -> None:
         """The minute's weather lines: the sky and the weather when they change, the
         hour's line with the glass, and at the watch's change the glass's fall or rise
         since the watch before (spec M5 §5). No line names a front or a centre."""
-        from freesail.world.weather import (
-            FOG_LINE_QUIET_S,
-            FOG_LINES,
-            VISIBILITY_NM,
-            WEATHER_LINES,
-        )
+        from freesail.world.weather import FOG_LINES, VISIBILITY_NM, WEATHER_LINES
 
         self._observe_weather()
         t = self.clock.ship_time
@@ -1936,51 +1973,20 @@ class World:
             elif was.weather == "fog" and now.weather != "fine":
                 # gone into other weather (behind a front): it lifted, and the weather said
                 text = f"{WEATHER_LINES[('fog', 'fine')]} {text}"
+            # the sight the log last said of a fog: as it settles, and none once it is gone
+            self._fog_said = (
+                (self.clock.tick, True, "settling", now.visibility)
+                if now.weather == "fog"
+                else None
+            )
             self.record(
                 Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
                 "weather.change",
                 text,
                 data={"weather": now.weather, "was": was.weather, "visibility": now.visibility},
             )
-        elif (
-            was is not None
-            and now.weather == "fog"
-            and now.visibility != was.visibility
-            and now.visibility in VISIBILITY_NM
-            and was.visibility in VISIBILITY_NM
-        ):
-            # the sight closing or opening in the fog, a step at a time
-            thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[was.visibility]
-            # notable where the sight a ship is handled by has changed: shut in thick, or
-            # first opening from a cable; the steps between are routine
-            key = (
-                ("thick" if now.visibility == "a cable" else "thickening")
-                if thicker
-                else ("clearing" if was.visibility == "a cable" else "thinning")
-            )
-            # one step is not said within `FOG_LINE_QUIET_S` of a step the other way, nor of
-            # the same words (the lead's list, B3: off Ushant "The fog is thickening." and a
-            # minute later "The fog is thinning."): the sight is read as it is, the log says
-            # the fog's turn when it has held
-            said = self._fog_said
-            quiet = (
-                said is not None
-                and self.clock.tick - int(said[0]) < FOG_LINE_QUIET_S
-                and (bool(said[1]) != thicker or said[2] == key)
-            )
-            if not quiet:
-                self._fog_said = (self.clock.tick, thicker, key)
-                self.record(
-                    Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
-                    "weather.fog",
-                    FOG_LINES[key],
-                    data={
-                        "weather": now.weather,
-                        "visibility": now.visibility,
-                        "was": was.visibility,
-                        "fog": float(getattr(now, "fog", 0.0)),
-                    },
-                )
+        elif was is not None and now.weather == "fog" and now.visibility in VISIBILITY_NM:
+            self._say_the_fog(now, was)
         self._last_conditions = now
         if t.minute != 0:
             return

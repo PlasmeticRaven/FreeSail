@@ -1045,7 +1045,9 @@ class Harbour:
                         "the game as it stands then, among your saves."
                     )
                 raise HarbourError(words, 409)
-            before = self._save_names()
+            desk = self.driver.desk
+            seats = list(getattr(desk, "seats", {}).values()) if desk is not None else []
+            before = {id(seat): len(getattr(seat, "saves", []) or []) for seat in seats}
             # the doors first, the driver's lock not held: a door stopping asks the game to
             # release its station, and the release saves the station's record as it always has
             for door in list(self.doors.values()):
@@ -1069,7 +1071,13 @@ class Harbour:
                 if door.running:
                     with contextlib.suppress(Exception):
                         self.stop_door(door.id)
-            written = sorted(self._save_names() - before)
+            # the saves the stand-downs wrote, by the seats' own record of them (not by the
+            # saves place's names, which a save of the same name would hide)
+            written = [
+                Path(path).stem
+                for seat in seats
+                for path in (getattr(seat, "saves", []) or [])[before.get(id(seat), 0) :]
+            ]
         lines = ["The game is ended."]
         if written:
             lines.append(
@@ -1077,12 +1085,6 @@ class Harbour:
                 f"as {', '.join(written)}, among your saves."
             )
         return {"lines": lines, "game": self.game_state()}
-
-    def _save_names(self) -> set[str]:
-        """The names of the saves in the saves place (`saves`), all of them."""
-        with contextlib.suppress(OSError):
-            return {p.stem for p in self.places.saves.glob("*.json") if p.is_file()}
-        return set()
 
     def game_state(self) -> dict[str, Any]:
         from freesail.agents import director as director_mod
