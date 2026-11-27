@@ -295,6 +295,7 @@ nothing is shifted. At the first pass the struck Renard had shifted her square-s
   hour's ("Hazy, fog; ..."), and the reading of the visibility ("a few miles", "a mile").
 - **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
   and the captain's orders that hang on them.
+- **The fog's lifting into other weather:** "The fog lifted. <the weather's line>".
 - **The captain's orders of spar work** ("clearing away the wreck of the ...", "shifting the ...",
   "rigging a jury mast", "bending the ...", "setting the ... (bent again to its spar)"), their
   evolutions' lines, and the belay of that work by a manoeuvre ("Belayed shifting the ...: ...").
@@ -306,6 +307,16 @@ nothing is shifted. At the first pass the struck Renard had shifted her square-s
 Nothing else moved.
 
 ## 6. Found and not mended
+
+- **A shift held after its spare is out of the booms, and then belayed by order** (`Runner.belay`),
+  leaves the spare gone and the spar still carried away: nothing puts a spare back. That is the
+  runner's belay of any shift, older than this package. A manoeuvre's hold of a shift, which this
+  package adds, takes it up again where it stood (truth 7-777 wears ship in the middle of a shift,
+  and the shift is done after).
+- **A stand-down's save is named** `freesail-seed<seed>-tick<tick>.json` by the desk, and overwrites
+  a save of that name: two stand-downs at one tick write one file, and an earlier file of the same
+  name is lost. The naming is the desk's and older than this package; the end now names what the
+  seats record they wrote.
 
 - `lie a-try` given after `shorten sail` waits behind every reef the shortening takes (17 to 107
   minutes by ship), and she sails on meanwhile. That is package 125's ground.
@@ -320,10 +331,14 @@ Nothing else moved.
 
 **A. The captain's spar work, which could leave her worse off than the trunk's captain.**
 
-1. **The sails bent again are set again by him** (`Captain._set_again`): a sail bent to a spar
-   shifted is set once bent where a sail of its kind is set (a head sail beside her head sails, a
-   topsail beside her topsails), the wind under the shortening figure, and said ("setting the jib
-   (bent again to its spar)"). Where none of its kind is set (she is shortened) it waits with them.
+1. **The sails bent again are set again by him** (`Captain._set_again`), the wind under the
+   shortening figure, and said ("setting the jib (bent again to its spar)"). A sail she carried set
+   when its spar went (`_business["was_set"]`, read as the wreck is cleared) is set again once
+   bent. Another is set where a sail of its own kind is set (`SAIL_KINDS`, the files' groups of a
+   kind of sail; never by the groups of every sail, "all sail", "plain sail", "square sails",
+   "light sails"). A sail that is neither waits on the list. The cutter, whose topsail was loosed
+   and her gaff topsail furled when her topmast went, has them bent again and left as they were,
+   her jib set.
 2. **No hand is taken from handling her.** The spar's work is begun only with her under command
    (`Captain._under_command`): no manoeuvre in hand (aback and boxing off, in stays, wearing,
    heaving to and lying to are each one), headway and steerage way (`hull.HELM_STEERAGE_SPEED`, a
@@ -365,18 +380,29 @@ Nothing else moved.
    miles as it first settles, a mile at its half, a cable at its full. It is never clearer than the
    sky gives, so each step is passed coming and going whatever the fog's block's sky. Truth 7-775 b
    scans a June of minutes off Falmouth: no change of sight in or out of fog moves two steps.
-2. **The air it lies in comes and goes by degrees too** (`Weather._fog_air`, read minute by minute
-   at the place): the fog settles over `FOG_SETTLE_S` from the moment the place came under a warm
-   sector or a high, and thins over `FOG_CLEAR_S` to the moment it will leave it. A fog that gives
-   way to other weather is said to lift ("The fog lifted. Passing showers."). Truth 7-775 b: where
-   the air is to go in half an hour the fog is half cleared, a minute before only just there, and
-   gone at the moment; where it came a quarter of an hour ago, half settled.
-3. **No flicker said.** A step of the fog's sight is not said within `FOG_LINE_QUIET_S` (600 s,
-   JUDGEMENT: a third of the settling; a watch officer says the fog's turn when it has held) of a
-   step the other way, nor of the same words. The sight itself is read as it is. The mark is the
-   World's (`_fog_said`, kept in its checkpoint; a class default of none for one written before).
-   Truth 7-775 b feeds the sight a mile, a few miles, a mile, a few miles, a mile, a minute apart:
-   "The fog is thinning." once.
+2. **The air it lies in comes and goes by degrees too** (`Weather._fog_air`):
+   - **In time, at the place:** read minute by minute, the fog settles over `FOG_SETTLE_S` from the
+     moment the place came under a warm sector or a high, and thins over `FOG_CLEAR_S` to the moment
+     it will leave it.
+   - **In space:** it thins within `FOG_AIR_EDGE_KM` (5 km, JUDGEMENT, as its reach from the coast
+     thins) of the edge of that air, read a kilometre at a time about her, so that a ship sailing
+     across the edge has it come and go by degrees.
+   - **Into other weather:** a fog that gives way to it is said to lift ("The fog lifted. Passing
+     showers.").
+
+   Truth 7-775 b: where the air is to go in half an hour the fog is half cleared, a minute before
+   only just there, and gone at the moment; where it came a quarter of an hour ago, half settled;
+   six km inside the edge thick, 3.5 and 1.5 km thinner by turns, gone at 0.3; the line of its
+   lifting into showers.
+3. **No flicker said, and nothing lost.** A step of the fog's sight is put off within
+   `FOG_LINE_QUIET_S` (600 s, JUDGEMENT: a third of the settling; a watch officer says the fog's turn
+   when it has held) of a step the other way, or of the same words. It is said when the quiet is
+   over if the sight is not back where the log left it (`World._say_the_fog`, from the sight the log
+   last said). The sight itself is read as it is. The mark is the World's (`_fog_said`: the tick,
+   the way, the words and the sight said), kept by its checkpoint; truth 7-775 saves with a quiet in
+   force and the loaded game holds it. Truth 7-775 b feeds the sight a mile, a few miles, a mile, a
+   few miles, a mile, a minute apart: "The fog is thinning." once; then the sight holding at a mile,
+   "The fog is thickening." when the quiet is over.
 4. **The times pinned as figures.** Truth 7-774 holds them in seconds, not by the constants: the
    settling 1,800 s from its first line to a cable (±120) and a mile at 900; the clearing 3,600 s from
    its first opening to the fog lifted (±120) and a few miles at 1,800. Truth 7-775 b holds the edges
@@ -400,6 +426,8 @@ readings, and the captain's orders.
 
 **D. The end's words.**
 
+- **The stand-downs' saves are named by the seats' own record of them** (`Seat.saves`), not by the
+  saves place's names, which a save of the same name would hide.
 - A game taken up from a save and played on is told since when: "This game was taken up from its save
   at <the save's time> and has not been saved since; what has passed since, to <now>, is lost if it
   is ended. End it all the same, or save it first." (`Driver.taken_up_from_a_save`, called by the

@@ -39982,3 +39982,12 @@ merchant brig's main topmast 4.78 against 3.83; the frigate's mainmast (her jury
 thickening." 15 min on (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to
 be clearing." (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on
 (routine).
+
+- `weather.FOG_AIR_EDGE_KM` 5 km (the reader's mends of the second pass): the fog thins within five
+  kilometres of the edge of the air that holds it, as its reach from the coast thins over
+  `FOG_COAST_THIN_KM`; half an hour's sailing at six knots.
+- The sails bent again after a shift are set again where she carried them set when the spar went,
+  or where a sail of their own kind is set. The cutter's main topmast case is then 3.57 kn in the
+  third hour (her topsail was loosed and her gaff topsail furled when it went, and are left so),
+  where the first version, which counted every sail as kin, made 4.97 and set what she had not
+  carried.
