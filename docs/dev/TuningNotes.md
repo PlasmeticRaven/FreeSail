@@ -40051,7 +40051,14 @@ sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
 
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
-**No pin moved.** The new figures, each JUDGEMENT and defined with its ground where it stands:
+**One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
+of the hands (`docs/primer/03-making-and-shortening-sail.md`), so `tests/test_agents.py`'s
+`test_the_contents_says_what_each_topic_costs_measured_from_the_text_served` and
+`test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number` move.
+Old: "about 11,330 tokens". New: "about 11,480 tokens". The history is kept in the first test's
+docstring. No other pin moved.
+
+The new figures, each JUDGEMENT and defined with its ground where it stands:
 
 - `world.captains.BRING_TO_AGAIN_S` 600 s: a refused or failed order to bring her to for the
   weather is given again ten minutes after the last (the trunk gave it once, on entering the

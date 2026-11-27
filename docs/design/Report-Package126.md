@@ -830,7 +830,10 @@ order `belay`, not of the runner's hold.
 
 ## 12. The pins moved
 
-**No pin moved.** The truths changed in their bodies are the package's own, unmerged: 7-778 (the
+**One pin moved, a count** (`docs/dev/TuningNotes.md`, "Package 126, part two"): the primer's
+chapter 3 grows by the paragraph on the last claimant of the hands, so the two size tests of
+`tests/test_agents.py` move from "about 11,330 tokens" to "about 11,480 tokens", with the history
+kept in the first's docstring. The truths changed in their bodies are the package's own, unmerged: 7-778 (the
 cutter now heaves to under her fore-and-aft canvas and keeps her topsail, where the second pass had
 her lie a-try under it; the wording "no topsail to lie a-try under" for "no topsail set to lie
 a-try under"; the fact of the sail asserted at the function) and 7-779 b (judged seed by seed over
