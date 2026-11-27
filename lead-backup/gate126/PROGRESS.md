@@ -1,0 +1,20 @@
+- start: worktrees checked
+- physics & data/ships diff empty: confirmed
+- read diff weather/world/runner/captains/harbour/server/client/README/primer
+- question: GET /api/save (download) does not update Driver.kept; game page saves via `save PATH` order (driver._save) so OK
+- tests (mends_126, harbour, captain_trials, weather*) --slow on NEW started -> tests_new.txt
+- gate/sparprobe.py written: 124 cases (8 ships, 29 spars x {12,25,12head,rise} + none); OLD batch started -> sp_old.jsonl
+- first look NEW cutter main.topmast 12head: goes astern -0.85kn for 2h beating (check OLD)
+- sparprobe trimmed to 49 cases (time); OLD restarted later
+- tests NEW --slow: 131 passed in 15:01, none skipped/xfailed
+- spar OLD/NEW compare -> sp_cmp.txt. FINDING: bilander|fore.topmast|rise: OLD made 12.85nm, 0 min astern, lay a-try at 85m; NEW 1.56nm, 92 min astern (-1.8..-2.4kn), heave-to "Only four hands to heave to; the rest are clearing away the wreck" then failed; shorten sail "Only one hand to the main topsail; the rest are clearing away the wreck". heave_to.yaml has no belays:true and is not all-hands -> SPAR_WORK_BELAYED never applies to it nor to sail handling.
+- FINDING cont: hands at spar work named in short_handed lines in 17 NEW cases (0 OLD). bilander fore.topmast 25kn: plain sail waits 95 min while wreck cleared, u 2-3.6 vs 7.8kn, made good 20.05->14.41nm. merchant-brig main.topmast rise: lie a-try refused ("heaving to already", heave-to for the lead), heave-to fails 115m, never lies a-try (OLD lay a-try 101m). merchant-brig 12head: made 1.55->-0.01nm, aback 1->3.
+- D harbour live server (port 8765, scratch settings/saves): end no game 409; end at once 200; twice 409; unsaved 409 words + lose 200; saved then end 200; another game started/ended; save loads after end (x3); taken-up-and-played words correct. Playwright click (chromium 1243 headless shell): refusal words, sure button, "The game is ended.", head "no game yet". SOUND. (end button inside collapsed In-play <details>)
+- broad batch 102 cases OLD/NEW done (b_old/b_new.jsonl, b_cmp.txt). FINDING: pass|*|40 (gale from start, sails furled): §4 lie-a-try mend acts on cutter, bilander, merchant-brig, privateer-schooner, topsail-schooner (+smack): "heave to" refused where OLD "lying a try" accepted/refused. Cutter OLD lay a-try at 2280s; NEW never brought to (sails on 40kn). UNDECLARED (report §5 says only the smack).
+- fog cases in batch: first state divergence at the first fog line (6120) on every ship; no pre-divergence undeclared in fog/wreck cases; 56/102 cases identical (all pass 12/25, 12 of 18 pass 40, seq x6, tender anchor, first-action)
+- fog scans (fog_analysis.txt): high world seeds 7/8/9 x2 (12 days each), clim June seeds x8 x2 (6 days; NO fog drawn at all in climatology runs). OLD: 78 fogs, 1 notable/fog, 164 two-rung jumps in fog. NEW: 78 fogs same blocks, 470 lines, 234 notable (~3/fog, max 2 notable in a clock hour, ~0.6 per fog-hour), 0 jumps>1 in fog (8 non-fog jumps identical OLD/NEW: 'a mile'->'the horizon' outside fog), 0 fog lines outside fog, 0 lost. One 'shut in thick' then 'seems to be clearing' exactly 10 min apart (s7 min 12360/12370: a cable for ~2 min) - boundary, question.
+- B5: OLD checkpoint mid-fog (08:45 at a cable) loads on NEW, goes on: clearing 10:45, thinning, lifted 11:45. OLD ckpt 07:50 (cable, NEW still settling): on load 'seems to be clearing' at +1m (cable->few miles, 2 rungs), thickening +11m, shut in +22m - the declared B5 case.
+- C seat: 9168 served items x 18 files, 72 differ = 4 items x 18 files, all primer ch.1's sentence and its token counts; 1350 orders, 0 differ. SOUND.
+- tack/wear/box-off: no short-handed line naming spar work (belay works for all-hands manoeuvres); heave to (12 hands, no belays) and trims/braces/take-in/reef short-handed by the spar work in ~20 NEW cases
+- mutants fast tier: 16/18 killed; M03 light-spars-first, M18 was_set-ignored survived; rerunning with --slow
+- mutants --slow: M03 light-spars-first SURVIVED (9 passed); M18 KILLED by 7-779[74]. DONE; report written.
