@@ -68,7 +68,7 @@ def _start(ship: Any, evo_id: str, params: dict[str, Any], verb: str) -> Result:
     runner = ship.extra.get("evolutions")
     if runner is None:
         raise OrderError(f"'{verb}' is work for the hands, and this ship has no runner for it.")
-    text = runner.start(ship, evo_id, "ship", params)
+    text = runner.start(ship, evo_id, "ship", params, say_wait=False)  # its own line
     kind = "evolution.queued" if "will follow" in text else "evolution.started"
     return kind, text, {"verb": verb, "level": 1, "evolution": evo_id}
 

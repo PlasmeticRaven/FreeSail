@@ -39932,6 +39932,96 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
 
+## Package 127: words and waits on today's ships (2026-11-24)
+
+Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words and item 4 in what she does, at the lead's ruling (`docs/design/Report-Package127.md`); item 5 is not pursued, and the cutter's going astern after filling away is carried forward. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-787, in `tests/test_words_and_waits.py`.
+
+**What she does, moved (item 4, ruled in):** a `take in` or `furl` given while the setting of its sail is in hand or waiting belays that setting (`verbs._countermand_the_set`). The brig in 40 kn, `set plain sail`, then `take in all sail`:
+- 300 s on. Old: the main topsail, the fore and main topgallants and the spanker set after it (635 s to 1013 s) and standing at the end. New: their setting is belayed in one notable line, the fore topsail is taken in from where it hung, and nothing is set at the end.
+- 30 s on. Old: refused, "Nothing done: ... already furled", and every sail then set. New: the order is the belay, as its reply and its line, and nothing is set.
+
+**Severities (the lead's ruling):** every turn-wait is routine (`runner.TURN_WAIT_SEVERITY`), the lateen's, the handed-on yards' and the weigh's "waits for the anchor" included; those three were notable before.
+
+**One new figure, JUDGEMENT:** `scripts.FILLED_WATCH_S` = 600 s, how long a ship filled away is watched for her way (the minutes a ship braced full from lying to takes to gather way and steer, with room). Her way is read against `physics.hull.WAY_ON_KN` (0.5 kn, the aback line's "way to lose"), not a new figure.
+
+**Pins moved, old beside new, each for the mend's own reason** (the xebec probe's take-in behind `trim sails`, `test_lateen_whole`, which this package first moved, the trunk's nudge 60 has moved the same way for every whole lateen, and it is the trunk's):
+
+- `tests/test_rig_words.py`, `test_the_lugger_hove_to_and_filled_away_mans_her_sheets_and_is_braced_by_no_line`. Old, at 602 s: "Filled away on the starboard tack; steering WNW (292°)." New, the same tick: "Her sheets drawn on the starboard tack; steering WNW (292°); she has no headway on her yet." Reason: item 3, she had sternway on her then; "She gathers headway; filled away on the starboard tack." comes when she has it, after the minute the test runs. Every tick of what she does is as it was.
+
+Built by package 127's builder; each moved pin to be passed by a reader other than the builder (the build report names who).
+
+**The passages and trials, moved by words alone (the lead's ruling (a)).** Each run on today's trunk (41d1d1bc) and on this package, every world each test builds recorded. In every one, her end state is the same to the bit: her place, heading and way, every sail's state and reefs, every spar's state and condition. And no line the trunk said changes its severity. The difference is the lines added. "Fill-away" counts the "She gathers headway" lines added; each also has one line's words changed ("Braced full ...; she has no headway on her yet", or "Her sheets drawn ..." where she works no braces, in place of "Filled away ..."). A `Shorten sail:` or `Make all sail:` line that carried a wait now carries none, since the wait is said in its own line.
+
+| Test | Lines, old | Lines, new | Turn-waits | Fill-away | Dire warnings |
+|---|---|---|---|---|---|
+| test_known_truths, the day under systems alone (`GATE_5A_DAY_*`) | 623 | 624 | 0 | 0 | 1 (56834) |
+| the passage for gate 5b (`GATE_5B_*`) | 731 | 746 | 15 | 0 | 0 |
+| the passage in thick weather (`GATE_5B_THICK_*`) | 469 | 475 | 6 | 0 | 0 |
+| the schooner with her octant (`GATE_5B_SCHOONER_*`) | 766 | 788 | 21 | 1 | 0 |
+| the merchant passage (`GATE_5C_MERCHANT_*`; truth 77) | 3096 | 3134 | 36 | 2 | 0 |
+| the naval cruise (`GATE_5C_CRUISE_*`; truth 77) | 2242 | 2268 | 26 | 0 | 0 |
+| the schooner on an intent (`GATE_6A_INTENT_*`) | 2079 | 2108 | 27 | 2 | 0 |
+| truth 78, the fake captain (`GATE_6A_FAKE_CAPTAIN_*`) | 3108 | 3146 | 36 | 2 | 0 |
+| test_captain_trials, the gale with sea room (`TRIAL_STATION_GALE_*`) | 1722 | 1749 | 26 | 1 | 0 |
+| the lee shore (`TRIAL_STATION_LEE_SHORE_LINES`; its digest not asserted) | 1561 | 1591 | 26 | 4 | 0 |
+| the station's stranger (`TRIAL_STATION_STRANGER_*`) | 788 | 796 | 8 | 0 | 0 |
+| the trade's stranger (`TRIAL_TRADE_STRANGER_*`) | 1594 | 1617 | 23 | 0 | 0 |
+| the trade in thick weather (`TRIAL_TRADE_THICK_*`) | 426 | 429 | 2 | 1 | 0 |
+
+The digests are re-measured beside them, each with its old value in a comment. The figures are the second pass's, a group's turn-waits said once for its order (they were one a yard or a sail: 79 lines in the naval cruise, now 26).
+
+Truth 77 now pins, beside each digest, the passage's line count and her end state: the last tick, her place to a millionth of a degree, her heading and her way. A change of words alone then reads as words.
+
+No cast or clearing line falls in these passages.
+
+The first build of the turn-waits moved six older "not hands enough for all at once" lines from routine to notable. A routine wait line between two of them reset the World's memory of the same words said again (`World.record`, `RECURRING_KINDS`). A newly said turn-wait is now marked (`runner.TURN_WAIT`) and left out of that memory.
+
+**The convoy's three truths (the lead's ruling (b)), moved by item 4, a change in what she does.** Item 4 left the scenario file as it was; the lead's ruling E1 then moved the privateer in it (below). The book's first `shorten sail`, a minute after `set plain sail`, now belays the topgallants still being set. Before, its take-in was refused as already furled, and they were set, worn for and taken in again. The commodore tacks at 1567 (was 1594) and stalls less.
+
+- **7-340, the recovery when aback with no way: re-measured, and renamed `..._eases_the_after_sail_and_she_pays_off` (it said "and boxes her off").**
+  - Unchanged: aback with no way at 1810.
+  - The work avasted and the spanker taken in: 1800, now 1860.
+  - The spanker in: 1959, now 2019.
+  - After it, before: the box-off at 1980, boxed off at 2110, the spanker set at 2160. Now: way again and the spanker set at 2040, and three knots at 2400.
+- **7-788, new: the box-off where the spanker in has not paid her off.** The same day with a one-point header at 2000 (the wind from 45 to 56 degrees, her head at 90). Boxing her off at 2040, boxed off at 2208, way again at 2220, three knots by 2400. With the law off, sternway until 2671.
+- **7-152 and 7-153, the straggler and the privateer: given their cause in the scenario itself** (the lead's ruling E1 on the first pass; the first build gave each its own setup in the test, the Friendship lying to five minutes and the schooner a cable nearer, and the day a player opens had lost both). In the new day, from her old place (49 48.6 N 5 06.5 W) the schooner looked on from 2.13 miles and more: no private signal, no exchange, no straggler. `data/scenarios/convoy-six.yaml` now places her a cable nearer (49 48.53 N 5 06.61 W). She comes down within two miles of the commodore, and the exchange and the straggler follow; the truths read the scenario as shipped.
+
+  | Event | Old (trunk) | New |
+  |---|---|---|
+  | Private signal shown, up | 3600, 3707 | 2940, 3011 |
+  | Judged an enemy under false colours (urgent) | 3960 | 3240 |
+  | No. 8 ordered, up | 4020, 4966 | 3300, 3371 |
+  | Straggler, No. 20 ordered | 2040 | 3360 |
+  | No. 20 up, answered | 2182, 2340 | 3442, 3540 |
+  | The Friendship regained | 6060 | 5880 |
+  | The privateer | evading by 3600 at 1.98 miles | evading from 2940 at 1.98 miles |
+
+  Station kept at the truth's six checks, 7800 to 10800: 152 m at the most. No prize. A new truth, `test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort`, pins the exchange.
+- **7-153's window, a fault carried by the lead (E2).** At seed 7 the truth passes with the schooner 0.05 to 0.15 mile nearer than her old place. At 0.2 and 0.25 she evades but ends outside the band at 3600, and at 0.35 and 0.5 she never evades; seeds 8 and 11 fail other clauses. The cause, found and not mended here:
+  - promoted to a hull of her own at about four miles (`world/ships.py`, a "full" crew no longer judged far), her near captain's lookout makes out colours at two miles without the glass her far brain used, which made them out at three (`COLOURS_MADE_OUT_NM`, `GLASS_FACTOR`);
+  - her near "investigating a stranger" names the stranger and never closes her (`captains._keep_stranger`).
+  So she judges herself overmatched only where the geometry brings her within two miles. The mend would be the near lookout's reading, which every near rules captain and the player's own ship read: not a few lines, and not this package's.
+
+
+**The first pass's list (the lead, 2026-11-27).**
+- **D1, the countermand within a group:** said once, notable, in a line of its own (`verbs._countermand_said`), on every ship. Before, it was folded into the group's routine line, or, where nothing in the group failed, said nowhere: the bilander's `shorten sail`, her sails ending otherwise with no line. Pinned on the bilander and the frigate.
+- **D3, a wait for hands beside the signal's line:** only the runner's turn-wait (`runner.TURN_WAIT`) is taken back by the signal and the ground tackle, and a wait for hands keeps its own notable line, as on the trunk. Pinned on the bilander. The fight and the damage orders lose nothing: a wait for hands is noted whatever `say_wait` is.
+- **D4, the wait's words:**
+  - Behind the same work it says "the same work" ("'Take in the main topgallant' will follow the same work, which the hands are still at."), where it named the work twice.
+  - A group's order says one line for the order, where it said one line a yard or a sail. It names every work its members wait behind: "Bracing the yards: some of it waits its turn, behind the same work, which the hands are still at."; "Shortening sail: some of it waits its turn, behind 'set the fore topsail' and 'set the main topsail', which the hands are still at.". It is keyed by the order, so two orders of the same words in one tick say each their own.
+  - The fourth reader found the first build of this naming the first member's blocker alone (F1), and keyed by the group's words alone (F2); both mended and pinned.
+  - Not pinned, no live path found:
+    - Ground tackle's check that a line it takes back is a turn-wait (F3): a weigh behind work that brings her up is always a wait for its turn.
+    - The handed-on yards' and the lateen-aback waits (F4) are not marked as turn-waits. A signal or a weigh behind handed-on yards would keep the runner's line beside its own, but `_in_the_way` lets no such order wait there.
+  - Moved here, a pin of this package's own: 7-780's `shorten sail`. Old, two lines ("'Reef the fore topsail' will follow ...", and the main's); new, one.
+- **Small:**
+  - Sternway under a knot is said "sternway, under a knot". It was "a knot" at 0.54; 7-781's cutter, a pin of this package's own, moved so.
+  - With a little way on her under the half knot, the line says "she has but little way on her yet", where it said "no headway".
+  - A boat's own clearing says "The boat is clear."
+  - `fill_away`'s served notes gloss `{filled}`.
+  - The turn-wait mark's place outside the World's memory has a truth of its own.
+- **D2:** "She gathers headway; filled away ..." is notable (`ship.way`), where the report said routine; pinned.
+
 ## Package 126, part one: the harbour and the weather (2026-11-24 to 2026-11-27)
 
 **No pin moved.** The captain's spar work and the `lie a-try` mend are not in this hash (held for a
