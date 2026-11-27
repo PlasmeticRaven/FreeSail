@@ -39932,7 +39932,6 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
 
-<<<<<<< HEAD
 ## Package 90, the Diana: her file, her tuning and the pins she moves (2026-11-20)
 
 Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D). Her file, `data/ships/corvette-20.yaml`, is new, written by `tools/ships/diana.py` through the generator; every other ship file comes out byte for byte. Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `under_plain_sail`, `close_hauled_on_starboard`, `until`, `wear`, `hove_to`), on her file with each figure changed in a scratch copy.
@@ -40209,7 +40208,7 @@ Words alone; no figure of her sailing moved and no pin of another ship's.
 - **Her ship reading's first line, old beside new.** Old, her era note opening "The Diana, a light frigate ...": `ship_class_words` took her name out and made "the" "a", so the reading said "The ship: Diana, a a light frigate of the Danish navy ...", to the player and in every station's brief. New, the note opening "Diana, a light frigate ..." (her generator; her file by it): "The ship: Diana, a light frigate of the Danish navy built at Copenhagen in 1804, taken by Spain at Cartagena in September 1809 and kept as a corvette to 1832, ship-rigged; a ship of the Spanish navy." Pinned whole under her own colours, and every committed file's class words checked for a doubled article (none; hers was the one).
 - **"a Spanish ship sloop", old beside new:** old, no description (the tail "ship sloop" in no row, hers holding "a ship sloop" alone, where the brig-sloop's hold both forms); new, "corvette", by the bare row "ship sloop" beside it. "a ship-sloop", "a Spanish ship-sloop" and "a French corvette" resolved before and do now.
 - **Truth E's docstring and her design note** carry the lead's reader's measure, said and not pinned: put about before her sail is set and her way is on her (600 s after `set plain sail`, in the game's default gusts, 2 to 3.5 kn of way) she stayed in none of nine in 12 and 15 kn, where settled she stays in 11 of 12.
-=======
+
 ## Package 90, the lateen hulls' list, its third pass: the boat lost by the lost road, the reliefs that wait, the bow's list as said (the lead's nudge 77, 2026-11-24)
 
 The branch `…/pkg-90-lateen3`, cut from `…/pkg-90` at 86fa56d3 (the second pass merged on the trunk at 474eff8b). The equations are read, not changed. Old is 86fa56d3.
@@ -40230,7 +40229,6 @@ The branch `…/pkg-90-lateen3`, cut from `…/pkg-90` at 86fa56d3 (the second p
    - The xebec, the wind through her bow: old "the foresail and the mizen and the mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."; new "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.".
    - The stern's line the same, and "shift it when you will" of a lateen on its mast now names it: "shift the mizen when you will".
    - "shift the foresail, the mainsail and the mizen" is taken as said. No hull without a whole lateen reads a comma so.
->>>>>>> 5cffbfe650a70b83f385c4241444cb1be09a822d
 
 ## Package 127: words and waits on today's ships (2026-11-24)
 
@@ -40349,7 +40347,6 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
 
-<<<<<<< HEAD
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
 **One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
@@ -40434,7 +40431,7 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
-=======
+
 ## Package 90, the lateen hulls' list, its third pass with package 127: item 2 by 127's rule, the boats' line in 127's words (the lead's nudge 83, 2026-11-27)
 
 `…/pkg-90` merged at e87714d7 (package 127 on the trunk at 572133ac). Old is e87714d7.
@@ -40451,4 +40448,3 @@ wreck's sails lowered to the deck by its clearing, begun in settled weather, tak
 - **A wait said once, routine, marked** (127's `TURN_WAIT`): the third pass's line for an order to a whole lateen waiting behind work (nudge 60's item 2) is 127's line for every order now, said once, routine and marked. The third pass's own branch is gone in the merge.
   - The strain's "when the hands are done trimming the mainsail" is a clause of the strain's warning, under the strain's count, and not a wait note.
   - The shift or box then ordered says its own wait by 127's road.
->>>>>>> 5cffbfe650a70b83f385c4241444cb1be09a822d
