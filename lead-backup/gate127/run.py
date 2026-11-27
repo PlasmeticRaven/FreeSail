@@ -49,7 +49,11 @@ def _fields(o):
     """An object's fields, its dataclass defaults counted (a checkpoint drops attributes that
     equal their class default from __dict__, so vars() alone reads differently after a load)."""
     import dataclasses
+    import os
 
+    if os.environ.get("GATE_HASH") == "vars":
+        # the first gate-127 runs' hash (vars() alone), to compare with records made then
+        return {k: v for k, v in sorted(vars(o).items())}
     names = set(vars(o))
     if dataclasses.is_dataclass(o):
         names |= {f.name for f in dataclasses.fields(o)}
@@ -60,7 +64,12 @@ def phys(w):
     s = w.ship
     out = []
     d = s.dyn
-    out.append(("dyn", [(k, _prim(v)) for k, v in _fields(d).items()]))
+    import os
+
+    if os.environ.get("GATE_HASH") == "vars":
+        out.append(("dyn", [_prim(getattr(d, k)) for k in sorted(vars(d))]))  # the first runs' form
+    else:
+        out.append(("dyn", [(k, _prim(v)) for k, v in _fields(d).items()]))
     for pid in sorted(s.parts):
         p = s.parts[pid]
         out.append((pid, [(k, _prim(v)) for k, v in _fields(p).items() if _prim(v) is not None]))
@@ -149,7 +158,10 @@ def run_case(case):
             _con.replay_mod.save_to_file = lambda _w, p, *a, **k: p  # write nothing in the tree
             station_watcher(w, "fake")
         every = int(case.get("hash_every", 60))
-        state = {"next": (w.clock.tick // every + 1) * every}
+        import os
+
+        legacy = os.environ.get("GATE_HASH") == "vars"  # the first runs' schedule: 1, 1+every, ...
+        state = {"next": 0 if legacy else (w.clock.tick // every + 1) * every}
 
         def advance(secs):
             left = int(secs)
@@ -159,7 +171,7 @@ def run_case(case):
                 left -= n
                 if w.clock.tick >= state["next"]:
                     rec["hashes"].append([w.clock.tick, phys(w), sails_sig(w)])
-                    state["next"] = (w.clock.tick // every + 1) * every
+                    state["next"] = w.clock.tick + every if legacy else (w.clock.tick // every + 1) * every
 
         for step in case["steps"]:
             op = step[0]
