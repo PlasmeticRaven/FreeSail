@@ -397,6 +397,37 @@ def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_h
         "By the captain, keeping station: clearing away the wreck of the main topmast (the main "
         "topmast carried away)."
     ]
+    # not under command, nothing: in a manoeuvre, aback with no headway, or without steerage way
+    import dataclasses
+
+    from freesail.world.captains import Perception
+
+    w = _cruising("brig")
+    _carry_away(w, "main.topmast")
+    cap, ship = w.captain, w.ship
+    runner = ship.extra["evolutions"]
+    p = Perception.read(w)
+    assert p.manoeuvre == "none" and p.headway and cap._spar_work(ship, p, set(), runner)
+    for changed in ({"manoeuvre": "wearing"}, {"manoeuvre": "hove to"}, {"headway": False}):
+        assert cap._spar_work(ship, dataclasses.replace(p, **changed), set(), runner) is None
+    u = ship.dyn.u
+    ship.dyn.u = 0.5  # a knot: no steerage way
+    assert cap._spar_work(ship, p, set(), runner) is None
+    ship.dyn.u = u
+    # a light spar last, and only with nothing at all in hand: the brig's studding-sail boom
+    # alone carried away and cleared, it waits while any work is in hand
+    w = _cruising("brig")
+    boom = "main.topmast.studdingsail_boom.starboard"
+    _carry_away(w, boom)
+    w.ship.spars[boom].sent_down = True
+    cap, ship = w.captain, w.ship
+    runner = ship.extra["evolutions"]
+    p = Perception.read(w)
+    assert runner.instances, "her trims in hand at the start"
+    assert cap._spar_work(ship, p, set(), runner) is None
+    runner.instances[:] = []
+    got = cap._spar_work(ship, p, set(), runner)
+    assert got is not None and got[0].startswith("shift the starboard main topmast studding"), got
     # the spares are read without writing into a ship with nothing carried away
     from freesail.world.captains import spares_of
 
