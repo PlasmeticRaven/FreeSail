@@ -17,7 +17,7 @@ from pathlib import Path
 
 PASSAGE = """
 name: a passage
-seed: 7
+seed: {seed}
 start: 1805-06-14T08:00
 position: 48 40 N 5 05 W
 region: channel-west
@@ -50,22 +50,16 @@ SPARS = {
 
 
 def build_cases():
+    sel = {"privateer-schooner": ["fore.topmast", "jib_boom", "fore.topsail.yard"],
+           "hermaphrodite-brig": ["fore.topmast", "fore.topsail.yard"],
+           "frigate-36": ["jib_boom", "fore.topsail.yard"],
+           "sixty-four": ["main.topmast", "jib_boom"], "lugger": ["main.lug_yard"]}
     cases = []
-    for ship in SHIPS:
-        for i, spar in enumerate(SPARS[ship]):
-            for kn in (12, 25):
-                cases.append({"id": f"{ship}|{spar}|{kn}", "ship": ship, "spars": [spar], "kn": kn,
-                              "wind_from": 270, "events": []})
-            if i == 0:
-                # the wind heads her 30 min after: she must tack/wear while the work runs
-                cases.append({"id": f"{ship}|{spar}|12head", "ship": ship, "spars": [spar], "kn": 12,
-                              "wind_from": 270, "events": [[40, "wind", 20, 12]]})
-                # rising wind 20 -> 38 over 30 min starting 30 min after
-                cases.append({"id": f"{ship}|{spar}|rise", "ship": ship, "spars": [spar], "kn": 20,
-                              "wind_from": 270, "events": [[40, "ramp", 270, 20, 38, 30]]})
-    for ship in SHIPS:  # and the same with nothing carried away (all three mends idle)
-        cases.append({"id": f"{ship}|none|12", "ship": ship, "spars": [], "kn": 12, "wind_from": 270,
-                      "events": []})
+    for ship, spars in sel.items():
+        for spar in spars:
+            cases.append({"id": f"{ship}|{spar}|25", "ship": ship, "spars": [spar], "kn": 25, "wind_from": 270, "events": []})
+            cases.append({"id": f"{ship}|{spar}|rise", "ship": ship, "spars": [spar], "kn": 20, "wind_from": 270,
+                          "events": [[40, "ramp", 270, 20, 38, 30]]})
     return cases
 
 
@@ -81,7 +75,7 @@ def run_case(case):
     w = None
     try:
         path = Path(tempfile.mkdtemp()) / "p.yaml"
-        path.write_text(PASSAGE.format(ship=case["ship"], kn=case["kn"], wind_from=case["wind_from"]))
+        path.write_text(PASSAGE.format(ship=case["ship"], kn=case["kn"], wind_from=case["wind_from"], seed=case.get("seed", 7)))
         sf = load_scenario(str(path))
         w = make_scenario_world(sf)
         begin(w, sf)

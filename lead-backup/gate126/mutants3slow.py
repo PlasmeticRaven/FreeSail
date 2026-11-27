@@ -1,0 +1,30 @@
+T = ["tests/test_mends_126.py", "-k", "she_does_no_worse and (bilander-25 or merchant-brig-20-38 or bilander-12] or topsail-schooner-25)"]
+C = "freesail/world/captains.py"
+RU = "freesail/evolutions/runner.py"
+MUTANTS = [
+    ("N01-giving-way-removed", RU, "        if gives_way and self._spar_work_gives_way(ship, inst, crew):",
+     "        if False and gives_way and self._spar_work_gives_way(ship, inst, crew):", T),
+    ("N02-resume-not-waiting", RU, "        if self._all_hands_at_work() or self._spar_work_waits(inst, crew):",
+     "        if self._all_hands_at_work():", T),
+    ("N03-worsening-gate-dropped", C,
+     '        if getattr(self, "trend", "") == "worsening" and not lying_to:\n            return None',
+     "        pass", T),
+    ("N04-weather-against-ignores-trend", C,
+     '        return float(p.wind_kn or 0.0) >= line or getattr(self, "trend", "") == "worsening"',
+     "        return float(p.wind_kn or 0.0) >= line", T),
+    ("N05-all-hands-at-once", C, "            and p.tick - int(since) >= WRECK_HANDS_UP_S",
+     "            and p.tick - int(since) >= 0", T),
+    ("N06-all-hands-never", C, "WRECK_HANDS_UP_S = 3600", "WRECK_HANDS_UP_S = 10**9", T),
+    ("N07-bring-to-never-again", C, "BRING_TO_AGAIN_S = 600", "BRING_TO_AGAIN_S = 10**9", T),
+    ("N08-bring-to-for-ever", C, '        if self._business.get("bring_to_stuck"):', "        if False:", T),
+    ("N09-topsail-true-for-smack", C, "        return not kept or not all(never_set(s) for s in kept)",
+     "        return True", T),
+    ("N10-light-spars-first", C, "            return (int(light_spar(ship, sp)), cls,",
+     "            return (-int(light_spar(ship, sp)), cls,", T),
+    ("N11-begun-while-order-waits", C,
+     "            return None  # an order of his or the watch's waits: it has the hands first",
+     "            pass", T),
+    ("N12-no-pipe-down", C, '        if business.pop("hands_up_called", None) and called:',
+     '        if False and business.pop("hands_up_called", None) and called:', T),
+    ("N13-head-sail-for-wreck-dropped", C, "            lambda: self._head_sail_for_the_wreck(ship, p, heads),\n", "", T),
+]
