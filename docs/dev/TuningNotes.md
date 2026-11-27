@@ -40008,7 +40008,11 @@ The first build of the turn-waits moved six older "not hands enough for all at o
 - **D3, a wait for hands beside the signal's line:** only the runner's turn-wait (`runner.TURN_WAIT`) is taken back by the signal and the ground tackle, and a wait for hands keeps its own notable line, as on the trunk. Pinned on the bilander. The fight and the damage orders lose nothing: a wait for hands is noted whatever `say_wait` is.
 - **D4, the wait's words:**
   - Behind the same work it says "the same work" ("'Take in the main topgallant' will follow the same work, which the hands are still at."), where it named the work twice.
-  - A group's order says one line for the order ("Bracing the yards: the work waits its turn behind the same work, ..."; "Shortening sail: the work waits its turn behind 'set the fore topsail', ..."), where it said one line a yard or a sail.
+  - A group's order says one line for the order, where it said one line a yard or a sail. It names every work its members wait behind: "Bracing the yards: some of it waits its turn, behind the same work, which the hands are still at."; "Shortening sail: some of it waits its turn, behind 'set the fore topsail' and 'set the main topsail', which the hands are still at.". It is keyed by the order, so two orders of the same words in one tick say each their own.
+  - The fourth reader found the first build of this naming the first member's blocker alone (F1), and keyed by the group's words alone (F2); both mended and pinned.
+  - Not pinned, no live path found:
+    - Ground tackle's check that a line it takes back is a turn-wait (F3): a weigh behind work that brings her up is always a wait for its turn.
+    - The handed-on yards' and the lateen-aback waits (F4) are not marked as turn-waits. A signal or a weigh behind handed-on yards would keep the runner's line beside its own, but `_in_the_way` lets no such order wait there.
   - Moved here, a pin of this package's own: 7-780's `shorten sail`. Old, two lines ("'Reef the fore topsail' will follow ...", and the main's); new, one.
 - **Small:**
   - Sternway under a knot is said "sternway, under a knot". It was "a knot" at 0.54; 7-781's cutter, a pin of this package's own, moved so.
