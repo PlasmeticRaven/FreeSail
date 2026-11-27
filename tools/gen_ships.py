@@ -131,13 +131,24 @@ FT = 0.3048
 # working load one third of that. In kN per square inch of circumference:
 ROPE_KN_PER_SQ_IN = round(1044.9 * 4.44822 / 1000.0 / 3.0, 4)  # 1.5493
 
-# The engine's force coefficient at the peak of each class's curve (data/sail_classes.yaml,
-# |(C_L, C_D)| at the best angle). Package 10: if the curves change, change these and rerun.
-PEAK_COEFF = {"square": 1.23, "studding": 1.25, "gaff": 1.29, "jibheaded": 1.32, "lug": 1.29}
-# Package 75 (docs/design/Design-ShipsEngineExtensions.md §3.1): the lateen row's 1.15 and 0.48
-# at its best angle, 35 degrees, give 1.246 by the same rule. No file of the eight carries a
-# lateen sail; without the entry the rating pass would fail on the first that does.
-PEAK_COEFF["lateen"] = 1.25
+from freesail.physics.sails import SAIL_CLASSES  # noqa: E402  (the root put on the path above)
+
+
+def peak_coeff(cls) -> float:
+    """The engine's force coefficient at the peak of a class's curve: the greatest
+    |(C_L, C_D)| over its tabulated points (the curves are piecewise linear, and the norm,
+    convex along each piece, is greatest at a point), rounded to two places."""
+    return round(max(math.hypot(c_l, c_d) for c_l, c_d in zip(cls.lift, cls.drag, strict=True)), 2)
+
+
+# The engine's force coefficient at the peak of each class's curve, read from the engine's own
+# tables (freesail.physics.sails.SAIL_CLASSES, from data/sail_classes.yaml), so that the copy
+# cannot drift from the law (package 90, item 37: package 10 raised the studding peak to 1.35
+# for truth 14, 1.44 at its best angle, and left this table's 1.25; tests/test_peak_coeff.py
+# holds the two together). Rounded to two places, as the table always was: square 1.23,
+# studding 1.44, gaff 1.29, jibheaded 1.32, lug 1.29, lateen 1.25 (package 75's 1.246), sprit
+# 1.20 (its drag alone, at 90 degrees).
+PEAK_COEFF = {name: peak_coeff(cls) for name, cls in SAIL_CLASSES.items()}
 
 # Sustained load / static peak-coefficient load, measured with tools/measure_loads.py on the
 # frigate on a beam reach with the yards trimmed to the wind: 0.9 at 35 knots under all
@@ -3271,6 +3282,7 @@ def schooner(out_dir="data/ships", armed=False):
             "hull_speed_kn": 11.5,
             "deck_height_m": deck_height,
             "rudder": {"area_m2": 2.0, "max_angle_deg": 35, "rate_deg_s": 4.0, "span_m": 3.4},
+            "helm": "tiller",
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between Lynx's {keel_ft:.0f} ft "
@@ -3297,6 +3309,10 @@ def schooner(out_dir="data/ships", armed=False):
             "on her own plate's 3 ft 1 in (hull.profile.ports_m's note): recorded, not moved.",
             "rudder": "A deep narrow blade, about 11 ft by 2 ft (span_m its depth, 11 ft; "
             "package 32e).",
+            # package 90, A3 (the ground report's §3): the one direct source of the six
+            "helm": "She steers by a tiller on deck: Chapelle 1930 p. 83 reads H.M. schooner "
+            "Musquidobit, late Lynx (fig. 17), as steered with a tiller, by where her rudder head "
+            "stands; the deck plan on that page shows the rudder head and a tiller.",
         },
     )
     # her hull as drawn, her own module's, the one hull of the two roles (package 75, SW-2 with
@@ -6099,6 +6115,7 @@ def cutter(out_dir="data/ships"):
             "hull_speed_kn": 9.5,
             "deck_height_m": deck_height,
             "rudder": {"area_m2": 1.2, "max_angle_deg": 35, "rate_deg_s": 5.0, "span_m": 2.7},
+            "helm": "tiller",
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.0f} ft "
@@ -6126,6 +6143,11 @@ def cutter(out_dir="data/ships"):
             "vessel, as the schooner).",
             "rudder": "A deep narrow blade, about 9 ft by 1 ft 6 in (judgement; span_m its "
             "depth, 9 ft; package 32e).",
+            # package 90, A3 (the ground report's §3): the rule only
+            "helm": "She steers by a tiller on deck: by the rule only (Falconer 1780, HELM: a "
+            "wheel save in small vessels, which need none; Lever 1827, the Rudder, fig. 373: the "
+            "tiller worked by a wheel in large ships); no draught of hers is read for it. "
+            "Judgement.",
         },
     )
 
@@ -8326,6 +8348,7 @@ def lugger(out_dir="data/ships"):
             "hull_speed_kn": round(1.34 * math.sqrt(lwl_ft), 1),
             "deck_height_m": deck_height,
             "rudder": {"area_m2": 1.4, "max_angle_deg": 35, "rate_deg_s": 5.0, "span_m": 2.5},
+            "helm": "tiller",
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.1f} ft keel "
@@ -8348,6 +8371,11 @@ def lugger(out_dir="data/ships"):
             "hull_speed_kn": f"1.34 sqrt({lwl_ft:.0f} ft).",
             "deck_height_m": "The deck about 3 ft 3 in above the water (judgement).",
             "rudder": "A blade about 8 ft deep (judgement).",
+            # package 90, A3 (the ground report's §3): the type
+            "helm": "She steers by a tiller on deck: the type's (Holdsworth 1874 p. 104, the "
+            "Yarmouth luggers' mizen stepped to one side for the tiller's play; pp. 196-197, the "
+            "Cornish luggers' mizen stepped forward, out of its way); the fitting on her rudder "
+            "head drawn on ZAZ6306 is read and not identified. Judgement.",
         },
     )
     # her drawn hull, from her sheets (package 75, SW-2; Build-Ships.md §5): drawn only
@@ -9135,6 +9163,7 @@ def smack(out_dir="data/ships"):
             "hull_speed_kn": round(1.34 * math.sqrt(lwl_ft), 1),
             "deck_height_m": deck_height,
             "rudder": {"area_m2": 0.7, "max_angle_deg": 35, "rate_deg_s": 6.0, "span_m": 2.0},
+            "helm": "tiller",
         },
         {
             "length_waterline_m": f"{lwl_ft:.0f} ft: judgement between the {keel_ft:.0f} ft keel "
@@ -9159,6 +9188,10 @@ def smack(out_dir="data/ships"):
             "deck_height_m": "The deck about 2 ft 6 in above the water (judgement).",
             "rudder": "A blade about 6 ft 6 in deep by 1 ft 2 in (judgement, the cutter's in "
             "small).",
+            # package 90, A3 (the ground report's §3): the rule only, as the cutter's
+            "helm": "She steers by a tiller on deck: by the rule only, as the cutter (Falconer "
+            "1780, HELM: a wheel save in small vessels, which need none; Lever 1827, the Rudder, "
+            "fig. 373); no draught of hers is read for it. Judgement.",
         },
     )
 
@@ -10395,8 +10428,20 @@ def boat_cutter_23(out_dir="data/ships"):
 # every helper as `g.<name>`; it is imported only below, after `gen_ships` is made this running
 # script, so that its Builders, DesignLoads and helpers are these, one copy (a Builder of one
 # copy with a DesignLoad of another fails at `dump`: measured, Design-Ship-Indefatigable.md
-# §1.2).
-SHIP_MODULES = ("indefatigable", "neufchatel", "bilander", "bellerophon")
+# §1.2). Package 90 (docs/design/Plan-Package90.md §5.1 item 1) names its five after the four,
+# the same way, smallest first: the tartane, the polacre, the xebec, the Diana and the Purísima
+# Concepción.
+SHIP_MODULES = (
+    "indefatigable",
+    "neufchatel",
+    "bilander",
+    "bellerophon",
+    "tartane",
+    "polacre",
+    "xebec",
+    "diana",
+    "concepcion",
+)
 
 
 if __name__ == "__main__":

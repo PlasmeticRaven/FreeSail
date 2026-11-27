@@ -41,6 +41,17 @@ unless said, the rule's rigs (`Ship.on_schooner_mast`; `tests/test_schooner_mast
   main's lower mast under a square topsail and a lateen on a small mizen; the polacre's
   lateens on her fore and her mizen, her square main with its lower yard and topsail between.
 
+Package 90's stage 0 (docs/design/Plan-Package90.md §5.1 item 9), two probes more, as the
+engine's note built them (docs/design/Design-Package90-Engine.md §0), for the tests to come;
+neither is a ship of the package, and their figures are scratch figures, not hers:
+
+- `xebec_probe()` (from `polacre_probe()`): the polacre probe with her square main, its yards,
+  its booms and its sails replaced by a third whole lateen on a 19 m yard, 150 m2.
+- `three_decker_probe()` (from `seventy-four.yaml`): the 74 with her upper deck renamed
+  `middle`, a new `upper` deck 2.3 m above it with her upper works, rail, quarterdeck,
+  forecastle and poop raised the same, each fit's upper-deck guns copied onto it, and her
+  stations scaled to a company of 839.
+
 Each `..._doc()` gives the document, fresh at every call, for a test that changes it or
 writes it out (`write_ship`, for `make_world`, which reads a path); the functions of the same
 names without it give the `Ship`. The new parts' figures are the design's where it gives them
@@ -261,6 +272,17 @@ POLACRE_MIZEN_LATEEN = {
     "centre_m": 7.0,
 }
 
+# Package 90's two probes more (docs/design/Design-Package90-Engine.md §0), scratch figures, as
+# the engine's note built them. The xebec: the polacre probe's fore lateen's cut a little larger
+# on her main, the yard rated as the fore's and its lines as the fore lateen's.
+XEBEC_MAIN_LATEEN = {"yard_m": 19.0, "truss_m": 12.0, "area_m2": 150, "x_m": 0.0, "centre_m": 9.5}
+# The three-decker: the new upper deck and everything above it raised so far over the 74's upper
+# deck, which becomes her middle deck; the decks so raised; and her company, every station of the
+# 74's scaled to it, the posts as hers.
+THREE_DECKER_RAISE_M = 2.3
+THREE_DECKER_UPPER_WORKS = ("upper", "quarterdeck", "forecastle", "roundhouse")
+THREE_DECKER_COMPLEMENT = 839
+
 
 # ---------------------------------------------------------------------------
 # The fixtures
@@ -371,6 +393,32 @@ def polacre_probe_doc() -> dict[str, Any]:
 
 def polacre_probe() -> Ship:
     return ship_from_dict(polacre_probe_doc(), "tests/rig_fixtures.py:polacre")
+
+
+def xebec_probe_doc() -> dict[str, Any]:
+    """`polacre_probe_doc()` rigged as a xebec: her square main, its yards, booms and sails
+    replaced by a third whole lateen on the main, three lateens and no braced yard (package
+    90's engine note §0; scratch figures)."""
+    doc = polacre_probe_doc()
+    _xebec(doc)
+    return doc
+
+
+def xebec_probe() -> Ship:
+    return ship_from_dict(xebec_probe_doc(), "tests/rig_fixtures.py:xebec")
+
+
+def three_decker_probe_doc() -> dict[str, Any]:
+    """`seventy-four.yaml` with a third gun deck: her upper deck renamed `middle`, a new `upper`
+    deck above it with her upper works raised, each fit's upper-deck guns copied onto it, and
+    her company 839 (package 90's engine note §0; scratch figures, not the Concepción's)."""
+    doc = _file("seventy-four")
+    _three_decker(doc)
+    return doc
+
+
+def three_decker_probe() -> Ship:
+    return ship_from_dict(three_decker_probe_doc(), "tests/rig_fixtures.py:three-decker")
 
 
 def write_ship(doc: dict[str, Any], folder: str | Path, name: str = "fixture") -> Path:
@@ -989,6 +1037,77 @@ def _polacre(doc: dict[str, Any]) -> None:
     _remove(doc, (fore_square - {"fore.lateen"}) | fore_yards | high | booms | spanker)
     doc["aliases"]["foresail"] = "fore.lateen"
     doc["aliases"]["mizen"] = "mizzen.lateen"
+
+
+def _xebec(doc: dict[str, Any]) -> None:
+    """The polacre probe's square main taken out, its course's place in plain and all sail
+    given to a whole lateen on the main (rated as the fore lateen, its canvas the course's)."""
+    like = _like(doc)
+    sails = _by_id(doc["sails"])
+    spars = _by_id(doc["spars"])
+    main = {
+        "yard": spars["fore.lateen_yard"]["rating_kn"],
+        "canvas_no": sails["main.course"]["canvas_no"],
+        "jeers": like("fore.lateen_yard.jeers"),
+        "vang": like("fore.lateen_yard.vang.starboard"),
+        "sheet": like("fore.lateen.sheet"),
+        "tack": like("fore.lateen.tack"),
+    }
+    _take_the_place(doc, "main.lateen", "main.course", only=("plain sail", "all sail"))
+    # the main's square sails and studding sails, and every yard and boom left in her (the
+    # polacre probe's are all the main's)
+    square = {s["id"] for s in doc["sails"] if s.get("yard", "").startswith("main.")}
+    square |= {s["id"] for s in doc["sails"] if s.get("boom", "").startswith("main.")}
+    yards = {s["id"] for s in doc["spars"] if s["class"] in ("yard", "studdingsail_boom")}
+    _remove(doc, square | yards)
+    _whole_lateen(doc, "main.mast", "main.lateen", XEBEC_MAIN_LATEEN, main)
+    doc["groups"].setdefault("fore-and-aft sails", []).append("main.lateen")
+    doc["aliases"]["mainsail"] = "main.lateen"
+
+
+def _raised(points: list, at: int = 1) -> list:
+    """Each point with its figure `at` (its height) raised by `THREE_DECKER_RAISE_M`."""
+    return [[*p[:at], round(p[at] + THREE_DECKER_RAISE_M, 2), *p[at + 1 :]] for p in points]
+
+
+def _three_decker(doc: dict[str, Any]) -> None:
+    """The 74's profile with a middle deck where her upper deck was, the upper deck and the
+    upper works over it raised, her guns and company with them."""
+    profile = doc["hull"]["profile"]
+    for key in ("decks_m", "ports_m", "port_size_m"):
+        by_deck = profile[key]
+        new = {"lower": by_deck["lower"], "middle": by_deck["upper"]}
+        for word in THREE_DECKER_UPPER_WORKS:
+            new[word] = by_deck[word] if key == "port_size_m" else _raised(by_deck[word])
+        profile[key] = new
+    profile["rail_m"] = _raised(profile["rail_m"])
+    for fit in doc["armament"]["fits"].values():
+        guns = []
+        for g in fit["guns"]:
+            if g.get("deck") == "upper":
+                middle = copy.deepcopy(g)
+                middle["deck"] = "middle"
+                middle["id"] = g["id"].replace("gun.upper.", "gun.middle.")
+                guns.append(middle)
+            if g.get("deck") in THREE_DECKER_UPPER_WORKS or g.get("place") in ("bow", "stern"):
+                g = copy.deepcopy(g)
+                g["height_m"] = round(g["height_m"] + THREE_DECKER_RAISE_M, 2)
+            guns.append(g)
+        fit["guns"] = guns
+    crew = doc["crew"]
+    stations = crew["stations"]
+    want = THREE_DECKER_COMPLEMENT - len(crew["posts"])
+    have = sum(stations.values())
+    scaled = {k: int(round(v * want / have)) for k, v in stations.items()}
+    scaled["waisters"] += want - sum(scaled.values())
+    idlers = crew["idlers_by_trade"]
+    share = scaled["idlers"] / stations["idlers"]
+    trades = {k: max(1, int(round(v * share))) for k, v in idlers.items()}
+    trades["servant"] += scaled["idlers"] - sum(trades.values())
+    crew["stations"] = scaled
+    crew["idlers_by_trade"] = trades
+    crew["complement"] = THREE_DECKER_COMPLEMENT
+    doc["ship"]["name"] = "Three-decker (probe)"
 
 
 # ---------------------------------------------------------------------------

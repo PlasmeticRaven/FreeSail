@@ -57,6 +57,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 4.0
     span_m: 3.58
+  # JUDGEMENT: she steers by a tiller on deck, as the privateer schooner, no source read for her helm. Against it, Chapelle 1930 p. 136: the slave brig Diligente of 1839, 100 ft between perpendiculars, whose plan he says does not show her helm but reads as probably a wheel. Her own draughts would settle it, read at her rudder head: RMG ZAZ6177 (her lines) and ZAZ6179 (her sail plan).
+  helm: tiller
   # Her side, decks and ports (Neuf-D §3; Build-Ships.md §5.1): x forward of the middle of her waterline between the rabbets, z above her sailing-trim line at each station, metres; measured on RMG ZAZ6177 (her lines, taken off at Deptford in 1815; 7.05 px/ft, +-0.3 ft) but where a line's note says judgement. Her ports and masts are Neuf's figures forward of the post at deck height, through the join to the after rabbet (tools/ships/neufchatel.py, POST_AT_DECK_FT).
   profile:
     # The top of her side, ZAZ6177 traced by column, the columns of the mast stumps and the deck fittings dropped (measured for the design, re-traced by the checker on both sheets of her lines: aft of her fore channels they agree; forward of them the re-trace stands higher, reported: docs/dev/TuningNotes.md). About 4 ft above the deck at side (Neuf §2.7). ZAZ6179, her sail plan, draws it about 7.8 ft above her water at the main and 8.4 at the fore (measured by the checker), against the lines' 7.5 and 8.1: the lines' figure stands.
@@ -270,7 +272,7 @@ spars:
   side: starboard
   length_m: 13.11
   height_m: 2.56
-  rating_kn: 3.4
+  rating_kn: 3.9
   rigged_out: false
 # Rating: fore.lower.studdingsail.larboard in 18 kn.
 - id: fore.lower.studdingsail_boom.larboard
@@ -279,7 +281,7 @@ spars:
   side: larboard
   length_m: 13.11
   height_m: 2.56
-  rating_kn: 3.4
+  rating_kn: 3.9
   rigged_out: false
 # the fore yard's studding-sail boom, run out 16.1 ft beyond the yardarm (ZAZ6179, measured), spreading the topmast studding sail's foot at the fore yard as the brig-sloop's file has it; Neuf-D §4.7 puts this sail on the topsail yard's boom, read here by the engine's pattern, a studding sail's boom the one at its foot; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topmast.studdingsail.starboard in 18 kn.
 - id: fore.topmast.studdingsail_boom.starboard
@@ -288,7 +290,7 @@ spars:
   side: starboard
   length_m: 4.91
   height_m: 13.23
-  rating_kn: 3.5
+  rating_kn: 4.0
   rigged_out: false
 # Rating: fore.topmast.studdingsail.larboard in 18 kn.
 - id: fore.topmast.studdingsail_boom.larboard
@@ -297,7 +299,7 @@ spars:
   side: larboard
   length_m: 4.91
   height_m: 13.23
-  rating_kn: 3.5
+  rating_kn: 4.0
   rigged_out: false
 # the fore topsail yard's studding-sail boom, run out 6.9 ft beyond the yardarm (ZAZ6179, measured), spreading the topgallant studding sail's foot at the topsail yard as the brig-sloop's file has it; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topgallant.studdingsail.starboard in 18 kn.
 - id: fore.topgallant.studdingsail_boom.starboard
@@ -306,7 +308,7 @@ spars:
   side: starboard
   length_m: 2.1
   height_m: 22.77
-  rating_kn: 1.3
+  rating_kn: 1.5
   rigged_out: false
 # Rating: fore.topgallant.studdingsail.larboard in 18 kn.
 - id: fore.topgallant.studdingsail_boom.larboard
@@ -315,7 +317,7 @@ spars:
   side: larboard
   length_m: 2.1
   height_m: 22.77
-  rating_kn: 1.3
+  rating_kn: 1.5
   rigged_out: false
 sails:
 # the fore course, a working square sail ('the foresail, on the windward yard-arm', Cobb 1841 pp. 106-107; 'sheeted down the foresail', p. 105), 33.3 ft deep, its foot 14 ft above her water (ZAZ6179, measured; 2,000 sq ft as drawn); cut by the brig-sloop's rule, head and foot 0.9 of its yard; two reefs (Cobb p. 95, 'a double reefed foresail', which foresail not said). Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Fore-course': No. 1 or 2; Luce 1884 ch. X p. 171 (Tables.md §1): the working foresail of No. 2, the heavy one of No. 1 (in the sail room)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.

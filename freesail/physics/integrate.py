@@ -38,6 +38,19 @@ from freesail.ship.graph import Ship
 from freesail.ship.parts import HelmMode
 
 SUBSTEPS = 4  # per tick (spec §3.1)
+# A boat towed astern on her painter (package 90, A4; a boat's `towed`): her drag on the ship is
+# her own resistance at the ship's speed (`hull.resistance`, the boat's form) times this.
+# JUDGEMENT: she rides a short painter's length astern in the ship's wake, water the ship drags
+# along with her, so it meets her slower than the sea meets the ship; a wake fraction of about a
+# quarter so near the stern (memory, unverified: the wake measured behind ships' hulls) gives
+# (1 - 0.25) squared, about 0.6, for a drag that goes as the square of the speed. Never tuned to a
+# hull's band: her truths say they are measured with her boat in tow. Past the boat's own hull
+# speed the figure has no ground (the lead's nudge 60, item 8): `hull.resistance`'s wave term,
+# the fourth power of her speed over her hull speed, stands for the bow wave of a hull that
+# cannot climb it, and is carried on there unchecked (the yawl's 7.6 kN at 10.4 kn, about a fifth
+# of the ship's own resistance), where a boat so towed sheers about and ships water rather than
+# dragging so; `world.boats.TOWED_TOO_FAST` says so in words, and the figure is not changed.
+TOW_WAKE_FACTOR = 0.6
 
 
 def water_velocity(ship: Ship) -> tuple[float, float]:
@@ -128,6 +141,13 @@ def _substep(
     tow = ship.extra.get("gear_drag") if isinstance(ship.extra, dict) else None
     if tow:
         drag_u += _rate(-float(tow) * d.u * abs(d.u), d.u)
+    # a boat towed astern on her painter (package 90, A4; `world.boats.keep_in_tow`): her own
+    # resistance at the ship's speed, lessened by the wake she rides in, on the way ahead alone
+    # (making sternway the painter is slack); nothing with no boat in tow
+    in_tow = ship.extra.get("boat_in_tow") if isinstance(ship.extra, dict) else None
+    if in_tow and d.u > 0.0:
+        towed_n = sum(hp.resistance(boat, d.u) for boat in in_tow) * TOW_WAKE_FACTOR
+        drag_u += _rate(towed_n, d.u)
 
     # the oars' thrust along her axis (package 82, item 4; `physics/oars.py`): a boat's
     # hull under oars, nothing for a ship without them or a boat lying on hers

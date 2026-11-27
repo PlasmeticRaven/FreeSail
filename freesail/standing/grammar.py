@@ -56,7 +56,13 @@ from freesail.api import readings as R
 from freesail.orders import errors, resolve
 from freesail.orders import grammar as imperative
 from freesail.orders.errors import OrderError
-from freesail.orders.vocabulary import Vocabulary, load_vocabulary, normalise, strip_article
+from freesail.orders.vocabulary import (
+    Vocabulary,
+    key,
+    load_vocabulary,
+    normalise,
+    strip_article,
+)
 from freesail.physics.wind import GUST_WORDS
 from freesail.standing.rules import (
     RANKS,
@@ -1353,7 +1359,14 @@ def bare_book_sentence(ship: Any, text: str) -> str | None:
     book's sentence the words mean, when they say a standing order's name in quotes (which
     the book then finds case-blind and by any distinct part of its name, `Book.find`), or
     the whole name of one in the book without them; None for anything else, so that
-    `belay the main sheet` is still the line verb."""
+    `belay the main sheet` is still the line verb. One rule between the book and the orders
+    (package 116, card 5): words without quotes that are a whole order of the vocabulary
+    (a verb's phrase or a synonym's, `Vocabulary.phrase_to_verb`) are that order and not the
+    book's, so that `strike the colours` strikes her colours with the fighting book's
+    standing order "the colours" in the book, and `show the colours` hoists them; in quotes,
+    or with the words 'standing order', the sentence is the book's as before (old: the
+    unquoted whole name was the book's first, and a captain striking to an enemy struck a
+    standing order from his book)."""
     runtime = (getattr(ship, "extra", None) or {}).get("standing")
     if runtime is None:
         return None
@@ -1371,6 +1384,8 @@ def bare_book_sentence(ship: Any, text: str) -> str | None:
         if after.strip(" ."):
             return None
         return f'{verb} "{name}"'
+    if key(said) in load_vocabulary().phrase_to_verb:
+        return None
     rule = runtime.book.get(rest.strip(" ."))
     return f'{verb} "{rule.name}"' if rule is not None else None
 

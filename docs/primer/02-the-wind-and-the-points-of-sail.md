@@ -189,7 +189,7 @@ take in the mizen
 
 ### Conning the helm
 
-The rest of the conning words (Luce 1866, ch. XXIV, 'Conning'; Falconer, *Helm*) speak to the wheel rather than to the course, and the game takes them as they were meant:
+The rest of the conning words (Luce 1866, ch. XXIV, 'Conning'; Falconer, *Helm*) speak to the wheel rather than to the course (to the tiller, in the same words, in the cutter, the lugger, the smack, the two schooners and the hermaphrodite brig), and the game takes them as they were meant:
 
 ```orders frigate
 steady

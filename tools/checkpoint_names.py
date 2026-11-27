@@ -2,21 +2,24 @@
 
     python tools/checkpoint_names.py            # the census, compared with the list
     python tools/checkpoint_names.py --write    # the list written again from the census
+    python tools/checkpoint_names.py --write --jobs 4   # the same, on four processes
 
 A checkpoint (`freesail/core/replay.py`) is a pickle, and a pickle names the classes and
 functions its loading calls. The loader admits an exact list of those names
 (`freesail/core/checkpoint_names.py`, `ADMITTED`) and nothing else. This tool makes the
 list from what the game's own checkpoints hold: every scenario under `data/scenarios/`
 begun as the harbour begins it (the server's `prepare_game`), run and checkpointed; the
-kept saves under `tests/fixtures/saves/`; a fight; a port, a ship in it and her business;
-the far world; and the wardroom (`wardroom_world`: the stations seated as play seats them,
-the watcher, the player at a seat, a captain and an officer at work); and a
-practice at the great guns (`practice_world`: a cask heaved over and engaged). The list is written
-from a long census (`LIST_RUN_S`, two hours of each scenario, where the fishermen's gear
-is out and the people's needs have come due); truth 7-606 (`tests/test_known_truths.py`)
-takes the short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own
-holds a name the list lacks, so that a new class in a checkpoint is added to the list on
-purpose and seen in the diff.
+kept saves under `tests/fixtures/saves/`, and each played on with a station left in it
+taken again; a fight; a port, a ship in it and her business; the far world; the wardroom
+(`wardroom_world`: the stations seated as play seats them, the watcher, the player at a
+seat, a captain and an officer at work); a practice at the great guns (`practice_world`: a
+cask heaved over and engaged); and a boat away as a hull (`boat_world`: under oars, then
+under her lug). The list is written from a long census (`LIST_RUN_S`, two hours of each
+scenario, where the fishermen's gear is out and the people's needs have come due) and the
+kin of every class it meets (`kin`); truth 7-606 (`tests/test_known_truths.py`) takes the
+short one (`RUN_S`, ten minutes) and fails when any checkpoint of the game's own holds a
+name the list lacks, so that a new class in a checkpoint is added to the list on purpose
+and seen in the diff.
 
 The census reads the game's own pickles with a recording loader; it never reads a
 checkpoint from elsewhere.
@@ -140,25 +143,56 @@ def census_of_scenario(path: Path, run_s: int = RUN_S, orders: tuple[str, ...] =
     return names_of_bytes(replay.checkpoint_bytes(scenario_world(path, run_s, orders)))
 
 
-def census(say=print, run_s: int = LIST_RUN_S) -> Iterator[tuple[str, set[tuple[str, str]]]]:
-    """(where, names) for every checkpoint of the game's own the census takes."""
-    for path in sorted(FIXTURES.glob("*.checkpoint")):
-        yield f"the kept save {path.name}", names_of_file(path)
-    for path in sorted(FIXTURES.glob("*.json")):
-        say(f"  {path.name}, played on")
-        yield f"the kept save {path.name}, played on", census_of_kept_save(path)
+def jobs(run_s: int = LIST_RUN_S) -> list[tuple]:
+    """The census's checkpoints, each a job a worker can take."""
+    out: list[tuple] = [("fixture", p.name) for p in sorted(FIXTURES.glob("*.checkpoint"))]
+    out += [("kept", p.name) for p in sorted(FIXTURES.glob("*.json"))]
     for path in scenario_files():
-        say(f"  {path.name}")
         # ten minutes (an evolution under way) and the long run (what the hours bring)
-        for seconds in sorted({RUN_S, run_s}):
-            yield f"the scenario {path.name} at {seconds} s", census_of_scenario(path, seconds)
-    for what, name, run_s, orders in WORLDS:
-        say(f"  {what}")
-        yield what, census_of_scenario(SCENARIOS / name, run_s, orders)
-    say("  the wardroom")
-    yield "the wardroom", census_of_wardroom()
-    say("  a practice at the great guns")
-    yield "a practice at the great guns", census_of_practice()
+        out += [("scenario", path.name, seconds) for seconds in sorted({RUN_S, run_s})]
+    out += [("world", i) for i in range(len(WORLDS))]
+    out += [("wardroom",), ("practice",), ("boat",)]
+    return out
+
+
+def run_job(job: tuple) -> tuple[str, set[tuple[str, str]]]:
+    kind = job[0]
+    if kind == "fixture":
+        return f"the kept save {job[1]}", names_of_file(FIXTURES / job[1])
+    if kind == "kept":
+        return f"the kept save {job[1]}, played on", census_of_kept_save(FIXTURES / job[1])
+    if kind == "scenario":
+        return f"the scenario {job[1]} at {job[2]} s", census_of_scenario(
+            SCENARIOS / job[1], job[2]
+        )
+    if kind == "world":
+        what, name, run_s, orders = WORLDS[job[1]]
+        return what, census_of_scenario(SCENARIOS / name, run_s, orders)
+    what, make = {
+        "wardroom": ("the wardroom", census_of_wardroom),
+        "practice": ("a practice at the great guns", census_of_practice),
+        "boat": ("a boat away", census_of_boat),
+    }[kind]
+    return what, make()
+
+
+def census(
+    say=print, run_s: int = LIST_RUN_S, workers: int = 1
+) -> Iterator[tuple[str, set[tuple[str, str]]]]:
+    """(where, names) for every checkpoint of the game's own the census takes, on
+    `workers` processes (each checkpoint its own world)."""
+    todo = jobs(run_s)
+    if workers <= 1:
+        for job in todo:
+            say(f"  {job}")
+            yield run_job(job)
+        return
+    from concurrent.futures import ProcessPoolExecutor
+
+    with ProcessPoolExecutor(workers) as pool:
+        for where, names in pool.map(run_job, todo):
+            say(f"  {where}")
+            yield where, names
 
 
 def census_of_kept_save(path: Path, run_s: int = 3600):
@@ -197,6 +231,33 @@ def practice_world():
         world.submit(order)
         world.run(then)
     return world
+
+
+def boat_world():
+    """A boat away as a hull of the one world (package 82), as the game sends her: the
+    frigate of the naval cruise at anchor, `go to the launch` (her coxswain and oarsmen in
+    her, the player with them), `give way` under oars, `step the mast`, `set the lug`, and
+    sailed so a quarter of an hour."""
+    from freesail.ui.server import prepare_game, server_parser
+
+    args = server_parser().parse_args(["--scenario", str(SCENARIOS / "naval-cruise.yaml")])
+    world = prepare_game(args, say=lambda _line: None)
+    world.run(60)
+    for order, then in (
+        ("go to the launch", 30),
+        ("give way", 600),
+        ("step the mast", 300),
+        ("set the lug", 900),
+    ):
+        world.submit(order)
+        world.run(then)
+    return world
+
+
+def census_of_boat():
+    from freesail.core import replay
+
+    return names_of_bytes(replay.checkpoint_bytes(boat_world()))
 
 
 def census_of_practice():
@@ -283,12 +344,13 @@ def write_list(names: set[tuple[str, str]]) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--write", action="store_true", help="write the list from the census")
+    ap.add_argument("--jobs", type=int, default=1, help="the census on this many processes")
     args = ap.parse_args(argv)
     from freesail.core.checkpoint_names import ADMITTED
     from freesail.core.replay import BOUND_METHODS
 
     found: set[tuple[str, str]] = set()
-    for where, names in census():
+    for where, names in census(workers=args.jobs):
         lacking = names - ADMITTED - {("builtins", "getattr")}
         if lacking:
             print(f"{where}: not in the list: {sorted(lacking)}")

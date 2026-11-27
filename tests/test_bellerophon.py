@@ -1031,7 +1031,13 @@ def test_her_helm_as_tuned_holds_truths_6_and_17():
     points to ten, +0.16, +0.39 and +0.79 at seven points, the beam and ten points (the 64's +0.17,
     +0.43 and +0.76); at six points, her own close-hauled course, 0.97 deg of lee helm (the 64's
     0.95), banded as the 64's. The Bellona's "weatherly helm" (Lavery 1985 p. 9, Table 2) is not
-    reached close-hauled without her griping aback getting under way: for the owner's eye."""
+    reached close-hauled without her griping aback getting under way: for the owner's eye.
+    Package 119 (the owner's word of 2026-11-19): the second wind is 15.5 knots, old 16; the
+    16-knot pass sat on an edge, one ordinary seaman in her starboard fore top (moved, she is
+    aback in 16 knots at the old muster too), and from rest, plain sail, braced sharp up she is
+    taken aback from about 16 to 16.5 knots under either muster, which is left to her author.
+    At 15.5 knots: 58.9 deg, settled in 456 s at the old muster; 57.5 deg, 474 s at five and
+    five's (docs/dev/TuningNotes.md, package 119). The same bounds as at 16."""
     from tests.test_known_truths import reading, run, under_plain_sail
 
     world = under_plain_sail(SEVENTY_FOUR, 270.0)
@@ -1051,7 +1057,7 @@ def test_her_helm_as_tuned_holds_truths_6_and_17():
         assert 0.1 <= helm <= 1.0, (off, helm)
     helm = reading(under_plain_sail(SEVENTY_FOUR, 67.5))["weather_helm"]
     assert -1.5 <= helm <= 0.0, helm  # six points: lee helm, as the 64's
-    for wind_kn in (15.0, 16.0):
+    for wind_kn in (15.0, 15.5):  # package 119; old (15.0, 16.0): 16 kn sat on an edge
         aback, min_off, sternway, settled_at, kn = _truth_17_form(SEVENTY_FOUR, wind_kn)
         assert aback == [], wind_kn
         assert min_off > 45.0 and sternway < 0.5, (wind_kn, min_off, sternway)
@@ -2540,8 +2546,11 @@ def test_a_deck_fired_to_leeward_leaves_out_the_guns_behind_shut_ports_and_says_
 # wanted every fit hand aboard (574, 477, 113 and 118); at B7.c before its review it drew on every
 # hand idle at quarters (196, 181, 61 and 76, the helm, the powder, the carpenter's crew and the
 # surgeon's mates among them) and lent 72, 39, none and none.
+# package 119 (the muster's rule 3: the odd hands of odd stations to the watches in turn): the
+# seventy-four's watches 265 and 265, her party one watch (old `(268, 150, 118)`, her starboard
+# watch of 268; docs/dev/TuningNotes.md, "Package 119")
 TACK_AT_QUARTERS = {
-    SEVENTY_FOUR: (268, 150, 118),
+    SEVENTY_FOUR: (265, 150, 115),
     SIXTY_FOUR: (218, 137, 81),
     "data/ships/brig.yaml": (48, 42, 6),
     "data/ships/hermaphrodite-brig.yaml": (55, 65, 0),

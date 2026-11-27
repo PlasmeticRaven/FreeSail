@@ -34,6 +34,21 @@ OrderHandler = Callable[["Ship", str], tuple[str, str, dict[str, Any]]]
 # same parts, the same yards.
 _SCHOONER_YARDS: weakref.WeakKeyDictionary[Ship, frozenset[str]] = weakref.WeakKeyDictionary()
 
+# A braced yard's level, each ship's (`Ship.yard_level`; package 90, A5), found once a ship from
+# her parts as filed and held here for the same reason as the schooner's yards.
+_YARD_LEVELS: weakref.WeakKeyDictionary[Ship, dict[str, int]] = weakref.WeakKeyDictionary()
+
+# The spars a yard hangs on, by its level: the course on the lower mast, the topsail on the
+# topmast, the topgallant and the royal on theirs.
+YARD_LEVEL_SPARS = ("mast", "topmast", "topgallant_mast", "royal_mast")
+
+
+def _square_foot_m(yard: Spar, sail: Sail) -> float:
+    """A square sail's foot as her file cuts it, at the heights her file gives: its head on its
+    yard and its centre (`centre_height_m`, the centre of its cut) midway between head and foot,
+    so the foot is the centre's height less its depth below the yard (package 90, nudge 39)."""
+    return 2.0 * sail.centre_height_m - yard.height_m
+
 
 class Ship:
     def __init__(self, spec: ShipSpec, fit: str | None = None):
@@ -251,6 +266,111 @@ class Ship:
             yard = p.roles.get("yard") if p.cls == "square" else None
             return yard is not None and yard in self._schooner_yards()
         return isinstance(p, Spar) and p.id in self._schooner_yards()
+
+    def yard_level(self, yard: str | Spar) -> int:
+        """A braced yard's level on its lower mast (package 90, A5; docs/design/Design-Ship-
+        Polacre.md §5.1, decision 6): 0 the course, 1 the topsail, 2 the topgallant, 3 the
+        royal; -1 a yard under the bowsprit, which stands on no mast. Read from its order on its
+        lower mast as filed, not from the class of the spar it hangs on alone: the level of that
+        spar (`YARD_LEVEL_SPARS`) and one more for each braced yard on the same spar below it,
+        so that on a pole mast, the mast and topmast in one stick, the topsail yard crossing the
+        mast's own head over the lower yard is a topsail and not a course (the smack's, the
+        polacre's main). A square yard on a lower mast with no braced yard below it and a whole
+        lateen's yard below it there counts that yard as its level below where its sail is set
+        over the lateen, the sail's foot clear above the lateen's yard (JUDGEMENT, the lead's lean
+        ruled, Plan §13.1 item 2, and narrowed so, nudge 39: the tartane's topsail over her great
+        lateen, the polacre's mizen topsail over her lateen mizen); a square sail whose foot comes
+        down below the lateen's yard is the course, wherever its yard crosses (the tartane's
+        tréou). On every file with one yard to a spar
+        it is the spar's level, as it always was. Found once a ship and held (`_YARD_LEVELS`);
+        any other spar's level is its parent's, or 0."""
+        sp = yard if isinstance(yard, Spar) else self._spar(yard)
+        levels = _YARD_LEVELS.get(self)
+        if levels is None:
+            levels = self._find_yard_levels()
+            _YARD_LEVELS[self] = levels
+        found = levels.get(sp.id)
+        if found is not None:
+            return found
+        parent = self.spars.get(sp.parent) if sp.parent else None
+        cls = parent.cls if parent is not None else ""
+        return YARD_LEVEL_SPARS.index(cls) if cls in YARD_LEVEL_SPARS else 0
+
+    def is_pole_mast(self, mast: str | Spar) -> bool:
+        """A lower mast that is a pole, the mast and topmast in one stick (package 90, A6;
+        docs/design/Design-Ship-Polacre.md §5.1, decision 7): a braced yard above its lowest
+        hangs on the mast itself and no topmast stands on it (the smack's main, the polacre's, a
+        tartane's). Read from the parts as filed, with no key, as the schooner's mast is."""
+        sp = mast if isinstance(mast, Spar) else self._spar(mast)
+        if sp.cls != "mast":
+            return False
+        on_it = [y for y in self.spars.values() if y.cls == "yard" and y.parent == sp.id]
+        if not any(self.yard_level(y) > 0 for y in on_it):
+            return False
+        return not any(s.parent == sp.id and s.cls == "topmast" for s in self.spars.values())
+
+    def on_pole(self, part: str | Part) -> bool:
+        """A braced yard above the lowest on a pole mast (`is_pole_mast`), or the square sail
+        bent to one (package 90, A6): taken in by letting its halyards go and lowering it onto
+        the yard below, and furled from the yard below."""
+        p = self._part(part)
+        if isinstance(p, Sail):
+            yid = p.roles.get("yard") if p.cls == "square" else None
+            if yid is None or yid not in self.spars:
+                return False
+            p = self.spars[yid]
+        if not isinstance(p, Spar) or p.cls != "yard" or not p.parent:
+            return False
+        mast = self.spars.get(p.parent)
+        return mast is not None and self.yard_level(p) > 0 and self.is_pole_mast(mast)
+
+    def _find_yard_levels(self) -> dict[str, int]:
+        """Every braced yard's level (`yard_level`), from the parts as filed, wrecked or sent
+        down or not, each yard's lower mast found by its parents (as `_schooner_yards` finds
+        them), so that the ship's own memos, and so every pickle, are as they were."""
+        yards = [sp for sp in self.spars.values() if sp.cls == "yard"]
+
+        def root_of(sp: Spar) -> Spar:
+            while sp.parent:
+                sp = self.spars[sp.parent]
+            return sp
+
+        out: dict[str, int] = {}
+        for order, sp in enumerate(yards):
+            root = root_of(sp)
+            if root.cls == "bowsprit":
+                out[sp.id] = -1  # under the bowsprit: no mast's
+                continue
+            parent = self.spars.get(sp.parent) if sp.parent else None
+            cls = parent.cls if parent is not None else ""
+            level = YARD_LEVEL_SPARS.index(cls) if cls in YARD_LEVEL_SPARS else 0
+            below = sum(
+                1
+                for i, other in enumerate(yards)
+                if other.parent == sp.parent and (other.height_m, i) < (sp.height_m, order)
+            )
+            level += below
+            if level == 0:
+                # a square sail set over a whole lateen, its foot clear above the lateen's yard,
+                # and no braced yard below it on its mast; not one whose foot comes down below
+                # that yard to the deck (the tartane's tréou, her course: nudge 39, ruling 1)
+                square = self.sail_of(sp)
+                foot = _square_foot_m(sp, square) if square is not None else None
+                for lat in self.spars.values():
+                    sail = self.sail_of(lat) if lat.cls == "lateen_yard" else None
+                    if (
+                        foot is not None
+                        and sail is not None
+                        and sail.cls == "lateen"
+                        and not sail.cut_at_mast
+                        and root_of(lat) is root
+                        and lat.height_m < sp.height_m
+                        and foot > lat.height_m
+                    ):
+                        level = 1
+                        break
+            out[sp.id] = level
+        return out
 
     def _schooner_yards(self) -> frozenset[str]:
         """The ids of the braced yards on a schooner's mast (`on_schooner_mast`), found once a

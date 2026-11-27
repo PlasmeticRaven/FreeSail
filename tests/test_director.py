@@ -23,9 +23,11 @@ from freesail.agents import tools as T
 from freesail.agents.agent import (
     CAPTAIN,
     DIRECTOR,
+    PERSON_WORDS,
     SESSION_DIRECTOR,
     STATION_FACTORIES,
     captain,
+    person_words,
     session_kind_of,
 )
 from freesail.agents.fake import captain_of_the_ship, director_above_the_game
@@ -131,8 +133,12 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     st = STATION_FACTORIES[DIRECTOR](world=w)
     assert st.name == DIRECTOR and st.authority.value == "director" and st.person == ""
     assert st.domain is not None and not st.domain.deck
-    assert st.brief.startswith(D.DIRECTOR_BRIEF) and "The player's brief:" in st.brief
-    assert "A quiet passage" in st.brief and "no wind above 27 knots" in st.brief
+    # the player's brief is the game's words, in the situation (package 117); the station
+    # brief says where it is and that its limits are held by the game as far as it can judge
+    assert st.brief.startswith(D.DIRECTOR_BRIEF) and st.brief.endswith(D.PLAYERS_BRIEF_WHERE)
+    assert "A quiet passage" not in st.brief
+    players = D.players_brief_words(w)
+    assert "A quiet passage" in players and "no wind above 27 knots" in players
     # the owner's refinement (2026-10-17): the forms are examples, not a rule
     assert "examples of reasonable orders, not as the whole of what you may try" in st.brief
     assert "attempted when you think it reasonable" in st.brief
@@ -152,11 +158,15 @@ def test_the_station_is_made_with_the_players_brief_after_the_fixed_part_and_the
     assert "the chart tool is not the truth" in st.brief
     head = h.brief.text()
     assert "taking the station of the director" in head and SESSION_DIRECTOR in head
-    assert "The voyage:" in head  # the voyage's words, as the captain's brief has them
+    # the voyage's words, as the captain's brief has them, and the player's brief: the
+    # game's, in the situation after the brief (package 117)
+    assert "The voyage:" not in head and "The voyage:" in h.brief.situation
+    assert "The player's brief:\nThe voyage's brief: A quiet passage" in h.brief.situation
     assert "no order of any ship" in head
     assert "his standing orders as the book holds" not in head  # no captain over the director
+    assert "his standing orders as the book holds" not in h.brief.situation
     # the fixed brief head's order holds (truth 46), whatever the station brief says
-    assert h.brief.order == ("disclosure", "opt_out", "documentation", "authority", "situation")
+    assert h.brief.order == ("disclosure", "opt_out", "documentation", "authority")
 
 
 def test_every_order_of_the_ship_is_refused_at_the_director_and_the_readings_are_read():
@@ -1317,7 +1327,7 @@ def test_the_line_opens_every_sample_with_the_place_the_deck_and_the_state():
     w = world_at(49.5, -5.5)
     h = seat_captain(w, ["go below"])
     w.run(1)
-    first = next(t.content for t in h.turns if t.role == "data")
+    first = next(t.content for t in h.turns if t.role == "data" and "situation" not in t.content)
     assert list(first)[0] == "you"
     assert first["you"].startswith("You: the captain, on the quarterdeck, since 10:00; the deck ")
     assert first["you"].endswith("on your feet since 10:00; Wednesday 12 June 1805.")
@@ -1377,7 +1387,8 @@ def test_an_officer_bound_to_nobody_on_a_merchantman_is_the_mate():
     assert merchant_ship(cutter) and officer_rank(cutter) == ("the mate", "mate")
     st = officer(world=cutter)
     assert st.person == "the mate" and st.rank == "mate"
-    assert "first lieutenant" not in st.brief and "in the place of the mate" in st.brief
+    assert "first lieutenant" not in st.brief and f"in the place of {PERSON_WORDS}" in st.brief
+    assert "whose place you take: the mate" in person_words(st)  # the situation's (117)
     frigate = world_at(49.5, -5.5)
     assert not merchant_ship(frigate) and officer_rank(frigate)[1] == "first lieutenant"
 
@@ -1452,7 +1463,7 @@ UNPERFORMED_HERE = {
 
 
 def _forms_worlds() -> list[Any]:
-    """The test's three seas for the forms, each made when first wanted: a fresh one; one
+    """The test's seas for the forms, each made when first wanted: a fresh one; one
     with the brig-sloop Harpy at far detail, 46 miles off with her captain's intent; and one
     with Harpy and the frigate Medusa three miles off and crewed, in sight of the frigate,
     Mr Fox and Mr Veale aboard, a low on the systems and a packet on the cabin table. No
@@ -1487,6 +1498,10 @@ def _forms_worlds() -> list[Any]:
             "bound for Falmouth",
             'squadron: "the Channel squadron" of Britain under the Medusa with the Nimble, keep '
             "the station off the Deadman within 8 miles",
+            # package 115 C: a French lugger thirty miles off made a prize of the Medusa's,
+            # for the prize court's sentence on her
+            'ship: a lugger "Furet" of France at 49 00 N 6 20 W, running home to Brest',
+            'ship "Furet": a prize of the Medusa',
         ):
             assert w.world_order(order, "the test").data["result"] == "done", order
         w.run(120)
@@ -1748,7 +1763,7 @@ def test_the_seats_spending_is_in_the_directors_budget_line_and_its_brief_says_t
     brief = D.station_brief_text(w)
     assert "A seat costs the owner money." in brief and "paid for by the owner" in brief
     assert "answer the player:" in brief and "phrased without world detail" in brief
-    assert brief.index("A seat costs") < brief.index("The player's brief:")
+    assert brief.index("A seat costs") < brief.index(D.PLAYERS_BRIEF_WHERE)
     assert "The seats held" not in D.budget_words(w)
     w.world_order(f"seat: {SEATED} as officer for 20 samples")
     assert D.budget_words(w).endswith(
@@ -1821,3 +1836,28 @@ def test_the_players_word_and_the_directors_answer_by_every_road_and_none_in_the
     copy = replay.replay(json.loads(json.dumps(w.save())), ship_factory)
     assert copy.log.digest() == w.log.digest()
     assert [x["text"] for x in D.channel_lines(copy)][:2] == answers[:2]
+
+
+def test_an_order_through_the_first_hulls_hand_runs_on_her_on_the_copy_and_the_world():
+    """Package 118, item 2 (the reader of 2026-11-19): the director's tools hold his first
+    hull's handle, and the copy an order is tried on and judged on had no current hull of
+    its own and read its followed one. With another hull followed, an order given through
+    the first hull's handle is tried, judged and performed on her, the copy as the world."""
+    from tests.test_crews import hove_to_world
+    from tests.test_crews import put as put_crewed
+
+    w = hove_to_world()
+    frigate = w.players
+    b = put_crewed(
+        w, "merchant brig", "britain", "49 33 N 5 30 W", "bound for Falmouth", "bound for Falmouth"
+    )
+    w.run(61)
+    D.direct(w, f'follow "{b.name}"', by="t")
+    said = D.direct(w, "aboard: the boat gone adrift [reason: test]", by="t")
+    assert said.startswith("Done:"), said
+    assert w.own.dealings.boat.lost and not frigate.dealings.boat.lost
+    D.budget_of(w).acts = 0
+    said = D.direct(frigate, "aboard: the boat gone adrift [reason: test]", by="t")
+    assert said.startswith("Done:"), said
+    assert frigate.dealings.boat.lost
+    assert "the boat is lost already" in D.dry_run(frigate, "aboard: the boat gone adrift")

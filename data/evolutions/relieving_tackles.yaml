@@ -9,6 +9,15 @@
 # tiller-ropes are shot away". Falconer 1780's RELIEVING-TACKLES are the careening tackles,
 # another use of the name. One phase, `reeve`; at its end the helm answers again. Her
 # steering meanwhile is as it was, the rudder held where the shot left it.
+#
+# By the tackles she answers more slowly than by the wheel.
+# `helm_rate_share` is the share of the wheel's rate (the rudder's `rate_deg_s` of her own
+# file) at which the tiller is hauled over by the tackles, the helm's orders passed below:
+# a half. That it is slower is Luce's (1884: with the relieving tackles hooked "you cannot
+# steer the ship with that nicety that you can with the wheel"); the figure is JUDGEMENT, no
+# source found for it. The script writes it to the ship as the tackles are rove and the
+# helmsman's rate reads it there (`physics.hull.steer`); `repair the wheel`
+# (repair_wheel.yaml) gives her the wheel's rate again.
 id: relieving_tackles
 verb: rig_the_relieving_tackles   # the work as the log names it: "rigging the relieving tackles"
 applies_to: {class: ship}
@@ -16,11 +25,12 @@ script: relieving_tackles
 params: {}
 preconditions: []
 timing:
+  helm_rate_share: 0.5   # by the tackles, half the wheel's rate (JUDGEMENT; Luce 1884 says slower, and no figure)
   reeve_s: 300   # hooked to the tiller and manned below: five minutes (JUDGEMENT; Luce's quarter bill keeps men stationed at them, so the tackles are at hand)
-on_start: {log: "Rig the relieving tackles! Hands below to the tiller."}
+on_start: {log: "{begin}"}
 on_complete: {log: "{done}", kind: helm.relieved, severity: notable}
 on_fail: {log: "Could not rig the relieving tackles: {reason}.", kind: evolution.failed, severity: notable}
 # crew: "an officer or quartermaster, with a few men" (Luce 1884, l. 21775): six hands
 # (JUDGEMENT in the number: two tackles, three a fall)
 crew: {hands: 6, rating: ordinary, stations: [afterguard, waisters]}
-source: "Steel 1794, RELIEVING-TACKLES (the tiller-ropes damaged); Luce 1884, the quarter bill and ch. on tackles (to steer if the wheel or tiller-ropes are shot away); Falconer 1780, HELM and TILLER; the minutes and the hands JUDGEMENT"
+source: "Steel 1794, RELIEVING-TACKLES (the tiller-ropes damaged); Luce 1884, the quarter bill and ch. on tackles (to steer if the wheel or tiller-ropes are shot away, and not with the wheel's nicety); Falconer 1780, HELM and TILLER; the minutes, the hands and the half of the wheel's rate JUDGEMENT"

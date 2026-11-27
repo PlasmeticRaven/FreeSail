@@ -275,6 +275,8 @@ def _evolution_ids(verb: str, vocab: Vocabulary) -> set[str]:
     if verb == "rig the relieving tackles":
         # `belay the relieving tackles` (the lead's reading of part D at 60af48e, item 6)
         return {"relieving_tackles"}
+    if verb == "repair the wheel":
+        return {"repair_wheel"}  # `belay the wheel` (package 116): the work by its own name
     if verb == "send the boat":
         return {"send_boat"}  # `belay the boat` (package 109): the port's boat, on her errand
     from freesail.orders import ground_tackle  # local import: it imports the verbs
@@ -341,7 +343,7 @@ def _by_order(
     if not evos:
         return None
     subjects: set[str] | None = None
-    what = _gerund_words(order.verb)
+    what = _work_words(ship, order.verb, vocab)
     if order.object:
         try:
             res = resolve.resolve(ship, order.object, order.side_word, order.verb)
@@ -370,7 +372,7 @@ def _by_kind(
     if rest and rest[0] in _JOINING:
         rest = rest[1:]
     subjects: set[str] | None = None
-    what = _gerund_words(verb)
+    what = _work_words(ship, verb, vocab)
     if rest:
         ids = _part_ids(ship, strip_article(rest), vocab)
         if ids is None:
@@ -412,3 +414,22 @@ def _part_ids(ship: Ship, words: list[str], vocab: Vocabulary) -> list[str] | No
 def _gerund_words(verb: str) -> str:
     first, _, rest = verb.partition(" ")
     return f"{gerund(first)} {rest}".strip()
+
+
+def _work_words(ship: Ship, verb: str, vocab: Vocabulary) -> str:
+    """The work an order's verb starts, named as the log names it on this ship once it is begun:
+    its script's own name for it by the ship where it has one (`Script.work_of`: the helm's mend
+    by her helm, from the one table, `evolutions.scripts.helm_words`), else the verb's gerund.
+    Package 90, A3 (nudge 45): a tiller hull asked to belay a mend not in hand was told "Nothing
+    in hand or waiting is repairing the wheel", the vocabulary's verb."""
+    from freesail.evolutions import registry
+    from freesail.evolutions.scripts import SCRIPTS
+
+    evos = _evolution_ids(verb, vocab)
+    if len(evos) == 1:
+        evo = registry.get(next(iter(evos)))
+        cls = SCRIPTS.get(evo.script) if evo is not None and evo.script else None
+        own = cls.work_of(ship) if cls is not None else None
+        if own:
+            return _gerund_words(own)
+    return _gerund_words(verb)

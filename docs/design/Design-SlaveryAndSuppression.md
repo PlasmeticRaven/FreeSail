@@ -26,6 +26,12 @@ difference said (§1.3). The game's years are about 1792 to 1825 (decision 66). 
 the 1820 edition unless 1827 is said; *Peters* the US *Statutes at Large*; the OCR is rough, and
 any figure here that becomes a game constant is read on the page image first.
 
+**Amended 2026-11-20 (decision 76 of the proposal):** the corsair's station is open by consent
+to a model and to a player, and is built as a package of its own in the career's milestone, with
+a rules-based corsair that needs nobody seated; a slave ship's master stays the rules' alone. The
+sentence above ("no player and no seated model is put at a slaver's station or a corsair's") now
+holds for the slaver's station only. The owner's words and what follows from them are in §8.
+
 **The owner answered the note's nine questions on 2026-11-13 (§11):** the recommendations
 stand on eight; on the fifth, a corsair's station may be held by a model under a brief that says
 plainly and in full what the station is and may do (§8.1). The note below is brought to the
@@ -568,6 +574,50 @@ own process, as `ConsentRevision-AdversarialSeats.md` was.
   letter of redemption); it is asked never to describe suffering for effect, and its brief says so
   in-world.
 
+**Amended 2026-11-20: the corsair's station opened by consent (the proposal's decision 76).** The
+owner looked again at the two rulings above, under decision 74 (the world functions, and the
+player is in it):
+
+> "we've built a consent system centered around directness, honesty, and free choice, and we might
+> allow a model or player to choose to play as a corsair, understanding the implications, the model
+> being briefed in the consent, and the player understanding by primer and by being informed, either
+> at scenario start, or by the world, of the implications of taking a corsair role. I don't intend
+> to play as a corsair, but it doesn't entirely make sense to me to make them rules-only."
+
+> "Agreed on drawing the line at a slave ship's master, a corsair, open and honest without
+> glorification of the reality is acceptable, and may be built alongside a robust rules-based system
+> so that a model never need be seated for the system to function. We can build this as a package
+> rather than a widening of 90, so you have direct oversight, as it's a general system. It can be
+> placed in the career milestone, the polacre's and xebec's corsair fits held for it."
+
+So, replacing the second and third points above where they differ:
+
+- **A slave ship's master is the rules' alone,** for every player and every model, as the first
+  point says. That line does not move.
+- **A corsair's station may be held by a model or by a player,** each by a free choice made
+  knowing what the station is and may do. For a model that is the consent brief, where the
+  corsair's station is its own question, said plainly and in full (§8.1 is the proposal for its
+  words); a model that declines it is not asked to hold any part of it, and its leaving is as free
+  as at every station. For a player it is the primer's own passage and being told in words, at the
+  scenario's start or by the world, before the station is taken. The condition of 2026-11-13 (no
+  kind of vessel kept from the player) is met the more easily: nothing is kept.
+- **Told openly and honestly, without glorification.** What a regency's cruiser did is said in the
+  game's plain words where it bears on the play (a capture, the people of the prize carried to the
+  regency, ransom and redemption as §6 and question 4 have them); nothing of it is drawn for
+  effect, no sum is reckoned for a person, and captivity is told in a few plain lines, never
+  played out.
+- **The rules' own corsair is built whole,** its captain's doctrine, its errand and its dealings
+  with a prize complete, so that the world's corsairs sail, cruise and take with nobody seated and
+  no model need ever be asked.
+- **The other side is told.** A player whose ship meets a cruiser that a model commands is told, as
+  for every adversarial seat, and nothing between them is hidden from the owner.
+- **Where it is built.** A package of its own under the lead (not a widening of package 90), placed
+  in the milestone of the world that moves and the career. The polacre's and the xebec's corsair
+  fits are held for it; the hulls themselves are package 90's and sail in the meantime under their
+  other fits.
+- **Until then nothing changes in the game:** it refuses the seat in words, as today. The consent
+  documents are revised only by the owner's own process, and no package edits them.
+
 ### 8.1 What a corsair's brief must say (a proposal; the consent documents untouched)
 
 The sentences below are what the brief would add, in its own voice and in the sections the re-ask
@@ -687,7 +737,9 @@ Given through the lead the same day, and recorded in decision 68's postscript in
    station**, the same day: "I'm not going to decide on the player in control of a corsair, as long
    as no vessel type is specifically restricted to corsairs and restricting the player wouldn't keep
    them from sailing a certain vessel type, it's probably OK to restrict." So it stays closed for
-   now, on the condition that no kind of vessel is thereby kept from the player (§8.2).
+   now, on the condition that no kind of vessel is thereby kept from the player (§8.2). **Looked at again on 2026-11-20** (the proposal's decision 76): the station
+   is open by consent to a model and to a player, built as its own package in the career's
+   milestone; a slave ship's master stays closed to all (§8, the amendment).
 6. **The people aboard a vessel of the trade:** a count with one plain sentence on her record,
    never persons the systems act on (as recommended).
 7. **The Southampton scans:** scans under a non-commercial licence are cited and not kept (as

@@ -12,7 +12,7 @@ from datetime import datetime
 import pytest
 
 from freesail.agents import Fake, Harness, SamplingPolicy, call, reply, tools
-from freesail.agents.agent import officers_words
+from freesail.agents.agent import PERSON_WORDS, officers_words, person_words
 from freesail.agents.remote import make_station
 from freesail.agents.seat import seat_player
 from freesail.api import queries
@@ -323,12 +323,14 @@ def test_the_frigates_officers_are_named_by_number_or_person_and_each_brief_says
     assert stations.resolve("officer 1") == OFFICER
     st = make_station(w, "officer 2", None)
     assert st.name == "second officer" and st.person == "Mr Pascoe" and st.rank == "lieutenant"
-    assert "in the place of Mr Pascoe" in st.brief
+    assert f"in the place of {PERSON_WORDS}" in st.brief  # his name: the situation's (117)
+    assert "whose place you take: Mr Pascoe" in person_words(st)
     words = officers_words(w, "second officer")
     assert words.startswith("The officers of the watch: the officer of the watch (Mr Pearce")
     assert "the second officer (Mr Pascoe, second lieutenant, the starboard watch)" in words
     assert "the third officer (Mr Russell, third lieutenant, the larboard watch)" in words
-    assert "You are the second officer." in st.brief
+    # said in the situation after his brief (package 117: the names are the game's)
+    assert "You are the second officer." in words and "Mr Pearce" not in st.brief
     seat = seat_player(w, "Mr Russell")
     assert seat.station.name == "third officer" and seat.station.person == "Mr Russell"
     # a ship with one officer's station: no such words

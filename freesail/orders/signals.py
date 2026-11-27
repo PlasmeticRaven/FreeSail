@@ -279,6 +279,11 @@ _SAIL_WORDS = (
     "brig-sloop",
     "chasse-maree",
     "chasse-marée",
+    # package 90's men of war, keyed before their files come (docs/design/Plan-Package90.md
+    # §5.1 item 7)
+    "corvette",
+    "xebec",
+    "three-decker",
 )
 
 

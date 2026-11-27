@@ -411,10 +411,17 @@ HULL_AS_FILED = {
 # What a gun gains by this step: the height the lee port will read (none reads it yet: the module
 # freesail/combat/ports.py's stage 0) and the deck word.
 GUN_DRAWN_KEYS = {"height_m", "deck"}
+# Package 90, A3 (the helm's kind; docs/dev/TuningNotes.md, "Package 90, A3"), old beside new: her
+# hull's `helm`, said nowhere before (the wheel, the key's default) and the tiller now, the one key
+# the step writes into her file, after her existing keys and before the profile. The physics reads
+# it not: only the helm's words do (`evolutions.scripts.helm_words`).
+HELM_A3 = (None, "tiller")
 
 
 def test_the_hull_figures_stand_as_filed(doc):
     hull = {key: value for key, value in doc["hull"].items() if key != "profile"}
+    # package 90, A3: her helm, held to its move and taken out here only
+    assert hull.pop("helm", None) == HELM_A3[1]
     assert hull == HULL_AS_FILED
     masts = {s["id"]: s for s in doc["spars"]}
     assert masts["main.mast"]["x_m"] == 1.5 and masts["main.mast"]["rake_deg"] == 5.2
@@ -429,8 +436,12 @@ def test_a_diff_of_her_physics_keys_against_git_shows_none(doc):
     if done.returncode != 0:
         pytest.skip(f"the base commit {BASE} cannot be read here")
     filed = yaml.safe_load(done.stdout.decode("utf-8"))
-    assert {key: v for key, v in doc["hull"].items() if key != "profile"} == filed["hull"]
-    assert list(doc["hull"])[:-1] == list(filed["hull"])  # the existing keys keep their order
+    hull = {key: v for key, v in doc["hull"].items() if key != "profile"}
+    # package 90, A3, old beside new: her helm, the one key it writes, taken out here only
+    assert (filed["hull"].get("helm"), hull.pop("helm", None)) == HELM_A3
+    assert hull == filed["hull"]
+    assert list(doc["hull"])[:-2] == list(filed["hull"])  # the existing keys keep their order
+    assert list(doc["hull"])[-2:] == ["helm", "profile"]
     assert list(doc) == list(filed)
     # of the ship's own keys her source note alone is reworded; and (package 75, SW-4:
     # Build-Ships.md §8.1, §8.2, §16.1, old beside new) her descriptions land in her own file,

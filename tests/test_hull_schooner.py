@@ -454,12 +454,32 @@ HULL_FIGURES = {
     "deck_height_m": 0.9,
 }
 
+# Package 90, item 37 (step A0; the owner's choice (a) of its question 2, 2026-11-18;
+# docs/design/Design-Package90-Engine.md §1.5), old beside new: the generator's peak for the
+# studding class read from the engine's curves, 1.44 for 1.25, so her fore topmast studding-sail
+# booms and her ringtail boom are rated as the rule intended. The ratings it writes, kN, the same
+# in both files (TuningNotes, "Package 90, A0").
+ITEM_37 = {
+    "fore.topmast.studdingsail_boom.starboard": (2.2, 2.6),
+    "fore.topmast.studdingsail_boom.larboard": (2.2, 2.6),
+    "ringtail_boom": (3.9, 4.5),
+}
+
+
+# Package 90, A3 (the helm's kind; TuningNotes, "Package 90, A3"), old beside new: the hull's
+# `helm`, said nowhere before (the wheel, the key's default) and the tiller now, the one key the
+# step writes into both files (one hull dict of the generator's). The physics reads it not: only the
+# helm's words do (`evolutions.scripts.helm_words`).
+HELM_A3 = (None, "tiller")
+
 
 @pytest.mark.parametrize("path", BOTH)
 def test_no_figure_the_physics_reads_moved(path):
     """§5.0 principle 8, §5.6: her hull's figures as filed, and a diff of her file's physics keys
     against git, the commit before her hull, shows none: only the profile is added, and only a port
-    or rail gun's height and its deck move (§5.3)."""
+    or rail gun's height and its deck move (§5.3), but the keys a ruled move names, old beside new
+    (package 75's SW-4; package 90's item 37, her three booms' ratings, and A3, her hull's
+    `helm`)."""
     now = yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
     for key, value in HULL_FIGURES.items():
         assert now["hull"][key] == value, key
@@ -489,6 +509,15 @@ def test_no_figure_the_physics_reads_moved(path):
         (old,) = [g for g in before_view["fits"]["long tom"] if g["place"] == "pivot"]
         (new,) = [g for g in now_view["fits"]["long tom"] if g["place"] == "pivot"]
         assert (old.pop("arc_deg"), new.pop("arc_deg")) == ([60.0, 140.0], [62.0, 141.0])
+    # Package 90, item 37: her booms' ratings, held to their move and put back here only
+    spars_before = {s["id"]: s for s in before_view["spars"]}
+    spars_now = {s["id"]: s for s in now_view["spars"]}
+    moved = {sid: (spars_before[sid]["rating_kn"], spars_now[sid]["rating_kn"]) for sid in ITEM_37}
+    assert moved == ITEM_37
+    for sid in ITEM_37:
+        spars_now[sid]["rating_kn"] = spars_before[sid]["rating_kn"]
+    # Package 90, A3: her helm, held to its move and taken out here only
+    assert (before_view["hull"].get("helm"), now_view["hull"].pop("helm", None)) == HELM_A3
     assert now_view == before_view
 
 

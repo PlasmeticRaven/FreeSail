@@ -74,6 +74,7 @@ from freesail.world.geo import (
     format_position,
     parse_position,
 )
+from freesail.world.service import free_intent_role
 
 __all__ = [
     "ACTOR_PREFIX",
@@ -166,6 +167,17 @@ ACTOR_PREFIX = "captain's rule "
 # reads where she is (judgement).
 JUDGE_EVERY_S = 60
 JUDGE_FIRST_S = 300
+
+# A whole lateen's practice and its board on the bad hand (package 90, A1c; the lead's ruling of
+# 2026-11-18, nudge 18; docs/design/Design-Package90-Engine.md §2.3 item 6). The rules captain
+# keeps the ship's practice ("shift" in both) and, by their book's `lateen_leave_kn` and
+# `bad_hand_s` read with these defaults (written in no committed book, so that no book's count
+# moves: `tests/test_subtypes.py`), leaves the yards in stays in fine weather (Stratico,
+# BISDOSSO: "con tempo bello"), sets the practice back as it freshens, and shifts a yard left on
+# the bad hand after a long board on it (the 2018 inventory's long boards; a little before the
+# probes' break-even, 34 to 67 minutes at the ruled rate). JUDGEMENT on every figure.
+LATEEN_LEAVE_KN = 12.0
+BAD_HAND_S = 1800
 
 # The states in which the rules-based captain keeps the deck himself over a seated officer
 # (package 41, spec M6 §11: he takes it back "for a judgement that needs the deck"): the
@@ -318,24 +330,48 @@ SIZE_RANK: dict[str, int] = {
     "seventy-four": 4,
     "hermaphrodite brig": 2,
     "bilander": 1,
+    # package 90's ships (docs/design/Plan-Package90.md §5.1 item 6; their files and rows come
+    # with each ship): the tartane the cutter's class; the polacre and the xebec a brig's, by
+    # their size; the corvette, a ship-sloop, the brig-sloop's (Design-Ship-Diana.md §11); and
+    # the three-decker a class above the ships of the line, compared and never an index (the
+    # owner's answer to question 8, 2026-11-18, Decisions-Package90-2026-11.md)
+    "tartane": 1,
+    "polacre": 2,
+    "xebec": 2,
+    "corvette": 2,
+    "three-decker": 5,
 }
 # The class of a ship of the line (the sixty-four and the seventy-four above), for the rank-4
 # rule (package 75, B7.e; docs/design/Design-Ship-Bellerophon.md §8.3): a lone King's ship of a
 # lower class hauls off from an enemy of this class made out within her doctrine's
 # `line_of_battle_nm` (`Judgement._line_of_battle_nm`): Maitland held three frigates hardly a
-# match for one ship of the line (p. 78).
+# match for one ship of the line (p. 78). The three-decker's 5 (package 90) is of the line too:
+# every reader compares a rank with this one as at least it.
 LINE_OF_BATTLE_RANK = 4
 # Matched in order, the first word found ranking her (`size_of_words`, `size_rank_of`): the
 # razee's first, since her words hold "frigate" and "sixty-four" (cut down from one), then
-# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8)
+# the ships of the line's, before "a ship" makes a frigate of them (package 75; Indf §8).
+# Package 90 (docs/design/Plan-Package90.md §5.1 item 6): each of its words before any row that
+# matches inside it or inside the words that name her: the three-decker's and the first rate's
+# before "ship of the line" ("a first rate, a ship of the line" is of rank 5); the corvette's,
+# the ship-sloop's and the xebec's before "a ship" ("a ship-sloop" holds it); the polacre's
+# before "a ship" and "brig" ("a polacre-ship", "a polacre brig"); the tartane's with them
 _SIZE_WORDS: tuple[tuple[str, int], ...] = (
     ("razee", 3),
     ("sixty-four", 4),
     ("seventy-four", 4),
+    ("three-decker", 5),
+    ("first rate", 5),
     ("ship of the line", 4),
     ("two-decker", 4),
     ("bilander", 1),
     ("frigate", 3),
+    ("corvette", 2),
+    ("ship-sloop", 2),
+    ("ship sloop", 2),
+    ("xebec", 2),
+    ("polacre", 2),
+    ("tartane", 1),
     ("a ship", 3),
     ("brig", 2),
     ("schooner", 1),
@@ -1053,8 +1089,8 @@ def role_for(world: Any, intent: Intent | None, given: str = "", sub_type_role: 
         return "packet"
     if intent is not None and intent.convoy:
         return "commodore"  # package 71: the convoy's escort, by the intent's words
-    if intent is not None and intent.kind in ("home", "passage", FREE) and _is_kings_ship(world):
-        return "kings-ship"  # a free intent's too (package 86): her service's role
+    if intent is not None and intent.kind in ("home", "passage", FREE):
+        return free_intent_role(world)  # her papers', else her wardroom's (packages 86, 121)
     return "merchant"
 
 
@@ -3177,6 +3213,7 @@ class Captain(Judgement):
         self._weather_work(p, kinds)
         if state not in ("at anchor", "in port", "in distress"):
             self._head_sails_straining(p, events)
+            self._lateen_work(p)  # package 90, A1c: nothing on a hull with no whole lateen
         if ABACK_RECOVER and state in ABACK_RECOVER_STATES and self._aback_with_no_way(p, kinds):
             return  # boxing her off: the state's own work waits for her way
         if DANGER_AHEAD and state in DANGER_AHEAD_STATES and self._danger_ahead_by_chart(p):
@@ -3220,6 +3257,8 @@ class Captain(Judgement):
                 self._waiting_at_road = False
         if "sail.across_the_stern" in kinds and state not in ("hove to for weather", "in distress"):
             self._across_the_stern(events)
+        if "sail.across_the_bow" in kinds and state not in ("hove to for weather", "in distress"):
+            self._across_the_bow(events)  # package 90, A1c: its whole lateens
         if "ship.brought_up" in kinds:
             self._business["brought_up"] = True
         if "ship.under_way" in kinds or "ship.aweigh" in kinds:
@@ -3562,10 +3601,74 @@ class Captain(Judgement):
             sl = sails.get(sid)
             if sl is not None and sl.is_set:
                 self.give(f"dip the {self._sail_name(sid)}", why=why)
+        self._shift_lateens_left(data, why)  # package 90, A1c: as a lug is dipped
         if data.get("yards"):
             self.give("trim sails", why=why)
         elif data.get("booms"):
             self.give("trim the sheets", why=why)
+
+    def _shift_lateens_left(self, data: dict[str, Any], why: str) -> None:
+        """Each whole lateen the watch's line said lies on its mast, still set, shifted by its own
+        order (package 90, A1c), as a lug left against its mast is dipped; one shifted since is
+        refused as done."""
+        sails = getattr(self.world.ship, "sails", {}) or {}
+        for sid in data.get("lateens") or []:
+            sl = sails.get(sid)
+            if sl is not None and sl.is_set:
+                self.give(f"shift the {self._sail_name(sid)}", why=why)
+
+    def _across_the_bow(self, events: list[Any]) -> None:
+        """The wind come round ahead through her bow outside a manoeuvre (package 90, A1a's line,
+        `navigation.watch_the_stern`): the whole lateens it left on their masts shifted (A1c),
+        as after the wind across the stern. The lugger's lugs the line names are not his to dip
+        here: their answer is not of this card, and the lugger's runs stay as they were."""
+        crossed = [e for e in events if e.kind == "sail.across_the_bow"]
+        if crossed:
+            self._shift_lateens_left(crossed[-1].data or {}, "the wind round ahead through the bow")
+
+    def _lateen_work(self, p: Perception) -> None:
+        """A hull with a whole lateen (package 90, A1c; Design-Package90-Engine.md §2.3 item 6):
+        the ship's practice in stays set by the mean true wind, `leave the lateens in stays` as it
+        falls under `lateen_leave_kn` and `shift the lateens in stays` as it rises over it, each
+        once at the crossing, as a standing order would, so that every tack by any road reads it;
+        the yards left on the bad hand shifted, each by its own order, as the wind rises over it
+        or after a board of `bad_hand_s` on it, while no manoeuvre is in hand. Both figures from
+        his book, read with their defaults. A hull with none: nothing, and nothing kept."""
+        from freesail.evolutions import scripts
+
+        ship = self.world.ship
+        if not scripts.has_whole_lateen(ship):
+            return
+        d = self.doctrine
+        th = d.threshold if d is not None else (lambda k, v=None: v)
+        leave_kn = float(th("lateen_leave_kn", LATEEN_LEAVE_KN))
+        b = self._business
+        light = p.wind_kn < leave_kn
+        was = b.get("lateen_light")
+        b["lateen_light"] = light
+        if was is None or was != light:
+            wanted = "leave" if light else "shift"
+            if scripts.lateen_practice(ship).get("stays") != wanted:
+                said = "under" if light else "over"
+                why = f"the wind {said} {leave_kn:g} knots"
+                self.give(f"{wanted} the lateens in stays", why=why)
+        left = scripts.lateens_on_their_masts(ship)
+        if not left or p.manoeuvre not in ("none", ""):
+            b.pop("bad_hand_since", None)
+            return
+        since = b.setdefault("bad_hand_since", p.tick)
+        risen = was is True and not light
+        board = p.tick - since >= float(th("bad_hand_s", BAD_HAND_S))
+        if not (risen or board):
+            return
+        b.pop("bad_hand_since", None)
+        why = (
+            f"the wind risen over {leave_kn:g} knots"
+            if risen
+            else f"{round((p.tick - since) / 60)} minutes on the bad hand"
+        )
+        for sl in left:
+            self.give(f"shift the {self._sail_name(sl.id)}", why=why)
 
     def _sail_if_none(self) -> None:
         """Plain sail made when she is under way with none set (package 43b), the topsails
@@ -4593,10 +4696,13 @@ class Captain(Judgement):
             parted_standing_lines,
             sprung_spars,
         )
+        from freesail.evolutions.scripts import helm_words
 
         world = self.world
         ship = world.ship
         tick = p.tick
+        if self._helm_first(ship, tick):
+            return
         if tick - int(self._business.get("repairs_tick", -(10**9))) < 600:
             return
         # the rigging is mended when the weather serves (the carpenter's and the boatswain's
@@ -4622,10 +4728,6 @@ class Captain(Judgement):
         order = [x.strip() for x in str(said).split(",") if x.strip()]
         in_action = self.state == "engaging"
         wanted: list[tuple[str, str]] = []
-        if ship.extra.get("helm_lost") and "relieving_tackles" not in in_hand:
-            # the helm first, before the leak and the rigging: a ship that cannot steer
-            # cannot fight or claw off (package 115 D4 (e))
-            wanted.append(("rig the relieving tackles", "the wheel shot away"))
         for what in order:
             if what == "the leak" and holes and "plug_shot_hole" not in in_hand:
                 wanted.append(("plug the shot holes", "the shot holes under water"))
@@ -4641,11 +4743,33 @@ class Captain(Judgement):
 
                             wanted.append((f"fish the {_name(ship, spar.id)}", "a sprung spar"))
                             break
+        if ship.extra.get("helm_by_tackles") and "repair_wheel" not in in_hand and not in_action:
+            # the wheel in its turn, after the leak and the rigging and out of action
+            # (package 116, card 5): she steers by the tackles meanwhile, the slower
+            wanted.append((helm_words(ship)["mend"], "steering by the relieving tackles"))
         if not wanted:
             return
         self._business["repairs_tick"] = tick
         text, why = wanted[0]
         self.give(text, why=why)
+
+    def _helm_first(self, ship: Any, tick: int) -> bool:
+        """The wheel shot away: the relieving tackles before everything, whatever the
+        weather and whatever other repair was last given (package 115 D4 (e): a ship that
+        cannot steer cannot fight or claw off; package 116, card 5: before, this stood
+        behind the repairs' own rules, so that he never rigged them lying to for weather, in
+        distress, with the wind at the shortening figure and above, where a ship with no
+        helm needs them most, nor within ten minutes of another repair's order). True
+        while the helm is lost: no other repair is given until the tackles are rove."""
+        if not ship.extra.get("helm_lost"):
+            return False
+        runner = ship.extra.get("evolutions")
+        in_hand = {inst.evo.id for inst in getattr(runner, "instances", [])} if runner else set()
+        asked = int(self._business.get("helm_tick", -(10**9)))
+        if "relieving_tackles" not in in_hand and tick - asked >= 60:
+            self._business["helm_tick"] = tick
+            self.give("rig the relieving tackles", why=str(ship.extra["helm_lost"]))
+        return True
 
     def _chase_order(self, p: Perception) -> str:
         """'chase the cutter': the chase named by HIS stranger's rig when the lookout has
@@ -4912,9 +5036,54 @@ class Captain(Judgement):
         world = self.world
         state = self.state or "on passage"
         ship = world.ship
+        if _waits_for_the_helm(ship, text):
+            # the wheel shot away and the tackles not yet rove (package 116, card 5): he
+            # gives no helm order and begins no helm manoeuvre; the order is not given, and
+            # his own work reads it as refused and tries again at its next judgement
+            from freesail.core.events import Event
+            from freesail.evolutions.scripts import HELM_LOST_WORDS
+
+            return Event(
+                tick=world.clock.tick,
+                ship_time=world.clock.ship_time,
+                severity=Severity.ROUTINE,
+                kind="order.rejected",
+                text=HELM_LOST_WORDS,
+                actor=actor_for(state),
+                data={"order": text, "not_given": "the wheel shot away"},
+            )
         done = said_as_done(ship, text) if hasattr(ship, "parts") else text
         said = f"By the captain, {state}: {done}" + (f" ({why})" if why else "")
         return world.submit(text, actor=actor_for(state), said=said)
+
+
+# The orders of his that drive the helm, by how they begin (package 116, card 5): not given
+# while the wheel is shot away and the relieving tackles not rove (`Captain.give`). The sail,
+# the guns, the damage, the lead and `heave to` (done by her sails) are given as before; an
+# order of another kind that would reach the helm meets the order's own refusal
+# (`orders.verbs._helm`, `Runner._failing_condition`).
+_HELM_ORDERS = (
+    "steer ",
+    "shape a course ",
+    "put her about",
+    "box her off",
+    "fill away",
+    "come to an anchor",
+    "get under way",
+    "lie a-try",
+    "give chase",
+    "chase ",
+    "make her out",
+    "keep your station",
+    "lay her aboard",
+    "let the pilot take her in",
+)
+
+
+def _waits_for_the_helm(ship: Any, text: str) -> bool:
+    if not (getattr(ship, "extra", None) or {}).get("helm_lost"):
+        return False
+    return " ".join(text.lower().split()).startswith(_HELM_ORDERS)
 
 
 # ---------------------------------------------------------------------------

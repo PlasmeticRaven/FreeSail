@@ -27,8 +27,6 @@ from freesail.world.places import Hold, Purse, pounds_words
 from freesail.world.ports import (
     _ERRAND_WORDS,
     BOAT_ASHORE_S,
-    BOAT_HOIST_IN_S,
-    BOAT_HOIST_OUT_S,
     BOAT_PACE_KN,
     IN_PORT_NM,
     LIGHTER_S_PER_TON,
@@ -97,9 +95,21 @@ from freesail.world.ports import (
     _off_the_leg,
     _possessive,
     _wind_from_over_the_water,
+    boat_in_s,
+    boat_out_s,
 )
 
 __all__ = ["Dealings"]
+
+# The boat's first phase on an errand: hoisted out, or a boat towed astern on her painter
+# (package 90, A4; a boat's `towed`) hauled up alongside by it. Either, the boat was never
+# in the water if her work is found gone (`_boat_kept`).
+OUT_PHASES = ("hoisting out", "hauling alongside")
+
+
+def _out_phase(boat: Any) -> str:
+    """'hoisting out', or 'hauling alongside' for a towed boat (package 90, A4)."""
+    return OUT_PHASES[1] if getattr(boat, "towed", False) else OUT_PHASES[0]
 
 
 def _names_a_boat(words: str) -> bool:
@@ -307,6 +317,11 @@ class Dealings:
                 self.jobs = [j for j in self.jobs if all(j is not g for g in gone)]
                 for job in gone:
                     self._apply_job(job)
+        if self._tows_a_boat():
+            # package 90, A4: a boat towed astern, in tow or not, for her drag on the ship
+            from freesail.world.boats import keep_in_tow
+
+            keep_in_tow(world.ship, self.boat)
         if self.coarse:
             return  # asleep: her jobs alone (the boat's errands by the plan's time; step 4)
         if world.clock.ship_time.second == 0 and self.ports and world.position is not None:
@@ -2185,7 +2200,7 @@ class Dealings:
             else:
                 doing = "going back"
             bits.append(f"the pilot {port.pilot.craft} {doing}")
-        bits.append(self.boat.words())
+        bits.append(self._boat_words())
         # practice and resupply (between packages 72 and 73): the hoy with her powder, while
         # its job is in hand at this port, and only then, so that the reading is otherwise
         # what it was
@@ -2722,6 +2737,45 @@ class Dealings:
         boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
         return max(boats, key=lambda b: (b.tons, b.length_ft)) if boats else None
 
+    def _tows_a_boat(self) -> bool:
+        """Whether her file tows a boat astern (package 90, A4; a boat's `towed`)."""
+        boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
+        return any(getattr(b, "towed", False) for b in boats)
+
+    def _towed(self) -> bool:
+        """Whether the boat is towed astern on her painter (package 90, A4; a boat's `towed`):
+        the boat away by her id in the ship's file, or the errands' boat at home."""
+        boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
+        boat = next((b for b in boats if b.id == self.boat.boat_id), None) or self.boat_spec()
+        return bool(getattr(boat, "towed", False))
+
+    def _boat_words(self) -> str:
+        """Her boat's state in words (`BoatState.words`): a boat towed astern stove by a shot and
+        cut adrift (package 90, the lead's nudge 76, item 3; `combat.hits`) is said so, not
+        "towing astern on her painter"."""
+        towed = self._towed()
+        if towed and not self.boat.away and not self.boat.lost:
+            extra = getattr(self.world.ship, "extra", None)
+            stove = set(extra.get("boats_stove") or ()) if isinstance(extra, dict) else set()
+            boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
+            in_tow = [b for b in boats if getattr(b, "towed", False)]
+            if in_tow and all(b.id in stove for b in in_tow):
+                return f"{self.boat.boat_name} stove by a shot and cut adrift"
+        return self.boat.words(towed, self._towed_too_fast())
+
+    def _towed_too_fast(self) -> bool:
+        """Whether her boat in tow is towed faster than her hull speed (package 90, the lead's
+        nudge 60, item 8; `world.boats.TOWED_TOO_FAST`)."""
+        from freesail.world.boats import TOWED_TOO_FAST
+
+        extra = getattr(self.world.ship, "extra", None)
+        return bool(isinstance(extra, dict) and extra.get(TOWED_TOO_FAST))
+
+    def _back_aboard(self) -> str:
+        """'hoisted in', or of a towed boat 'veered astern on her painter again' (package 90,
+        A4)."""
+        return "veered astern on her painter again" if self._towed() else "hoisted in"
+
     def _send_boat(
         self,
         port: Port,
@@ -2757,7 +2811,7 @@ class Dealings:
             errand=errand,
             port_id=port.id,
             carrying=list(carrying),
-            phase="hoisting out",
+            phase=_out_phase(boat),
             since_tick=world.clock.tick,
             people=list(people or []),
         )
@@ -2782,8 +2836,8 @@ class Dealings:
         now = int(world.clock.tick)
         pull_s = self.to_shore_m(port) / units.knots_to_ms(BOAT_PACE_KN)
         ashore_s = float(BOAT_ASHORE_S.get(errand, BOAT_ASHORE_S["message"]))
-        ashore_at = now + BOAT_HOIST_OUT_S + int(pull_s)
-        back_at = ashore_at + int(ashore_s) + int(pull_s) + BOAT_HOIST_IN_S
+        ashore_at = now + boat_out_s(boat) + int(pull_s)
+        back_at = ashore_at + int(ashore_s) + int(pull_s) + boat_in_s(boat)
         self.boat = BoatState(
             away=True,
             boat_id=boat.id,
@@ -3003,7 +3057,7 @@ class Dealings:
         name = self.boat.boat_name
         head = f"{name[:1].upper()}{name[1:]}"
         port = self.ports.get(self.boat.port_id)
-        if self.boat.phase != "hoisting out" and port is not None:
+        if self.boat.phase not in OUT_PHASES and port is not None:
             for severity, kind, text, data in self._boat_back(port):
                 self._record(severity, kind, text, data)
             return
@@ -3172,7 +3226,7 @@ class Dealings:
             (
                 Severity.NOTABLE,
                 "boat.alongside",
-                f"{head} alongside from the shore and hoisted in.",
+                f"{head} alongside from the shore and {self._back_aboard()}.",
                 {"port": port.id, "errand": self.boat.errand},
             )
         ]
@@ -3380,8 +3434,8 @@ class Dealings:
         now = int(self.world.clock.tick)
         her = hull_name(target)
         pull_s = int(metres / units.knots_to_ms(BOAT_PACE_KN))
-        alongside_at = now + BOAT_HOIST_OUT_S + pull_s
-        back_at = alongside_at + 300 + pull_s + BOAT_HOIST_IN_S  # five minutes alongside her
+        alongside_at = now + boat_out_s(boat) + pull_s
+        back_at = alongside_at + 300 + pull_s + boat_in_s(boat)  # five minutes alongside her
         self.boat = BoatState(
             away=True,
             boat_id=boat.id,
@@ -3512,7 +3566,7 @@ class Dealings:
                     Severity.NOTABLE,
                     "boat.alongside",
                     f"{head} alongside from the {self.boat.to_name or 'other ship'} and "
-                    "hoisted in.",
+                    f"{self._back_aboard()}.",
                     {"ship": str(self.boat.to_hull), "errand": "to_ship"},
                 )
             ]
@@ -3643,7 +3697,7 @@ class Dealings:
         if not self.boat.away:
             self.boat.boat_name = boat.name
         return {
-            "words": self.boat.words(),
+            "words": self._boat_words(),
             "away": self.boat.away,
             "errand": self.boat.errand,
             "phase": self.boat.phase,

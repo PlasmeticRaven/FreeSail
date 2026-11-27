@@ -1744,6 +1744,54 @@ REGISTRY.add(
     )
 )
 
+# The ship's practice for her whole lateens in going about (package 90, A1b;
+# Design-Package90-Engine.md §2.3 item 3), so that a model at the conn knows what `tack ship`
+# will do with the yards: in stays and in wearing, each shifted round the mast or left on it
+# (`scripts.lateen_practice`, "shifted" in both by default), set by `leave the lateens in stays`
+# and its kin. A hull with no whole lateen has none: the row's words say so.
+NO_LATEEN_WORDS = "no whole lateen aboard"
+
+
+def _no_lateen_words(_world: Any) -> str:
+    return NO_LATEEN_WORDS
+
+
+def _lateen_practice(world: Any, _: str | None) -> dict[str, Any] | None:
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = world.ship
+    if not scripts.has_whole_lateen(ship):
+        return None
+    practice = scripts.lateen_practice(ship)
+    return {"words": scripts.lateen_practice_words(ship, practice), **practice}
+
+
+REGISTRY.add(
+    Reading(
+        "lateen_practice",
+        ("the lateen practice",),
+        "query",
+        "",
+        _lateen_practice,
+        description="the ship's practice for her whole lateens in going about: each yard "
+        "shifted round its mast or left on it, in stays and in wearing",
+        none_words=_no_lateen_words,
+    )
+)
+
+
+def idle_lateen_rows(world: Any) -> set[str]:
+    """The practice's row, left out of a sample where she carries no whole lateen (package 90;
+    the lead's nudge 46, item 6: "no whole lateen aboard" was in every station's sample on all
+    eighteen ships, a seat paying for it on every reading and learning nothing). Read by
+    `action_readings.idle_rows`, as the practice and resupply's own rows are. The readings tool
+    keeps it on every ship: every reading is named in the primer (`tests/test_grammar_book.py`)
+    and the tool's own tests read every registry row."""
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = getattr(world, "ship", None)
+    return set() if ship is not None and scripts.has_whole_lateen(ship) else {"lateen_practice"}
+
 
 # ---------------------------------------------------------------------------
 # Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the
@@ -2455,15 +2503,24 @@ def ship_words(world: Any) -> str:
             nation = nation_id.replace("-", " ")
     captain = getattr(world, "captain", None)
     role = str(getattr(captain, "role", "") or "")
-    from freesail.world.captains import _is_kings_ship
+    # her service by her papers first, then her captain's role, then her wardroom
+    # (`service.service_of`; package 121, the owner's word of 2026-11-20: a frigate under a
+    # privateer's papers read "a King's ship" to the officer and the director); a prize under
+    # her prize crew is said by the role (a prize is not her captor's King's ship)
+    from freesail.world.service import KINGS, MERCHANT, PRIVATEER, service_of
 
-    kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
-    escort = ", the convoy's escort" if role == "commodore" else ""
+    service_is = "" if role == "prize-master" else service_of(world)
+    kings = service_is == KINGS
+    if service_is == PRIVATEER:
+        role = "privateer"
+    elif service_is == MERCHANT and role not in ("packet", "fisherman", "revenue", "indiaman"):
+        role = "merchant"
+    escort = ", the convoy's escort" if kings and role == "commodore" else ""
     # package 75, SW-4's words step: a revenue cutter is the Customs' cruiser, armed and of the
     # Crown and not the Navy's, as Sherbourne served the Board of Customs against the smugglers
     # from 1763 to 1779 (docs/design/VesselCandidates.md; the kit's manual); an Indiaman a
     # merchantman that is armed, named by her book's word (data/captains/indiaman.yaml)
-    duty = ", in the service of the Customs" if role == "revenue" else ""
+    duty = ", in the service of the Customs" if role == "revenue" and not kings else ""
     if kings:
         # a navy by its nation's adjective (package 75, B2b, the lead's ruling of 2026-11-07):
         # "a ship of the French navy", where the name read "the France navy" and "the the
@@ -2602,16 +2659,23 @@ def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
 def _places(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the places`: the names in the words (every sample carries them, so the static
     descriptions ride in `items`, where the prompt's answer and the pane find them)."""
+    from freesail.evolutions.scripts import helm_words
     from freesail.world import things as TH
     from freesail.world.places import PLACES
 
     places = getattr(world, "places", None)
     if places is None:
         return None
+    # the quarterdeck "where ... the wheel is", by her helm, from the one table (package 90,
+    # A3; the lead's nudge 47): "the tiller is" where she steers by one, a wheel ship's as it was
+    by_helm = f"{helm_words(getattr(world, 'ship', None))['helm']} is"
     out = {
         "words": ", ".join(p.name for p in PLACES.values()),
-        "items": {p.id: {"name": p.name, "description": p.description} for p in PLACES.values()},
-        "described": places.describe(),
+        "items": {
+            p.id: {"name": p.name, "description": p.description.replace("the wheel is", by_helm)}
+            for p in PLACES.values()
+        },
+        "described": [d.replace("the wheel is", by_helm) for d in places.describe()],
     }
     lying = TH.lying_aboard(world)
     if lying:

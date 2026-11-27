@@ -818,6 +818,8 @@ class Console:
         from freesail.api.session import ship_factory
 
         self.world = replay_mod.replay(data, ship_factory, road=report.road)
+        if self.desk is not None:
+            self.desk.mark(self.world)  # its default saver (package 117)
         self._attach()
         self.pace = Pace(self.world, self.pace.rule)
         restore_python_rules(self.world, data)  # attached, so its lines are printed

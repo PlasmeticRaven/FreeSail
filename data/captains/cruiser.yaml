@@ -98,29 +98,6 @@ thresholds:
   mending_sooner_kn: {value: 4, source: "as above"}
   station_wear_hours: {value: 2, source: "the cruise's book: wore ship at the end of every second hour"}
   hail: {value: "What ship is that?", source: "the hail of a King's ship coming up with a stranger (Luce 1884 ch. XX, the custom of the hail); the words judgement"}
-
-# The stations a cruiser of each nation keeps (package 43b; spec M6 §19: "the naval
-# stations from the war (a cruiser on the station the doctrine names)"): the world's
-# business puts a cruiser of a nation at war on one of hers within the region in play
-# (`freesail/world/business.py`), a brig-sloop or a hired cutter, her intent `keep the
-# station off <place> within <n> miles`. The places are features of the chart; the stations
-# are the war's as remembered, UNVERIFIED (the inshore squadron off the Black Rocks and
-# Ushant in the blockade of Brest, 1803 to 1805; the cruisers off the Lizard and the Start
-# for the trade coming up Channel; the French privateers and corvettes off the Isle of Bas,
-# the Sept Iles and the Lizard against it).
-stations:
-  britain:
-    - {place: the Black Rocks, within_nm: 8, kind: brig-sloop}
-    - {place: Ushant, within_nm: 12, kind: brig-sloop}
-    - {place: the Lizard, within_nm: 10, kind: cutter}
-    - {place: the Start, within_nm: 10, kind: cutter}
-  france:
-    - {place: Isle of Bas, within_nm: 10, kind: brig-sloop, colours: none}
-    - {place: Sept Iles, within_nm: 10, kind: brig-sloop, colours: none}
-    - {place: the Lizard, within_nm: 20, kind: brig-sloop, colours: none}
-  spain: []
-  batavian-republic: []
-
   # Package 74 (spec M7 §18; docs/design/Design-Prizes.md §2.4): the prize. `mans_prizes`
   # whether a struck enemy is taken possession of; `prize_crew_share` the share of his fit
   # men put aboard her (at least `prize_crew_least`, never more than half her complement nor
@@ -145,6 +122,28 @@ stations:
   prize_company: {value: in company while bound the same way, source: "the prize kept in company while he can (the actions' narratives, James); judgement"}
   parole_accepted: {value: true, source: "an officer's parole taken by the custom of the period (the Regulations Sect. XII ch. III art. VI on those on parole); judgement"}
   prisoners_landed: {value: the first friendly port, source: "the prisoners landed to the Agent for Prisoners at the first port (the Regulations Sect. XII ch. III art. V, on file)"}
+
+# The stations a cruiser of each nation keeps (package 43b; spec M6 §19: "the naval
+# stations from the war (a cruiser on the station the doctrine names)"): the world's
+# business puts a cruiser of a nation at war on one of hers within the region in play
+# (`freesail/world/business.py`), a brig-sloop or a hired cutter, her intent `keep the
+# station off <place> within <n> miles`. The places are features of the chart; the stations
+# are the war's as remembered, UNVERIFIED (the inshore squadron off the Black Rocks and
+# Ushant in the blockade of Brest, 1803 to 1805; the cruisers off the Lizard and the Start
+# for the trade coming up Channel; the French privateers and corvettes off the Isle of Bas,
+# the Sept Iles and the Lizard against it).
+stations:
+  britain:
+    - {place: the Black Rocks, within_nm: 8, kind: brig-sloop}
+    - {place: Ushant, within_nm: 12, kind: brig-sloop}
+    - {place: the Lizard, within_nm: 10, kind: cutter}
+    - {place: the Start, within_nm: 10, kind: cutter}
+  france:
+    - {place: Isle of Bas, within_nm: 10, kind: brig-sloop, colours: none}
+    - {place: Sept Iles, within_nm: 10, kind: brig-sloop, colours: none}
+    - {place: the Lizard, within_nm: 20, kind: brig-sloop, colours: none}
+  spain: []
+  batavian-republic: []
 
 books:
   on passage:

@@ -1,0 +1,9 @@
+- harness gate/run.py, gate/compare.py written; trial 3 cases OK
+- main batch (574 cases: waits 156+15 boats, anchor 39, gales 78, fill 52, rule4 234) run OLD+NEW
+- fill-away way probe 52 cases: way traces identical 52/52; Filled-away-without-headway 0; borderline 2
+- saves: 4 OLD checkpoints loaded on NEW: states identical 50/50 hashes each vs NEW straight; json replays run
+- scenario games (7, 2-3 h): convoy-six diverges at 60 (rule 4, book's shorten sail; belay said in a ROUTINE group line); other 6: words only (R1 waits), end states equal
+- waking (8 passages, fake watcher): wait lines wake 0; belay +1 wake per R4 case; dire +0..6
+- 7-153 window: 27 probes x2 trees (3 seeds x 9 offsets)
+- FINDING D1: countermand inside `shorten sail` said in routine group line (59 main cases) or not at all (5 bilander cases)
+- FINDING D2: "She gathers headway" is notable (declared routine)
