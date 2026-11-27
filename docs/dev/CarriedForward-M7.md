@@ -7,9 +7,9 @@ Milestone 7 was closed by the owner on 2026-11-24, **closed, with a list** (`doc
 From his play of the gate (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`):
 
 1. **The first passage teaches the time's compression**, not `tick` after `tick`, once the first `tick` has shown what one is.
-2. **A game can be ended from the harbour**, without stopping the harbour or beginning another.
-3. **Fog comes on and clears over a time**, and is said as it does ("the fog seems to be clearing", "a fog is settling in"), as far as the weather's simulation allows.
-4. **The game's own captain replaces a spar carried away.** In the first action the Renard sailed three hours with her main topgallant mast gone and never shifted it; the work exists for a player.
+2. **A game can be ended from the harbour**, without stopping the harbour or beginning another. **Mended: package 126, part one, merged 27 November at 7bc7de20.**
+3. **Fog comes on and clears over a time**, and is said as it does ("the fog seems to be clearing", "a fog is settling in"), as far as the weather's simulation allows. **Mended: package 126, part one, merged 27 November at 7bc7de20.**
+4. **The game's own captain replaces a spar carried away.** In the first action the Renard sailed three hours with her main topgallant mast gone and never shifted it; the work exists for a player. **Built and held: package 126's part two, after two reads not passed (the spar's work took the hands that work her); a third pass is in hand.**
 
 **Placed by the owner the same day (the proposal's decision 79):** the first goes with the milestone of the player's first hours; the other three open milestone 8 as its mending step, with the older faults of section 4 and package 125, the test suite's package planned beside it.
 
@@ -57,7 +57,21 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 15. A boat stove on the booms by a shot still reads as on the booms and can be sent ashore (found 24 November by the lead's reader; on the trunk before package 90).
 
-Of these, package 127 (launched 24 November) takes 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed.
+16. A save of *the first action* has its checkpoint refused on loading ("names pathlib.PosixPath") and the game is replayed from its journal instead: it loads rightly, a minute and a half slower (found 24 November by the lead, loading the owner's gate save).
+
+17. **A far ship at anchor that never sails, and costs the pace** (the owner's note 6 of 27 November, found by the lead in his cruise's saves). A trader of the background trade lying at anchor off the port she is to load at ("trade 33 tons of brandy from the Havre to Dover", at anchor off Le Havre) weighs every minute of the day, lays her whole passage over the chart afresh, finds its first leg is to anchor where she lies, and stays; the next minute she does it again. She never sails, and each laying of the passage costs about three-quarters of a second on the build machine: in his cruise about two-thirds of the machine's time by day, the pace falling to some fifty ticks a second with two crewed ships near him where the same sea without her cost runs about a hundred and fifty. By night she does not weigh, and the pace comes back; at dawn it falls again. One ship of the ten in his sea did it; it is on the trunk as on the gate's build.
+
+18. **A ship made a King's ship in the harbour carries no private signals** (the owner's note 10 of 27 November; confirmed). The month's table is given by the captain's place (a King's ship's, a cruiser's, a commodore's) or by a scenario's `papers: {private_signals: true}`; the harbour writes `papers: {service: kings}` and neither, so `the private signal` is refused aboard her with the merchantman's reason. The primer's chapter 23 says it is so ("a King's ship by her papers or her wardroom alone ... carries none"); no scenario of the game is touched, only a game made in the harbour.
+
+19. **A privateer made a crewed ship never closes a stranger she is looking at** (found by package 127's builder and the lead's reader, 27 November). Fully crewed, the convoy's privateer keeps about 2.1 miles from the stranger she investigates and takes up evading only at 1.94 to 2.00 miles; the builder reads the cause as her near lookout making out colours at two miles without the glass where her far captain used three with it (`captains._keep_stranger`); the reader saw the distances and could not confirm the glass. So the convoy of six's day turns on where she is placed: a cable farther and nothing happens, a cable nearer and she is judged an enemy but no straggler is signalled; with other seeds the exchange comes later. Truth 7-153 pins the day as shipped, at one seed.
+
+20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
+
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19, 20, 21 and 22 are not yet placed (22 is for the ships' session and a later package of the physics).
+
+21. The saves a stand-down writes are named by seed and tick, and two written at one tick overwrite one another (found by package 126's builder; the desk's naming, older than the package).
+
+22. **A wreck left hanging helps some hulls** (found by package 126's builder, 27 November, measuring the captain's spar work against the trunk). A wrecked sail gives no drive, but its windage and its spars' count three times over (`physics.sails`), and the wreck does her no harm: a topmast's wreck forward pays her off like a head sail. With the wreck cleared at the moment it falls, no hands and no time spent, the trunk's own captain makes less in seven of twenty-eight passages than with it left hanging (the 74 in 20 knots rising to 38: 0.8 miles made good against 9.6; the bilander in the same: 2.3 against 8.9), and more in the rest (the merchant brig in the rising wind 9.1 against -5.5). Nothing of the physics is changed by package 126; the captain clears a wreck as a seaman would, by the lead's ruling (section 7).
 
 ## 5. Booked by the owner or the lead, not launched
 
@@ -83,6 +97,9 @@ Each was told to him when it was made and is in the records of its package.
 - The *Diana* files the displacement her own plan gives; the three-decker her drawn displacement.
 - A ship with a wheel takes the tiller's orders and repairs her wheel; the hermaphrodite brig's helm is left as filed.
 - Three outcomes on the smack with her topsail set (heaving to in 30 knots; a tack from hove to; backing and filling).
+- Milestone 7's merges over a reader's NOT PASS by the rule of the lateen hulls' list (package 90: a lateen-only fault is owed in full before any lateen hull's file joins).
+- In package 125, the rule that every captain takes in topgallants when a topgallant yard strains was built at the lead's ruling and then taken out by him: in the lee-shore trial it left her four miles further to leeward and filled her away into a gale two miles from the land. It is kept on the builder's branch with its cause.
+- The game's own captain clears a wreck as soon as he has hands for it, and does not leave it hanging where the physics makes it serve her (package 126's part two; fault 22 of section 4): so his spar work is measured against the trunk where clearing is no loss, and against the wreck cleared at once where it is.
 
 ## 8. Waiting on a decision of the owner's
 
@@ -90,6 +107,8 @@ Each was told to him when it was made and is in the records of its package.
 - Milestone 7c, the data made true across 1792 to 1825: not begun.
 - The older gates (6a with 6b, 6c, and the director's 7b) are closed with milestone 7 by his word of 24 November; what 7b left unbuilt is placed in section 9, the lead's proposal.
 - The chart's work, parked; its records say where it stopped.
+- **The owner's notes of 27 November** (`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`, his later notes), with the lead's proposed placing, his to change: an order of succession appointed by the captain (his note 7; decision 63 gives the command to the senior officer) with milestone 8's second half, her people; a raking fire (note 8: a shot is placed anywhere along her length whatever her aspect, and nothing rakes) with the fight's known faults in milestone 8's first half, a package of its own from the sources; fire aboard, its fighting and the magazine (note 9) with package 77, and the guns' faults, condition and care with the gunner's station of package 87; temperature (note 11; the spec's deferred section 26) in two layers, the thermometer and the fog that comes of warm air over cold water with the weather of the world that moves, the cold with the crew's health in milestone 8's second half.
+- Package 128 (the test suite) and package 129 (faults 16 to 18 above): proposed, not launched.
 
 ## 9. What the director's milestone (7b) left unbuilt, placed
 

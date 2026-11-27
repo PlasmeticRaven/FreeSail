@@ -95,7 +95,7 @@ def _start(ship: Any, evo_id: str, subject: str, params: dict[str, Any], verb: s
         raise OrderError(f"There is no such evolution as '{evo_id}'.")
     _afloat(ship)
     runner = _runner(ship, verb)
-    text = runner.start(ship, evo_id, subject, params)
+    text = runner.start(ship, evo_id, subject, params, say_wait=False)
     # the runner writes its own started line; work that waits its turn behind other work
     # on the same hold says so in a line of its own (the World leaves the started kind's
     # text to the runner)

@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-24, 15:56 UTC (THE SECOND PASS IS MERGED at 474eff8b; THE DIANA IS STAGED ON IT, her run green, her reader at work: DO NOT MERGE THE TRUNK INTO HER AGAIN; A THIRD PASS of five before the tartane's file: a boat cut adrift still used; a spar lost while its shift waits; a relief not at once; four pins; the bow's list). Nudge number: 77.
+Latest note: 2026-11-27, 07:11 UTC (PACKAGE 127 IS ON THE TRUNK at 572133ac: THE THIRD PASS CAN COME, whole, on one reported hash, the trunk merged first; the boats line is now "The boats griped fast on the booms; the ship is clear."; THE DIANA's ONE COMMIT OF WORDS (nudge 78) is still awaited). Nudge number: 83.
