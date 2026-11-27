@@ -40048,3 +40048,44 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to be clearing."
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
+
+## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
+
+**No pin moved.** The new figures, each JUDGEMENT and defined with its ground where it stands:
+
+- `world.captains.BRING_TO_AGAIN_S` 600 s: a refused or failed order to bring her to for the
+  weather is given again ten minutes after the last (the trunk gave it once, on entering the
+  state); refused twice in the same words with her sail unchanged, not again until it changes.
+- `world.captains.WRECK_HANDS_UP_S` 3,600 s: a wreck that has hung an hour with her watch never free
+  of its own work has all hands turned up for it, piped down when it is cleared.
+- `world.captains.SPAR_WORK_QUIET_S` 600 s, `SPAR_MEND_ORDER`, `LIGHT_SPAR_CLASSES` and
+  `SPARE_YARD_ANSWERS` as the second pass had them (under fire, the order of the work, the light
+  spars last, a spare yard to a topsail yard alone).
+- `tests/test_mends_126.PASSAGE_FLOORS` 0.3 nm, 5 min, 1: the least margins of "no worse than the
+  trunk" in truth 7-779 b, whose margins are otherwise half the trunk's own seed-to-seed range in
+  the cell over seeds 7, 8 and 9.
+
+**For the ships' session: a wreck left hanging pays some hulls off** (the carried list, fault 22).
+The physics gives a wrecked sail no drive but three times its windage, and its wrecked spars three
+times theirs (`physics.sails._sail_windage_area`, `_spar_windage_area`, `WRECK_MULTIPLIER`), and no
+harm. A topmast's wreck forward acts as a head sail. The cells of the lead's probe (bound for
+Falmouth from 48 40 N 5 05 W, the spar carried away at minute ten, three hours, medians of seeds 7, 8
+and 9; made good nm / minutes astern / times aback) where the trunk's own captain with the wreck
+cleared at the moment it fell, no hands spent, does worse than with it hanging, and so where the
+captain of package 126 is measured against that clearing (the lead's ruling of 2026-11-27), old
+beside new beside the instant clearing:
+
+| Ship, spar | Wind | Trunk (wreck left hanging) | Wreck cleared at once | Package 126 |
+|---|---|---|---|---|
+| bilander, fore topmast | 12 kn | 9.94 / 0 / 0 | 8.68 / 22 / 1 | 10.20 / 0 / 0 |
+| bilander, fore topmast | 25 kn | 9.26 / 29 / 2 | 5.00 / 58 / 5 | 15.86 / 0 / 0 |
+| bilander, fore topmast | 12 kn, heading her | 5.64 / 0 / 0 | -1.10 / 170 / 2 | 5.77 / 0 / 0 |
+| bilander, fore topmast | 20 rising to 38 | 11.87 / 0 / 1 | 0.56 / 160 / 1 | 11.87 / 0 / 1 |
+| 74, fore topmast | 25 kn | 24.90 / 8 / 1 | 1.88 / 111 / 20 | 25.68 / 8 / 1 |
+| 74, fore topmast | 12 kn, heading her | 0.62 / 136 / 2 | 0.56 / 143 / 2 | 0.41 / 144 / 2 |
+| 74, fore topmast | 20 rising to 38 | 13.03 / 43 / 0 | 11.16 / 92 / 0 | 10.62 / 91 / 1 |
+
+The bilander's fore topmast and the 74's fore topmast are both forward of her centre of effort; in
+the bilander's 12 knots it is her going astern (22 minutes against none) that makes the clearing
+worse, not her way. In the other 21 cells clearing at once is no loss, and the trunk is the
+yardstick (the report's §9).

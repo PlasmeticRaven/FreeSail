@@ -1,9 +1,13 @@
-"""Package 126: the weather (the owner's note 3 of gate M7,
-`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`). The harbour's part is in
+"""Package 126: the weather and the captain (the owner's notes 3 and 4 of gate M7,
+`docs/playtests/2026-11-24-gate-m7-owner-runs/README.md`; the list carried forward,
+`docs/dev/CarriedForward-M7.md`, section 4, item 12). The harbour's part is in
 `tests/test_harbour.py` (truths 7-770 to 7-773).
 
 The fog comes on and goes by degrees (`world.weather.Weather.fog_degree`), the sight closing
-and opening through the weather's own steps and the log saying each.
+and opening through the weather's own steps and the log saying each; the game's own captain
+clears a spar's wreck and shifts it for a spare where she carries one, out of action
+(`world.captains.Captain._spar_work`); and a ship with no topsail set to lie a-try under
+heaves to in the gale where the order would have been refused and left her sailing on.
 """
 
 from __future__ import annotations
@@ -12,8 +16,13 @@ import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import pytest
+
 from freesail.core import replay as replay_mod
+from freesail.physics import strain as ST
+from freesail.ship import parts
 from freesail.world import weather as W
+from freesail.world.scenarios import begin, load_scenario, make_scenario_world
 from tests.test_chart import SCHOONER, chart_world, high_over_the_channel
 
 # -- the fog by degrees ---------------------------------------------------------------------
@@ -234,3 +243,648 @@ def test_truth_7_775_b_the_fog_thins_at_its_edges_and_its_sight_steps_one_at_a_t
     across = [sys.fog_degree(edge - km, 0.0, noon) for km in (6.0, 3.5, 1.5, 0.3)]
     assert across[0] == 1.0 and 0.0 < across[2] < across[1] < 1.0 and across[3] == 0.0, across
     monkeypatch.setattr(sys, "_fog_air", real_air)
+
+
+# -- the captain's spars --------------------------------------------------------------------
+
+CRUISE = """
+name: a spar carried away
+seed: 7
+start: 1805-06-12T10:00
+position: {{lat_deg: 49.80, lon_deg: -5.30}}
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/{ship}.yaml
+  heading_deg: 180
+  speed_kn: 5
+intent: cruise off the Lizard within 10 miles
+wind: {{from_deg: 270, knots: 12, gustiness: 0.0, variability: 0.0}}
+ports: [falmouth, plymouth, brest]
+orders:
+  - set plain sail
+"""
+
+
+def _cruising(ship: str):
+    path = Path(tempfile.mkdtemp()) / "cruise.yaml"
+    path.write_text(CRUISE.format(ship=ship), encoding="utf-8")
+    sf = load_scenario(str(path))
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    w.run(600)
+    return w
+
+
+def _carry_away(w, *spars: str) -> None:
+    for sid in spars:
+        ST._wreck_spar(w.ship, ST.strain_state(w.ship), w.ship.spars[sid], 2.0)
+
+
+def _captains(w, n0: int) -> list[str]:
+    return [e.text for e in w.log[n0:] if str(e.actor).startswith("captain")]
+
+
+def test_truth_7_776_the_captain_clears_the_wreck_and_shifts_the_spar_for_a_spare():
+    """The owner's note 4 of gate M7: the game's own captain, out of action and with
+    nothing else in hand, clears away the wreck of a spar carried away, shifts it for a spare
+    of its class from the booms, bends again the head sail it took as soon as it stands, then
+    shifts the next spar that stands on it, and bends the rest; each order says why in his
+    words. The cutter's main topmast carried away: the wreck (with the topgallant mast and
+    both yards on it), the topmast from her one spare, the jib, the topsail yard from her one
+    spare yard, the topsail and the gaff topsail; the topgallant mast, for which she carries
+    no spare, and its yard are left as they are."""
+    w = _cruising("cutter")
+    _carry_away(w, "main.topmast")
+    n0 = len(w.log)
+    w.run(5 * 3600)
+    said = _captains(w, n0)
+    keys = ("wreck", "shifting", "bending", "jury", "(bent again to its spar)")
+    work = [x for x in said if any(k in x for k in keys)]
+    by = "By the captain, keeping station: "
+    assert work == [
+        by + "clearing away the wreck of the main topmast (the main topmast carried away).",
+        by + "shifting the main topmast (the main topmast carried away).",
+        by + "bending the jib (its spar shifted for a spare).",
+        by + "setting the jib (bent again to its spar).",
+        by + "shifting the topsail yard (the topsail yard carried away).",
+        by + "bending the topsail (its spar shifted for a spare).",
+        by + "bending the gaff topsail (its spar shifted for a spare).",
+    ], work  # her topsail loosed and her gaff topsail furled when it went: bent, not set
+    ship = w.ship
+    assert not ship.spars["main.topmast"].wrecked and not ship.spars["topsail.yard"].wrecked
+    assert ship.spars["main.topgallant_mast"].wrecked and ship.spars["topgallant.yard"].wrecked
+    assert parts.booms(ship).have("topmast") == 0 and parts.booms(ship).have("yard") == 0
+    assert ship.sails["jib"].state is not parts.SailState.UNBENT
+    assert [e.kind for e in w.log[n0:] if e.kind == "spar.shifted"] == ["spar.shifted"] * 2
+    assert ship.sails["jib"].is_set and ship.sails["topsail"].state is not parts.SailState.UNBENT
+    # two spars down, of two classes: the one that keeps her manageable first (the brig's
+    # main topmast before her fore topgallant mast, the wreck and the shift alike), and her
+    # one spare yard to her topsail yard, never to a lower yard
+    w = _cruising("brig")
+    _carry_away(w, "fore.topgallant_mast", "main.topmast", "main.yard")
+    n0 = len(w.log)
+    w.run(4 * 3600)
+    order = [
+        x.split(": ", 1)[1].split(" (")[0]
+        for x in _captains(w, n0)
+        if "wreck of" in x or "shifting" in x
+    ]
+    assert order[:4] == [
+        "clearing away the wreck of the main topmast",
+        "clearing away the wreck of the main yard",
+        "clearing away the wreck of the fore topgallant mast",
+        "shifting the main topmast",
+    ], order
+    assert order.index("shifting the main topsail yard") < order.index(
+        "shifting the fore topgallant mast"
+    ), order
+    assert "shifting the main yard" not in order and w.ship.spars["main.yard"].wrecked
+
+
+def test_truth_7_777_none_where_she_has_no_spare_none_under_fire_and_none_with_hands_busy():
+    """The Renard's own case (the cutter's main topgallant mast shot away): the wreck is
+    cleared, and the line says there is no spare topgallant mast aboard; nothing is shifted,
+    the topgallant yard waiting on its mast. No spar work is ordered within ten minutes of a
+    shot come aboard, nor while other repair work is in hand; and none in action."""
+    w = _cruising("cutter")
+    _carry_away(w, "main.topgallant_mast")
+    n0 = len(w.log)
+    w.run(3 * 3600)
+    said = [x for x in _captains(w, n0) if "wreck" in x or "shifting" in x or "bending" in x]
+    assert said == [
+        "By the captain, keeping station: clearing away the wreck of the main topgallant mast "
+        "(the main topgallant mast carried away)."
+    ]
+    # and nothing asked that she cannot do: no shift given and refused for want of a spare
+    refused = [e.text for e in w.log[n0:] if e.kind == "order.rejected" and "spare" in e.text]
+    assert refused == [], refused
+    cleared = [e.text for e in w.log[n0:] if e.kind == "wreck.cleared"]
+    assert len(cleared) == 1 and cleared[0].endswith("There is no spare topgallant mast aboard.")
+    ship = w.ship
+    assert ship.spars["main.topgallant_mast"].sent_down and ship.spars["topgallant.yard"].sent_down
+    # under fire, with other repair work in hand, in action: nothing; then the wreck
+    from freesail.combat.hits import damage_of
+    from tests.test_damage_control import _hole
+
+    w = _cruising("brig")
+    _carry_away(w, "main.topmast")
+    cap, ship = w.captain, w.ship
+
+    def asked() -> list[str]:
+        n0 = len(w.log)
+        cap._business.pop("repairs_tick", None)
+        from freesail.world.captains import Perception
+
+        cap._repairs(Perception.read(w))
+        return [x for x in _captains(w, n0) if "wreck" in x]
+
+    damage_of(ship).struck_by["a stranger"] = w.clock.tick - 60
+    assert asked() == []
+    damage_of(ship).struck_by["a stranger"] = w.clock.tick - 601
+    _hole(w, 0.8)  # above the water: the captain's own repairs leave it, the order given here
+    assert w.submit("plug the shot holes").kind == "order.accepted"
+    assert "plug_shot_hole" in {i.evo.id for i in ship.extra["evolutions"].instances}
+    assert asked() == []
+    runner = ship.extra["evolutions"]
+    runner.instances[:] = [i for i in runner.instances if i.evo.id != "plug_shot_hole"]
+    cap.state = "engaging"
+    assert asked() == []
+    cap.state = "struck"  # a prize's spars are her captor's to order, not her own captain's
+    assert asked() == []
+    cap.state = "keeping station"
+    # an order of his or the watch's waiting for hands has them first (the lead's list of
+    # 2026-11-27 for part two, item 1): her trims waiting, nothing; none waiting, the wreck
+    assert any(i.waiting for i in runner.instances)
+    assert asked() == []
+    runner.instances[:] = [i for i in runner.instances if not i.waiting]
+    assert asked() == [
+        "By the captain, keeping station: clearing away the wreck of the main topmast (the main "
+        "topmast carried away)."
+    ]
+    # not under command, nothing: in a manoeuvre, aback with no headway, or without steerage way
+    import dataclasses
+
+    from freesail.world.captains import Perception
+
+    w = _cruising("brig")
+    _carry_away(w, "main.topmast")
+    cap, ship = w.captain, w.ship
+    runner = ship.extra["evolutions"]
+    runner.instances[:] = [i for i in runner.instances if not i.waiting]  # none waits for hands
+    p = Perception.read(w)
+    assert p.manoeuvre == "none" and p.headway and cap._spar_work(ship, p, set(), runner)
+    for changed in ({"manoeuvre": "wearing"}, {"manoeuvre": "hove to"}, {"headway": False}):
+        assert cap._spar_work(ship, dataclasses.replace(p, **changed), set(), runner) is None
+    u = ship.dyn.u
+    ship.dyn.u = 0.5  # a knot: no steerage way
+    assert cap._spar_work(ship, p, set(), runner) is None
+    ship.dyn.u = u
+    # a light spar last, and only with nothing at all in hand: the brig's studding-sail boom
+    # alone carried away and cleared, it waits while any work is in hand
+    w = _cruising("brig")
+    boom = "main.topmast.studdingsail_boom.starboard"
+    _carry_away(w, boom)
+    w.ship.spars[boom].sent_down = True
+    cap, ship = w.captain, w.ship
+    runner = ship.extra["evolutions"]
+    p = Perception.read(w)
+    assert runner.instances, "her trims in hand at the start"
+    assert cap._spar_work(ship, p, set(), runner) is None
+    runner.instances[:] = []
+    got = cap._spar_work(ship, p, set(), runner)
+    assert got is not None and got[0].startswith("shift the starboard main topmast studding"), got
+    # the spares are read without writing into a ship with nothing carried away
+    from freesail.world.captains import spares_of
+
+    whole = _cruising("cutter").ship
+    whole.extra.pop("booms", None)
+    whole.extra.pop("spare_spars", None)
+    assert spares_of(whole, "topmast") == 1 and spares_of(whole, "topgallant_mast") == 0
+    assert "booms" not in whole.extra and "spare_spars" not in whole.extra
+    # a manoeuvre begun while a spar is being shifted belays the shift and takes its hands; the
+    # shift is taken up again after, and done
+    from tests.test_damage_control import _world as harbour_world
+
+    w = harbour_world()
+    _carry_away(w, "main.topmast")
+    assert w.submit("clear away the wreck of the main topmast").kind == "order.accepted"
+    w.run(2400)
+    assert w.ship.spars["main.topmast"].sent_down
+    assert w.submit("shift the main topmast").kind == "order.accepted"
+    w.run(120)
+    n0 = len(w.log)
+    assert w.submit("wear ship").kind == "order.accepted"
+    w.run(3 * 3600)
+    after = [(e.kind, e.text) for e in w.log[n0:]]
+    belayed = [t for k, t in after if k == "evolution.belayed" and "shifting the main topmast" in t]
+    assert belayed, after[:12]
+    kinds = [k for k, _ in after]
+    assert "spar.shifted" in kinds and kinds.index("spar.shifted") > kinds.index(
+        "evolution.belayed"
+    )
+    assert not w.ship.spars["main.topmast"].wrecked
+
+
+def test_truth_7_777_b_the_wreck_she_needs_to_work_her_is_cleared_before_a_light_one():
+    """The order of the wreck's clearing (the lead's list of 2026-11-27 for package 126, part
+    two, item 3; the reader's mutant M03, a light spar sorted first, survived): with a light
+    spar's wreck hanging beside a working spar's, the working spar's is cleared first, with
+    work in hand or with none; the light spar's is cleared after it, and only with nothing at
+    all in hand."""
+    from freesail.evolutions.scripts import wrecks
+    from freesail.world.captains import Perception
+
+    boom = "main.topmast.studdingsail_boom.starboard"
+    for in_hand in (True, False):
+        w = _cruising("brig")
+        _carry_away(w, boom, "fore.topmast")
+        cap, ship = w.captain, w.ship
+        runner = ship.extra["evolutions"]
+        # her trims going on, none waiting for hands (work waiting has the hands first)
+        runner.instances[:] = [i for i in runner.instances if in_hand and not i.waiting]
+        assert bool(runner.instances) is in_hand
+        got = cap._spar_work(ship, Perception.read(w), set(), runner)
+        assert got is not None and got[0] == "clear away the wreck of the fore topmast", got
+    # the working spar's wreck cleared: the light spar's waits on work in hand, and is cleared
+    # with none
+    for sp in wrecks(ship):
+        if getattr(sp, "id", None) != boom:
+            sp.sent_down = True
+    assert [x.id for x in wrecks(ship) if hasattr(x, "id")] == [boom]
+    runner.instances[:] = [i for i in _cruising("brig").ship.extra["evolutions"].instances[:1]]
+    assert cap._spar_work(ship, Perception.read(w), set(), runner) is None
+    runner.instances[:] = []
+    got = cap._spar_work(ship, Perception.read(w), set(), runner)
+    assert got is not None and got[0].startswith("clear away the wreck of the starboard"), got
+
+
+# -- lying to with no topsail set -----------------------------------------------------------
+
+GALE = """
+name: a gale abeam
+seed: 7
+start: 1805-06-14T04:00
+position: 48 40 N 5 05 W
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/{ship}.yaml
+  heading_deg: 0
+  speed_kn: 6
+  glass: true
+intent: bound for Falmouth
+ports: [falmouth, plymouth, brest]
+weather:
+  wind:
+    - {{at: 1805-06-14T00:00, from_deg: {wind}, knots: 20, air_mass: neutral}}
+    - {{at: 1805-06-14T04:30, from_deg: {wind}, knots: 20}}
+    - {{at: 1805-06-14T05:30, from_deg: {wind}, knots: 35}}
+    - {{at: 1805-06-14T08:00, from_deg: {wind}, knots: 35}}
+  background:
+    {{hpa: 1004, gradient_hpa_per_100km: 1.2, high_toward_deg: 200}}
+  sea: true
+orders:
+  - set plain sail
+"""
+
+
+def _gale(ship: str, wind: int):
+    path = Path(tempfile.mkdtemp()) / "gale.yaml"
+    path.write_text(GALE.format(ship=ship, wind=wind), encoding="utf-8")
+    sf = load_scenario(str(path))
+    w = make_scenario_world(sf)
+    begin(w, sf)
+    return w
+
+
+def test_truth_7_778_with_no_topsail_set_to_lie_a_try_under_she_heaves_to_in_the_gale():
+    """The list carried forward from milestone 7, section 4, item 12 (`lie a-try` ordered by
+    the game's own captain with the wind abeam and not taken), as it is on a ship in the game:
+    the smack, her topsail furled under her plain sail, bound for Falmouth with the wind
+    rising from twenty knots to thirty-five over an hour, abeam (from the west) and nearer
+    the wind (from the north-east): at the gale's line the captain's `lie a-try` was refused
+    ("The topsail is not set; set it to lie a-try under it.") and she sailed on at seven to
+    nine knots for the two hours of the gale. She heaves to under her fore-and-aft canvas,
+    the order said with its reason, and drifts at under two and a half knots; a ship with
+    her topsail set lies a-try as before (the cutter)."""
+    for wind in (270, 55):
+        w = _gale("smack", wind)
+        w.run(int(1.5 * 3600))
+        said = _captains(w, 0)
+        refused = [e for e in w.log if e.kind == "order.rejected" and "lie a-try" in e.text]
+        assert refused == [], [e.text for e in refused]
+        assert (
+            "By the captain, hove to for weather: heaving to (no topsail set to lie a-try under)."
+            in said
+        ), said
+        hove = [e for e in w.log if e.kind == "ship.hove_to"]
+        assert hove and "under her fore-and-aft canvas" in hove[0].text, (wind, hove)
+        assert 3540 <= hove[0].tick <= 3540 + 900
+        speeds = []
+        for _ in range(30):
+            w.run(60)
+            speeds.append(float(w.readings.value("speed")) * 1.943844)
+        assert max(speeds) < 2.5 and w.captain.state == "hove to for weather", (wind, speeds)
+    w = _gale("cutter", 270)
+    w.run(int(1.5 * 3600))
+    assert any(e.text.startswith("Lying a-try under the topsail") for e in w.log)
+    assert "By the captain, hove to for weather: lying a try." in _captains(w, 0)
+    # her topsail unbent is as her topsail furled: she heaves to
+    w = _gale("smack", 270)
+    w.ship.sails["topsail"].state = parts.SailState.UNBENT
+    w.run(int(1.5 * 3600))
+    said = _captains(w, 0)
+    assert (
+        "By the captain, hove to for weather: heaving to (no topsail set to lie a-try under)."
+        in said
+    ), said
+    # a topsail in hand, lowered for its reefs at the gale's line, is not a topsail stowed: the
+    # bilander lies a-try under it, as she did
+    w = _gale("bilander", 270)
+    w.run(int(2.5 * 3600))
+    said = _captains(w, 0)
+    assert "By the captain, hove to for weather: lying a try." in said, said
+    assert not any("no topsail set to lie a-try under" in x for x in said)
+    assert any(e.text.startswith("Lying a-try under the main topsail") for e in w.log)
+
+
+# -- the spar's work leaves her no worse off --------------------------------------------------
+
+
+def _three_hours_on(ship: str, spar: str, spar_work: bool, monkeypatch) -> dict:
+    """Her way through the third hour after a spar carried away out of action, how often she
+    was taken aback, and what the captain said, with his spar work or without it (the trunk's
+    captain, who left the spar as it fell)."""
+    from freesail.world import captains as C
+
+    given: list[dict] = []
+    if not spar_work:
+        monkeypatch.setattr(C.Captain, "_spar_work", lambda self, *a, **k: None)
+    else:
+        real = C.Captain._spar_work
+
+        def watched(self, ship_, p, in_hand, runner):
+            got = real(self, ship_, p, in_hand, runner)
+            if got is not None:
+                given.append(
+                    {
+                        "order": got[0],
+                        "manoeuvre": p.manoeuvre,
+                        "headway": p.headway,
+                        "u": float(ship_.dyn.u),
+                        "in_hand": len(getattr(runner, "instances", []) or []),
+                    }
+                )
+            return got
+
+        monkeypatch.setattr(C.Captain, "_spar_work", watched)
+    w = _cruising(ship)
+    _carry_away(w, spar)
+    n0 = len(w.log)
+    way: list[float] = []
+    for minute in range(180):
+        w.run(60)
+        if minute >= 120:
+            way.append(float(w.ship.dyn.u) * 1.943844)
+    monkeypatch.undo()
+    return {
+        "world": w,
+        "mean": sum(way) / len(way),
+        "least": min(way),
+        "aback": sum(1 for e in w.log[n0:] if e.kind == "ship.aback"),
+        "said": _captains(w, n0),
+        "given": given,
+    }
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(
+    ("ship", "spar", "sail"),
+    [
+        ("cutter", "main.topmast", "jib"),  # a fore-and-after
+        ("brig", "main.topmast", "main.topsail"),  # a small square-rigger
+        ("seventy-four", "fore.topmast", "fore.topsail"),  # a ship of the line
+    ],
+)
+def test_truth_7_779_her_spar_shifted_she_makes_no_less_way_and_is_no_more_often_aback(
+    ship, spar, sail, monkeypatch
+):
+    """The lead's list of 2026-11-24 for package 126, A3: the spar's work must not leave her
+    worse off than the trunk's captain, who left the spar as it fell. A spar carried away out
+    of action, cruising off the Lizard in twelve knots: three hours on she makes no less way
+    through the third hour, and is taken aback no more often, than the same ship with the
+    same loss and no spar work; the sail that stood on the spar is bent again, set by him,
+    and drawing; he gave no spar's order while she was in a manoeuvre, and every order of the
+    work (the wreck, the shift, the bend, the set) said why."""
+    on = _three_hours_on(ship, spar, True, monkeypatch)
+    off = _three_hours_on(ship, spar, False, monkeypatch)
+    assert on["mean"] >= off["mean"], (on["mean"], off["mean"])
+    assert on["least"] > 0.0, on["least"]  # never going astern in the third hour
+    assert on["aback"] <= off["aback"], (on["aback"], off["aback"])
+    w = on["world"]
+    name = w.captain._sail_name(sail)
+    said = on["said"]
+    assert any(f"setting the {name} (bent again to its spar)" in x for x in said), said
+    assert any(f"bending the {name} (its spar shifted for a spare)" in x for x in said), said
+    assert not w.ship.spars[spar].wrecked
+    assert w.ship.sails[sail].is_set
+    assert not [x for x in off["said"] if "shifting" in x or "wreck" in x]
+    # every order of the spar's work given with her under command, a light spar's with
+    # nothing at all in hand
+    from freesail.physics.hull import HELM_STEERAGE_SPEED
+    from freesail.world.captains import light_spar
+
+    assert on["given"], on["given"]
+    for g in on["given"]:
+        assert g["manoeuvre"] == "none" and g["headway"], g
+        assert g["u"] >= HELM_STEERAGE_SPEED, g
+        named = g["order"].removeprefix("shift the ")
+        light = [
+            sp
+            for sp in w.ship.spars.values()
+            if light_spar(w.ship, sp) and w.captain._sail_name(sp.id) == named
+        ]
+        if g["order"].startswith("shift the ") and light:
+            assert g["in_hand"] == 0, g
+
+
+# -- the spar's work against the trunk, in four winds (the lead's probe) ----------------------
+
+PASSAGE = """
+name: a spar carried away on passage
+seed: {seed}
+start: 1805-06-14T04:00
+position: 48 40 N 5 05 W
+region: channel-west
+nation: britain
+ship:
+  file: data/ships/{ship}.yaml
+  heading_deg: 0
+  speed_kn: 6
+  glass: true
+intent: bound for Falmouth
+ports: [falmouth, plymouth, brest]
+weather:
+  wind:
+{wind}
+  background:
+    {{hpa: 1012, gradient_hpa_per_100km: 1.2, high_toward_deg: 200}}
+  sea: true
+orders:
+  - set plain sail
+"""
+# The lead's four winds (from the west, she bound north): twelve knots; twenty-five; twelve with
+# the wind heading her four points at forty minutes (half an hour after the spar went); twenty
+# rising to thirty-eight from forty to seventy minutes.
+PASSAGE_WINDS: dict[str, list[tuple[str, int, int]]] = {
+    "12": [("04:00", 270, 12), ("04:50", 270, 12), ("09:00", 270, 12)],
+    "25": [("04:00", 270, 25), ("09:00", 270, 25)],
+    "12-heading": [("04:00", 270, 12), ("04:40", 270, 12), ("04:45", 330, 12), ("09:00", 330, 12)],
+    "20-38": [("04:00", 270, 20), ("04:40", 270, 20), ("05:10", 270, 38), ("09:00", 270, 38)],
+}
+# The spar carried away at minute ten, by ship: the lead's four and the three of truth 7-779.
+PASSAGE_SPARS = {
+    "bilander": "fore.topmast",
+    "merchant-brig": "main.topmast",
+    "topsail-schooner": "fore.topmast",
+    "frigate-36": "main.topmast",
+    "cutter": "main.topmast",
+    "brig": "main.topmast",
+    "seventy-four": "fore.topmast",
+}
+PASSAGE_SEEDS = (7, 8, 9)
+FALMOUTH = (50.15, -5.07)
+
+
+def _from_falmouth_nm(lat: float, lon: float) -> float:
+    import math
+
+    dlat = math.radians(FALMOUTH[0] - lat)
+    dlon = math.radians(FALMOUTH[1] - lon) * math.cos(math.radians((lat + FALMOUTH[0]) / 2))
+    return math.hypot(dlat, dlon) * 3437.75
+
+
+def _spar_passage(ship: str, wind: str, seed: int, how: str) -> dict:
+    """Three hours bound for Falmouth after `PASSAGE_SPARS[ship]` carried away at minute ten:
+    her way made good toward Falmouth (nm), the minutes she went astern, how often she was
+    taken aback, and the tick she was brought to (lying a-try or hove to) or None. `how`:
+    "mine" this tree's captain; "trunk" the trunk's captain (the spar's work, the bring-to
+    given again and the narrowed `lie a-try` patched out: shown equal to the trunk in every
+    line and position on every cell, the report's section 8); "instant" the trunk's captain
+    with the wreck cleared the moment it fell, no hands spent and no time (its sails to the
+    sail room, its spars sent down)."""
+    from freesail.evolutions.scripts import wreck_root
+    from freesail.world import captains as C
+
+    saved = (C.Captain._spar_work, C.Captain._bring_to_again, C.Captain._topsail_to_lie_under)
+    if how in ("trunk", "instant"):
+        C.Captain._spar_work = lambda self, *a, **k: None
+        C.Captain._bring_to_again = lambda self, p: None
+        C.Captain._topsail_to_lie_under = lambda self: True
+    try:
+        lines = "\n".join(
+            f"    - {{at: 1805-06-14T{at}, from_deg: {d}, knots: {k}"
+            f"{', air_mass: neutral' if i == 0 else ''}}}"
+            for i, (at, d, k) in enumerate(PASSAGE_WINDS[wind])
+        )
+        path = Path(tempfile.mkdtemp()) / "passage.yaml"
+        path.write_text(PASSAGE.format(ship=ship, wind=lines, seed=seed), encoding="utf-8")
+        sf = load_scenario(str(path))
+        w = make_scenario_world(sf)
+        begin(w, sf)
+        w.run(600)
+        s = w.ship
+        ST._wreck_spar(s, ST.strain_state(s), s.spars[PASSAGE_SPARS[ship]], 2.0)
+        if how == "instant":
+            for sail in s.sails.values():
+                if wreck_root(s, sail) is not None and sail.state is not parts.SailState.BLOWN_OUT:
+                    sail.state = parts.SailState.UNBENT
+            for sp in s.spars.values():
+                if sp.wrecked:
+                    sp.sent_down = True
+        n0 = len(w.log)
+        start = _from_falmouth_nm(w._position.lat_deg, w._position.lon_deg)
+        astern = 0
+        for _ in range(180):
+            w.run(60)
+            if float(s.dyn.u) < -0.05:
+                astern += 1
+        log = w.log[n0:]
+        return {
+            "made_good": start - _from_falmouth_nm(w._position.lat_deg, w._position.lon_deg),
+            "astern": astern,
+            "aback": sum(1 for e in log if e.kind == "ship.aback"),
+            "brought_to": next((e.tick for e in log if e.kind == "ship.hove_to"), None),
+            "world": w,
+        }
+    finally:
+        C.Captain._spar_work, C.Captain._bring_to_again, C.Captain._topsail_to_lie_under = saved
+
+
+# The margins of "not worse" (the lead's ruling of 2026-11-27 for part two's truth): half the
+# trunk's own seed-to-seed range in the cell over `PASSAGE_SEEDS` (what one seed against its
+# neighbour moves her in that cell with no change of the code), and never under these floors
+# (JUDGEMENT: three cables made good, five minutes astern, one time aback: a tenth of an hour's
+# sailing at three knots, and the least count of the others).
+PASSAGE_FLOORS = (0.3, 5.0, 1.0)
+PASSAGE_CELLS = [(ship, wind) for ship in PASSAGE_SPARS for wind in PASSAGE_WINDS]
+
+
+def _median(xs: list[float]) -> float:
+    xs = sorted(xs)
+    return xs[len(xs) // 2]
+
+
+def _cell_verdict(trunk: list[dict], instant: list[dict], mine: list[dict]) -> dict:
+    """The cell judged on its seeds together (medians), by the lead's ruling: the yardstick
+    is the trunk, or the wreck cleared at once where that is itself worse than the trunk
+    beyond the margin in any of the three measures; mine not worse than the yardstick beyond
+    the margin in way made good, minutes astern and times aback."""
+    keys = ("made_good", "astern", "aback")
+    margin = {
+        k: max(f, (max(r[k] for r in trunk) - min(r[k] for r in trunk)) / 2)
+        for k, f in zip(keys, PASSAGE_FLOORS, strict=True)
+    }
+    med = {
+        how: {k: _median([r[k] for r in runs]) for k in keys}
+        for how, runs in (("trunk", trunk), ("instant", instant), ("mine", mine))
+    }
+    t, i, m = med["trunk"], med["instant"], med["mine"]
+    instant_worse = (
+        i["made_good"] < t["made_good"] - margin["made_good"]
+        or i["astern"] > t["astern"] + margin["astern"]
+        or i["aback"] > t["aback"] + margin["aback"]
+    )
+    y = i if instant_worse else t
+    return {
+        "by": "instant" if instant_worse else "trunk",
+        "margin": margin,
+        "medians": med,
+        "ok": {
+            "made_good": m["made_good"] >= y["made_good"] - margin["made_good"],
+            "astern": m["astern"] <= y["astern"] + margin["astern"],
+            "aback": m["aback"] <= y["aback"] + margin["aback"],
+        },
+    }
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize(("ship", "wind"), PASSAGE_CELLS)
+def test_truth_7_779_b_her_spar_carried_away_she_does_no_worse_than_the_trunk_on_passage(
+    ship, wind
+):
+    """The lead's list of 2026-11-27 for package 126, part two, item 1, and his ruling of the
+    same day: bound for Falmouth from 48 40 N 5 05 W, a spar carried away at minute ten, three
+    hours, in twelve knots, twenty-five, twelve with the wind heading her and twenty rising to
+    thirty-eight, on the bilander, the merchant brig, a topsail schooner, the frigate, the
+    cutter, the brig and the seventy-four, on three seeds: this tree's captain makes no less
+    way, goes astern no longer and is taken aback no more often (the cell's medians, by
+    `_cell_verdict`'s margins) than the trunk's captain, or, where the wreck cleared at once is
+    itself worse than the trunk (a wreck hanging pays some hulls off like a head sail, the
+    physics giving it three times its windage and none of its harm: the carried list, fault
+    22), than that; and on every seed on which the trunk's captain lies a-try or heaves to in
+    the gale, so does this one."""
+    runs = {
+        how: [_spar_passage(ship, wind, seed, how) for seed in PASSAGE_SEEDS]
+        for how in ("trunk", "instant", "mine")
+    }
+    verdict = _cell_verdict(runs["trunk"], runs["instant"], runs["mine"])
+    assert all(verdict["ok"].values()), verdict
+    for seed, t, m in zip(PASSAGE_SEEDS, runs["trunk"], runs["mine"], strict=True):
+        if t["brought_to"] is not None:
+            assert m["brought_to"] is not None, (seed, t["brought_to"])
+
+
+def test_truth_7_779_b_the_trunk_in_this_tree_is_the_trunk():
+    """The stand-in `_spar_passage` runs for the trunk's captain (his spar work, the bring-to
+    given again and the narrowed `lie a-try` patched out) is the trunk's own on a cell that
+    carries a spar's work: these figures were the trunk's at f09fe283 (and the stand-in's, on
+    all 84 cell-seeds, in every line and position: the report's section 8)."""
+    got = _spar_passage("bilander", "20-38", 7, "trunk")
+    assert (round(got["made_good"], 2), got["astern"], got["aback"], got["brought_to"]) == (
+        8.9,
+        21,
+        1,
+        6123,
+    )
