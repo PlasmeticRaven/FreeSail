@@ -40416,3 +40416,88 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - shortened: 20 kn (140, 220), 3; 25 kn (150, 220), trunk 1.
   - Her 7-762 cases are in `SLOW_TESTS`.
 - **Read by:** her pins were pinned by her builder (package 90, the ships' session). The moved ones have been read by no reader of this package's.
+
+## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
+
+**One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
+of the hands (`docs/primer/03-making-and-shortening-sail.md`), so `tests/test_agents.py`'s
+`test_the_contents_says_what_each_topic_costs_measured_from_the_text_served` and
+`test_a_chapter_lists_its_sections_with_sizes_and_serves_one_by_a_word_or_its_number` move.
+Old: "about 11,330 tokens". New: "about 11,480 tokens". The history is kept in the first test's
+docstring. No other pin moved.
+
+The new figures, each JUDGEMENT and defined with its ground where it stands:
+
+- `world.captains.BRING_TO_AGAIN_S` 600 s: a refused or failed order to bring her to for the
+  weather is given again ten minutes after the last (the trunk gave it once, on entering the
+  state); tried twice with her sail unchanged, refused, failed or done and not hove to, it is not
+  given again until her sail changes.
+- `world.captains.LIE_A_TRY_CANVAS_NO` No. 4: the lightest canvas of a topsail she lies a-try under
+  (courses and topsails of No. 2; the sloop's topsail of No. 6 or 7, the cutter's and the smack's,
+  a fair-weather sail that blew out laid to under it in forty knots). With none she heaves to.
+- `world.captains.WRECK_HANDS_UP_S` 3,600 s: a wreck that has hung an hour with her watch never free
+  of its own work has all hands turned up for it, in settled weather only and never as she is
+  brought to; piped down when it is cleared.
+- `evolutions.runner.SPAR_WORK_RESUME_QUIET_S` 300 s: a spar's work held for her working is taken up
+  again only when nothing has waited for hands or gone on short for five minutes.
+- `world.captains.SPAR_WORK_QUIET_S` 600 s, `SPAR_MEND_ORDER`, `LIGHT_SPAR_CLASSES` and
+  `SPARE_YARD_ANSWERS` as before (under fire, the order of the work, the light spars last, a spare
+  yard to a topsail yard alone).
+- The passage truth 7-779 b (`tests/test_mends_126.py`), judged seed by seed over seeds 3, 7, 8, 9
+  and 11: `PASSAGE_ASTERN_MIN` 5 minutes, `PASSAGE_ABACK` 1, `PASSAGE_BROUGHT_S` 300 s,
+  `PASSAGE_WAY_SHARE` 0.10 and `PASSAGE_WAY_FLOOR_NM` 1.0 nm (the price of the hands' work in way
+  made good). They replace the package's own unmerged `PASSAGE_FLOORS` (0.3 nm, 5 min, 1, the
+  floors of a median margin of half the trunk's range), which moved no pin of the trunk's.
+
+**For the ships' session: a wreck left hanging pays some hulls off** (the carried list, fault 22).
+The physics gives a wrecked sail no drive but three times its windage, and its wrecked spars three
+times theirs (`physics.sails._sail_windage_area`, `_spar_windage_area`, `WRECK_MULTIPLIER`), and no
+harm. A topmast's wreck forward acts as a head sail. On the lead's probe (bound for Falmouth from
+48 40 N 5 05 W, the spar carried away at minute ten, three hours, seeds 3, 7, 8, 9 and 11) the
+trunk's own captain with the wreck cleared at the moment it fell, no hands spent, is worse than with
+it left hanging on 44 of the 140 cell-seeds, and there the captain of package 126 is measured
+against that clearing (the lead's rulings of 2026-11-27). The cells where it is so on most seeds,
+made good nm / minutes astern / times aback / tick brought to, trunk (wreck left hanging) beside the
+wreck cleared at once beside package 126, with the spar work's belays and the verdict (every
+bilander's and 74's cell-seed where the wreck cleared at once is the yardstick):
+
+| Ship (fore topmast) | Wind | Seed | Trunk | Wreck cleared at once | Package 126 | Belays | |
+|---|---|---|---|---|---|---|---|
+| bilander | 12 kn | 3 | 10.63 / 0 / 0 / - | -0.21 / 171 / 2 / - | 10.86 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 7 | 9.94 / 0 / 1 / - | 9.88 / 22 / 1 / - | 10.19 / 0 / 1 / - | 4 | inside |
+| bilander | 12 kn | 8 | 9.40 / 0 / 0 / - | 8.68 / 22 / 1 / - | 9.58 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 9 | 10.86 / 0 / 0 / - | -0.22 / 171 / 2 / - | 10.27 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn | 11 | 9.94 / 0 / 0 / - | -0.11 / 171 / 2 / - | 10.47 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 3 | 16.10 / 0 / 0 / - | 3.90 / 85 / 5 / - | 15.88 / 5 / 0 / - | 6 | inside |
+| bilander | 25 kn | 7 | 3.23 / 89 / 2 / - | 5.00 / 58 / 6 / - | 3.23 / 89 / 2 / - | 0 | inside |
+| bilander | 25 kn | 8 | 15.02 / 0 / 0 / - | 12.74 / 36 / 2 / - | 15.87 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 9 | 9.26 / 29 / 4 / - | 1.13 / 107 / 5 / - | 16.46 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 11 | 15.41 / 0 / 0 / - | 0.90 / 114 / 2 / - | 17.50 / 0 / 0 / - | 2 | inside |
+| bilander | 12 kn, heading | 3 | 5.99 / 0 / 0 / - | -1.29 / 172 / 2 / - | 6.09 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 7 | 2.62 / 76 / 0 / - | -1.10 / 168 / 2 / - | 3.01 / 81 / 1 / - | 6 | inside |
+| bilander | 12 kn, heading | 8 | 5.64 / 0 / 0 / - | -0.57 / 170 / 2 / - | 5.75 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 9 | 5.91 / 0 / 0 / - | -1.26 / 173 / 2 / - | 5.99 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn, heading | 11 | 6.01 / 0 / 0 / - | -1.18 / 171 / 2 / - | 6.13 / 0 / 0 / - | 4 | inside |
+| bilander | 20 to 38 | 3 | 14.24 / 0 / 0 / 6889 | 0.64 / 154 / 1 / 6751 | 14.24 / 0 / 0 / 6889 | 1 | inside |
+| bilander | 20 to 38 | 7 | 8.90 / 21 / 1 / 6123 | 2.28 / 141 / 1 / 6247 | 8.90 / 21 / 1 / 6123 | 3 | inside |
+| bilander | 20 to 38 | 8 | 11.87 / 0 / 1 / 7103 | 0.56 / 160 / 1 / 7086 | 11.87 / 0 / 1 / 7103 | 1 | inside |
+| bilander | 20 to 38 | 9 | 14.32 / 0 / 0 / 6340 | -0.71 / 163 / 1 / 6140 | 14.32 / 0 / 0 / 6340 | 1 | inside |
+| bilander | 20 to 38 | 11 | 14.28 / 0 / 1 / 6502 | 0.49 / 147 / 1 / 6653 | 14.28 / 0 / 1 / 6502 | 0 | inside |
+| 74 | 12 kn | 3 | 0.06 / 161 / 2 / - | -0.53 / 176 / 2 / - | 0.06 / 161 / 2 / - | 0 | inside |
+| 74 | 12 kn | 8 | 9.25 / 0 / 0 / - | 4.17 / 104 / 1 / - | 11.18 / 0 / 0 / - | 0 | inside |
+| 74 | 25 kn | 7 | 6.51 / 96 / 9 / - | 1.88 / 111 / 20 / - | 2.98 / 117 / 14 / - | 6 | declared: way, astern, aback |
+| 74 | 25 kn | 9 | 25.50 / 8 / 1 / - | 1.51 / 120 / 21 / - | 26.28 / 8 / 1 / - | 1 | inside |
+| 74 | 12 kn, heading | 3 | -1.06 / 162 / 3 / - | -1.51 / 176 / 2 / - | -1.06 / 162 / 3 / - | 0 | inside |
+| 74 | 12 kn, heading | 7 | 0.62 / 131 / 2 / - | 0.56 / 143 / 2 / - | 0.41 / 144 / 2 / - | 3 | inside |
+| 74 | 12 kn, heading | 9 | 0.48 / 136 / 2 / - | 0.50 / 144 / 2 / - | 0.31 / 142 / 2 / - | 4 | inside |
+| 74 | 12 kn, heading | 11 | 1.04 / 136 / 2 / - | 0.86 / 143 / 2 / - | 0.79 / 143 / 2 / - | 4 | inside |
+| 74 | 20 to 38 | 3 | 8.58 / 52 / 4 / 5351 | 11.17 / 97 / 0 / 5496 | 7.30 / 97 / 3 / 5349 | 1 | declared: way, astern |
+| 74 | 20 to 38 | 7 | 9.56 / 43 / 0 / 5018 | 0.82 / 144 / 8 / 4932 | 3.99 / 116 / 1 / 4916 | 1 | inside |
+| 74 | 20 to 38 | 8 | 13.03 / 59 / 1 / 5856 | 11.93 / 92 / 0 / 5806 | 11.84 / 89 / 0 / 5840 | 1 | inside |
+| 74 | 20 to 38 | 9 | 13.88 / 25 / 0 / 5380 | 11.16 / 90 / 0 / 5318 | 10.83 / 86 / 0 / 5359 | 1 | inside |
+| 74 | 20 to 38 | 11 | 13.67 / 34 / 0 / 5527 | 11.57 / 97 / 0 / 5462 | 11.54 / 87 / 0 / 5503 | 1 | inside |
+
+The bilander's fore topmast and the 74's are forward of her centre of effort;
+cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
+against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
+wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
