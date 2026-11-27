@@ -86,8 +86,8 @@ CHARTS_DIR = Path(__file__).resolve().parents[2] / "data" / "charts"
 
 # The tiles a level keeps loaded, the least lately read let go first (`Level.tile`). JUDGEMENT,
 # measured: a far trader's passage from the Havre to Dover laid by the planner reads 33 tiles
-# of the two fine levels, more than 32 of one; with 16 kept, every laying loaded them all
-# again (37 loads), with 64 none. A tile is about a megabyte, so a level holds some 64 MB at
+# of one level and 31 of another; with 16 kept, every laying loaded them all again (37
+# loads), with 64 none. A tile is about a megabyte, so a level holds some 64 MB at
 # most. What is kept changes no answer: a tile is the same read from the cache or the disk.
 TILE_CACHE = 64
 
