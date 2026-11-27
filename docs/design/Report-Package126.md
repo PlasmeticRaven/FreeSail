@@ -230,8 +230,53 @@ readings in a fog.
 
 ## 5. The pins moved, and the differences served
 
-**No pin moved** (`docs/dev/TuningNotes.md`, "Package 126, part one"). The comparison of today's
-ships against the trunk on this hash is being run; its table follows here before the report.
+**No pin moved** (`docs/dev/TuningNotes.md`, "Package 126, part one").
+
+**Today's ships, old beside new** (this hash's code beside the trunk at 64fcc565, whose code is that
+of ba51f24e, where the old runs were made). The same orders at seed 7 under the game's own captain:
+
+- every ship file (the thirteen ships and the five boats);
+- four cases: a gale abeam and a gale close-hauled (bound for Falmouth from 48 40 N 5 05 W, the
+  wind rising from 20 to 35 knots over an hour and held two and a half more), a cruise off the
+  Lizard (12 knots pinned, three hours), and a June passage off Falmouth under a high with the
+  systems' weather (six hours);
+- in every run, the whole log and the ship's end state compared.
+
+| Case | Same in every line and the end state | Differs |
+|---|---|---|
+| gale abeam | 18 of 18 | none |
+| gale close-hauled | 18 of 18 | none |
+| cruise | 18 of 18 | none |
+| June off Falmouth | none of 18 | the fog's coming and going (§2, §4), on every file |
+
+Every case with no fog in it is the trunk's, line for line. In the June fog runs:
+
+- **The five boats** differ in the weather's lines, and in what hangs on their minutes; they end
+  within 11 m of the trunk's.
+- **The 74, the 64, the razee, the frigate and the brig** end where the trunk's do, their logs
+  differing by the fog's lines and the soundings, bearings and fixes taken in it.
+- **The others under way** differ in the fog's lines and in what hangs on its minutes: the captain's
+  fog signals and their ceasing, the courses shaped and the tide's allowance at the next minute,
+  the log hove, the trims. They end 0.5 to 6.3 cables from the trunk's (the cutter the most).
+
+***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
+seat): **the same**, line for line (629 lines in the Sherbourne's log on both).
+
+**What a player or a model's seat is served that differs** (every such line, by kind):
+
+- **The fog's lines** (§2): `weather.change` "A fog is settling in." and `weather.fog` "The fog is
+  thickening.", "The fog has shut in thick.", "The fog seems to be clearing." and "The fog is
+  thinning."
+- **The weather's words through a fog:** the sky's ("The sky hazy.", "The sky thick.") and the
+  hour's ("Hazy, fog; ..."), and the reading of the visibility ("a few miles", "a mile").
+- **What follows those minutes:** the lookout's sightings, the signals' book of fog under a mile,
+  and the captain's orders that hang on them.
+- **The fog's lifting into other weather:** "The fog lifted. <the weather's line>".
+- **The harbour's page and state:** the end's button and words (with the ship's time and its day),
+  and `games` in the state.
+- **The primer's chapter 1 and the README:** one sentence each on ending a game (§3).
+
+Nothing else moved.
 
 ## 6. Found and not mended
 
