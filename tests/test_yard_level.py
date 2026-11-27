@@ -85,6 +85,22 @@ COMMITTED_YARD_LEVELS: dict[str, dict[str, int]] = {
         "main.topgallant.yard": 2,
         "main.royal.yard": 3,
     },
+    # the Diana's (package 90, her builder): the frigate-36's twelve yards at their levels, read
+    # off her file as committed. Old: no row, before her file
+    "corvette-20": {
+        "fore.yard": 0,
+        "fore.topsail.yard": 1,
+        "fore.topgallant.yard": 2,
+        "fore.royal.yard": 3,
+        "main.yard": 0,
+        "main.topsail.yard": 1,
+        "main.topgallant.yard": 2,
+        "main.royal.yard": 3,
+        "mizzen.topsail.yard": 1,
+        "mizzen.topgallant.yard": 2,
+        "mizzen.royal.yard": 3,
+        "mizzen.crossjack.yard": 0,
+    },
     "cutter": {"square_sail.yard": 0, "topsail.yard": 1, "topgallant.yard": 2},
     "frigate-36": {
         "fore.yard": 0,
@@ -174,7 +190,8 @@ COMMITTED_YARD_LEVELS: dict[str, dict[str, int]] = {
 
 def test_the_table_of_yard_levels_has_a_row_for_every_committed_file_and_no_other():
     assert set(COMMITTED_YARD_LEVELS) == {p.stem for p in SHIP_FILES}
-    assert sum(len(row) for row in COMMITTED_YARD_LEVELS.values()) == 91
+    # 91 before the Diana's file (package 90), her twelve the frigate-36's yards
+    assert sum(len(row) for row in COMMITTED_YARD_LEVELS.values()) == 103
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])

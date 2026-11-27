@@ -425,11 +425,6 @@ def _group_evolution(
         lines = storm.listed_lines(ship, lines)
         lines = storm.bowsprit_sail_lines(ship) + storm.flying_topsail_lines(ship) + lines
         lines += storm.shorten_sail_lines(ship, storm.true_wind_kn(ship))
-        # package 125, D: a jib left on her because her helm will not hold her without it,
-        # said in the reply (and so in the log's line of the order)
-        kept_words = storm.kept_jibs_words(ship, storm.loaded_jibs(ship)[1])
-    else:
-        kept_words = ""
     for line in lines:
         try:
             sub = parse(ship, line, vocab)
@@ -462,8 +457,6 @@ def _group_evolution(
     # a line's words the runner said itself are none here (`verbs.unsaid`)
     text = f"{order.verb[0].upper()}{order.verb[1:]}: " + " ".join(t for t in texts if t)
     text = text.rstrip()
-    if kept_words:
-        text += " " + kept_words
     if failed:
         text += " Not done: " + errors.sentence_list(failed) + "."
     data = {
