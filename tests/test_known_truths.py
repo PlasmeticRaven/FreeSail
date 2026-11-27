@@ -24112,7 +24112,9 @@ def test_truth_7_760_no_ship_tacks_worse_than_she_did():
     package, by what she did. The haul by her way moves no committed square-rigger's tack (every
     one keeps 0.48 to 0.58 of her way at the point and hauls there as before); the hermaphrodite
     brig, slack in stays (0.21 to 0.33), hauls with the wind ahead and stays as before, quicker in
-    light airs (411 to 291 s in 8 knots) and slower shortened in 20 (138 to 186 s)."""
+    light airs (411 to 291 s in 8 knots) and slower shortened in 20 (138 to 186 s); the two
+    schooners, slack too in 20 and 25 knots (0.17 to 0.27) but with no square after yards to
+    swing, by one or two seconds."""
     for table in (FLEET_PLAIN, FLEET_SHORTENED):
         for key, (made, band, trunk) in table.items():
             assert len(made) >= trunk, key

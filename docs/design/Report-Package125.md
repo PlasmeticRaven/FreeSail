@@ -1,6 +1,6 @@
 # Package 125: the moment of the haul (report)
 
-The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
+The brief: `docs/dev/briefs/Brief-Package125.md`. The lead's rulings on the ground report (2026-11-24): A by her way, the figure settled by the measure below; B closed and nothing built; C as given; D as given; E built, every captain's. On the lead's list of 2026-11-27 E is taken out (§6), and the trunk at f2821c7 (package 127) is merged in. The pins moved are in `docs/dev/TuningNotes.md` under "Package 125".
 
 Every measure is at seed 7, made with the truths' own helpers (`close_hauled_on_starboard`: the wind from the north, no gusts, plain sail set and braced up). Tacks are from 290, 292.5 and 295 degrees, in 8, 12, 15, 20 and 25 knots. "Shortened" means the game's own `shorten sail` run to its end, then sixty seconds, then the helm put down. **S**n means stayed in n seconds; **m** means missed stays; **F** means refused; **·** means no end in 900 s.
 
@@ -26,7 +26,7 @@ Under plain sail; each wind's three cells are the headings 290, 292.5 and 295:
 | *the corvette (probe)* | S351 m m | S187 S187 S184 | S232 S235 S238 | m m m | m m m | 7 |
 
 - The brig's two cells in quotation marks were logged "Tacked", but she lay on her old tack at the end (§4).
-- The trunk moved under this package (the lateen hulls' list, at 7c1773e). The whole sweep was run again on it and is the same to the second.
+- The trunk moved under this package: the lateen hulls' list at 7c1773e, then package 127 at f2821c7. The whole sweep was run again on each and is the same to the second.
 
 Shortened, in 20 and 25 kn:
 
@@ -76,7 +76,10 @@ No figure meets all three, so it is 0.4, as the lead ruled for that case. 0.35 w
 
 ### 2.4 What moves
 
-- **The committed ships:** the hermaphrodite brig alone (TuningNotes gives every cell old beside new). Every other committed ship's tacks are the same to the second, plain and shortened.
+- **The committed ships:**
+  - the hermaphrodite brig (TuningNotes gives every cell old beside new);
+  - both schooners, by one or two seconds: in 20 kn from 290 and in 25 kn from every heading. In those winds they keep 0.17 to 0.27 of their way at the point, so they now wait for the wind ahead. With no square after yards to swing, the haul then only lets fly the staysail sheets abaft the fore mast (A alone: the run with A alone gives the same seconds);
+  - every other committed ship's tacks are the same to the second, plain and shortened.
 - **The corvette:**
   - plain sail: 7 -> 13 of 15, staying in 20 and 25 kn from every heading (220 to 273 s);
   - shortened: 20 kn 182/175/176 -> 206/206/206; 25 kn from 290, 216 -> 197 s.
@@ -105,6 +108,13 @@ Closed, nothing built (the lead's ruling).
 | bilander | S308 S313 · | S295 S296 S297 | S309 S310 S310 | S339 S339 S339 | S377 S377 S377 | 14 of 15 |
 
 - The three · of the merchant brig began from 45 to 58 degrees off at 1.0 to 1.5 kn, not settled. Their haul comes at 0.56 to 0.60 of their way, so the haul rule leaves them as they were.
+- **The merchant brig in 20 kn from 290** (sail set, idle, one trim). She did miss: "Tacked; braced up on the starboard tack, heading SW by W (232°)." at 461 s on the trunk -> "Missed stays: she came through the wind and fell back on her old tack." at 461 s. Her tack, read every 30 s:
+  - 30 s: 9.5 degrees on the starboard bow, 3.1 kn ahead ("Mainsail haul" at 32 s);
+  - 60 to 120 s: through the wind, 50 to 90 degrees on the larboard bow, with no way (headway -0.5 to 0.0 kn); "Let go and haul" at 97 s;
+  - 150 s: 13.7 degrees on the larboard bow, 2.6 kn astern, helm hard over (35 degrees) for the sternway;
+  - 180 s: back through the wind, 11.5 degrees on the starboard bow, 3.2 kn astern;
+  - 210 to 460 s: on her old tack, 109 to 144 degrees off the wind, going astern at 0.6 to 2.4 kn and yawing between.
+  - The other five cells of the six measured so are unmoved.
 - Reported and left: the runner queues an all-hands tack behind the watch's work of setting sail.
 - The smack's tacks are refused at those headings ("She is not close-hauled"): her apparent wind there is more than ten degrees from her close-hauled angle. Put full and by first, she lies 48 to 51 degrees off and stays in 8 to 25 kn, in 103 to 176 s.
 
@@ -116,7 +126,7 @@ Closed, nothing built (the lead's ruling).
   - within two points of the wind: "Missed stays: she lies in irons, her head in the wind.";
   - each with a missed stay's severity (urgent) and recovery ("Up helm; square the yards; ...").
 - It is read at the end, so a tack that comes round before the timeout is still a tack.
-- In the fleet only the brig's four 20-kn lines change (§1). The in-irons words did not arise, so truth 7-765 holds a cutter there to show them.
+- In the fleet only the brig's four 20-kn lines change (§1), and the merchant brig's from 290 with her sail set (§3). The in-irons words did not arise, so truth 7-765 holds a cutter there to show them.
 
 ## 5. D: the jib she cannot be held without
 
@@ -136,13 +146,23 @@ Closed, nothing built (the lead's ruling).
   - the razee from 295, 486 -> 261 s;
   - the corvette 1 -> 3 of 3 (184, 187, 189 s), lying 65 to 70 degrees off at 6.9 to 8.1 kn where the trunk left her 47 to 50 off at 1.2 to 2.2.
 
-## 6. E: the captain and a straining topgallant yard
+## 6. E: the captain and a straining topgallant yard (built, measured, and taken out)
+
+On the lead's list of 2026-11-27, E is taken out of this hash whole: the method `Captain._topgallant_yards_working` and its call, its truths (7-768 and 7-769), its slow-tier entry and the lee-shore trial's moved pin. Every captain-run day on today's ships is the trunk's, except by A, C and D. E is kept at 28375be, in this branch's history, and on a local branch.
+
+**Why he fills away sooner under E, in the lee-shore trial.**
+- With the topgallants in at 1,560 s (27 kn, both yards working), she keeps her station by the wind under less sail aloft.
+- Three times in the next hour and a half she comes up into the wind and is caught aback with no way (3,720, 4,800 and 5,880 s). Each time she is boxed off, and with the spanker in and the storm staysails she keeps station at 5.6 to 5.9 kn where the trunk's makes 7.5 to 8.7.
+- So she is some four miles further to leeward, nearer Ushant, when she heaves to at 9,720 s, and the lee sector holds land (her reckoning reads it at 10 to 12 miles, where the trunk's reads none).
+- Drifting hove to, that closes to 6.0 miles, the lee-shore line, at 26,760 s. The lee-shore exit then fills her away into 42 kn, and she comes within 2.4 miles of the land by 28,200 s.
+
+The measures of E as built, kept for the rule when it is carried with its cause:
 
 - **What the code does:**
   - `shorten sail` takes in the loftiest first already: studding sails, square sail, royals, flying jib, topgallants, then the topsails' reef; the jibs by their ratings.
   - A watch too small takes the sails in turn: the frigate's three topgallants come in together, about 200 s after the order; the corvette's one by one, 213 to 300 s.
   - The captain begins by the glass and the wind (the wind risen by `worsening_wind_kn` within the hour, over `shorten_sail_kn` less `worsening_sooner_kn`). In this probe's wind that fired at 1,440 to 3,120 s across seeds 1 to 8.
-- **Built:** `Captain._topgallant_yards_working`. A strain warning on a topgallant yard, in a wind over that same line, is answered at once by "take in the topgallants" ("By the captain, ...: taking in the topgallants (the topgallant yards working)."). It is given once, until the wind falls under the line again, and never under it. It is every captain's, by his own book's two figures (24 kn in every committed book), as `_head_sails_straining` is every captain's. No book of a role differs, so no role is left out.
+- **As built (now taken out):** `Captain._topgallant_yards_working`. A strain warning on a topgallant yard, in a wind over that same line, is answered at once by "take in the topgallants" ("By the captain, ...: taking in the topgallants (the topgallant yards working)."). It is given once, until the wind falls under the line again, and never under it. It is every captain's, by his own book's two figures (24 kn in every committed book), as `_head_sails_straining` is every captain's. No book of a role differs, so no role is left out.
 - **The probe:** the wind rising from 20 to 35 kn over the hour from 04:00 and held, gusts and shifts 0.3, a low coming in; 40 miles south of Falmouth, bound for it, the wind abeam, plain sail, no order given; seeds 1 to 8. Carried away or blown out:
 
 | Ship | Trunk | This package |
@@ -155,7 +175,7 @@ Closed, nothing built (the lead's ruling).
 
 - **The brig at seed 3:** the answer came at 1,495 s, but her watch still had not got her fore topgallant in when its yard went at 3,019 s. It is her hands, not the answer.
 - **The topgallants come in sooner** for most ships in seeds 1, 2, 3, 4, 6 and 8, by 60 to 940 s. The captain's first three states and their times are the same in every run measured.
-- **The captain's trials.** Of the trials, only the station off Ushant with the land under her lee moves (TuningNotes):
+- **The captain's trials, under E.** Only the station off Ushant with the land under her lee moved:
   - her topgallant yards are reported working in 27 kn at 1,502 s, and the captain takes the topgallants in at 1,560 s;
   - her day runs otherwise from there: filled away from her first a-try at 26,760 s (30,780 before), no second a-try (41,880 before), beating to the station at 67,200 s;
   - never aground, and nothing lost;
@@ -171,9 +191,11 @@ Closed, nothing built (the lead's ruling).
   - The jib: all pass.
   - The captain: all pass.
   - The words: one moves (TuningNotes), and one tide-gauge timing test failed in that run, timing alone.
-- **The build:** the slow tier of the captain's files and of the evolutions file: 176 passed, and 1 failed, the lee-shore trial, moved by E (above and TuningNotes). The fast tier whole and the slow tier of what it touched: the build report gives the counts.
+- **The build:** without E, every captain trial's pin is the trunk's (f2821c7), unmoved. The fast tier whole and the slow tier of what it touched: the build report gives the counts.
 
 ## 8. For the lead, measured and not built
+
+**The brig's and the merchant brig's fall-backs in 20 kn** (§2.5, §3): they come through the wind with no way, gather sternway and are turned back by their canvas, their helm shifted for it. It is their canvas and not their helm, and C says what they did. Not mended.
 
 **The captain's `lie a-try` behind the shortening's reefs** (package 126's builder's finding):
 - **What the code does:** on entering "hove to for weather" the captain gives `shorten sail` and then `lie a-try` (`Captain._on_enter`). The runner starts a waiting evolution only when no earlier one holds a part of its (`_start_waiting`). `lie a-try` hands every square sail but the a-try topsail, so it holds the sails the shortening is still reefing, and waits for every reef given before it. In the corvette's seed 7 it is given at 2,100 s and begins at 4,826 s; "'Reef the foresail' will follow 'lie a-try'" in the meantime.
@@ -184,11 +206,35 @@ Closed, nothing built (the lead's ruling).
 
 ## 9. Differences a player or a seat is served
 
-1. "Mainsail haul" called later, with the wind ahead, for a ship that comes slack into stays (of the committed ships, the hermaphrodite brig), and her tacks' times (§2.4).
-2. "Missed stays: she came through the wind and fell back on her old tack." and "Missed stays: she lies in irons, her head in the wind.", urgent, where "Tacked; braced up on ..." was said of a ship that had not come round (§4). After them, the missed stay's own lines ("Squared the yards; she fell off on ...").
-3. "The jib is left on her: she gripes, and her helm will not hold her without it." in the reply to `shorten sail`, and the jib left set, where a jib was taken in by its rating and her helm needs it (§5). The storm staysails are no longer set in its place on that account.
-4. "By the captain, ...: taking in the topgallants (the topgallant yards working)." for every ship the game's captain sails, in a wind over his worsening line, with what follows from it (§6):
-   - the topgallants in sooner, and the shortening's own "take in the topgallants" then finding them in;
-   - in the lee-shore trial, a different day after it.
+1. "Mainsail haul" called later, with the wind ahead, for a ship that comes slack into stays, and her tacks' times (§2.4, §10):
+   - the hermaphrodite brig;
+   - the two schooners by one or two seconds.
+2. "Missed stays: she came through the wind and fell back on her old tack." and "Missed stays: she lies in irons, her head in the wind.", urgent, where "Tacked; braced up on ..." was said of a ship that had not come round (§4). After them come the missed stay's own lines ("Squared the yards; she fell off on ..."), and never "filled away". In the measured fleet: the brig's four 20-kn cases, and the merchant brig's from 290 with her sail set.
+3. "The jib is left on her: she gripes, and her helm will not hold her without it." in the reply to `shorten sail`, and the jib left set, where a jib was taken in by its rating and her helm needs it (§5). The storm staysails are no longer set in its place on that account. A kept jib is not taken in, so no countermand or belay is said of it (package 127's rule).
 
-Nothing else is served differently. The fleet's sweeps (§1, §2.4) are the same to the second for every committed ship but the hermaphrodite brig; the fast tier of every file that tacks or shortens passes but for the one moved pin.
+Nothing else is served differently: no captain's day moves (E is out), and every other cell in §10's measure is the same to the second.
+
+## 10. Every cell old beside new
+
+The trunk at f2821c7 is old; this hash is new. The measure covers 216 cells:
+- the ten committed ships that tack under the truths' settle: 150 plain and 60 shortened;
+- the merchant brig and the bilander with their sail set, in 20 kn: 6.
+
+38 cells change, and no tack is lost by what she did. The lead's reader found no tack lost in 408 steady cells; that table is theirs.
+
+| Ship | Case | Old | New | Rule |
+|---|---|---|---|---|
+| brig | plain 20 kn, 292.5 / 295 | "Tacked" 459 / 460 s (lying 149 / 135 degrees off on her old tack) | missed stays, at the same seconds | C |
+| brig | shortened 20 kn, 290 / 292.5 | "Tacked" 456 / 456 s (111 / 110 off, old tack) | missed stays | C |
+| merchant brig | sail set, 20 kn, 290 | "Tacked" 461 s (130 off, old tack) | missed stays | C |
+| frigate-36 | shortened 25 kn, 290 / 292.5 / 295 | S309 / S205 / S231 | S233 / S252 / S265, her jib kept | D |
+| razee | shortened 25 kn, 295 | S486 (NE by E, 52 deg off at the end) | S261 (ENE), her jib kept | D |
+| hermaphrodite brig | plain 8 kn | S411 S405 S397 | S300 S296 S291 | A |
+| hermaphrodite brig | plain 12 kn | S267 S266 S263 | S198 S198 S196 | A |
+| hermaphrodite brig | plain 15 kn | S192 S189 S193 | S194 S186 S184 | A |
+| hermaphrodite brig | plain 20 kn | S176 S170 S170 | S186 S184 S183 | A |
+| hermaphrodite brig | plain 25 kn | S165 S163 S162 | S171 S169 S167 | A |
+| hermaphrodite brig | shortened 20 kn | S138 S150 S149 | S186 S185 S183 | A |
+| hermaphrodite brig | shortened 25 kn | S162 S160 S159 | S167 S166 S164 | A |
+| both schooners | plain 20 kn, 290 | S233 | S235 | A |
+| both schooners | plain 25 kn | S157 S156 S157 | S156 S155 S156 | A |

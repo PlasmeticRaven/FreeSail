@@ -40022,7 +40022,7 @@ The first build of the turn-waits moved six older "not hands enough for all at o
   - The turn-wait mark's place outside the World's memory has a truth of its own.
 - **D2:** "She gathers headway; filled away ..." is notable (`ship.way`), where the report said routine; pinned.
 
-## Package 125, the moment of the haul, a failed tack's words, the jib she cannot be held without, and the captain's topgallants (2026-11-24)
+## Package 125, the moment of the haul, a failed tack's words, and the jib she cannot be held without (2026-11-24; the captain's topgallants taken out 2026-11-27)
 
 The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: docs/design/Report-Package125.md. Measured at seed 7 by the truths' own helpers (the wind from the north, no gusts), every committed ship that tacks, from 290, 292.5 and 295 degrees in 8, 12, 15, 20 and 25 knots, plain and shortened by the game's own `shorten sail`.
 
@@ -40030,7 +40030,7 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
 - `scripts.HAUL_WAY_FRACTION` 0.4 (new). "Mainsail haul" a point on the bow while she keeps two fifths of her way at "helm's a-lee"; under it, with the wind ahead. At the point every committed square-rigger keeps 0.48 to 0.58; the hermaphrodite brig 0.21 to 0.33; the light corvette of the ships' package 0.25 to 0.37 (0.37 at 8 kn, 0.30 to 0.36 at 12, 0.29 to 0.35 at 15, 0.28 to 0.33 at 20, 0.25 to 0.30 at 25). The lead's test of a lower figure: 0.33 loses her 20-kn tack from 290 (she hauls at the point there with 0.33); 0.35 keeps her 20 and 25 kn and moves no committed ship, but her 12-kn tacks from 292.5 and 295 are still 319 and 331 s against the trunk's 187 and 184. No figure keeps all three of the lead's terms, so 0.4.
 - `scripts.WIND_AHEAD_RAD` half a degree (new): Luce's "with the wind ahead"; a quarter point and half a point were measured for her, 13 of 15 either way and no better on the whole.
 - `storm.HELM_IN_HAND_SHARE` 0.25 (new). A jib loaded to its 0.75 is left set where she would want more than a quarter of her rudder's travel without it, while under its whole rating. At the order in 25 kn the frigate and the corvette would each want 9.5 to 12 degrees; with the jib in the frigate gripes to 11 to 20 and recovers, the corvette to 21 to 25 and does not. A third of the travel (11.7) would keep it from 295 alone.
-- The captain's answer to a straining topgallant yard: over `shorten_sail_kn` less `worsening_sooner_kn` (24 kn in every committed book), the books' own two figures; no new figure.
+- The captain's answer to a straining topgallant yard (E) was built at 28375be and taken out on the lead's list of 2026-11-27: no figure of it stands.
 
 **Pins moved, old beside new.**
 - `tests/test_evolutions.py::test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on`, replaced by three tests in its place:
@@ -40038,24 +40038,24 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - `..._with_her_head_in_the_wind_is_in_irons` (new case): "Missed stays: she lies in irons, her head in the wind."
   - `..._on_the_new_tack_names_where_she_lies`: the old naming kept for a tack that has come round, held 100 degrees off on the new tack: "Tacked; braced up on the larboard tack, heading S by W (190°)."; its tick count (the timeout's 300 s and one) as the old test had it.
   - Why: a tack fallen back on her old tack had not come round (the brig in 20 kn was logged "Tacked" lying 110 to 149 degrees off on her old tack).
-- `tests/test_captain_trials.py::test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it`, by E alone (every other rule switched off in turn leaves it failing; E off, it passes as before). The states and the line count, old beside new:
-  - The answer: her topgallant yards are reported working in 27 kn at 1502 and 1503, and the captain takes the topgallants in at 1560.
-  - The states: old `..., (15060, hove to), (30780, on passage), (30840, keeping station), (32160, hove to), (38340, on passage), (38400, beating), (38400, keeping station), (41880, hove to), (51480, on passage), (51540, beating)`; new `..., (15060, hove to), (26760, on passage), (26820, keeping station), (32220, hove to), (38340, on passage), (38400, beating), (67200, keeping station)`.
-  - The lines: 1561 -> 1940. By kind: ship.aback 9 -> 32, sail.backed 2 -> 42, ship.missed_stays 1 -> 5, ship.wore 1 -> 4, order.accepted 109 -> 149.
-  - Unchanged: never aground, nothing carried away or blown out. The digest is not asserted (02f37aef18207781 on this container).
-  - For the lead: she fills away sooner in the gale's tail and is taken aback more often beating off the land.
-- No other pin moved. Before the build, the 46 test files that tack or shorten (5,485 fast-tier tests) passed under each rule alone (the report's §7). On the build, the slow tier of the captain's files passed but for the trial above.
+- `tests/test_captain_trials.py::test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it`: moved by E at 28375be, and back to the trunk's figures with E taken out. The file is the trunk's (f2821c7), package 127's re-measured figures unmoved.
+  - What E did there, for the rule when it is carried: states `(26760, on passage) ... (67200, keeping station)` against the trunk's `(30780, on passage) ... (51540, beating)`; 1561 -> 1940 lines; within 2.4 miles of the land at 28,200 s in 42 kn.
+  - The cause: the report's §6.
+- No other pin moved. Before the build, the 46 test files that tack or shorten (5,485 fast-tier tests) passed under each rule alone (the report's §7). No captain trial's pin moves on this hash.
 
 **What moves in the fleet (the truths 7-760 to 7-762 tables).**
-- The hermaphrodite brig alone of the committed ships, by the haul: plain 8 kn 411/405/397 -> 300/296/291 s; 12 kn 267/266/263 -> 198/198/196; 20 kn 176/170/170 -> 186/184/183; shortened 20 kn 138/150/149 -> 186/185/183. Every other committed ship's tacks the same to the second.
+- The hermaphrodite brig by the haul: plain 8 kn 411/405/397 -> 300/296/291 s; 12 kn 267/266/263 -> 198/198/196; 15 kn 192/189/193 -> 194/186/184; 20 kn 176/170/170 -> 186/184/183; 25 kn 165/163/162 -> 171/169/167; shortened 20 kn 138/150/149 -> 186/185/183; shortened 25 kn 162/160/159 -> 167/166/164.
 - The brig in 20 kn, by the words: plain from 292.5 and 295 and shortened from 290 and 292.5, "Tacked" at 456 to 460 s -> "Missed stays: she came through the wind and fell back on her old tack."
 - The jib kept in 25 kn shortened: the frigate 309/205/231 -> 233/252/265 s; the razee from 295, 486 -> 261.
+- Both schooners by the haul, by one or two seconds: plain 20 kn from 290, 233 -> 235 s; plain 25 kn 157/156/157 -> 156/155/156.
+- The merchant brig with her sail set, 20 kn from 290: "Tacked; braced up on the starboard tack, heading SW by W (232°)." at 461 s, lying 130 degrees off on her old tack -> "Missed stays: she came through the wind and fell back on her old tack."
+- Every cell, old (f2821c7) beside new: the report's §10.
 
 **Read by:** a reader other than the builder, on the stronger tier, a subagent of this session (2026-11-24).
 - The moved evolution pins: passed.
-- Truths 7-760 to 7-769: each fails with its mend taken out, and each passes with it.
+- Truths 7-760 to 7-769: each fails with its mend taken out, and each passes with it. Of them, 7-768 and 7-769 were E's, and are taken out with it.
 - Its three points, mended:
   - 7-766's storm-staysail assertion checked nothing; it now asserts "storm staysail" is not in the reply.
   - The old-tack pin's tick count is exact (301 and the squaring's 51).
   - The in-irons pin has the whole line, the urgency and the fell-off.
-- The moved trial pin (above) was measured after that reading, and is put to the lead with the build.
+- The moved trial pin was measured after that reading. It is gone with E. The lead's reader read the hash 28375be and found the lee-shore trial's cause, and the merchant brig's and the schooners' cells undeclared; all three are declared in the report.
