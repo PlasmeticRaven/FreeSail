@@ -1177,7 +1177,105 @@ PASSAGE_CELLS = [(ship, wind) for ship in PASSAGE_SPARS for wind in PASSAGE_WIND
 # The cell-seeds outside the rule, each with its cause (the report's section 9 says each in a
 # sentence); the truth holds the set exactly, so that one more outside, or one of these come
 # inside, fails it.
-PASSAGE_DECLARED: dict[tuple[str, str, int], str] = {}
+PASSAGE_DECLARED: dict[tuple[str, str, int], str] = {
+    ("topsail-schooner", "20-38", 3): (
+        "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
+        "which fails in thirty-eight knots or takes late, where the trunk's captain, refused "
+        "`lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did "
+        "not, and could not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("topsail-schooner", "20-38", 7): (
+        "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
+        "which fails in thirty-eight knots or takes late, where the trunk's captain, refused "
+        "`lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did "
+        "not, and could not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("topsail-schooner", "20-38", 8): (
+        "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
+        "which fails in thirty-eight knots or takes late, where the trunk's captain, refused "
+        "`lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did "
+        "not, and could not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("topsail-schooner", "20-38", 9): (
+        "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
+        "which fails in thirty-eight knots or takes late, where the trunk's captain, refused "
+        "`lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did "
+        "not, and could not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("topsail-schooner", "20-38", 11): (
+        "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
+        "which fails in thirty-eight knots or takes late, where the trunk's captain, refused "
+        "`lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did "
+        "not, and could not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("cutter", "20-38", 3): (
+        "her topsail of light canvas, she is hove to under her fore-and-aft canvas where the "
+        "trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's "
+        "captain was not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("cutter", "20-38", 7): (
+        "her topsail of light canvas, she is hove to under her fore-and-aft canvas where the "
+        "trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's "
+        "captain was not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("cutter", "20-38", 8): (
+        "her topsail of light canvas, she is hove to under her fore-and-aft canvas where the "
+        "trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's "
+        "captain was not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("cutter", "20-38", 9): (
+        "her topsail of light canvas, she is hove to under her fore-and-aft canvas where the "
+        "trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's "
+        "captain was not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("cutter", "20-38", 11): (
+        "her topsail of light canvas, she is hove to under her fore-and-aft canvas where the "
+        "trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's "
+        "captain was not (the lead's ruling of 2026-11-27, (a))"
+    ),
+    ("frigate-36", "25", 7): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): "
+        "aback eleven times against eight in her wears; 4.65 nm against 4.23, 15 minutes astern "
+        "against 19"
+    ),
+    ("frigate-36", "20-38", 3): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
+        "before the rise: given `lie a-try` at the trunk's tick, she lies a-try 545 s after it; "
+        "13.29 nm against 12.34"
+    ),
+    ("brig", "20-38", 3): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
+        "just before the rise: given `lie a-try` at the trunk's tick, she comes round through "
+        "the wind as she is brought up and lies a-try 689 s after it; 10.61 nm against 2.70, 18 "
+        "minutes astern against 44"
+    ),
+    ("seventy-four", "25", 7): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): "
+        "117 minutes astern against the wreck cleared at once's 111 and the trunk's 96"
+    ),
+    ("seventy-four", "20-38", 3): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
+        "before the rise: 7.30 nm against the trunk's 8.58 and the wreck cleared at once's "
+        "11.17, 97 minutes astern as the latter's"
+    ),
+    ("topsail-schooner", "12-heading", 11): (
+        "the clearing in hand through her wear and her tack, the hands turned up for it at the "
+        "hour: 21 minutes astern against 15, and 8.98 nm made good against 6.64"
+    ),
+    ("cutter", "12-heading", 7): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
+        "before the wind headed her: 175 minutes astern against 165 (astern most of the three "
+        "hours whatever is done), aback once against three, -0.87 nm against -1.37"
+    ),
+    ("cutter", "12-heading", 9): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): "
+        "178 minutes astern against 172, the wreck cleared at once's 177"
+    ),
+    ("seventy-four", "12-heading", 8): (
+        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): "
+        "144 minutes astern against 138, the wreck cleared at once's 143"
+    ),
+}
 
 
 def _way_margin(way: float) -> float:
