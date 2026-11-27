@@ -357,7 +357,7 @@ Nothing else moved.
 
    | Ship, spar carried away | with | without |
    |---|---|---|
-   | cutter, main topmast | 4.97 kn | -1.18 kn |
+   | cutter, main topmast | 3.57 kn | -1.18 kn |
    | brig, main topmast | 4.42 kn | 2.92 kn |
    | 74, fore topmast | 4.15 kn | 2.48 kn |
    | merchant brig, main topmast | 4.78 kn | 3.83 kn |

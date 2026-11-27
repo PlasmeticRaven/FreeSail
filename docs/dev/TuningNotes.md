@@ -39973,7 +39973,7 @@ lines in all. The sky's own lines ("The sky thick.", "The sky hazy.") as the sig
   ch. XVII, and Fincham 1843, p. 286.
 
 **The spar's work, with it beside without it** (truth 7-779 and its probes; cruising off the Lizard
-in twelve knots, seed 7, the third hour's mean way): the cutter's main topmast 4.97 kn against
+in twelve knots, seed 7, the third hour's mean way): the cutter's main topmast 3.57 kn against
 -1.18; the brig's main topmast 4.42 against 2.92; the 74's fore topmast 4.15 against 2.48; the
 merchant brig's main topmast 4.78 against 3.83; the frigate's mainmast (her jury mast) 3.69 against
 2.39. None is taken aback more often with it.
