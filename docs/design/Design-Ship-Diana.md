@@ -531,6 +531,9 @@ it is set again.**
   and with it in she gripes past her rudder (the least of any committed ship's to her lateral
   plane, 0.0245, traced from her plan). With `set the jib` again she bears away, gathers way and
   stays.
+- **Put about before her sail is set and her way is on her** (600 s after `set plain sail`, in the
+  game's default gusts, 2 to 3.5 knots of way) she stayed in none of nine in 12 and 15 kn, where
+  settled she stays in 11 of 12 (the lead's reader's measure, nudge 78).
 - **The engine's part** (the haul's moment; a jib taken in where a ship cannot be held without it)
   is booked as package 125. When it lands she is measured again, and truth D goes back to its first
   band if she then holds it.

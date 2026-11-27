@@ -67,13 +67,15 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
 
-Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are package 129, launched 27 November at the owner's word; 19, 20, 21, 22 and 23 are not yet placed (22 is for the ships' session and a later package of the physics).
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 mended 6 in its part one (merged 27 November at 7bc7de20) and holds 12 for its part two; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are package 129, launched 27 November at the owner's word; 19, 20, 21, 22 and 23 are not yet placed; 24 is the ships' session's (22 is for the ships' session and a later package of the physics).
 
 21. The saves a stand-down writes are named by seed and tick, and two written at one tick overwrite one another (found by package 126's builder; the desk's naming, older than the package).
 
 22. **A wreck left hanging helps some hulls** (found by package 126's builder, 27 November, measuring the captain's spar work against the trunk). A wrecked sail gives no drive, but its windage and its spars' count three times over (`physics.sails`), and the wreck does her no harm: a topmast's wreck forward pays her off like a head sail. With the wreck cleared at the moment it falls, no hands and no time spent, the trunk's own captain makes less in seven of twenty-eight passages than with it left hanging (the 74 in 20 knots rising to 38: 0.8 miles made good against 9.6; the bilander in the same: 2.3 against 8.9), and more in the rest (the merchant brig in the rising wind 9.1 against -5.5). Nothing of the physics is changed by package 126; the captain clears a wreck as a seaman would, by the lead's ruling (section 7).
 
 23. The box off's own line can name the wrong tack: "Boxed her off; braced sharp up on the starboard tack, full and by." said with her lying on the larboard tack, after `keep her full and by` and a box off had worn her round (the cutter and both schooners in 20 to 30 knots; found by the lead's reader of package 125 and traced by its builder, 27 November; older than the package).
+
+24. Words of three ships' class and one's: the razee, the 64 and the 74 read "hMS as razeed, 1795", "hMS as built, a 64-gun ship ..." and "hMS a 74-gun ship ..." where a leading capital is made small; the smack reads "a Navy's smack" (found by the *Diana*'s builder, 27 November; for the ships' session with its third pass).
 
 ## 5. Booked by the owner or the lead, not launched
 
@@ -84,7 +86,7 @@ Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8,
 
 ## 6. Package 90, the ships, in hand across the gate
 
-Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. The lateen hulls' list of eight was merged on 24 November and its second pass the same day; a third pass of five is owed before the tartane's file. Then the corvette *Diana*, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a breeze under all plain sail, who wants her jib; her helm and her tacks are measured again when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
+Released across the gate by the owner on 19 November. Merged so far: the helm's kind and a tiller's words; the whole lateen and its strain; a yard's level by its place on its mast and the topsail on a pole; the boat in tow. The lateen hulls' list of eight was merged on 24 November and its second pass the same day; a third pass of five is owed before the tartane's file. **The corvette *Diana* joined on 27 November at a9e0a3f7**, by the owner's word "Join now": a light ship with a small rudder, slack in stays in a fresh breeze under all plain sail, who wants her jib; her helm and her tacks are measured again, and the moment of her haul set in her file, when package 125 lands. Then the tartane, the polacre, the xebec and the three-decker.
 
 **The rule the lead set, the owner's to overturn:** lateen and tow steps join the trunk when today's ships are proven unmoved; every fault that reaches only a lateen hull or a boat in tow is owed in full, and proven, before any lateen hull's file joins.
 
