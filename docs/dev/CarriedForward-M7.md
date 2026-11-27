@@ -63,7 +63,11 @@ Found by the ships' session's builders and the lead's readers while gating packa
 
 18. **A ship made a King's ship in the harbour carries no private signals** (the owner's note 10 of 27 November; confirmed). The month's table is given by the captain's place (a King's ship's, a cruiser's, a commodore's) or by a scenario's `papers: {private_signals: true}`; the harbour writes `papers: {service: kings}` and neither, so `the private signal` is refused aboard her with the merchantman's reason. The primer's chapter 23 says it is so ("a King's ship by her papers or her wardroom alone ... carries none"); no scenario of the game is touched, only a game made in the harbour.
 
-Of these, package 127 (launched 24 November) takes 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched.
+19. **A privateer made a crewed ship never closes a stranger she is looking at** (found by package 127's builder and the lead's reader, 27 November). Fully crewed, the convoy's privateer keeps about 2.1 miles from the stranger she investigates and takes up evading only at 1.94 to 2.00 miles; the builder reads the cause as her near lookout making out colours at two miles without the glass where her far captain used three with it (`captains._keep_stranger`); the reader saw the distances and could not confirm the glass. So the convoy of six's day turns on where she is placed: a cable farther and nothing happens, a cable nearer and she is judged an enemy but no straggler is signalled; with other seeds the exchange comes later. Truth 7-153 pins the day as shipped, at one seed.
+
+20. Small things of package 127's new words, left as found by the lead's reader: "will follow the same work" said of a signal waiting behind a different signal; "some of it waits its turn" where all of it waits; an order's wait logged a tick after a line of the same moment that belays what it waited for; and a wait said for a `weigh` that will be refused, there being no anchor down.
+
+Of these, package 127 (**merged 27 November at 572133ac**) mended 1, 3, 4, 7, 8, 9 and 13; package 125 takes 2 and 11; package 126 takes 6 and 12; 5 could not be reproduced by a player's orders and is dropped; 10 is for the ships' session; 14 is not yet placed; 16, 17 and 18 are the lead's proposed package 129, not launched; 19 and 20 are not yet placed.
 
 ## 5. Booked by the owner or the lead, not launched
 

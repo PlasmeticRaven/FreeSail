@@ -40021,3 +40021,30 @@ The first build of the turn-waits moved six older "not hands enough for all at o
   - `fill_away`'s served notes gloss `{filled}`.
   - The turn-wait mark's place outside the World's memory has a truth of its own.
 - **D2:** "She gathers headway; filled away ..." is notable (`ship.way`), where the report said routine; pinned.
+
+## Package 126, part one: the harbour and the weather (2026-11-24 to 2026-11-27)
+
+**No pin moved.** The captain's spar work and the `lie a-try` mend are not in this hash (held for a
+later pass), so no figure of theirs stands here. The new figures, each JUDGEMENT and defined with
+its ground where it stands:
+
+- `weather.FOG_SETTLE_S` 1,800 s and `FOG_CLEAR_S` 3,600 s: advection fog rolls in off the cold
+  water on a light air within the half hour, and is lifted and thins over an hour or so as the wind
+  freshens or the sun gains (W §1.4's fog, its pace judgement). The blocks that draw fog are the old
+  ones, the same seeded draw, so every fog of the old weather is one of the new, at the same edges.
+- `weather.FOG_WIND_THIN_KN` 3 kn and `FOG_COAST_THIN_KM` 5 km: thick three knots under the 12 kn
+  that lifts it and a few miles inside its 30 km reach; thinning between, where it stopped at once.
+- `weather.FOG_AIR_EDGE_KM` 5 km: the fog thins within five kilometres of the edge of the air that
+  holds it, as its reach from the coast thins over `FOG_COAST_THIN_KM`; half an hour's sailing at
+  six knots.
+- `weather.FOG_LINE_QUIET_S` 600 s: a step of the fog's sight is not said within ten minutes of
+  one the other way, nor of the same words, and is said when the quiet is over if it has held. A
+  third of the settling. At its boundary a fog shut in thick may be said clearing ten minutes later.
+
+**One fog's lines, old beside new** (off Falmouth under the June high, seed 7, the morning of the
+5th; truth 7-774): old, "Fog came down." (notable) at the block's edge and "The fog lifted."
+(routine) at the next, the sight from the horizon to a cable and back at one minute each. New, six
+lines, every fog alike: "A fog is settling in." (notable), "The fog is thickening." 15 min on
+(routine), "The fog has shut in thick." 30 min on (notable); "The fog seems to be clearing."
+(notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
+sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
