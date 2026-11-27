@@ -78,9 +78,13 @@ ships:
      lights: stern lantern, squadron: trade, sailing_factor: 0.85}
   # the privateer: a French schooner five miles to windward under her own colours, cruising
   # for prizes; her doctrine (data/captains/privateer.yaml) takes a merchantman and keeps
-  # clear of a man of war
+  # clear of a man of war. Placed a cable nearer the convoy than she lay (49 48.6 N 5 06.5 W),
+  # so that she comes down within two miles of the commodore, makes out a man of war of the
+  # King's, and the private signal, her false reply, the convoy closed round the commodore and
+  # the straggler's signal follow: with the commodore no longer lying aback eight minutes after
+  # her first tack, from where she lay she stood off at two miles and more and none of it came
   - {id: vengeur, description: schooner, name: Vengeur, nation: france,
-     position: 49 48.6 N 5 06.5 W, goal: "patrolling off the Lizard within 20 miles",
+     position: 49 48.53 N 5 06.61 W, goal: "patrolling off the Lizard within 20 miles",
      intent: "cruise for prizes off the Lizard within 20 miles", colours: shown}
 
 squadrons:

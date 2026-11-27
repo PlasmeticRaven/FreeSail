@@ -769,7 +769,7 @@ def _start_hoist(world: Any, locker: Any, hoist: Any, hoists: int, words: str) -
     hoist.breaks_out = S.NOT_YET
     hoist.complete_at = None if hoist.complete_at is None else S.NOT_YET
     try:
-        return runner.start(
+        text = runner.start(
             ship,
             "make_signal",
             None,
@@ -778,6 +778,12 @@ def _start_hoist(world: Any, locker: Any, hoist: Any, hoists: int, words: str) -
     except OrderError:
         locker.flying = [h for h in locker.flying if h is not hoist]
         raise
+    # the signal's own line carries the runner's words, its wait with them: the runner's line of
+    # the wait is not said again
+    notes = getattr(ship, "notes", None)
+    if isinstance(notes, list):
+        notes[:] = [n for n in notes if not _turn_wait_of(n, text)]
+    return text
 
 
 def _make(world: Any, locker: Any, tick: int, words: str, book_said: str) -> Result:
@@ -1261,3 +1267,13 @@ def _adjective(world: Any) -> str:
         return str(world.nations.get(S.own_nation(world)).adjective)
     except Exception:  # noqa: BLE001
         return S.books_for(world).nation
+
+
+def _turn_wait_of(note: Any, text: str) -> bool:
+    """Whether a ship's note is the runner's line of this work's wait for its turn (`runner.
+    TURN_WAIT`), taken back where the order's own line says it: a wait for hands, said with the
+    same words, keeps its line and its severity."""
+    from freesail.evolutions.runner import TURN_WAIT
+
+    data = note[4] if len(note) > 4 and isinstance(note[4], dict) else {}
+    return note[1] == "evolution.waiting" and note[2] == text and bool(data.get(TURN_WAIT))

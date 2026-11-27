@@ -319,11 +319,9 @@ def judge_cables(ship: Ship, dt: float) -> None:
             )
             continue
         key = f"cable:{anchor.id}"
-        last = st.last_warning_s.get(key)
-        if last is not None and st.elapsed_s - last < strain.WARNING_INTERVAL_S:
-            continue
-        st.last_warning_s[key] = st.elapsed_s
         dire = ratio > strain.CARRY_AWAY_RATIO
+        if not strain.warning_due(st, key, dire):  # the dire one said after a lesser one
+            continue
         words = (
             "stranding at the hawse; it will not hold much longer: veer more cable, or let go "
             "the second anchor."
