@@ -153,11 +153,12 @@ def test_truth_7_780_an_orders_own_line_does_not_say_the_wait_again():
         for x in _lines(w, t0 - 1, ("evolution.waiting",))
         if "will follow" in x[1] or "waits its turn" in x[1]
     ]
-    # one line for the group's order (the lead's first pass, D4), where before each reef said
-    # its own: "'Reef the fore topsail' will follow 'set the fore topsail', ..." and the main's
+    # one line for the group's order naming every work its members wait behind (the lead's first
+    # pass, D4, and its reader's F1: the first build named the fore's alone), where before each
+    # reef said its own: "'Reef the fore topsail' will follow 'set the fore topsail', ..."
     assert waits == [
-        "Shortening sail: the work waits its turn behind 'set the fore topsail', which the "
-        "hands are still at."
+        "Shortening sail: some of it waits its turn, behind 'set the fore topsail' and 'set the "
+        "main topsail', which the hands are still at."
     ], waits
 
 
@@ -553,8 +554,8 @@ def test_truth_7_780_the_same_work_behind_itself_and_a_groups_wait_said_once():
         if e.tick >= t0 and e.kind == "evolution.waiting" and "waits its turn" in e.text
     ]
     assert turns == [
-        "Bracing the yards: the work waits its turn behind the same work, which the hands are "
-        "still at."
+        "Bracing the yards: some of it waits its turn, behind the same work, which the hands "
+        "are still at."
     ], turns
     again = [e.text for e in w.log if e.tick >= t0 and "will follow" in e.text]
     assert again == [
@@ -619,3 +620,23 @@ def test_truth_7_781_she_gathers_headway_is_said_notable_where_filled_away_was()
     w, _lines = _filled(LUGGER, ["set plain sail"], "heave to", 60.0, 300)
     (gathers,) = [e for e in w.log if e.kind == "ship.way"]
     assert gathers.text.startswith("She gathers headway") and gathers.severity.value == "notable"
+
+
+def test_truth_7_780_two_orders_of_one_group_in_one_tick_say_their_waits_each():
+    """Three brace orders given in one tick behind the brig's first: each order's yards waiting
+    behind the one before say their own line (keyed by the order, the reader's F2), where the
+    first build said one line for all three, keyed by the group's words alone."""
+    w = _make(BRIG, heading=60.0)
+    w.submit("set plain sail")
+    w.run(700)
+    t0 = w.clock.tick
+    w.submit("brace the yards sharp up on the larboard tack")
+    w.submit("square the yards")
+    w.submit("brace the yards sharp up on the starboard tack")
+    w.run(2)
+    turns = [
+        e.text
+        for e in w.log
+        if e.tick >= t0 and e.kind == "evolution.waiting" and "waits its turn" in e.text
+    ]
+    assert len(turns) == 2 and all(t.startswith("Bracing the yards: some of it") for t in turns)

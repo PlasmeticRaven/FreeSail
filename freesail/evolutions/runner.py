@@ -261,8 +261,9 @@ TURN_WAIT_SEVERITY = "routine"
 # out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
 # for all at once" said twice with a turn-wait between is routine the second time, as before.
 TURN_WAIT = "turn_wait"
-# The groups of the order being given whose wait for their turn is said already (one line for the
-# order: `Runner.start`); in the runner's `__dict__` from the order to the next tick only.
+# The groups of the orders being given whose wait for their turn is said already, by (the order,
+# the group), with the works they wait behind and the note that says it (`Runner._group_turn_wait`);
+# in the runner's `__dict__` from the order to the next tick only.
 TURN_GROUPS_SAID = "turn_groups_said"
 
 
@@ -507,18 +508,11 @@ class Runner:
                 # by it (`World.record`, `TURN_WAIT`); of a group's order (the yards braced, the
                 # sails of `reef topsails`), one line for the order, by the first that waits
                 group = inst.params.get("group")
-                groups = self.__dict__.setdefault(TURN_GROUPS_SAID, set())
+                mark = {TURN_WAIT: True}
                 if not group:
-                    ship.note(
-                        TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, {TURN_WAIT: True}
-                    )
-                elif group not in groups:
-                    groups.add(group)
-                    line = (
-                        f"{group[:1].upper()}{group[1:]}: the work waits its turn behind "
-                        f"{behind}, which the hands are still at."
-                    )
-                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", line, sid, {TURN_WAIT: True})
+                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, mark)
+                else:
+                    self._group_turn_wait(ship, group, behind, sid, mark)
                 said = True
             if said and say_wait:
                 self.__dict__[WAIT_SAID] = True
@@ -540,6 +534,44 @@ class Runner:
         if not self._begin(ship, inst):
             return inst.wait_line
         return self._format(inst, evo.on_start.log)
+
+    def _group_turn_wait(
+        self, ship: Ship, group: str, behind: str, sid: str, mark: dict[str, Any]
+    ) -> None:
+        """A group's order (`params["group"]`: the yards of a brace, the sails of `shorten
+        sail`) says its wait for its turn in one line for the order, naming every work its
+        members wait behind: "Shortening sail: some of it waits its turn, behind 'set the fore
+        topsail' and 'set the main topsail', which the hands are still at." The line is the
+        first member's note, its words widened as each later member of the same order waits
+        behind other work (the notes are the tick's, not yet in the log). Keyed by the order and
+        the group, so that another order of the same words in the same tick says its own."""
+        from freesail.orders.errors import join_names
+
+        groups = self.__dict__.setdefault(TURN_GROUPS_SAID, {})
+        key = (self._giving, group)
+        entry = groups.get(key)
+        head = f"{group[:1].upper()}{group[1:]}"
+
+        def line(behinds: list[str]) -> str:
+            named = join_names(behinds, "and", limit=len(behinds))
+            return (
+                f"{head}: some of it waits its turn, behind {named}, which the hands are still at."
+            )
+
+        notes = getattr(ship, "notes", None)
+        if entry is not None and isinstance(notes, list):
+            if behind in entry["behind"]:
+                return
+            at = next((i for i, n in enumerate(notes) if n is entry["note"]), None)
+            if at is not None:
+                entry["behind"].append(behind)
+                was = notes[at]
+                notes[at] = (was[0], was[1], line(entry["behind"]), *was[3:])
+                entry["note"] = notes[at]
+                return
+        ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", line([behind]), sid, mark)
+        if isinstance(notes, list) and getattr(ship, "notes", None) is notes and notes:
+            groups[key] = {"behind": [behind], "note": notes[-1]}
 
     def step(self, ship: Ship, dt: float, wind: Wind) -> None:
         """Advance every running evolution by one tick, then start any that were
