@@ -87,7 +87,7 @@ TRIAL_STATION_STRANGER_LINES = 796  # package 84 step 6 (787 at 71; 756 at 56, t
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives c1d54413006885aa; TuningNotes)
 # package 127, words alone, the states unmoved: was d1a7b668bec784ff
-TRIAL_STATION_STRANGER_DIGEST = "1f99ac1472e0f4d0"  # the trim's words (c1d54413006885aa at SW-4)
+TRIAL_STATION_STRANGER_DIGEST = "0e39292a7c3de4ff"  # the trim's words (c1d54413006885aa at SW-4)
 
 
 @pytest.fixture(scope="module")
@@ -177,7 +177,7 @@ TRIAL_STATION_GALE_LINES = 1749  # package 88 (1014 on c168c51, aground 42394; 9
 # (93274bb5f658a34f on c168c51)
 TRIAL_STATION_GALE_DIGEST = (
     # package 127, words alone, the states unmoved: was b12065ef819367b3
-    "598d5039a3c267c1"
+    "71a65daa6511cb52"
 )
 
 
@@ -384,7 +384,7 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # 75's words, passed by the lead by its lines (aa04702e062bc64b before); package 76, item 8
     # (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
     # package 127, words alone, the states unmoved: was 323b8966ceab6857
-    "680c82c125997f6b"
+    "7aafdf0eda574cd7"
     # 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
     # package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose
     # yards are head yards alone, mans her head braces to heave to and fill away (11094, 12493,

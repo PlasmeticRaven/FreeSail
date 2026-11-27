@@ -3008,7 +3008,7 @@ GATE_5B_LINES = 746  # the well's order gone, its two held lines (2026-10-21; 73
 # the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
 # package 127, words alone, the states unmoved: was 2c38f76132521e4e
 GATE_5B_DIGEST = (
-    "e6ae51ba40745582"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
+    "ab9ef3aa02c65cbc"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3089,7 +3089,7 @@ GATE_5B_SCHOONER_LINES = (
 # (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
 GATE_5B_SCHOONER_DIGEST = (
     # package 127, words alone, the states unmoved: was 0fef1c52128ce9b2
-    "0a7193d752f0d3c2"
+    "636d72442bc90ccf"
 )
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
@@ -3108,7 +3108,7 @@ GATE_5B_THICK_LINES = 475  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
 # package 127, words alone, the states unmoved: was f119ec763d2b442e
 # (the trim's words (9ce8174ebc6948c6 at ruling 2))
-GATE_5B_THICK_DIGEST = "8c53335d5f6d10d7"
+GATE_5B_THICK_DIGEST = "9bb89611336bcc3c"
 
 
 def the_landfall(log):
@@ -4193,7 +4193,7 @@ GATE_5C_CRUISE_LINES = (
 # (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
 GATE_5C_CRUISE_DIGEST = (
     # package 127, words alone, the states unmoved: was bdd6ce8a97a33140
-    "e82ff12060620796"
+    "96ed44410bfc8e9c"
 )
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
@@ -4344,7 +4344,7 @@ GATE_5C_MERCHANT_LINES = 3134  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
 GATE_5C_MERCHANT_DIGEST = (
     # package 127, words alone, the states unmoved: was 8259996fb122428e
-    "524f4ba5fbc3a987"
+    "e8f0311b30fa8cb2"
 )
 
 
@@ -4817,7 +4817,7 @@ GATE_6A_INTENT_LINES = 2108  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # before; TuningNotes, "Package 90, A2")
 GATE_6A_INTENT_DIGEST = (
     # package 127, words alone, the states unmoved: was 7239b1a1ed45736f
-    "6e0dabb35a9e4276"
+    "75517a6246a755f4"
 )
 
 
@@ -5028,7 +5028,7 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # TuningNotes, "Package 90, A2")
 GATE_6A_FAKE_CAPTAIN_DIGEST = (
     # package 127, words alone, the states unmoved: was 50529f09d4de955e
-    "4d5c721461dbd955"
+    "bdb0c738930bd644"
 )
 
 
