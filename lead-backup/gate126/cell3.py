@@ -14,7 +14,7 @@ from pathlib import Path
 INSTANT_CELLS = [("bilander", w) for w in ("12", "25", "12-heading", "20-38")] + [
     ("seventy-four", w) for w in ("12", "25", "20-38")]
 OTHER_CELLS = [("merchant-brig", "20-38"), ("merchant-brig", "12-heading"), ("topsail-schooner", "25"),
-               ("frigate-36", "20-38"), ("cutter", "25"), ("brig", "20-38"), ("seventy-four", "12-heading")]
+               ("frigate-36", "20-38"), ("cutter", "25"), ("brig", "20-38"), ("seventy-four", "12-heading"), ("topsail-schooner", "20-38")]
 SEEDS = (7, 8, 9, 3, 11)
 
 
@@ -78,7 +78,7 @@ def main(argv):
     first = [("bilander", "20-38"), ("seventy-four", "25")]
     inst = first + [c for c in INSTANT_CELLS if c not in first]
     work = [(s, w, seed, how) for (s, w) in inst for seed in (7, 3, 11) for how in hows]
-    work += [(s, w, seed, how) for (s, w) in OTHER_CELLS for seed in (7, 11) for how in hows if how in ("old", "mine")]
+    work += [(s, w, seed, how) for (s, w) in OTHER_CELLS for seed in (7, 11) for how in hows]
     import os
     done = set()
     if os.path.exists(out):
