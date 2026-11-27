@@ -548,13 +548,16 @@ def test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge(tmp_path):
     """Nudge 79, the declaration: on every committed ship with a boat, `lay out a kedge` with her
     boat lost was taken, and the boat cut adrift hoisted out and laid it out (the frigate's launch:
     "Hoist out the launch; the kedge and a hawser into her.", the kedge let go 775 s on). Now it
-    is refused at the order, as a lost boat is sent on no errand."""
+    is refused at the order, as a lost boat is sent on no errand, in the errands' words: "...: the
+    launch is lost: cut adrift on the 10th; a new one is the yard's" (the lead's reader at nudge
+    86; the third pass's ended "cut adrift on the 10th")."""
     w = at_anchor_in(CARRICK_ROAD)
     assert w.submit("cut the boat adrift").kind != "order.rejected"
     w.run(1)
     r = w.submit("lay out a kedge")
     assert r.kind == "order.rejected"
     assert r.text.startswith("Order not carried out ('lay out a kedge'): the launch is lost: ")
+    assert r.text.endswith("; a new one is the yard's"), r.text
 
 
 def test_on_a_committed_ship_clearing_for_action_with_her_boat_lost(tmp_path):

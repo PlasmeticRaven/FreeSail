@@ -7028,13 +7028,6 @@ class BoxOffScript(BoxHaulScript):
     review). Gone round by the stern instead, a settee is hoisted on the other tack's lee, as in
     box-hauling (`_settee_at_come_to`)."""
 
-    def check(self, words: dict[str, Any]) -> str | None:
-        # coming to, she does not box off: the order was taken and did nothing (package 90, the
-        # lead's nudge 77, item 3); hove to, refused as box-hauling refuses it
-        if heave_to_in_hand(self.ship):
-            return "She is heaving to; she will not box off while she comes to."
-        return super().check(words)
-
     def _settee_at_box(self) -> tuple[SetteeChange, str, str]:
         """Only a settee on the weather side of the tack she is on is changed (package 75):
         lowered at the box and hoisted on that tack's lee, the old lee side being the side the
@@ -10786,8 +10779,10 @@ class LayOutKedgeScript(_AnchorScript):
         if self.ports.boat.lost:
             # a boat lost (swamped, cut adrift, or stove by a shot as she towed: the lead's
             # nudge 77, item 1) lays out no kedge till the yard replaces her, as she is sent on
-            # no errand (`Dealings`) and manned by nobody (`boats.man_boat`)
-            return f"{boat.name} is lost: {self.ports.boat.lost_words or self.ports.boat.lost}"
+            # no errand (`Dealings`) and manned by nobody (`boats.man_boat`); in the errands'
+            # words, the yard's new one said (the lead's reader at nudge 86)
+            why = self.ports.boat.lost_words or self.ports.boat.lost
+            return f"{boat.name} is lost: {why}; a new one is the yard's"
         self.boat_name = boat.name
         if getattr(boat, "towed", False):
             self.towed = True

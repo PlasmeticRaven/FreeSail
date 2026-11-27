@@ -3429,10 +3429,12 @@ def test_a_relief_that_waits_behind_work_on_its_sail_is_said_to_wait(tmp_path_fa
     ), said
 
 
-def test_coming_to_she_is_neither_offered_nor_given_boxing_off(polacre_in_40):
-    """Nudge 77, item 3: `box her off` was offered and taken while a heave-to was in hand, and
-    did nothing. Coming to, the words offer only the shift, and the box is refused at the
-    order (`scripts.heave_to_in_hand`)."""
+def test_coming_to_she_is_not_offered_boxing_off_and_a_box_given_waits_its_turn(polacre_in_40):
+    """Nudge 77, item 3: `box her off` was offered while a heave-to was in hand. Coming to, the
+    words offer only the shift (`scripts.heave_to_in_hand`). A box given then is taken and waits
+    behind the heave-to, as on the trunk, to begin if it fails (the lead's ruling at nudge 86;
+    the third pass refused it at the order, "She is heaving to; she will not box off while she
+    comes to.", which was not true of a heave-to failing)."""
     world = _from(polacre_in_40)
     ship = world.ship
     _shift_the_wind(world, -8.0)
@@ -3442,8 +3444,12 @@ def test_coming_to_she_is_neither_offered_nor_given_boxing_off(polacre_in_40):
     world.run(2)
     assert scripts.heave_to_in_hand(ship)
     assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen"
-    r = world.submit("box her off")
-    assert r.kind == "order.rejected" and "She is heaving to; she will not box off" in r.text
+    n0 = len(world.log.all())
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(2)
+    assert "'Box off' will follow 'heave to', which the hands are still at." in [
+        e.text for e in _after(world, n0)
+    ]
 
 
 def test_the_bows_list_in_her_sails_order_is_taken_as_said(xebec):
@@ -3462,10 +3468,10 @@ def test_the_bows_list_in_her_sails_order_is_taken_as_said(xebec):
     assert r.text == "Order: shift the foresail, the mainsail and the mizen."
 
 
-def _at_sea(path: str):
+def _at_sea(path: str, knots: float = 15.0):
     sc = Scenario(
         wind_from_deg=0.0,
-        wind_speed_kn=15.0,
+        wind_speed_kn=knots,
         gustiness=0.0,
         variability=0.0,
         ship_heading_deg=270.0,
@@ -3478,33 +3484,89 @@ def _at_sea(path: str):
 
 
 @pytest.mark.parametrize(
-    ("path", "first", "reply"),
+    ("path", "first", "said"),
     [
-        (
-            "data/ships/frigate-36.yaml",
-            "heave to",
-            "She is heaving to; she will not box off while she comes to.",
-        ),
-        ("data/ships/lugger.yaml", "heave to", "She has no head yards to brace abox."),
+        ("data/ships/frigate-36.yaml", "heave to", ["Belayed boxing off: she is hove to."]),
         (
             "data/ships/seventy-four.yaml",
             "lie a-try",
-            "She is heaving to; she will not box off while she comes to.",
+            [
+                "Belayed boxing off: she is hove to.",
+                "Piped down; the starboard watch has the deck.",
+            ],
         ),
     ],
 )
-def test_on_a_committed_ship_boxing_off_while_she_comes_to_is_refused_at_the_order(
-    path, first, reply
+def test_on_a_committed_ship_a_box_given_while_she_comes_to_is_belayed_when_she_is_hove_to(
+    path, first, said
 ):
-    """Nudge 79, the declaration: on every committed ship that heaves to, `box her off` given
-    while she comes to was taken, waited, and failed once she was hove to ("Could not box her
-    off: She is hove to; fill away first, or wear.", the frigate 172 s on; the lugger "She has no
-    head yards to brace abox."). Now it is refused at the order, with the lugger's own reason."""
+    """Nudges 79 and 86: on the trunk, `box her off` given while she comes to was taken, waited,
+    and failed once she was hove to ("Could not box her off: She is hove to; fill away first, or
+    wear.", the frigate 172 s on, the 74 lying a-try 280 s on, her hands kept up). The third pass
+    refused it at the order; by the lead's ruling at nudge 86 it is taken and waits as before,
+    and, she hove to, it is belayed then and said so, and all hands up for it are piped down (the
+    74's lie a-try called them; the frigate's heave-to called none)."""
     world = _at_sea(path)
+    n0 = len(world.log.all())
     assert world.submit(first).kind == "order.accepted"
     world.run(1)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(400)
+    ends = ("work.belayed", "crew.piped_down", "evolution.failed", "ship.boxed_off")
+    assert [e.text for e in _after(world, n0) if e.kind in ends] == said
+
+
+def test_on_a_committed_ship_with_no_head_yards_a_box_given_while_she_comes_to_is_refused():
+    """Nudge 79, the declaration: the lugger's box given while she comes to was taken, waited, and
+    failed 82 s on, "Could not box her off: She has no head yards to brace abox.". It can never be
+    done, and is refused at the order with that reason (kept at the lead's ruling of nudge 86)."""
+    world = _at_sea("data/ships/lugger.yaml")
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(1)
     r = world.submit("box her off")
-    assert r.kind == "order.rejected" and r.text.endswith(reply), r.text
+    assert r.kind == "order.rejected" and r.text.endswith("She has no head yards to brace abox.")
+
+
+def test_a_box_given_behind_a_heave_to_still_waiting_is_belayed_when_she_comes_to():
+    """The lead's ruling at nudge 86: a box given while a heave-to or lie a-try is in hand or
+    still waiting waits behind it, to begin if it fails. The frigate wearing, `heave to` and the
+    box given behind the wear, each waiting: worn 379 s on, hove to 566 s on, and the box belayed
+    then and said so, all hands piped down. On the trunk: "Could not box her off: She is hove to;
+    fill away first, or wear.", the hands kept up."""
+    world = _at_sea("data/ships/frigate-36.yaml")
+    n0 = len(world.log.all())
+    for order in ("wear ship", "heave to", "box her off"):
+        assert world.submit(order).kind == "order.accepted", order
+        world.run(1)
+    world.run(700)
+    ends = ("work.belayed", "crew.piped_down", "evolution.failed", "ship.boxed_off")
+    assert [e.text for e in _after(world, n0) if e.kind in ends] == [
+        "Belayed boxing off: she is hove to.",
+        "Piped down; the starboard watch has the deck.",
+    ]
+
+
+def test_a_box_given_while_her_heave_to_fails_begins_when_it_fails_and_boxes_her_off():
+    """The lead's nudge 86, the reader's finding: a box given while a heave-to was failing saved
+    her on the trunk, and the third pass refused it ("She is heaving to; she will not box off
+    while she comes to."), leaving her aback with her helm amidships. The brig in 12 kn under
+    plain sail, `heave to`, the wind four points onto her bow 20 s on, the box given 60 s on:
+    taken and waiting, her heave-to failed 600 s on ("Could not heave to: she would not lie to on
+    the starboard tack, ..."), the box begun at once, and "Boxed her off; braced sharp up on the
+    larboard tack, full and by." 709 s on, as on the trunk, line for line."""
+    world = _at_sea("data/ships/brig.yaml", 12.0)
+    n0 = len(world.log.all())
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(20)
+    _shift_the_wind(world, -4.0)
+    world.run(40)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(700)
+    after = _after(world, n0)
+    failed = [e for e in after if e.kind == "evolution.failed"]
+    boxed = [e for e in after if e.kind == "ship.boxed_off"]
+    assert [e.text[:15] for e in failed] == ["Could not heave"], [e.text for e in failed]
+    assert boxed and boxed[0].tick > failed[0].tick, [e.text for e in after]
 
 
 def test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out():

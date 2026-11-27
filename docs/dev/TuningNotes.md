@@ -40475,3 +40475,30 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, the third pass's box mended at the reader's finding: a box behind a failing heave-to saves her again (the lead's nudge 86, 2026-11-27)
+
+`…/pkg-90` merged at 93cf624c (package 126's second part). Old is 93cf624c.
+
+- **The finding.** A box given while a heave-to or a lie a-try was in hand waited on the trunk, began if her coming to failed, and saved her. The third pass refused it at the order ("She is heaving to; she will not box off while she comes to."), and left her aback with her helm amidships where the heave-to failed.
+- **The mend, the lead's ruling** (`runner.Runner.start`, `_start_waiting`, `_box_not_wanted`; the box script's own refusal taken out):
+  - a box given while she comes to (a heave-to or lie a-try in hand or still waiting) is taken and waits its turn, as on the trunk;
+  - it begins if her coming to fails;
+  - where she comes to, it is belayed when its turn comes, "Belayed boxing off: she is hove to." (notable), and the all hands kept up for it are piped down;
+  - where she has no head yards (the lugger), it is still refused at the order with that reason, as it can never be done.
+- **Measured** (`n86/box.py`, at sea from 270 with the wind from the north, plain sail settled 600 s; `heave to`; the wind four points onto her bow 20 s on; the box given 60 s on or when she is first said aback). 23 cases: the brig, the 36, the corvette, the hermaphrodite brig and the 74, each in 12 and 25 kn; the corvette in 30 kn with no shift, the box at 1, 60 and 300 s.
+  - **17 are the trunk's byte for byte.** In each where her heave-to failed, the box began as it failed and boxed her off as on the trunk.
+    - The brig in 12 kn: the heave-to failed at 600 s ("Could not heave to: she would not lie to on the starboard tack, the wind on the larboard bow; ..."); "Boxed her off; braced sharp up on the larboard tack, full and by." at 709 s.
+    - The corvette in 30 kn, at 1, 60 and 300 s: each boxed off as on the trunk.
+  - **6 moved, each by one line,** where she came to with the box waiting: "Could not box her off: She is hove to; fill away first, or wear." is now "Belayed boxing off: she is hove to." These are the corvette in 12 kn, the 36 in 25, the hermaphrodite brig in 12 and 25, and the 74 in 12 and 25.
+  - **None ends worse than on the trunk.**
+- **The 74 lying a-try, the box given behind it:** on the trunk it failed at 280 s and her hands were kept up. Now it is belayed at 280 s and "Piped down; the starboard watch has the deck." follows. Piped down, the watch below goes below, and what she does after may move by it (the reader's brig lying a-try in 30 kn: her spanker set 16 s sooner and her main topgallant 1 s sooner).
+- **The kedge's refusal for a lost boat** says the yard's new one as the errands' refusals do: "the launch is lost: cut adrift on the 10th; a new one is the yard's".
+- **Pins:**
+  - `test_a_box_given_while_her_heave_to_fails_begins_when_it_fails_and_boxes_her_off` (the brig);
+  - `test_on_a_committed_ship_a_box_given_while_she_comes_to_is_belayed_when_she_is_hove_to` (the 36 heaving to, the 74 lying a-try: belayed, and piped down where all hands were called), in place of the third pass's refused-at-the-order pin;
+  - `test_a_box_given_behind_a_heave_to_still_waiting_is_belayed_when_she_comes_to` (the 36 wearing, the heave-to and the box waiting behind the wear);
+  - `test_on_a_committed_ship_with_no_head_yards_a_box_given_while_she_comes_to_is_refused` (the lugger);
+  - `test_coming_to_she_is_not_offered_boxing_off_and_a_box_given_waits_its_turn` (the polacre probe), in place of the third pass's;
+  - the kedge's pin, its words.
+  - Each of the mend's four parts, undone, fails one of them.
