@@ -24112,7 +24112,7 @@ def _fleet_tack(world, made: bool, band) -> None:
 def test_truth_7_760_no_ship_tacks_worse_than_she_did():
     """Package 125 (truth 7-760, the table's own check): in every cell of the fleet's tables, plain
     and shortened, she stays from at least as many headings as she did on the trunk before this
-    package, by what she did. No ship of the eighteen is slack in stays by her file (the lead's
+    package, by what she did. No ship file of today's makes her slack in stays (the lead's
     ruling on rule A of 2026-11-27), so every one is hauled at the point as on the trunk; the
     hermaphrodite brig and the two schooners, whose way is under two fifths there (0.17 to
     0.33), with the rest."""
@@ -24203,7 +24203,7 @@ def test_truth_7_763b_a_ship_known_slack_in_stays_is_said_so_in_the_ship():
     """Package 125 (truth 7-763, the lead's ruling on rule A, item 4): her people know the habit,
     and the reading `the ship` says it in one line after her class: "She is slack in stays: when
     her way is gone in going about, the after yards are hauled with the wind ahead, not a point
-    on the bow." No ship of the eighteen has it, and none is told it."""
+    on the bow." No ship file of today's has it, and none is told it."""
     from freesail.api.readings import ship_words
 
     line = (

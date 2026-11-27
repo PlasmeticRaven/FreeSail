@@ -2543,7 +2543,7 @@ def ship_words(world: Any) -> str:
     parts = [f"The ship: {name}, {cls}; {service}{of}{escort}{duty}."]
     if getattr(spec, "slack_in_stays", False):
         # her handling as her people know it, from her file (package 125, the lead's ruling
-        # on rule A of 2026-11-27; `ShipSpec.slack_in_stays`): no ship of the eighteen says it
+        # on rule A of 2026-11-27; `ShipSpec.slack_in_stays`): no ship file of today's says it
         parts.append(
             "She is slack in stays: when her way is gone in going about, the after yards are "
             "hauled with the wind ahead, not a point on the bow."

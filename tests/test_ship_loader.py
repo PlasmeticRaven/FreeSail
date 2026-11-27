@@ -452,7 +452,8 @@ def test_slack_in_stays_is_a_habit_her_file_may_give_false_by_default_and_refuse
     """Package 125, the lead's ruling on rule A (2026-11-27): `ship.slack_in_stays` in a ship's
     file says her people know her slack in stays (`TackScript._time_to_haul` hauls her after
     yards with the wind ahead when her way is gone). Absent, she is not; true or false only,
-    anything else refused in words; and no ship of the eighteen sets it."""
+    anything else refused in words; and no ship file of today's sets it
+    (every file in `data/ships/` is read, however many)."""
     import glob
     import pickle
 
@@ -474,5 +475,5 @@ def test_slack_in_stays_is_a_habit_her_file_may_give_false_by_default_and_refuse
     assert pickle.loads(pickle.dumps(spec)).slack_in_stays is False
     assert "slack_in_stays" in ship_from_dict(slack).spec.__getstate__()
     paths = sorted(glob.glob("data/ships/*.yaml"))
-    assert len(paths) == 18
+    assert paths
     assert not [p for p in paths if load_ship(p).spec.slack_in_stays]

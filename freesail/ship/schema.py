@@ -1186,8 +1186,8 @@ class ShipSpec:
     # two moments because ships differ: true, her people haul them with the wind ahead once
     # her way is under two fifths of what she had at "helm's a-lee"
     # (`TackScript._time_to_haul`); false, the default, at the point whatever her way. A habit
-    # of the ship known to her people, not a reading of the deck. No ship of the eighteen
-    # sets it. Left out of the pickle while false.
+    # of the ship known to her people, not a reading of the deck. No ship file of
+    # today's sets it. Left out of the pickle while false.
     slack_in_stays: bool = False
 
     def __getstate__(self) -> dict[str, Any]:

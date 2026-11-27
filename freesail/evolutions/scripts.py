@@ -2845,8 +2845,8 @@ class TackScript(Script):
 
         The second moment is a habit of the ship, said in her file (`ShipSpec.slack_in_stays`;
         the lead's ruling of 2026-11-27): her people know her slack in stays. A ship without it
-        is hauled at the point whatever her way, as before package 125; none of the eighteen
-        sets it."""
+        is hauled at the point whatever her way, as before package 125; no ship file of
+        today's sets it."""
         off = abs(rel)
         if off > POINT:
             return False
