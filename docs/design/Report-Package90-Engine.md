@@ -2969,3 +2969,51 @@ On the old side, a boat cut adrift is still said to be griped fast on the booms,
 Nothing else moved in any case: every other reply and line is the same.
 
 **For the coordinating session:** the hash to send is **801c309** on **`…/pkg-90-lateen3`**, tiered whole above. The commit after it, this section's, touches this report alone. One thing waits on the lead's word: a pin for the dire count begun afresh (item 3 above), in the next hash if wanted.
+
+## After the staged third pass (nudge 84): the dire count's pin and carried fault 24, built above 5cffbfe; the hash held for the reader's report (2026-11-27)
+
+**The staged hash is untouched:** 801c309, with its report at 5cffbfe. The work below is above them on **`…/pkg-90-lateen3`**, pushed. **It is not a hash to send:** it is held until the reader's report on 801c309 comes back, so that its list and these go together, `…/pkg-90` merged again before the hash.
+
+**The commits:**
+- **8dd313b**, the merge of `…/pkg-90` at **939de7d6** (the Diana). The one line resolved by hand is the notes', `docs/dev/TuningNotes.md`: each side added sections at the end, and each is kept whole, the Diana's beside the third pass's (every line of both sides in it).
+  - **Its message is wrong in one word:** it names package 126's second part, which 939de7d6 does not hold.
+  - The Diana's, the lateen work's and the rig words' tests run on the merge: 544 passed.
+- **becaedb**, carried fault 24, the ships' class words: the mend, and three pins.
+- **ab809fe**, the pin of the dire count begun afresh, and the notes for both (`docs/dev/TuningNotes.md`, "Package 90, after the staged third pass").
+
+**1. The dire count begun afresh when a cause comes again** (`strain._causes_come`, 801c309's line; the lead's yes at nudge 84): `test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes`.
+- **The case:** the xebec in 50 kn, her lateens on the bad hand, the wind eight points through her bow 20 s on, and back 40 s after.
+- **On 801c309:** the main yard is warned dire "lying on the mast; she will carry it away" as it passes 1.5 again.
+- **With the line removed:** the test fails, the yard warned "working" alone.
+
+**2. Carried fault 24, the ships' class words** (`readings.ship_class_words`), mended at the cause for every file. **Words alone:** nothing a ship does moves. It is the reading's few lines: 22 in `ship_class_words`, and 4 in `ship_words`.
+- **Her name is taken out with the "HMS" that goes with it.** Before, only her name went, and "HMS" was left at the head.
+- **Only a leading article is made small**, where any leading capital was ("hMS"). A class that opens with a word of its own keeps it and is given its article: "a Spanish xebec ..." (no committed file has one).
+- **A first clause naming her and her state, and no class, is read past to her class:**
+  - the class after its comma: "HMS Indefatigable as built, a 64-gun ship ..." gives "a 64-gun ship ...";
+  - or else the next clause's, after its colon: "HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a frigate ...".
+- **"the" before a possessive is kept**, where it was made "a" ("a Navy's smack"). An "a" made from "the" before a vowel is "an".
+- **"the Navy's" goes where she is not a King's ship, as "H.M." does** (`readings.ship_words`). The smack out of Falmouth is a merchantman.
+
+| Ship | Old (939de7d6) | New |
+|---|---|---|
+| the razee | "hMS as razeed, 1795, ship-rigged" | "an Ardent-class 64 of 1784 cut down to a frigate by the Navy Office's draught of September 1794, ship-rigged" |
+| the 64 | "hMS as built, a 64-gun ship of the Ardent class" | "a 64-gun ship of the Ardent class" |
+| the 74 | "hMS a 74-gun ship of the Arrogant class" | "a 74-gun ship of the Arrogant class" |
+| the smack | "a Navy's smack" | "the Navy's smack" |
+| the smack out of Falmouth (`smack-falmouth`), the ship reading | "The ship: Culloden, a Navy's smack; a merchantman of Britain." | "The ship: Culloden, a smack; a merchantman of Britain." |
+
+- **The other ten committed ships' class words are the same, byte for byte**, the Diana's among them. Of the 49 committed scenarios' ship sentences, only the smack's moves.
+- **For the lead, what the razee's words now say:** a class, but long, the clause after her note's colon whole to its parenthesis. A shorter one ("an Ardent-class 64 cut down to a frigate") needs her note's first clause written so, at her generator (`tools/ships/indefatigable.py`), or a rule I would rather not guess. It is the lead's to say.
+- **The pins:**
+  - `test_every_committed_ships_class_words_read_as_her_class`, over every committed ship file, after the Diana's doubled-article test: an article or "H.M." at the head, no word made small at it, no article before a possessive, none doubled; and the four by their words.
+  - `test_a_class_opening_with_a_name_of_its_own_keeps_its_capital_and_takes_an_article`.
+  - `test_the_navys_smack_under_a_merchants_papers_is_a_smack`.
+  - **Each of the mend's eight parts, undone, fails one of them.**
+- The files that read the ship's words run on becaedb: `test_the_ship_herself`, `test_diana`, `test_neufchatel`, `test_bilander`, `test_subtypes`, `test_company_moved`, `test_boat_director`, `test_in_world`, `test_readings`, `test_indefatigable` and `test_bellerophon`, 704 passed.
+
+**Checked on ab809fe:** `ruff check` and `ruff format --check` clean.
+
+**Next:** the reader's list, when it comes, then `…/pkg-90` merged again, then the hash, tiered whole against a base on the merged tree, with the eighteen (now nineteen, the Diana's file among them) in gales, A2's harness and the declaration measured again.
+
+**For the coordinating session:** nothing here is the hash; the hash is held as asked.
