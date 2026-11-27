@@ -8,9 +8,11 @@ the first. The branch is `claude/pkg-126`, cut from the trunk at 112ff819.
 **Part one** (the lead's split of 2026-11-27), the harbour's end of a game with the stations' table
 and the fog, **was merged at 7bc7de20** by the hash afb5a998; sections 1 to 6 are its record, as
 merged. **Part two** is this hash: the captain's spar work (the owner's note 4) and the `lie a-try`
-mend (item 12), a third pass on the trunk as it stands, by the lead's list of 2026-11-27 (part two,
-items 1 to 3) and his ruling of the same day on the wreck's windage; sections 7 to 13. Its truths
-are 7-776 to 7-779 (with 7-777 b and 7-779 b).
+mend (item 12), a fourth pass on the trunk as it stands, by the lead's lists of 2026-11-27 (part
+two, items 1 to 3; the reader's third read, items 1 to 5), his ruling of the same day on the
+wreck's windage and his ruling of the afternoon on the ship that will not lie to and on the
+passage rule; sections 7 to 13. Its truths are 7-776 to 7-779 (with 7-777 b to g, 7-778 b and
+7-779 b).
 
 ## 1. A game ended from the harbour (the owner's note 2), and the stations' table
 
@@ -300,7 +302,9 @@ Nothing else moved.
 Renard sailed three hours with her main topgallant mast gone and her captain never touched it. The
 work exists for a player (`clear away the wreck of the <spar>`, `shift the <spar>`, `rig a jury
 mast`, `bend the <sail>`); this part gives it to the game's own captain
-(`world.captains.Captain._spar_work`, given from his repairs, `Captain._repairs`).
+(`world.captains.Captain._spar_work`, given from his repairs, `Captain._repairs`). This is its
+fourth pass, by the lead's list of 2026-11-27 (the reader's third read) and his ruling of the same
+afternoon.
 
 **What he does, in turn.**
 
@@ -312,8 +316,7 @@ mast`, `bend the <sail>`); this part gives it to the game's own captain
    those she had set, to be set again.
 2. **A head sail set once** (`_head_sail_for_the_wreck`) where the wreck took the head sails she
    had set: the first of her `headsails` that still stands, bent and stowed ("setting the fore
-   staysail (to keep her head off, her head sails gone)"), so that she keeps her head off while the
-   spar is shifted; none over his shortening line.
+   staysail (to keep her head off, her head sails gone)"); none over his shortening line.
 3. **A head sail the wreck took bent again** as soon as its spar stands; then **each spar shifted
    for a spare of its class** (`shift_spar.yaml`), or a lower mast stepped again as a jury mast
    (`jury_mast.yaml`), in the same order; the rest of the sails bent again; and **each sail set
@@ -321,51 +324,63 @@ mast`, `bend the <sail>`); this part gives it to the game's own captain
    for one of its kind (`_set_again`). A spar she has no spare for is left as it is (a spare yard
    answers a topsail yard alone, `SPARE_YARD_ANSWERS`). Every order says why in his words.
 
-**When: the spar's work is the last claimant of her hands** (the lead's list, item 1). The second
-pass's captain took the hands that work her: in the reader's 56 passages about twenty had trims,
-braces, take-ins, reefs or a heave-to held short by the spar's work. Now:
+**The spar's work is the last claimant of her hands, all hands called or not** (items 1 and 3).
 
-- **The runner gives her working the spar's hands.** Any work that is short of hands or too few to
-  begin and is not itself a spar's (her sails handled, her yards braced, her brought to, a repair)
-  holds the spar's work in hand and has its hands (`runner.Runner._spar_work_gives_way`: "Belayed
-  clearing away the wreck of the fore topmast: hands to brace the fore yard."). The spar's work is
-  taken up again where it stood only when no other work waits for hands or goes on short
-  (`_spar_work_waits`), as a manoeuvre's belay is (`_try_resume`). With all hands called by order
-  the hands are up for the work, and work merely going on short no longer holds it; work too few to
-  begin still does. The manoeuvres' belay of the spar's work (tack, wear, box off) stands as it was.
-- **He begins none** while an order of his or the watch's waits for hands or its turn, nor under
-  fire (a shot come aboard within ten minutes), in action or struck. **The shift** (and the
-  bending and setting after it) **he begins** only with her under command (no manoeuvre in hand,
-  her way on, her sails drawing), under his shortening line and with the weather not worsening
-  (`_weather_against_spar_work`: the glass falling fast, or the wind risen by a force,
-  `worsening_wind_kn`, within the hour: the lead's "he does not begin it with the wind rising
-  toward his shortening").
-- **The wreck is cut away as soon as there are hands for it**, the gale or no (the lead's ruling
-  of 2026-11-27): it waits only while she is shortening in a worsening wind, and is cleared once she
-  lies to for the weather (her sail work done and her hands free) or the weather has stopped
-  worsening. The trunk's repairs wait for the weather to serve (never lying to, never at the
-  shortening figure); a wreck's clearing alone now goes on there (`Captain._repairs`).
-- **A wreck is never left for good while she has hands** (`WRECK_HANDS_UP_S`, an hour): where her
-  watch is never free of its own work (the bilander's and the merchant brig's, seven on deck, whose
-  sail orders waited for hands through every hour of the three in the fresher winds), a wreck that
-  has hung an hour has all hands turned up for it ("calling all hands (to clear away the wreck of
-  the main topmast)"), and they are piped down when it is cleared ("piping down (the wreck cleared
-  away)"). Where all hands are on deck already for her own work, the hour's mark lets the clearing
-  go on without a call of his.
+- Any work short of hands or too few to begin that is not itself a spar's holds the spar's work in
+  hand and has its hands (`runner.Runner._spar_work_gives_way`: "Belayed clearing away the wreck
+  of the fore topmast: hands to take in the mainsail."). The second pass exempted work merely
+  short while all hands were called by order, so that once he had turned the hands up for the
+  wreck her sail work went short with the wreck named ("Only four hands to the mainsail; the rest
+  are clearing away the wreck of the fore topmast."). The exemption is gone, for his all hands and
+  the player's alike: no work goes short with the wreck named as what the rest are at (truth 7-777
+  c, on the bilander with all hands called and without).
+- **A quiet before it is taken up again**: the spar's work held is taken up where it stood only when
+  nothing has waited for hands or gone on short for five minutes (`runner.SPAR_WORK_RESUME_QUIET_S`,
+  300 s; truth 7-777 d). The reader's twelve belays in the bilander's passage in 25 knots on seed 3
+  are six now; the most in any of the 140 cell-seeds is nine (the cutter in 25 knots, seed 3, whose
+  watch tends her sheets and braces through the three hours), and the median three.
+- **A spar's work held stands in no one's way** (found in this pass): held, it still held its parts,
+  so that the `lie a-try` he gave in the rising gale waited behind the clearing held for the weather
+  ("'Lie a-try' will follow 'clear away the wreck of the main topmast', which the hands are still
+  at."), and the brig on seeds 7 and 9 and the frigate on seed 9 were never brought to. Now later
+  work does not wait for it (`_start_waiting`), and it is not taken up again while work begun
+  meanwhile shares its parts (`_spar_work_waits`; truth 7-777 e). All three are brought to at the
+  trunk's own tick.
 
-**The lead's question: a wreck through a gale, and after.** With the weather worsening he begins no
-spar work, so a wreck hangs while he shortens. Once she lies to for the weather the wreck is cleared
-(the lugger of the gale from the start, §8, clears her main topmast's wreck lying to); a wreck that
-has hung an hour with her watch never free has all hands turned up for it; and when the gale is
-over (the wind under his shortening line, the glass no longer falling fast, a force not risen in
-the hour) and she is under command again, the spar is shifted, its sails bent and set. Nothing in
-the captain leaves a wreck for good: the clearing waits on her hands and on her being brought to
-or snug, never on the wind alone. What the third pass found it could not do in three hours: the
-bilander in 25 knots on one seed of three is never under command with hands free (aback, boxing off
-and wearing in turn the whole while, as the trunk's captain's is), and on the other two has her
-clearing begun with all hands up and not done; and the bilander and the merchant brig in the rising
-wind have their clearing in hand, belayed in turn by her braces and the lead, and not done by the
-third hour: their wreck is being worked, not left.
+**He begins none** while an order of his or the watch's waits for hands or its turn, nor under fire
+(a shot come aboard within ten minutes), in action or struck; **the shift** (and the bending and
+setting after it) only with her under command (no manoeuvre in hand, her way on, her sails
+drawing).
+
+**Heavy weather: no spar work at all unless she lies to** (item 4 (b), the lead's leaning taken as
+it stands). At his shortening line or over it, or with the weather worsening (the glass falling
+fast, or the wind risen by a force within the hour: `_weather_against_spar_work`), he does no
+spar's work at all, the wreck's clearing with it, unless she is brought to for the weather
+(`_lying_to_for_weather`). Work in hand when the weather turns is held, its progress kept and its
+hands let go ("Belayed clearing away the wreck of the main topmast: hands kept for the weather.",
+`Captain._hold_spar_work_for_weather`), and none is begun or taken up again while he holds it
+(`runner.SPAR_WORK_WEATHER_HELD`). So in a rising gale he is the trunk's captain until she lies to,
+the wreck hanging as it hung on the trunk, save where its clearing was begun in the settled weather
+before (truth 7-777 e). Lying to, the wreck is cut away whatever the wind (the lugger of the gale
+from the start, §8, clears her main topmast's wreck lying to); the spar is shifted when the gale is
+over.
+
+**A wreck is never left for good while she has hands** (`WRECK_HANDS_UP_S`, an hour): where her
+watch is never free of its own work, a wreck that has hung an hour has all hands turned up for it
+("calling all hands (to clear away the wreck of the main topmast)") and they are piped down when it
+is cleared ("piping down (the wreck cleared away)"), **in settled weather only, and never as she is
+brought to** (items 3 and 4: the 74 in 20 rising to 38 on seed 3 was called all hands for the wreck
+in the tick she was given `lie a-try`). Truth 7-777 f holds it at the function: at the hour and not
+a second before, never at his shortening line, with the weather worsening, with a bringing-to in
+hand or given that tick, and piped down when the wreck is cleared.
+
+**The lead's question: a wreck through a gale, and after.** With the weather against it he does no
+spar work, so a wreck hangs while he shortens and while she is brought to. Once she lies to for the
+weather it is cut away; when the gale is over (under his shortening line, the glass no longer
+falling fast, a force not risen in the hour) and she is under command, a wreck still hanging is
+cleared, an hour of it with her watch never free has all hands turned up for it, and the spar is
+shifted, its sails bent and set. Nothing in the captain leaves a wreck for good: the clearing waits
+on her being brought to or on the weather settling, and on her hands.
 
 **The Renard's own case** (the owner's): her main topgallant mast shot away, she carries no spare
 for it (the cutter's booms: one spare topmast, one spare topsail yard). The captain clears the wreck
@@ -374,240 +389,434 @@ There is no spare topgallant mast aboard." (truth 7-777); nothing is shifted, an
 yard waits on its mast. What a cutter could send up in its place from what she carries: her
 topgallant "mast" is the pole of her topmast (the ship file, after Fincham: "the 8 ft pole of the
 topmast, on which the topgallant sets"), so the one spar of hers that would give her a topgallant
-pole again is her spare topmast, shifted whole for the topmast (the work `shift the main topmast`
-does), at the cost of the only spare topmast she has and a topmast's work (a stump of a sound
-topmast sent down to send up a new one for a light sail). The captain does not do it, and nothing
-is changed for it here: the question of spares is the lead's to put to the owner.
+pole again is her spare topmast, shifted whole for the topmast, at the cost of the only spare
+topmast she has and a topmast's work for a light sail. The captain does not do it, and nothing is
+changed for it here.
 
-## 8. `lie a-try` with no topsail to lie under, and a refused bringing-to given again (item 12)
+## 8. `lie a-try` with no topsail to lie under, and a refused bringing-to given again (item 2)
 
-**The mend acts only where the topsail can never be set** (the lead's list, item 2). The second
-pass's test (`_topsail_to_lie_under`) was false for any topsail furled, so that in a gale from the
-start, the topsails furled and about to be set, he gave `heave to`, it was refused, and five more
-ships than the smack were changed undeclared. Now `lie a-try` gives way to `heave to` only where
-every topsail it keeps is unbent (no sail is bent in a gale) or furled and outside her plain sail
-(the ship file's group, which nothing of his would set): of today's ships, the smack's light
-topsail alone (no reef bands, not in her plain sail; truth 7-778).
+**What she can lie a-try under is a fact of the sail, not of the moment** (item 2). The second
+pass's test read the topsail's state: the smack's light topsail, loosed by his own sail for a
+strong wind, became one to lie under, and lying a-try under it in the reader's gale from the start
+it strained six times and split at 6709 s; the privateer with her fore topmast gone was given `lie
+a-try` four times and refused ("She has no topsail to lie a-try under."). Now
+(`Captain._topsail_to_lie_under`) it is a topsail of the mast she lies to with (`yards_to_back`),
+on a yard and a mast that stand, bent and sound, of working canvas, with reef bands or in her plain
+sail. With none she is given `heave to` under the canvas she has, the smack, a boat and a ship whose
+topmast is gone alike (truth 7-778).
 
-**A refused or failed order to bring her to is given again** (`Captain._bring_to_again`), every
-`BRING_TO_AGAIN_S` (ten minutes; JUDGEMENT, grounded where it is defined) while she lies to for the
-weather and is not brought to, with nothing of the kind in hand ("lying a try (not brought to)").
-Refused twice in the same words with her sail as it was (a boat with no topsail at all; the smack
-with no head sail set), it is not given again until her sail changes, so that an order nothing in
-hand will make good is not a line every ten minutes. On the trunk it was given once, on entering
-the state. **The refusal after his own heave-to for the lead** ("She is heaving to already.", the
-bilander of the reader's rising wind) is this case: given again ten minutes after, with the cast
-done.
+- **Of working canvas** (`LIE_A_TRY_CANVAS_NO`, No. 4; JUDGEMENT, grounded where it is defined:
+  courses and topsails are of No. 2, Luce and Steel; a ship's mizen topsail of No. 4 in the files;
+  the sloop's topsail of No. 6 or 7, a light sail). The lead's words alone kept the cutter's
+  topsail, which has a reef band and is in her plain sail but is of No. 6: lying a-try under it in
+  forty knots it blew out at 3171 s (the gale from the start, below), as the trunk's own cutter's
+  does in the reader's gale (the trunk's, unchanged, at 2280 s). It is a sail set in fair weather;
+  she heaves to instead, and keeps it.
+- **Her light square canvas taken in first** (`_light_canvas_aback`): with no topsail to lie under,
+  a square sail of light canvas loosed or set on the yards a heave-to lays aback is taken in before
+  she is hove to ("taking in the topsail (to heave to under her fore-and-aft canvas)"), the heave-to
+  given at the next try. The smack's topsail, set by his own sail for a strong wind (the trunk's),
+  was laid aback by her heave-to and blew out; the cutter's likewise.
 
-**The gale from the start, every ship file** (40 knots from the west from the first minute, sails
-furled, `set plain sail`, bound for Falmouth from 48 40 N 5 05 W, seed 7, three hours; this hash
-beside the trunk at f09fe283, the whole log compared):
+**A refused or failed order to bring her to is given again**, ten minutes after the last
+(`BRING_TO_AGAIN_S`), while she lies to for the weather and is not brought to, with nothing of the
+kind in hand; **tried twice with her sail as it was, it is not given a third time until her sail
+changes** (truth 7-778 b: at ten minutes and not before; the third not given; given again with her
+sail changed). The second pass counted refusals in the same words only, so that a heave-to accepted
+and then failing ("Could not heave to: she would not lie to") was given every ten minutes through
+the gale, ten times on the smack; it now counts every try, refused, failed or done, and a try is
+not counted done until she is hove to (the count was cleared while she was still heaving to). The
+refusal after his own heave-to for the lead ("She is heaving to already.") is given again ten
+minutes after, with the cast done.
 
-| Ship file | Trunk: brought to | This hash: brought to | First difference | Bring-to refused or failed (trunk / this hash) |
-|---|---|---|---|---|
-| bilander | never | at 8788 s | 900 s | 1 / 3 |
-| boat-cutter-23 | never | never | 900 s | 1 / 2 |
-| boat-cutter-28 | never | never | 900 s | 1 / 2 |
-| boat-launch-25 | never | never | 900 s | 1 / 2 |
-| boat-launch-31 | never | never | 900 s | 1 / 2 |
-| boat-yawl-16 | never | never | 900 s | 1 / 2 |
-| brig | at 4614 s | at 4614 s | none: the same in every line | 0 / 0 |
-| cutter | never | at 2589 s | 900 s | 1 / 3 |
-| frigate-36 | at 3909 s | at 3909 s | none: the same in every line | 0 / 0 |
-| hermaphrodite-brig | at 1225 s | at 1225 s | none: the same in every line | 0 / 0 |
-| lugger | at 3240 s | at 3240 s | 3240 s | 0 / 0 |
-| merchant-brig | never | at 10547 s | 900 s | 1 / 4 |
-| privateer-schooner | never | at 3895 s | 900 s | 1 / 2 |
-| razee-44 | at 3511 s | at 3511 s | none: the same in every line | 0 / 0 |
-| seventy-four | at 4520 s | at 4520 s | none: the same in every line | 0 / 0 |
-| sixty-four | at 3578 s | at 3578 s | none: the same in every line | 0 / 0 |
-| smack | never | at 1500 s | 300 s | 1 / 3 |
-| topsail-schooner | never | at 3895 s | 900 s | 1 / 2 |
+**The lead's ruling on a ship whose `heave to` fails** (the topsail schooner with her fore topmast
+gone, in 20 rising to 38): his (b) in its smallest form was tried, her course given again under
+what she carries once the bringing-to rested, said once ("shaping a course for 49 52 n 5 06 w (she
+will not lie to; kept away under what she carries)") with her sheets trimmed. It did not restore
+her: on seed 9, 15.63 nm made good and 44 minutes astern against 15.17 and 33 without it and the
+trunk's 27.37 and 3. Making her sail on as the trunk's did would be a new way of handling her in a
+gale; it was not built, and the cells are declared by (a) (§9).
 
-- **Brought to where the trunk's never was:** the bilander, the cutter, the merchant brig, the
-  privateer, the topsail schooner (`lie a-try` refused at the start for the topsail not set, given
-  again when it is) and the smack (`heave to` under her fore-and-aft canvas). No ship the trunk's
-  captain brought to is left unbrought, or brought to later.
-- **The boats:** no topsail and no heave-to of theirs: "She has no topsail to lie a-try under." once
-  more than on the trunk, then nothing; they are not brought to, as on the trunk.
-- **The smack:** hove to at 1500 s; at 7429 s her straining foresail is taken in by the captain's
-  standing work (the trunk's), which leaves her not lying to, and `heave to` is refused twice ("No
-  head sail is set ...") and then not given again with her sail as it is.
-- **The lugger:** brought to as on the trunk; her main topmast carried away in the gale, she clears
+**The gale from the start, every ship file** (two gales: 40 knots from the west steady, sails
+furled, `set plain sail`, bound for Falmouth from 48 40 N 5 05 W, seed 7, three hours; and the
+reader's, 40 knots from 250 with gustiness and variability 0.2, the same; this hash beside the
+trunk at f09fe283, the whole log compared):
+
+*40 knots from the west:*
+
+| Ship file | Trunk: brought to | This hash: brought to | First difference | Refused or failed (trunk / this hash) | Sails lost (trunk / this hash) |
+|---|---|---|---|---|---|
+| bilander | never | at 8788 s | 905 s | 1 / 3 | fore.topmast staysail, jib, main.settee / fore.topmast staysail, main.settee |
+| boat-cutter-23 | never | never | 300 s | 2 / 3 | none / none |
+| boat-cutter-28 | never | never | 300 s | 2 / 3 | none / none |
+| boat-launch-25 | never | never | 300 s | 2 / 3 | none / none |
+| boat-launch-31 | never | never | 300 s | 2 / 3 | none / none |
+| boat-yawl-16 | never | never | 300 s | 2 / 3 | none / none |
+| brig | at 4614 s | at 4614 s | none: the same in every line | 1 / 1 | none / none |
+| cutter | never | at 2100 s | 300 s | 1 / 1 | none / none |
+| frigate-36 | at 3909 s | at 3909 s | none: the same in every line | 2 / 2 | main.course / main.course |
+| hermaphrodite-brig | at 1225 s | at 1225 s | none: the same in every line | 0 / 0 | none / none |
+| lugger | at 3240 s | at 3240 s | 3600 s | 0 / 0 | main.topsail / none |
+| merchant-brig | never | at 10547 s | 915 s | 1 / 4 | jib / jib |
+| privateer-schooner | never | at 3895 s | 995 s | 1 / 2 | none / none |
+| razee-44 | at 3511 s | at 3511 s | none: the same in every line | 1 / 1 | none / none |
+| seventy-four | at 4520 s | at 4520 s | none: the same in every line | 1 / 1 | none / none |
+| sixty-four | at 3578 s | at 3578 s | none: the same in every line | 0 / 0 | none / none |
+| smack | never | at 1500 s | 300 s | 2 / 4 | none / none |
+| topsail-schooner | never | at 3895 s | 995 s | 1 / 2 | none / none |
+
+*the reader's: 40 knots from 250, gusty:*
+
+| Ship file | Trunk: brought to | This hash: brought to | First difference | Refused or failed (trunk / this hash) | Sails lost (trunk / this hash) |
+|---|---|---|---|---|---|
+| bilander | never | at 5476 s | 985 s | 1 / 2 | fore.topmast staysail, jib / fore.topmast staysail, jib |
+| boat-cutter-23 | never | never | 300 s | 2 / 3 | none / none |
+| boat-cutter-28 | never | never | 300 s | 2 / 3 | none / none |
+| boat-launch-25 | never | never | 300 s | 2 / 3 | none / none |
+| boat-launch-31 | never | never | 300 s | 2 / 3 | none / none |
+| boat-yawl-16 | never | never | 300 s | 2 / 3 | none / none |
+| brig | at 3632 s | at 3632 s | none: the same in every line | 1 / 1 | none / none |
+| cutter | at 2280 s | at 2100 s | 300 s | 0 / 1 | topsail / none |
+| frigate-36 | at 3065 s | at 3065 s | none: the same in every line | 1 / 1 | none / none |
+| hermaphrodite-brig | at 1026 s | at 1026 s | none: the same in every line | 0 / 0 | none / none |
+| lugger | at 2820 s | at 2820 s | 2843 s | 0 / 0 | main.topsail / none |
+| merchant-brig | never | at 5455 s | 937 s | 1 / 2 | fore.topmast staysail, jib / fore.topmast staysail, jib |
+| privateer-schooner | never | at 3001 s | 901 s | 1 / 1 | none / none |
+| razee-44 | at 2928 s | at 2928 s | 4277 s | 1 / 1 | main.topgallant, main.topgallant.studdingsail.larboard, main.topgallant.studdingsail.starboard / none |
+| seventy-four | at 2960 s | at 2960 s | none: the same in every line | 1 / 1 | none / none |
+| sixty-four | at 2951 s | at 2951 s | 4291 s | 1 / 1 | main.topgallant, main.topgallant.studdingsail.larboard, main.topgallant.studdingsail.starboard / none |
+| smack | never | at 9420 s | 300 s | 2 / 5 | none / none |
+| topsail-schooner | never | at 3001 s | 901 s | 1 / 1 | none / none |
+
+- **No sail is lost that the trunk keeps**, in either gale, on any file; four keep a sail the trunk
+  loses (the bilander's jib in the westerly; the lugger's main topsail, the razee's and the 64's
+  main topgallant and its studding sails in the reader's; the cutter's topsail in the reader's,
+  laid to under it on the trunk). The smack's topsail and the cutter's, which the second pass's
+  reading lost in the reader's gale and the westerly, are kept.
+- **Every ship the trunk's captain brings to is brought to**, at the same tick, save the cutter in
+  the reader's gale, at 2100 s against 2280 s (hove to under her fore-and-aft canvas, where the
+  trunk's lay a-try under her topsail and lost it).
+- **Brought to where the trunk's captain never was:** the bilander, the cutter, the merchant brig,
+  the privateer, the topsail schooner and the smack (`lie a-try` given again when the topsail is
+  set; `heave to` under her fore-and-aft canvas for the cutter and the smack, their light topsails
+  taken in first where set).
+- **The boats:** no topsail to lie under, so `heave to` in its place, refused ("No head sail is set
+  to haul to windward, nor a topsail to lay aback.") and given once more ten minutes after; then
+  rested, her sail unchanged. Not brought to, as on the trunk.
+- **The lugger:** brought to as on the trunk; her main topsail carried away in the gale, she clears
   its wreck lying to (§7), where the trunk's left it hanging.
-- **The brig, the frigate, the hermaphrodite brig, the razee, the 74 and the 64:** the trunk's in
-  every line.
+- **The brig, the frigate, the hermaphrodite brig, the razee (westerly), the 74 and the 64
+  (westerly):** the trunk's in every line.
 
-## 9. The spar's work against the trunk (the lead's probe and his ruling)
 
-**The probe** (the lead's list, item 1): bound for Falmouth from 48 40 N 5 05 W, the game's own
-captain, a spar carried away by `strain._wreck_spar` at minute ten, three hours; in 12 knots, 25,
-12 with the wind heading her four points at +30 minutes, and 20 rising to 38 over +30 to +60; the
-bilander (fore topmast), the merchant brig (main topmast), a topsail schooner (fore topmast) and the
-frigate (main topmast) beside the three of truth 7-779 (the cutter's main topmast, the brig's, the
-74's fore topmast); seeds 7, 8 and 9 (`tests/test_mends_126.py`, `_spar_passage`).
+## 9. The spar's work against the trunk, seed by seed (the lead's probe, his rulings)
 
-**The trunk in this tree.** The trunk's captain is run in this tree with the spar's work, the
-bring-to given again and the narrowed `lie a-try` test patched out. Against the trunk itself
-(f09fe283, the same code as the trunk now) it is **the same in every line and end position on all
-84 cell-seeds**, on this hash's code (and on the pass's before it). `test_truth_7_779_b_the_trunk_
-in_this_tree_is_the_trunk` holds one of its cells to the trunk's figures.
+**The probe**: bound for Falmouth from 48 40 N 5 05 W, the game's own captain, a spar carried away
+by `strain._wreck_spar` at minute ten, three hours; in 12 knots, 25, 12 with the wind heading her
+four points at +45 minutes, and 20 rising to 38 over +40 to +70; the bilander (fore topmast), the
+merchant brig (main topmast), a topsail schooner (fore topmast), the frigate (main topmast), the
+cutter (main topmast), the brig (main topmast) and the 74 (fore topmast); **seeds 3, 7, 8, 9 and
+11**, the reader's (`tests/test_mends_126.py`, `_spar_passage`). Measured on the trunk itself
+(f09fe283, the code of the trunk now), on the trunk with the wreck cleared at the moment it fell (no
+hands spent and no time: its sails to the sail room, its spars sent down), and on this hash.
 
-**What was found: a wreck left hanging helps some hulls** (the carried list, fault 22). A wrecked
-sail gives no drive, but its windage and its spars' count three times over
-(`physics.sails._sail_windage_area`, `_spar_windage_area`, `WRECK_MULTIPLIER`), and the wreck does
-her no harm: a topmast's wreck forward pays her off like a head sail. With the wreck cleared at the
-moment it fell (no hands and no time spent: its sails to the sail room, its spars sent down), the
-trunk's own captain does worse in some cells than with it left hanging, by much (the 74 in 25 knots
-on seed 7: 1.88 miles made good, aback twenty times, against 6.51 and nine). No captain who clears
-the wreck can meet "not less than the trunk's" there. **The lead's ruling** (2026-11-27): the
-captain does not leave a wreck hanging because it serves her; nothing of the physics is changed; the
-truth is measured cell by cell against the trunk where clearing at once is no loss, and against the
-wreck cleared at once where it is; the windage is carried for the ships' session and a later physics
-package.
+**The judging is by seed** (item 4 (a), and the lead's ruling on the rule's own fault). On each
+cell-seed she passes where she is not worse than the trunk; or, where the wreck cleared at once is
+the yardstick (itself worse than the trunk beyond the allowances: a wreck hanging pays some hulls
+off like a head sail, the physics giving it three times its windage and none of its harm, the
+carried list, fault 22), where she is not worse than that. Not worse: minutes astern not more than
+five beyond, times aback not more than one beyond, brought to not later than five minutes after,
+and way made good not less by more than the price of the hands' work, a tenth of the yardstick's
+way and never under a mile (`PASSAGE_WAY_SHARE`, `PASSAGE_WAY_FLOOR_NM`; JUDGEMENT, grounded where
+they are defined: the lead's "a mile or two behind for it is a seaman", taken at its lower bound,
+and a tenth as the hour's clearing costing a third of her way for that hour of the three). And
+wherever the trunk's captain brings her to, so does this one, on every seed. The cell-seeds outside
+are declared in the truth (`PASSAGE_DECLARED`), each with its cause, and the truth holds the set
+exactly: one more outside, or one of them come inside, fails it.
 
-**The truth** (`test_truth_7_779_b_her_spar_carried_away_she_does_no_worse_than_the_trunk_on_
-passage`, slow, one test a cell). Each cell is judged on its three seeds together, by their
-medians: way made good toward Falmouth (miles), minutes going astern, times taken aback. The margin
-of each is half the trunk's own seed-to-seed range in that cell, never under three cables, five
-minutes and one time aback (JUDGEMENT, grounded at `PASSAGE_FLOORS`). The yardstick is the wreck
-cleared at once wherever that is itself worse than the trunk beyond the margin in any of the three,
-else the trunk. And on every seed on which the trunk's captain lies a-try or heaves to in the gale,
-this one does: no exception.
+**The result: 121 of the 140 cell-seeds inside; 19 declared.** The wreck cleared at once is the
+yardstick in 44. Every cell-seed on which the trunk's captain brings her to, this one does.
 
-Medians of seeds 7, 8 and 9, made good (nm) / minutes astern / times aback:
+The nineteen, each with its cause:
 
-| Ship | Wind | Yardstick | Trunk | Wreck cleared at once | This hash | Margin |
-|---|---|---|---|---|---|---|
-| bilander | 12 kn | **the wreck cleared at once** | 9.94 / 0 / 0 | 8.68 / 22 / 1 | 10.20 / 0 / 0 | 0.73 / 5 / 1 |
-| bilander | 25 kn | **the wreck cleared at once** | 9.26 / 29 / 2 | 5.00 / 58 / 5 | 15.86 / 0 / 0 | 5.89 / 44 / 2 |
-| bilander | 12 kn, heading her | **the wreck cleared at once** | 5.64 / 0 / 0 | -1.10 / 170 / 2 | 5.77 / 0 / 0 | 1.64 / 38 / 1 |
-| bilander | 20 rising to 38 | **the wreck cleared at once** | 11.87 / 0 / 1 | 0.56 / 160 / 1 | 11.87 / 0 / 1 | 2.71 / 10 / 1 |
-| merchant brig | 12 kn | the trunk | 9.34 / 5 / 1 | 11.34 / 0 / 0 | 9.99 / 5 / 1 | 0.30 / 5 / 1 |
-| merchant brig | 25 kn | the trunk | 10.44 / 6 / 1 | 16.16 / 0 / 2 | 10.66 / 6 / 1 | 7.21 / 8 / 5 |
-| merchant brig | 12 kn, heading her | the trunk | 4.73 / 15 / 1 | 5.97 / 0 / 0 | 5.25 / 15 / 1 | 0.82 / 10 / 1 |
-| merchant brig | 20 rising to 38 | the trunk | -5.51 / 28 / 1 | 9.95 / 0 / 0 | -5.51 / 28 / 1 | 4.33 / 10 / 1 |
-| topsail schooner | 12 kn | the trunk | 13.44 / 1 / 0 | 14.25 / 1 / 0 | 14.78 / 1 / 0 | 2.26 / 5 / 1 |
-| topsail schooner | 25 kn | the trunk | 27.45 / 5 / 0 | 27.71 / 5 / 0 | 27.73 / 5 / 0 | 2.60 / 5 / 1 |
-| topsail schooner | 12 kn, heading her | the trunk | 8.23 / 22 / 1 | 10.09 / 1 / 0 | 9.42 / 1 / 0 | 1.72 / 18 / 2 |
-| topsail schooner | 20 rising to 38 | the trunk | 27.99 / 3 / 0 | 28.70 / 3 / 0 | 29.51 / 3 / 0 | 1.39 / 5 / 1 |
-| frigate | 12 kn | the trunk | 9.96 / 0 / 0 | 12.42 / 0 / 0 | 12.29 / 0 / 0 | 0.32 / 5 / 1 |
-| frigate | 25 kn | the trunk | 7.69 / 3 / 0 | 14.48 / 1 / 1 | 10.02 / 3 / 0 | 11.82 / 10 / 4 |
-| frigate | 12 kn, heading her | the trunk | 4.33 / 9 / 2 | 7.91 / 0 / 0 | 7.48 / 0 / 0 | 0.85 / 5 / 1 |
-| frigate | 20 rising to 38 | the trunk | 13.43 / 18 / 1 | 21.70 / 0 / 0 | 22.27 / 8 / 1 | 2.71 / 5 / 1 |
-| cutter | 12 kn | the trunk | 0.17 / 175 / 1 | 0.65 / 174 / 2 | 0.66 / 175 / 1 | 0.30 / 5 / 1 |
-| cutter | 25 kn | the trunk | 7.85 / 122 / 1 | 22.90 / 0 / 0 | 22.74 / 0 / 0 | 9.15 / 76 / 1 |
-| cutter | 12 kn, heading her | the trunk | -1.37 / 172 / 3 | -0.72 / 174 / 2 | -0.86 / 175 / 1 | 0.30 / 5 / 2 |
-| cutter | 20 rising to 38 | the trunk | 0.98 / 177 / 1 | 0.88 / 177 / 1 | 0.93 / 177 / 1 | 0.30 / 5 / 1 |
-| brig | 12 kn | the trunk | 11.72 / 0 / 0 | 13.03 / 0 / 0 | 13.24 / 0 / 0 | 0.53 / 5 / 1 |
-| brig | 25 kn | the trunk | 26.30 / 0 / 0 | 27.02 / 0 / 0 | 26.74 / 0 / 0 | 2.23 / 5 / 1 |
-| brig | 12 kn, heading her | the trunk | 7.07 / 5 / 1 | 9.01 / 0 / 0 | 8.34 / 0 / 0 | 0.30 / 5 / 1 |
-| brig | 20 rising to 38 | the trunk | 16.84 / 0 / 0 | 14.60 / 0 / 0 | 14.12 / 0 / 0 | 3.46 / 5 / 1 |
-| 74 | 12 kn | the trunk | 8.10 / 0 / 0 | 9.25 / 0 / 0 | 10.98 / 0 / 0 | 0.65 / 5 / 1 |
-| 74 | 25 kn | **the wreck cleared at once** | 24.90 / 8 / 1 | 1.88 / 111 / 20 | 25.68 / 8 / 1 | 9.50 / 48 / 4 |
-| 74 | 12 kn, heading her | **the wreck cleared at once** | 0.62 / 136 / 2 | 0.56 / 143 / 2 | 0.41 / 144 / 2 | 0.38 / 5 / 1 |
-| 74 | 20 rising to 38 | **the wreck cleared at once** | 13.03 / 43 / 0 | 11.16 / 92 / 0 | 10.62 / 91 / 1 | 2.16 / 17 / 1 |
+- **the topsail schooner, 20 rising to 38, seeds 3, 7, 8, 9, 11**: her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, which fails in thirty-eight knots or takes late, where the trunk's captain, refused `lie a-try` once, let her sail on: tried to bring her to where the trunk's captain did not, and could not (the lead's ruling of 2026-11-27, (a)).
+- **the cutter, 20 rising to 38, seeds 3, 7, 8, 9, 11**: her topsail of light canvas, she is hove to under her fore-and-aft canvas where the trunk's captain, refused `lie a-try`, let her sail on: brought to where the trunk's captain was not (the lead's ruling of 2026-11-27, (a)).
+- **the frigate, 25 knots, seed 7**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): aback eleven times against eight in her wears; 4.65 nm against 4.23, 15 minutes astern against 19.
+- **the frigate, 20 rising to 38, seed 3**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) before the rise: given `lie a-try` at the trunk's tick, she lies a-try 545 s after it; 13.29 nm against 12.34.
+- **the brig, 20 rising to 38, seed 3**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) just before the rise: given `lie a-try` at the trunk's tick, she comes round through the wind as she is brought up and lies a-try 689 s after it; 10.61 nm against 2.70, 18 minutes astern against 44.
+- **the 74, 25 knots, seed 7**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): 117 minutes astern against the wreck cleared at once's 111 and the trunk's 96.
+- **the 74, 20 rising to 38, seed 3**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) before the rise: 7.30 nm against the trunk's 8.58 and the wreck cleared at once's 11.17, 97 minutes astern as the latter's.
+- **the topsail schooner, 12 knots with the wind heading her, seed 11**: the clearing in hand through her wear and her tack, the hands turned up for it at the hour: 21 minutes astern against 15, and 8.98 nm made good against 6.64.
+- **the cutter, 12 knots with the wind heading her, seed 7**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) before the wind headed her: 175 minutes astern against 165 (astern most of the three hours whatever is done), aback once against three, -0.87 nm against -1.37.
+- **the cutter, 12 knots with the wind heading her, seed 9**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): 178 minutes astern against 172, the wreck cleared at once's 177.
+- **the 74, 12 knots with the wind heading her, seed 8**: the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): 144 minutes astern against 138, the wreck cleared at once's 143.
 
-**No cell fails.** The wreck cleared at once is the yardstick in seven: the bilander in every wind
-(cleared, she goes astern in 12 knots and with the wind heading her, the hanging fore topmast having
-kept her head off) and the 74 in three; and in each of the seven, **the windage is the cause**: a
-wreck forward on a hull that gripes without it. They are declared for the ships' session in
-`docs/dev/TuningNotes.md` in the same words. In the rest the trunk is the yardstick and this hash
-is level or better, most by miles (the cutter in 25 knots 22.7 against 7.9; the bilander in 25
-knots 15.9 against 9.3; the frigate in the rising wind 22.3 against 13.4).
+**What the brig loses her way to in the rising wind** (item 4): the wreck itself. Her clearing
+begun at minute eleven in the settled twenty knots, its sails are lowered to the deck before the
+rise, and the hanging wreck's windage, which pays her off on the trunk, is gone. Brought to at the
+trunk's own tick on seeds 7 and 9 (6266 s and 6200 s), she makes 13.22 and 13.91 nm against the
+trunk's 16.19 and 16.84, and the wreck cleared at once makes 12.80 and 14.60: no sail left unset, no
+trim waiting, no hands kept from her; the same loss as the instant clearing's, inside the rule
+against it. On seed 8 she is inside against the trunk; on seed 3 she lies a-try 689 s later, but
+makes 10.61 nm against 2.70 (declared above).
 
-- **The frigate in 25 knots**, seed 7 (the lead's case: -0.84 miles against the trunk's 4.23 on the
-  pass he read): its log there was the trunk's to the minute until the clearing lowered the wreck's
-  sails to the sail room at 2995 s, taking off their windage; from there her times aback and her
-  wears drifted by seconds and her track parted. On this hash, where the clearing yields to her
-  braces and the lead and goes on with the hands up, **she makes no less on any seed**: 4.65, 28.42
-  and 10.02 miles against the trunk's 4.23, 27.86 and 7.69 (seed 7: 15 minutes astern against 19,
-  aback eleven times against eight; the cell's medians 3 minutes and none, as the trunk's). The
-  cell's margin, 11.8 miles, is the trunk's own spread in that wind (4.2 to 27.9 over three seeds):
-  the measure of what one seed is worth there.
-- **The three small ones** of the pass before (the bilander and the cutter a few minutes more
-  astern with the wind heading her, the 74 a few cables less): on three seeds the bilander's is
-  level with the trunk and its yardstick is the wreck cleared at once; the cutter's is three
-  minutes astern more than the trunk's median, inside five, and better in way and aback; the 74's
-  yardstick is the wreck cleared at once, which it matches.
-- **The second pass's fault the reader found** (the bilander in the rising wind, 1.56 miles made
-  good and ninety minutes astern): she now makes the trunk's 8.90, 11.87 and 14.32 on the three
-  seeds, the clearing belayed by her shortening and her braces and taken up between them. Where the
-  yardstick is the wreck cleared at once, as there, the truth would pass a captain as bad as the
-  second pass's; the function's truths (7-777: no spar's order while work waits, in a manoeuvre,
-  under fire, struck, in action; the belays of `_spar_work_gives_way`) are what pin the last claim
-  there.
+**The trunk in this tree.** `_spar_passage` runs the trunk's captain within this tree (the spar's
+work, the hold for the weather, the bring-to given again and the narrowed `lie a-try` patched
+out); `test_truth_7_779_b_the_trunk_in_this_tree_is_the_trunk` holds one cell to the trunk's own
+figures at f09fe283, and the probe's trunk and instant clearing were run on the trunk itself.
 
-## 10. The wreck's order pinned (item 3)
+**The table, whole** (made good nm / minutes astern / times aback / tick brought to; belays: the
+spar's work held for her working or the weather in the passage):
 
-The reader's mutant M03 (`rank` turned so that a light spar's wreck sorts first) survived the slow
-tier: a light wreck first, with work in hand, returned None and held up the working wreck. Truth
-7-777 b pins it at the function: the brig with a studding-sail boom's wreck beside her fore
-topmast's clears the fore topmast's first with work in hand and with none, and the boom's only
-after it and only with nothing in hand. M03 fails it (the fast tier).
+| Ship | Wind | Seed | Yardstick | Trunk | Wreck cleared at once | Package 126 | Belays | |
+|---|---|---|---|---|---|---|---|---|
+| bilander | 12 kn | 3 | the instant | 10.63 / 0 / 0 / - | -0.21 / 171 / 2 / - | 10.86 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 7 | the instant | 9.94 / 0 / 1 / - | 9.88 / 22 / 1 / - | 10.19 / 0 / 1 / - | 4 | inside |
+| bilander | 12 kn | 8 | the instant | 9.40 / 0 / 0 / - | 8.68 / 22 / 1 / - | 9.58 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn | 9 | the instant | 10.86 / 0 / 0 / - | -0.22 / 171 / 2 / - | 10.27 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn | 11 | the instant | 9.94 / 0 / 0 / - | -0.11 / 171 / 2 / - | 10.47 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 3 | the instant | 16.10 / 0 / 0 / - | 3.90 / 85 / 5 / - | 15.88 / 5 / 0 / - | 6 | inside |
+| bilander | 25 kn | 7 | the instant | 3.23 / 89 / 2 / - | 5.00 / 58 / 6 / - | 3.23 / 89 / 2 / - | 0 | inside |
+| bilander | 25 kn | 8 | the instant | 15.02 / 0 / 0 / - | 12.74 / 36 / 2 / - | 15.87 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 9 | the instant | 9.26 / 29 / 4 / - | 1.13 / 107 / 5 / - | 16.46 / 0 / 0 / - | 3 | inside |
+| bilander | 25 kn | 11 | the instant | 15.41 / 0 / 0 / - | 0.90 / 114 / 2 / - | 17.50 / 0 / 0 / - | 2 | inside |
+| bilander | 12 kn, heading | 3 | the instant | 5.99 / 0 / 0 / - | -1.29 / 172 / 2 / - | 6.09 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 7 | the instant | 2.62 / 76 / 0 / - | -1.10 / 168 / 2 / - | 3.01 / 81 / 1 / - | 6 | inside |
+| bilander | 12 kn, heading | 8 | the instant | 5.64 / 0 / 0 / - | -0.57 / 170 / 2 / - | 5.75 / 0 / 0 / - | 4 | inside |
+| bilander | 12 kn, heading | 9 | the instant | 5.91 / 0 / 0 / - | -1.26 / 173 / 2 / - | 5.99 / 0 / 0 / - | 3 | inside |
+| bilander | 12 kn, heading | 11 | the instant | 6.01 / 0 / 0 / - | -1.18 / 171 / 2 / - | 6.13 / 0 / 0 / - | 4 | inside |
+| bilander | 20 to 38 | 3 | the instant | 14.24 / 0 / 0 / 6889 | 0.64 / 154 / 1 / 6751 | 14.24 / 0 / 0 / 6889 | 1 | inside |
+| bilander | 20 to 38 | 7 | the instant | 8.90 / 21 / 1 / 6123 | 2.28 / 141 / 1 / 6247 | 8.90 / 21 / 1 / 6123 | 3 | inside |
+| bilander | 20 to 38 | 8 | the instant | 11.87 / 0 / 1 / 7103 | 0.56 / 160 / 1 / 7086 | 11.87 / 0 / 1 / 7103 | 1 | inside |
+| bilander | 20 to 38 | 9 | the instant | 14.32 / 0 / 0 / 6340 | -0.71 / 163 / 1 / 6140 | 14.32 / 0 / 0 / 6340 | 1 | inside |
+| bilander | 20 to 38 | 11 | the instant | 14.28 / 0 / 1 / 6502 | 0.49 / 147 / 1 / 6653 | 14.28 / 0 / 1 / 6502 | 0 | inside |
+| merchant brig | 12 kn | 3 | the trunk | 9.12 / 15 / 2 / - | 12.13 / 0 / 0 / - | 9.65 / 15 / 2 / - | 4 | inside |
+| merchant brig | 12 kn | 7 | the trunk | 9.52 / 5 / 1 / - | 11.34 / 0 / 0 / - | 10.02 / 5 / 1 / - | 3 | inside |
+| merchant brig | 12 kn | 8 | the trunk | 9.01 / 5 / 1 / - | 10.48 / 0 / 0 / - | 9.56 / 5 / 1 / - | 4 | inside |
+| merchant brig | 12 kn | 9 | the trunk | 9.34 / 7 / 1 / - | 12.00 / 0 / 0 / - | 9.76 / 7 / 1 / - | 4 | inside |
+| merchant brig | 12 kn | 11 | the trunk | 9.95 / 6 / 1 / - | 11.83 / 0 / 0 / - | 10.40 / 6 / 1 / - | 4 | inside |
+| merchant brig | 25 kn | 3 | the trunk | 8.67 / 27 / 6 / - | 17.99 / 0 / 1 / - | 10.32 / 21 / 4 / - | 5 | inside |
+| merchant brig | 25 kn | 7 | the trunk | 10.44 / 6 / 1 / - | 16.16 / 0 / 2 / - | 10.59 / 6 / 1 / - | 4 | inside |
+| merchant brig | 25 kn | 8 | the trunk | -3.76 / 22 / 11 / - | 16.60 / 0 / 1 / - | 4.42 / 19 / 12 / - | 2 | inside |
+| merchant brig | 25 kn | 9 | the trunk | 10.66 / 6 / 1 / - | 15.60 / 0 / 2 / - | 10.78 / 6 / 1 / - | 4 | inside |
+| merchant brig | 25 kn | 11 | the trunk | 13.49 / 17 / 3 / - | 17.39 / 0 / 3 / - | 14.60 / 16 / 2 / - | 4 | inside |
+| merchant brig | 12 kn, heading | 3 | the trunk | 2.16 / 15 / 2 / - | 7.55 / 0 / 0 / - | 4.04 / 14 / 1 / - | 7 | inside |
+| merchant brig | 12 kn, heading | 7 | the trunk | 4.73 / 11 / 1 / - | 5.97 / 0 / 0 / - | 4.87 / 11 / 1 / - | 5 | inside |
+| merchant brig | 12 kn, heading | 8 | the trunk | 5.88 / 15 / 1 / - | 5.84 / 0 / 0 / - | 6.15 / 15 / 1 / - | 5 | inside |
+| merchant brig | 12 kn, heading | 9 | the trunk | 4.23 / 32 / 2 / - | 7.37 / 0 / 0 / - | 5.16 / 25 / 2 / - | 8 | inside |
+| merchant brig | 12 kn, heading | 11 | the trunk | 4.76 / 12 / 1 / - | 7.73 / 0 / 0 / - | 5.09 / 12 / 1 / - | 4 | inside |
+| merchant brig | 20 to 38 | 3 | the trunk | 1.53 / 28 / 1 / 7611 | 11.16 / 0 / 0 / 6953 | 1.53 / 28 / 1 / 7611 | 1 | inside |
+| merchant brig | 20 to 38 | 7 | the trunk | -5.51 / 22 / 1 / 7348 | 9.13 / 0 / 0 / 6150 | -5.51 / 22 / 1 / 7348 | 1 | inside |
+| merchant brig | 20 to 38 | 8 | the trunk | 2.84 / 41 / 1 / 7706 | 9.95 / 9 / 0 / 7201 | 2.84 / 41 / 1 / 7706 | 0 | inside |
+| merchant brig | 20 to 38 | 9 | the trunk | -5.81 / 28 / 1 / 6526 | 16.47 / 0 / 1 / 5119 | -5.81 / 28 / 1 / 6526 | 0 | inside |
+| merchant brig | 20 to 38 | 11 | the trunk | -2.82 / 49 / 1 / 7673 | 13.74 / 0 / 0 / 7088 | -2.82 / 49 / 1 / 7673 | 1 | inside |
+| topsail schooner | 12 kn | 3 | the trunk | 16.75 / 1 / 0 / - | 17.43 / 1 / 0 / - | 17.52 / 1 / 0 / - | 4 | inside |
+| topsail schooner | 12 kn | 7 | the trunk | 12.41 / 1 / 0 / - | 13.60 / 1 / 0 / - | 14.57 / 1 / 0 / - | 4 | inside |
+| topsail schooner | 12 kn | 8 | the trunk | 13.44 / 1 / 0 / - | 14.25 / 1 / 0 / - | 15.07 / 1 / 0 / - | 4 | inside |
+| topsail schooner | 12 kn | 9 | the trunk | 16.93 / 1 / 0 / - | 17.52 / 1 / 0 / - | 17.43 / 1 / 0 / - | 5 | inside |
+| topsail schooner | 12 kn | 11 | the trunk | 15.50 / 14 / 1 / - | 15.95 / 14 / 1 / - | 16.05 / 14 / 1 / - | 4 | inside |
+| topsail schooner | 25 kn | 3 | the trunk | 29.61 / 1 / 0 / - | 30.09 / 3 / 0 / - | 30.22 / 1 / 0 / - | 8 | inside |
+| topsail schooner | 25 kn | 7 | the trunk | 23.92 / 5 / 0 / - | 25.91 / 5 / 0 / - | 26.63 / 5 / 0 / - | 6 | inside |
+| topsail schooner | 25 kn | 8 | the trunk | 27.45 / 2 / 0 / - | 27.71 / 3 / 0 / - | 27.82 / 2 / 0 / - | 8 | inside |
+| topsail schooner | 25 kn | 9 | the trunk | 29.11 / 5 / 0 / - | 29.74 / 5 / 0 / - | 29.54 / 5 / 0 / - | 6 | inside |
+| topsail schooner | 25 kn | 11 | the trunk | 29.95 / 1 / 0 / - | 30.19 / 2 / 0 / - | 30.31 / 1 / 0 / - | 7 | inside |
+| topsail schooner | 12 kn, heading | 3 | the instant | 8.93 / 1 / 0 / - | 10.43 / 7 / 1 / - | 9.56 / 1 / 1 / - | 5 | inside |
+| topsail schooner | 12 kn, heading | 7 | the trunk | 5.21 / 37 / 3 / - | 8.78 / 1 / 0 / - | 8.75 / 2 / 1 / - | 7 | inside |
+| topsail schooner | 12 kn, heading | 8 | the trunk | 8.65 / 1 / 0 / - | 10.09 / 1 / 0 / - | 9.49 / 1 / 1 / - | 7 | inside |
+| topsail schooner | 12 kn, heading | 9 | the trunk | 8.23 / 22 / 1 / - | 10.57 / 1 / 0 / - | 10.43 / 1 / 1 / - | 5 | inside |
+| topsail schooner | 12 kn, heading | 11 | the trunk | 6.64 / 15 / 2 / - | 9.74 / 15 / 2 / - | 8.98 / 21 / 2 / - | 4 | declared: astern |
+| topsail schooner | 20 to 38 | 3 | the trunk | 26.94 / 1 / 0 / - | 28.95 / 4 / 1 / - | 19.85 / 2 / 1 / 11040 | 3 | declared: way |
+| topsail schooner | 20 to 38 | 7 | the instant | 27.99 / 3 / 0 / - | 23.51 / 35 / 0 / - | 10.97 / 21 / 0 / 3960 | 3 | declared: way, astern |
+| topsail schooner | 20 to 38 | 8 | the trunk | 30.16 / 3 / 0 / - | 31.00 / 3 / 0 / - | 16.37 / 19 / 1 / 9180 | 3 | declared: way, astern |
+| topsail schooner | 20 to 38 | 9 | the trunk | 27.37 / 3 / 0 / - | 28.70 / 3 / 1 / - | 15.17 / 33 / 0 / - | 3 | declared: way, astern |
+| topsail schooner | 20 to 38 | 11 | the trunk | 27.13 / 2 / 0 / - | 28.79 / 3 / 0 / - | 15.89 / 2 / 0 / - | 3 | declared: way |
+| frigate | 12 kn | 3 | the trunk | 8.06 / 3 / 1 / - | 11.67 / 0 / 0 / - | 10.41 / 4 / 1 / - | 1 | inside |
+| frigate | 12 kn | 7 | the trunk | 9.39 / 0 / 0 / - | 11.47 / 0 / 0 / - | 11.66 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn | 8 | the trunk | 10.03 / 0 / 0 / - | 12.42 / 0 / 0 / - | 12.29 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn | 9 | the trunk | 9.96 / 0 / 0 / - | 12.78 / 0 / 0 / - | 12.61 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn | 11 | the trunk | 11.81 / 0 / 0 / - | 14.35 / 0 / 0 / - | 13.76 / 0 / 0 / - | 0 | inside |
+| frigate | 25 kn | 3 | the trunk | 29.08 / 0 / 0 / - | 30.23 / 0 / 0 / - | 29.99 / 0 / 0 / - | 0 | inside |
+| frigate | 25 kn | 7 | the trunk | 4.23 / 19 / 8 / - | 11.38 / 1 / 1 / 4054 | 4.65 / 15 / 11 / - | 3 | declared: aback |
+| frigate | 25 kn | 8 | the trunk | 27.86 / 0 / 0 / - | 28.73 / 0 / 0 / - | 28.42 / 0 / 0 / - | 0 | inside |
+| frigate | 25 kn | 9 | the trunk | 7.69 / 3 / 0 / 4075 | 14.48 / 3 / 1 / 4118 | 10.00 / 3 / 0 / 4073 | 2 | inside |
+| frigate | 25 kn | 11 | the trunk | 27.22 / 0 / 0 / - | 30.38 / 0 / 0 / - | 28.22 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn, heading | 3 | the trunk | 4.99 / 8 / 5 / - | 6.50 / 4 / 1 / - | 6.01 / 10 / 5 / - | 2 | inside |
+| frigate | 12 kn, heading | 7 | the trunk | 4.26 / 9 / 2 / - | 7.73 / 0 / 0 / - | 7.48 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn, heading | 8 | the trunk | 5.96 / 1 / 0 / - | 7.91 / 3 / 1 / - | 7.11 / 0 / 0 / - | 2 | inside |
+| frigate | 12 kn, heading | 9 | the trunk | 4.33 / 9 / 2 / - | 9.15 / 0 / 0 / - | 9.07 / 0 / 0 / - | 0 | inside |
+| frigate | 12 kn, heading | 11 | the instant | 8.52 / 0 / 0 / - | 6.91 / 5 / 1 / - | 10.00 / 0 / 0 / - | 0 | inside |
+| frigate | 20 to 38 | 3 | the trunk | 12.34 / 17 / 5 / 5293 | 22.60 / 0 / 0 / 5442 | 13.29 / 24 / 2 / 5838 | 1 | declared: astern, brought to late |
+| frigate | 20 to 38 | 7 | the trunk | 13.43 / 20 / 2 / 5480 | 15.19 / 6 / 2 / 5155 | 16.08 / 19 / 2 / 5421 | 1 | inside |
+| frigate | 20 to 38 | 8 | the trunk | 18.47 / 18 / 1 / 6279 | 24.57 / 0 / 0 / 6196 | 24.07 / 0 / 0 / 6236 | 1 | inside |
+| frigate | 20 to 38 | 9 | the trunk | 13.06 / 12 / 1 / 5194 | 21.70 / 0 / 0 / 5153 | 14.55 / 8 / 1 / 5194 | 3 | inside |
+| frigate | 20 to 38 | 11 | the trunk | 16.49 / 13 / 0 / 5764 | 24.16 / 0 / 0 / 5877 | 22.46 / 0 / 0 / 5906 | 1 | inside |
+| cutter | 12 kn | 3 | the trunk | 0.10 / 175 / 1 / - | 0.40 / 174 / 2 / - | 0.48 / 175 / 1 / - | 0 | inside |
+| cutter | 12 kn | 7 | the trunk | 0.17 / 175 / 0 / - | 0.65 / 167 / 0 / - | 0.66 / 175 / 0 / - | 0 | inside |
+| cutter | 12 kn | 8 | the instant | 0.39 / 175 / 1 / - | 0.70 / 174 / 3 / - | 0.77 / 175 / 1 / - | 0 | inside |
+| cutter | 12 kn | 9 | the trunk | -0.11 / 178 / 2 / - | 0.16 / 177 / 2 / - | 0.28 / 178 / 2 / - | 1 | inside |
+| cutter | 12 kn | 11 | the trunk | 0.22 / 175 / 1 / - | 0.49 / 174 / 1 / - | 0.60 / 175 / 1 / - | 0 | inside |
+| cutter | 25 kn | 3 | the trunk | 24.31 / 0 / 0 / - | 25.31 / 0 / 0 / - | 25.18 / 0 / 0 / - | 9 | inside |
+| cutter | 25 kn | 7 | the trunk | 3.73 / 153 / 1 / - | 16.00 / 60 / 1 / - | 15.81 / 57 / 0 / - | 7 | inside |
+| cutter | 25 kn | 8 | the trunk | 22.02 / 0 / 0 / - | 22.90 / 0 / 0 / - | 22.69 / 0 / 0 / - | 7 | inside |
+| cutter | 25 kn | 9 | the trunk | 7.85 / 122 / 1 / - | 25.12 / 0 / 0 / - | 25.02 / 0 / 0 / - | 7 | inside |
+| cutter | 25 kn | 11 | the trunk | 8.26 / 122 / 0 / - | 25.52 / 0 / 0 / - | 25.53 / 0 / 0 / - | 7 | inside |
+| cutter | 12 kn, heading | 3 | the instant | -1.51 / 166 / 3 / - | -1.07 / 174 / 2 / - | -1.02 / 175 / 2 / - | 3 | inside |
+| cutter | 12 kn, heading | 7 | the trunk | -1.37 / 165 / 3 / - | -0.70 / 167 / 1 / - | -0.87 / 175 / 1 / - | 1 | declared: astern |
+| cutter | 12 kn, heading | 8 | the trunk | -1.25 / 174 / 2 / - | -0.72 / 174 / 3 / - | -0.63 / 175 / 1 / - | 1 | inside |
+| cutter | 12 kn, heading | 9 | the trunk | -1.69 / 172 / 5 / - | -1.33 / 177 / 2 / - | -1.17 / 178 / 2 / - | 2 | declared: astern |
+| cutter | 12 kn, heading | 11 | the instant | -1.44 / 168 / 3 / - | -1.08 / 174 / 2 / - | -0.93 / 175 / 2 / - | 3 | inside |
+| cutter | 20 to 38 | 3 | the trunk | 0.92 / 178 / 1 / - | 0.85 / 177 / 2 / - | -0.36 / 178 / 1 / 4140 | 1 | declared: way |
+| cutter | 20 to 38 | 7 | the trunk | 0.69 / 177 / 1 / - | 0.60 / 177 / 1 / - | -0.82 / 177 / 1 / 3960 | 2 | declared: way |
+| cutter | 20 to 38 | 8 | the trunk | 1.03 / 177 / 1 / - | 0.90 / 177 / 1 / - | -0.11 / 177 / 1 / 4128 | 1 | declared: way |
+| cutter | 20 to 38 | 9 | the trunk | 0.98 / 178 / 1 / - | 0.88 / 177 / 1 / - | -0.79 / 178 / 1 / 4020 | 0 | declared: way |
+| cutter | 20 to 38 | 11 | the trunk | 1.23 / 178 / 1 / - | 1.10 / 177 / 1 / - | -0.23 / 178 / 1 / 4140 | 0 | declared: way |
+| brig | 12 kn | 3 | the trunk | 9.71 / 7 / 2 / - | 13.38 / 0 / 0 / - | 12.82 / 0 / 0 / - | 4 | inside |
+| brig | 12 kn | 7 | the trunk | 11.04 / 0 / 0 / - | 12.34 / 0 / 0 / - | 12.27 / 0 / 0 / - | 3 | inside |
+| brig | 12 kn | 8 | the trunk | 12.10 / 0 / 0 / - | 13.03 / 0 / 0 / - | 12.90 / 0 / 0 / - | 6 | inside |
+| brig | 12 kn | 9 | the trunk | 11.72 / 0 / 0 / - | 13.59 / 0 / 0 / - | 13.26 / 0 / 0 / - | 3 | inside |
+| brig | 12 kn | 11 | the trunk | 12.90 / 0 / 0 / - | 13.96 / 0 / 0 / - | 13.74 / 0 / 0 / - | 5 | inside |
+| brig | 25 kn | 3 | the instant | 22.82 / 8 / 5 / - | 20.09 / 2 / 2 / - | 23.99 / 8 / 5 / - | 4 | inside |
+| brig | 25 kn | 7 | the trunk | 23.09 / 0 / 0 / - | 25.33 / 0 / 0 / - | 24.24 / 0 / 0 / - | 2 | inside |
+| brig | 25 kn | 8 | the trunk | 26.30 / 0 / 0 / - | 27.02 / 0 / 0 / - | 26.70 / 0 / 0 / - | 3 | inside |
+| brig | 25 kn | 9 | the trunk | 27.56 / 0 / 0 / - | 28.86 / 0 / 0 / - | 28.21 / 0 / 0 / - | 3 | inside |
+| brig | 25 kn | 11 | the trunk | 27.44 / 2 / 1 / - | 26.82 / 0 / 1 / - | 27.84 / 2 / 1 / - | 3 | inside |
+| brig | 12 kn, heading | 3 | the instant | 6.83 / 8 / 2 / - | 4.36 / 2 / 12 / - | 5.99 / 3 / 1 / - | 5 | inside |
+| brig | 12 kn, heading | 7 | the trunk | 7.07 / 0 / 0 / - | 9.01 / 0 / 0 / - | 8.83 / 0 / 0 / - | 3 | inside |
+| brig | 12 kn, heading | 8 | the trunk | 7.13 / 7 / 1 / - | 7.85 / 1 / 1 / - | 8.21 / 0 / 1 / - | 7 | inside |
+| brig | 12 kn, heading | 9 | the trunk | 6.68 / 5 / 1 / - | 9.39 / 0 / 0 / - | 9.18 / 0 / 0 / - | 3 | inside |
+| brig | 12 kn, heading | 11 | the trunk | 9.01 / 0 / 0 / - | 9.97 / 0 / 0 / - | 9.75 / 0 / 0 / - | 5 | inside |
+| brig | 20 to 38 | 3 | the trunk | 2.70 / 44 / 6 / 6274 | 14.19 / 2 / 1 / 6223 | 10.61 / 18 / 4 / 6963 | 5 | declared: brought to late |
+| brig | 20 to 38 | 7 | the instant | 16.19 / 0 / 0 / 6266 | 12.80 / 0 / 0 / 6087 | 13.22 / 0 / 0 / 6266 | 4 | inside |
+| brig | 20 to 38 | 8 | the trunk | 23.11 / 0 / 0 / 6779 | 21.78 / 0 / 0 / 6649 | 21.64 / 0 / 0 / 6697 | 4 | inside |
+| brig | 20 to 38 | 9 | the instant | 16.84 / 0 / 0 / 6200 | 14.60 / 0 / 0 / 6220 | 13.91 / 0 / 0 / 6200 | 4 | inside |
+| brig | 20 to 38 | 11 | the instant | 18.32 / 8 / 4 / 6424 | 13.67 / 7 / 3 / 6363 | 13.57 / 8 / 4 / 6424 | 4 | inside |
+| 74 | 12 kn | 3 | the instant | 0.06 / 161 / 2 / - | -0.53 / 176 / 2 / - | 0.06 / 161 / 2 / - | 0 | inside |
+| 74 | 12 kn | 7 | the trunk | 7.95 / 0 / 0 / - | 9.25 / 0 / 0 / - | 10.30 / 0 / 0 / - | 0 | inside |
+| 74 | 12 kn | 8 | the instant | 9.25 / 0 / 0 / - | 4.17 / 104 / 1 / - | 11.18 / 0 / 0 / - | 0 | inside |
+| 74 | 12 kn | 9 | the trunk | 8.10 / 0 / 0 / - | 10.07 / 0 / 0 / - | 10.98 / 0 / 0 / - | 0 | inside |
+| 74 | 12 kn | 11 | the trunk | 10.19 / 0 / 0 / - | 12.47 / 0 / 0 / - | 12.91 / 0 / 0 / - | 0 | inside |
+| 74 | 25 kn | 3 | the trunk | 26.83 / 0 / 0 / - | 27.73 / 0 / 0 / - | 27.68 / 0 / 0 / - | 0 | inside |
+| 74 | 25 kn | 7 | the instant | 6.51 / 96 / 9 / - | 1.88 / 111 / 20 / - | 2.98 / 117 / 14 / - | 6 | declared: way, astern, aback |
+| 74 | 25 kn | 8 | the trunk | 24.90 / 0 / 0 / - | 25.71 / 0 / 0 / - | 25.68 / 0 / 0 / - | 0 | inside |
+| 74 | 25 kn | 9 | the instant | 25.50 / 8 / 1 / - | 1.51 / 120 / 21 / - | 26.28 / 8 / 1 / - | 1 | inside |
+| 74 | 25 kn | 11 | the trunk | 26.00 / 0 / 0 / - | 26.85 / 0 / 0 / - | 26.78 / 0 / 0 / - | 0 | inside |
+| 74 | 12 kn, heading | 3 | the instant | -1.06 / 162 / 3 / - | -1.51 / 176 / 2 / - | -1.06 / 162 / 3 / - | 0 | inside |
+| 74 | 12 kn, heading | 7 | the instant | 0.62 / 131 / 2 / - | 0.56 / 143 / 2 / - | 0.41 / 144 / 2 / - | 3 | inside |
+| 74 | 12 kn, heading | 8 | the trunk | 1.24 / 138 / 2 / - | 1.19 / 143 / 2 / - | 1.04 / 144 / 2 / - | 4 | declared: astern |
+| 74 | 12 kn, heading | 9 | the instant | 0.48 / 136 / 2 / - | 0.50 / 144 / 2 / - | 0.31 / 142 / 2 / - | 4 | inside |
+| 74 | 12 kn, heading | 11 | the instant | 1.04 / 136 / 2 / - | 0.86 / 143 / 2 / - | 0.79 / 143 / 2 / - | 4 | inside |
+| 74 | 20 to 38 | 3 | the instant | 8.58 / 52 / 4 / 5351 | 11.17 / 97 / 0 / 5496 | 7.30 / 97 / 3 / 5349 | 1 | declared: way, astern |
+| 74 | 20 to 38 | 7 | the instant | 9.56 / 43 / 0 / 5018 | 0.82 / 144 / 8 / 4932 | 3.99 / 116 / 1 / 4916 | 1 | inside |
+| 74 | 20 to 38 | 8 | the instant | 13.03 / 59 / 1 / 5856 | 11.93 / 92 / 0 / 5806 | 11.84 / 89 / 0 / 5840 | 1 | inside |
+| 74 | 20 to 38 | 9 | the instant | 13.88 / 25 / 0 / 5380 | 11.16 / 90 / 0 / 5318 | 10.83 / 86 / 0 / 5359 | 1 | inside |
+| 74 | 20 to 38 | 11 | the instant | 13.67 / 34 / 0 / 5527 | 11.57 / 97 / 0 / 5462 | 11.54 / 87 / 0 / 5503 | 1 | inside |
 
-## 11. The differences on today's ships
 
-**Today's ships, old beside new** (this hash's code beside the trunk at f09fe283; the same
-harness as part one's §5): every ship file (the thirteen ships and the five boats) in four cases at
-seed 7 under the game's own captain (a gale abeam and a gale close-hauled bound for Falmouth from
-48 40 N 5 05 W, the wind rising from 20 to 35 knots over an hour; a cruise off the Lizard, 12 knots,
-three hours; the June passage off Falmouth under a high, six hours), the whole log and the end state
-compared.
+## 10. The wreck's order pinned, and the mechanisms (items 1 and 3 of the third read)
+
+The reader's mutant M03 (`rank` turned so that a light spar's wreck sorts first) is killed by truth
+7-777 b. **Every mechanism is now pinned at the function, in the fast tier**, each truth a small
+world with the state set by hand and the one behaviour asserted: 7-777 c (work short of hands, all
+hands called or not, belays the spar's work and has its hands), 7-777 d (nothing taken up while
+work waits, nor within five quiet minutes), 7-777 e (no spar's work with the wind at the line or the
+weather worsening unless she lies to; work in hand held for the weather; held, it stands in no one's
+way), 7-777 f (all hands at the hour, in settled weather, never as she is brought to; piped down),
+7-777 g (the head sail after the clearing), 7-778 b (a refused bringing-to given again at ten
+minutes and resting after the second try with her sail unchanged). **The mutation check** (each
+mutant alone on a copy of this hash; the fast tests of `tests/test_mends_126.py`, `-x`):
+
+{MUT}
+
+## 11. The differences on today's ships, and the player's orders
+
+**Today's ships, old beside new** (this hash beside the trunk's code at f09fe283; part one's
+harness, §5): every ship file in four cases at seed 7 under the game's own captain (a gale abeam and
+a gale close-hauled bound for Falmouth from 48 40 N 5 05 W, the wind rising from 20 to 35 knots over
+an hour; a cruise off the Lizard, 12 knots, three hours; the June passage off Falmouth under a high,
+six hours), the whole log and the end state compared.
 
 | Case | Same in every line and the end state | Differs |
 |---|---|---|
-| gale abeam | 12 of 18 | the five boats, the smack |
-| gale close-hauled | 12 of 18 | the five boats, the smack |
+| gale abeam | 11 of 18 | the five boats, the cutter, the smack |
+| gale close-hauled | 11 of 18 | the five boats, the cutter, the smack |
 | cruise | 18 of 18 | none |
 | June off Falmouth | 18 of 18 | none |
 
-- **The five boats in the two gales:** one line more, "Captain's rule 'hove to for weather': order
-  not carried out ('lie a-try'): She has no topsail to lie a-try under.", ten minutes after the
-  first (§8); every other line and the end state the trunk's.
-- **The smack in the two gales:** "By the captain, hove to for weather: heaving to (no topsail set
-  to lie a-try under)." where the trunk's `lie a-try` was refused ("The topsail is not set; set it to
-  lie a-try under it.") and she sailed on; she lies to under her fore-and-aft canvas, at 0.9 knots
-  abeam and 0.3 knots astern close-hauled at the third hour, where the trunk's ran on at 8.6 knots,
-  and ends 13 miles (abeam) and 15 (close-hauled) from where the trunk's did. The lines that follow
-  (the heave-to's, all hands called and piped down, her leeway, her strain warnings fewer) are its.
+- **The five boats in the two gales:** at the gale's line `heave to` in place of `lie a-try`, and
+  refused in its own words, "Captain's rule 'hove to for weather': order not carried out ('heave
+  to'): No head sail is set to haul to windward, nor a topsail to lay aback.", where the trunk's
+  said "She has no topsail to lie a-try under."; given once more ten minutes after and refused, then
+  rested (one line more than the trunk). Every other line and the end state the trunk's.
+- **The cutter in the two gales:** at the gale's line "taking in the topsail (to heave to under her
+  fore-and-aft canvas)" where the trunk's said "lying a try"; "heaving to (no topsail to lie a-try
+  under; not brought to)" ten minutes after (twice close-hauled); hove to under her fore-and-aft
+  canvas at 4920 s abeam and 5580 s close-hauled, where the trunk's lay a-try under her topsail at
+  4536 s and 4732 s. Her end: the topsail in its gear and the head sails set, against the trunk's
+  topsail set; at the third hour 0.6 knots astern abeam against 1.6, 1.5 close-hauled against 1.7; she ends 2.2
+  miles (abeam) from where the trunk's did.
+- **The smack in the two gales:** "heaving to (no topsail to lie a-try under)" where the trunk's
+  `lie a-try` was refused and she sailed on; hove to under her fore-and-aft canvas at 4140 s, at 0.9
+  knots ahead abeam and 0.3 astern close-hauled at the third hour, where the trunk's ran on at 8.6
+  knots; her head sails set at the end where the trunk's had them in their gear. The lines that
+  follow are the heave-to's.
 - **No spar carried away** in any of the 72 runs, so the spar's work is in none of them; the
-  probe's 84 cell-seeds and the gale from the start (§8, §9) are where it is measured.
+  probe's 140 cell-seeds and the gale from the start (§8, §9) are where it is measured.
 
 ***The first action*, left to the game's own captains** (four hours from its start at seed 7, no
-seat): **the same**, line for line (633 lines in the Sherbourne's log on both). The Renard's main
-topgallant mast is not carried away by then on this seed in either; her captain's work on it is
-truth 7-777's (§7).
+seat): **the same**, line for line (633 lines in the Sherbourne's log on both).
 
 **What a player or a model's seat is served that differs** (every such line, by kind): the
-captain's spar orders and their reasons (§7: "clearing away the wreck of the ...", "shifting the
-...", "bending the ...", "setting the ... (bent again to its spar)", "setting the fore staysail (to
-keep her head off, her head sails gone)", "calling all hands (to clear away the wreck of the ...)",
-"piping down (the wreck cleared away)"); the runner's belay of a spar's work for her working
-("Belayed clearing away the wreck of the fore topmast: hands to brace the fore yard."); the
-smack's heave-to for the weather (§8); a bringing-to given again, "(not brought to)", and its
-refusals, once more than on the trunk where nothing will make it good. Nothing else moved.
+captain's spar orders and their reasons (§7, as before, with "calling all hands (to clear away the
+wreck of the ...)" in settled weather only); the runner's hold of a spar's work, for her working
+("Belayed clearing away the wreck of the fore topmast: hands to brace the fore yard.") and for the
+weather ("... hands kept for the weather."); `heave to` in place of `lie a-try` with no topsail to
+lie under, its reason "(no topsail to lie a-try under)", and its refusals; "taking in the topsail (to
+heave to under her fore-and-aft canvas)"; a bringing-to given again, "(not brought to)", at most
+twice with her sail unchanged.
+
+**The runner's change acts on a player's orders too** (item 5). With no captain, a player's own
+`clear away the wreck` is held by a later order of his that is short of hands, and taken up again
+after it. The reader's case, the bilander under the player's orders alone (18 knots from the west,
+plain sail set, her fore topmast carried away at 900 s, `clear away the wreck of the fore topmast`,
+then `reef the main topsail`, `heave to` (refused), `take in the mainsail` at 1680 s), old beside
+new:
+
+| | The trunk | This hash |
+|---|---|---|
+| `take in the mainsail` | waited for hands until the clearing was done, began at 6056 s, the mainsail in at 6143 s | belays the clearing at 2113 s ("Belayed clearing away the wreck of the fore topmast: hands to take in the mainsail."), the mainsail in at 2200 s |
+| the wreck cleared | at 6056 s | at 6425 s, taken up again five quiet minutes after her other work |
+
+The brig's and the merchant brig's sequences of the reader's are the same in every line. His later
+order is his present wish (the lead's word). **The primer** says it: chapter 3, after the shift,
+"The work on a spar carried away ... is the last claimant of her hands: work ordered after it that
+is short of hands, or too few to begin, takes its hands ... taken up again where it stood once
+nothing else has waited for hands or gone on short for five minutes, with all hands called or
+without"; and chapter 9 says what the captain does in a gale with no topsail to lie under and with
+a spar carried away. Its words on work in hand otherwise stand: "Short-handed, the work goes slower
+and the log says so; with too few it waits for hands" holds of the later work, which is short only
+when the spar's hands are not enough for it; and "Belayed work is gone, not paused" is of the
+order `belay`, not of the runner's hold.
 
 ## 12. The pins moved
 
-**No pin moved.** The truths changed in their bodies are the package's own: 7-777 gains the wait
-(an order waiting for hands has them first: nothing; none waiting, the wreck) and its under-command
-cell clears the waiting work first, as the new gate asks; 7-777 b and 7-779 b are new; 7-779 is as
-it was. New JUDGEMENT figures, each grounded where it is defined: `BRING_TO_AGAIN_S` (600 s),
-`WRECK_HANDS_UP_S` (3600 s), `PASSAGE_FLOORS` (0.3 nm, 5 min, 1). `docs/dev/TuningNotes.md`,
-"Package 126, part two", has them beside the trunk's figures.
+**No pin moved.** The truths changed in their bodies are the package's own, unmerged: 7-778 (the
+cutter now heaves to under her fore-and-aft canvas and keeps her topsail, where the second pass had
+her lie a-try under it; the wording "no topsail to lie a-try under" for "no topsail set to lie
+a-try under"; the fact of the sail asserted at the function) and 7-779 b (judged seed by seed over
+five seeds, its medians and `PASSAGE_FLOORS` gone). New figures, each JUDGEMENT and grounded where
+it is defined: `runner.SPAR_WORK_RESUME_QUIET_S` (300 s), `world.captains.LIE_A_TRY_CANVAS_NO`
+(No. 4), and the passage truth's `PASSAGE_ASTERN_MIN` (5), `PASSAGE_ABACK` (1),
+`PASSAGE_BROUGHT_S` (300 s), `PASSAGE_WAY_SHARE` (0.10) and `PASSAGE_WAY_FLOOR_NM` (1.0).
+`BRING_TO_AGAIN_S` (600 s) and `WRECK_HANDS_UP_S` (3600 s) stand as they were, their rules narrowed
+(every try counted; settled weather only). `docs/dev/TuningNotes.md`, "Package 126, part two", has
+them.
 
 ## 13. Found and not mended, and what this pass could not do
 
 - **A wreck left hanging helps some hulls** (§9; the carried list, fault 22): the physics', for the
-  ships' session; nothing of it touched.
-- **The bilander in 25 knots** (§7): on seed 7 she is never under command with hands free in three
-  hours, and her wreck waits for her to be; on seeds 8 and 9 all hands are turned up for it at the
-  hour and the clearing is begun, belayed in turn by her braces and taken up between them, and not
-  done by the third hour.
-- **The rising wind's clearing** on the bilander and the merchant brig is in hand at the third hour,
-  belayed in turn by her braces and the lead, not done (§7).
-- **The smack's heave-to undone by the captain's own take-in** of her straining foresail (§8): the
-  trunk's standing work; her `heave to` is then refused for want of a head sail, and he does not set
-  one for it. Left as found.
+  ships' session; nothing of it touched. It is the cause of most of the nineteen declared.
+- **A ship with no topsail to lie under whose `heave to` will not hold her** (the topsail schooner
+  with her fore topmast gone in thirty-eight knots): tried to bring her to where the trunk's captain
+  did not, and could not; the lead carries it for a later package of the captain's (his ruling of
+  2026-11-27).
 - **A stand-down's save naming** (part one's §6; the carried list, item 21): as it was.
