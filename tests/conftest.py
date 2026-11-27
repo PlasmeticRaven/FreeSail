@@ -217,6 +217,14 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-b-harpy-tick602100]",
         "test_checkpoint.py::test_a_playtest_save_loads_from_its_checkpoint_and_runs_on_a_watch[m5c-cutter-tick34091]",
         "test_checkpoint.py::test_the_packages_own_save_loads_from_its_checkpoint_and_runs_on_a_watch",
+        # package 129: the owner's sea a day (about 300 s), the first action a prisoner saved
+        # and taken up, by the driver and from the harbour, every shipped scenario saved and
+        # loaded (some 270 s), a planted path named without loading
+        "test_weigh_signals_checkpoint.py::test_truth_7_793_a_day_of_the_owners_sea_lays_no_passage_again_and_again",
+        "test_weigh_signals_checkpoint.py::test_truth_7_796_the_first_action_saved_a_prisoner_loads_by_its_checkpoint",
+        "test_harbour.py::test_truth_7_798_the_first_action_begun_in_the_harbour_and_saved_a_prisoner_holds_no_path",
+        "test_checkpoint.py::test_truth_7_797_every_shipped_scenario_saved_loads_by_its_checkpoint_and_holds_no_path",
+        "test_checkpoint.py::test_truth_7_799_the_names_of_a_checkpoint_are_read_without_loading_it_and_say_where",
         "test_crew_orders.py::test_close_reef_takes_every_reef_band",
         "test_crew_orders.py::test_pipe_down_is_refused_while_the_hands_are_about_ship",
         "test_evolutions.py::test_a_parted_sheet_is_rove_afresh_from_the_coil_and_the_sail_set_again",

@@ -2684,3 +2684,47 @@ def test_truth_7_794_a_ship_made_a_kings_ship_in_the_harbour_carries_the_private
             assert read == "The private signal: none aboard.", read
             assert "this ship carries none" in shown, shown
         port.harbour.end(lose_unsaved=True)
+
+
+def test_truth_7_798_the_first_action_begun_in_the_harbour_and_saved_a_prisoner_holds_no_path(
+    port, client
+):
+    """The owner's first action as he plays it: begun from the harbour's page, the guns
+    fired, the colours struck and the player taken aboard the Renard, his parole given;
+    saved by the game's own save. Its checkpoint, read by its names without loading it,
+    holds no path object (the harbour's place of the consent records is kept as words) and no
+    name the loader refuses; taken up again from the harbour it loads by its checkpoint and
+    is the game that was saved. OLD: the place was a path object in the world, and the
+    checkpoint was refused ("names pathlib.PosixPath") and the game replayed."""
+    sys.path.insert(0, str(ROOT / "tools"))
+    import checkpoint_holders as H
+
+    begun = client.post("/api/harbour/start", json={"scenario": "data/scenarios/first-action.yaml"})
+    assert begun.status_code == 200, begun.text
+    d = port.driver
+    for order in ("beat to quarters", "cast loose the guns", "fire as they bear"):
+        d.submit(order)
+    d.tick(900)
+    d.submit("strike the colours")
+    d.tick(1500)
+    d.submit("I give my parole")
+    d.tick(600)
+    played = d.world
+    assert played.own is not played.__dict__["_own"]  # aboard her captor
+    assert isinstance(played.consent_records_dir, str)
+    digest, tick = played.log.digest(), played.clock.tick
+    said = d.save("taken")
+    assert said.kind == "driver.saved", said.text
+    save = Path(said.data["path"])
+    body = H.pickle_of(save.with_suffix(".checkpoint"))
+    held = H.holders(body)
+    assert held and not [h.line() for h in held if h.module.startswith("pathlib")]
+    assert not [h.line() for h in H.not_admitted(body)]
+    assert client.post("/api/harbour/end", json={"lose_unsaved": True}).status_code == 200
+    loaded = client.post("/api/harbour/start", json={"load": save.name})
+    assert loaded.status_code == 200, loaded.text
+    taken = d.world
+    assert taken.load_report.how == "checkpoint", taken.load_report.words
+    assert taken.clock.tick == tick and taken.log.digest() == digest
+    assert isinstance(taken.consent_records_dir, str)
+    port.harbour.end(lose_unsaved=True)
