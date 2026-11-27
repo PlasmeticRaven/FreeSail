@@ -1,5 +1,6 @@
 """A far trader that never sailed, the harbour's King's ship, and a checkpoint refused: the
-truths 7-790 to 7-797.
+truths 7-790 to 7-793, 7-795 and 7-796 (7-794 and 7-798 in `test_harbour.py`, 7-797 and 7-799 in
+`test_checkpoint.py`).
 
 Three faults of the game as it was, two found by the owner in his own play (his notes 6 and
 10 of 27 November), each reproduced first and pinned here as the game now has it.

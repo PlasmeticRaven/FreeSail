@@ -40127,3 +40127,8 @@ already words or none, so this may not be the owner's cause; no other holder was
 
 **The new truths' time:** 7-793 302 s, 7-797 248 s, 7-798 23 s, 7-799 6.5 s and 7-796, in the slow
 tier; 7-790, 7-791, 7-792, 7-794 and 7-795 in the fast.
+
+**Read by a reader other than the builder** (one, on the code and the truths against this section):
+no old assertion changed, loosened or moved slow; each named figure, old and new, as said; the
+truths pin states, counts and bands (a world's digest only compared, saved against loaded); the
+tiers as said. One slip found, the new test file's opening naming 7-790 to 7-797; mended.
