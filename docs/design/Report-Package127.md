@@ -2,7 +2,7 @@
 
 The design and report of package 127, the eight faults of `docs/dev/CarriedForward-M7.md`, section 4 (items 1, 3, 4, 5, 7, 8, 9 and 13), in what the log said, or failed to say, on ships already in the game. The log is the game: a line untrue, or a wait unsaid, is a fault of the game. Each was reproduced on a committed ship by a player's orders (seed 7, a steady wind from the north unless said), its cause found, and mended at the cause where the mend changes only what is said. Where a mend would change what a ship does, it was held for the lead's word. The lead ruled item 4 in, and item 5 and the cutter's sternway out.
 
-New truths 7-780 to 7-787 are in `tests/test_words_and_waits.py`, a file of their own so that the three builders of the mending step do not meet in `tests/test_known_truths.py`. Each fails on the trunk (112ff81) and passes with its mend. 7-788 is unused: item 5 is not pursued, at the lead's ruling.
+New truths 7-780 to 7-787 are in `tests/test_words_and_waits.py`, a file of their own so that the three builders of the mending step do not meet in `tests/test_known_truths.py`. Each fails on the trunk (112ff81) and passes with its mend. Item 5 is not pursued, at the lead's ruling. 7-788 is the box-off where the spanker in has not paid her off, beside 7-340 in `tests/test_known_truths.py` (the convoy's truths, below).
 
 ## Item 1: a wait behind other work, said in the log
 
@@ -18,7 +18,7 @@ New truths 7-780 to 7-787 are in `tests/test_words_and_waits.py`, a file of thei
 
 **Cause.** The line is `fill_away`'s `on_complete`, said when the yards are braced full whatever her way, and nothing watched her after.
 
-**Mend, in words.** "Filled away" is said only of a ship with headway. With none, it is "Braced full on the larboard tack; ...; she has no headway on her yet." ("Her sheets drawn ..." where she works no braces), and then, once, "She gathers headway; filled away on the larboard tack." when she has it. If ten minutes pass with none, a line says she has not. A ship filled away with way on her that then loses it and makes sternway is told so once: "Filled away, she has lost her way and makes a knot of sternway, the wind 38° on the larboard bow." The watch is `scripts.watch_filled_away`, run by the runner each tick. Its mark is in `ship.extra` while it watches, and it ends unsaid when she heaves to or a manoeuvre begins. It reads her way and touches nothing. The completion line keeps its kind, `ship.filled_away`, which the captain reads. `FILLED_WATCH_S` (600 s) is JUDGEMENT.
+**Mend, in words.** "Filled away" is said only of a ship with headway. With none, it is "Braced full on the larboard tack; ...; she has no headway on her yet." ("Her sheets drawn ..." where she works no braces), and then, once, "She gathers headway; filled away on the larboard tack." when she has it. If ten minutes pass with none, a line says she has not. A ship filled away with way on her that then loses it and makes sternway is told so once: "Filled away, she has lost her way and makes sternway, under a knot, the wind 38° on the larboard bow." (a knot and more by its knots). With a little way on her, under the half knot that is way, the line says "she has but little way on her yet". The watch is `scripts.watch_filled_away`, run by the runner each tick. Its mark is in `ship.extra` while it watches, and it ends unsaid when she heaves to or a manoeuvre begins. It reads her way and touches nothing. The completion line keeps its kind, `ship.filled_away`, which the captain reads. `FILLED_WATCH_S` (600 s) is JUDGEMENT.
 
 **Carried forward, not this package's** (the lead's ruling): the cutter's hour astern is what she does, every ship's helm kept as for headway while she makes sternway. The case: the cutter, seed 7, 15 kn from north, heading 60, `set plain sail`, 600 s, `set the topsail`, 600 s, `lie a-try`, 900 s, `fill away`. Filled at +1 s with 2.2 kn of way, the helm on a heading for ENE (68°). Her head sags from 57° to 45° off the wind by +120 s with 35° of rudder, her way falling to 1.2 kn. By +300 s she makes 1.04 kn of sternway, 38° off the wind, the rudder at −29° (the heading helm's sign for headway, which with sternway holds her head up). She stays so, 1.15 kn astern, 39° off, −29° of rudder, from +600 s to the end of the hour and beyond. No sail is backed, and the lifting and aback lines do not fire: she has no headway to lift, and some sail draws.
 
@@ -102,7 +102,7 @@ Every other caller lets the runner say it. Wherever the order's own line is writ
 - A newly said turn-wait carries `turn_wait` in its data (`runner.TURN_WAIT`). It keeps it out of the World's memory of a recurring line's words, so that the lines about it keep the severity they had without it.
 - Every turn-wait is routine: behind any work ("'X' will follow 'Y', which the hands are still at."), behind the yards a belay handed on, a whole lateen aback ("The mainsail is aback against the mast; it will not come in till she pays off."), and ground tackle's fallback. Before, the two said were notable; they are now one rule (`runner.TURN_WAIT_SEVERITY`). A routine line eases no compressed passage and wakes no seat. The weigh's "waits for the anchor" line is routine too (notable before).
 - "Braced full ... she has no headway on her yet." and "Filled away ..." are notable, as the line always was (`ship.filled_away`).
-- "She gathers headway; filled away ..." is routine.
+- "She gathers headway; filled away ..." is notable (`ship.way`), as the "Filled away" line it stands in place of was; pinned (the lead's ruling on the first pass, D2, where this report said routine).
 - "Filled away, she has lost her way and makes ... of sternway ..." and "Braced full ten minutes, she has gathered no headway ..." are notable (`ship.way`).
 - The dire strain warning is notable, as every strain warning is.
 - The waiting line of a watch too few keeps the hands-wait's severity: notable for an order given singly, routine within a group after its first.
@@ -127,11 +127,12 @@ All of these are old beside new in `docs/dev/TuningNotes.md` under this package.
   - each end state is the same to the bit, and no line the trunk said changes its severity;
   - the lines added are named by kind and count in the notes' table;
   - truth 77 now pins the line count and end state beside each digest.
-- **The convoy's three truths, by item 4** (what she does). Each is given its cause back by its own setup, and the scenario file is unchanged:
+- **The convoy's three truths, by item 4** (what she does):
   - 7-340 is re-measured to the new day's recovery;
   - its box-off is a case of its own, 7-788, by a one-point header;
-  - 7-152's straggler: the Friendship lies to five minutes;
-  - 7-153's evasion: the privateer starts a cable nearer.
+  - 7-152's straggler and 7-153's evasion are given their cause in the scenario itself (the lead's ruling E1): `data/scenarios/convoy-six.yaml` places the privateer a cable nearer (49 48.53 N 5 06.61 W, was 49 48.6 N 5 06.5 W), and both truths read the scenario as shipped. The first build's setups in the test (the Friendship lying to five minutes, the schooner moved in the test alone) are gone.
+  - A new truth pins the exchange on the shipped day: `test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort`.
+  - 7-153's narrow window (E2) is found and recorded in the notes, not mended; the lead carries it.
 
 The new truths are:
 - 7-780 to 7-787, in `tests/test_words_and_waits.py`;

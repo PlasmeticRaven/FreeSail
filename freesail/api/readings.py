@@ -2541,6 +2541,13 @@ def ship_words(world: Any) -> str:
             cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
     of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
     parts = [f"The ship: {name}, {cls}; {service}{of}{escort}{duty}."]
+    if getattr(spec, "slack_in_stays", False):
+        # her handling as her people know it, from her file (package 125, the lead's ruling
+        # on rule A of 2026-11-27; `ShipSpec.slack_in_stays`): no ship of the eighteen says it
+        parts.append(
+            "She is slack in stays: when her way is gone in going about, the after yards are "
+            "hauled with the wind ahead, not a point on the bow."
+        )
     guns = _guns_fit_words(world)
     parts.append(f"Her guns: {guns}." if guns else "She carries no guns.")
     crew = (getattr(ship, "extra", None) or {}).get("crew")

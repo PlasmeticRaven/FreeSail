@@ -261,6 +261,10 @@ TURN_WAIT_SEVERITY = "routine"
 # out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
 # for all at once" said twice with a turn-wait between is routine the second time, as before.
 TURN_WAIT = "turn_wait"
+# The groups of the orders being given whose wait for their turn is said already, by (the order,
+# the group), with the works they wait behind and the note that says it (`Runner._group_turn_wait`);
+# in the runner's `__dict__` from the order to the next tick only.
+TURN_GROUPS_SAID = "turn_groups_said"
 
 
 @dataclass
@@ -476,10 +480,11 @@ class Runner:
             self.instances.append(inst)
             handed = [b for b in blockers if b.params.get(HANDED_ON)]
             first = (handed or blockers)[0]
-            words = (
-                f"'{self._describe(inst).capitalize()}' will follow "
-                f"'{self._describe(first)}', which the hands are still at."
-            )
+            mine, theirs = self._describe(inst), self._describe(first)
+            # the same work behind the same work (a second brace of a yard being braced, a sail
+            # set again): "the same work", where naming it twice told nothing apart
+            behind = "the same work" if mine == theirs else f"'{theirs}'"
+            words = f"'{mine.capitalize()}' will follow {behind}, which the hands are still at."
             said = False
             if handed and say_wait:
                 # behind the yards a belay handed on (they hold the ship as the manoeuvre
@@ -500,8 +505,14 @@ class Runner:
             elif say_wait and not said:
                 # behind any other work: said at the order, as the two above are, and once;
                 # marked, so that the World's memory of the same words said again is not moved
-                # by it (`World.record`, `TURN_WAIT`)
-                ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, {TURN_WAIT: True})
+                # by it (`World.record`, `TURN_WAIT`); of a group's order (the yards braced, the
+                # sails of `reef topsails`), one line for the order, by the first that waits
+                group = inst.params.get("group")
+                mark = {TURN_WAIT: True}
+                if not group:
+                    ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", words, sid, mark)
+                else:
+                    self._group_turn_wait(ship, group, behind, sid, mark)
                 said = True
             if said and say_wait:
                 self.__dict__[WAIT_SAID] = True
@@ -524,10 +535,49 @@ class Runner:
             return inst.wait_line
         return self._format(inst, evo.on_start.log)
 
+    def _group_turn_wait(
+        self, ship: Ship, group: str, behind: str, sid: str, mark: dict[str, Any]
+    ) -> None:
+        """A group's order (`params["group"]`: the yards of a brace, the sails of `shorten
+        sail`) says its wait for its turn in one line for the order, naming every work its
+        members wait behind: "Shortening sail: some of it waits its turn, behind 'set the fore
+        topsail' and 'set the main topsail', which the hands are still at." The line is the
+        first member's note, its words widened as each later member of the same order waits
+        behind other work (the notes are the tick's, not yet in the log). Keyed by the order and
+        the group, so that another order of the same words in the same tick says its own."""
+        from freesail.orders.errors import join_names
+
+        groups = self.__dict__.setdefault(TURN_GROUPS_SAID, {})
+        key = (self._giving, group)
+        entry = groups.get(key)
+        head = f"{group[:1].upper()}{group[1:]}"
+
+        def line(behinds: list[str]) -> str:
+            named = join_names(behinds, "and", limit=len(behinds))
+            return (
+                f"{head}: some of it waits its turn, behind {named}, which the hands are still at."
+            )
+
+        notes = getattr(ship, "notes", None)
+        if entry is not None and isinstance(notes, list):
+            if behind in entry["behind"]:
+                return
+            at = next((i for i, n in enumerate(notes) if n is entry["note"]), None)
+            if at is not None:
+                entry["behind"].append(behind)
+                was = notes[at]
+                notes[at] = (was[0], was[1], line(entry["behind"]), *was[3:])
+                entry["note"] = notes[at]
+                return
+        ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", line([behind]), sid, mark)
+        if isinstance(notes, list) and getattr(ship, "notes", None) is notes and notes:
+            groups[key] = {"behind": [behind], "note": notes[-1]}
+
     def step(self, ship: Ship, dt: float, wind: Wind) -> None:
         """Advance every running evolution by one tick, then start any that were
         waiting and are now free. Call once per tick, before the physics."""
         self.__dict__.pop(WAIT_SAID, None)  # the mark is the order's, read as it is given
+        self.__dict__.pop(TURN_GROUPS_SAID, None)  # the groups whose wait an order has said
         self._last_factor = weather_factor(wind.effective_speed, ship.dyn.heel)
         motion = ship.extra.get("motion")
         self._roll_deg = float(motion.roll_deg) if motion is not None else 0.0
@@ -561,6 +611,11 @@ class Runner:
             from freesail.orders.storm import keep_storm_canvas
 
             keep_storm_canvas(ship)
+        if "jibs_kept" in ship.extra:
+            # a jib `shorten sail` left on her, forgotten once it is in (package 125, D)
+            from freesail.orders.storm import forget_kept_jibs
+
+            forget_kept_jibs(ship)
         if "course_pending" in ship.extra:
             # a course across the wind held for want of way, given when she has it (37m)
             from freesail.orders.navigation import keep_course_pending

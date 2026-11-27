@@ -78,8 +78,8 @@ TRIAL_STATION_STRANGER_WITHIN_HAIL_TICKS: list[int] = []  # [10423] at 45c; neve
 # the game's tick, where her World's clock, counted from her promotion, stood behind the tick
 # the private signal broke out at and never showed it her; she answers it now (a reply at
 # 9840, one line more), the states, the books and the chase as before (TuningNotes, step 6)
-# package 127: 28 turn-waits (788 before), the states unmoved
-TRIAL_STATION_STRANGER_LINES = 816  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
+# package 127: 8 turn-waits (788 before), the states unmoved
+TRIAL_STATION_STRANGER_LINES = 796  # package 84 step 6 (787 at 71; 756 at 56, the glass; 754 at 57)
 # package 75, SW-4: the brig-sloop made out "ten ports a side" (RMG ZAZ4491, read), where the
 # words had sixteen; every tick and line the same, proved by bisection (the word put back gives
 # d56963daf49d566a again; docs/dev/TuningNotes.md, SW-4)
@@ -87,7 +87,7 @@ TRIAL_STATION_STRANGER_LINES = 816  # package 84 step 6 (787 at 71; 756 at 56, t
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives c1d54413006885aa; TuningNotes)
 # package 127, words alone, the states unmoved: was d1a7b668bec784ff
-TRIAL_STATION_STRANGER_DIGEST = "110ae64dfe6569a2"  # the trim's words (c1d54413006885aa at SW-4)
+TRIAL_STATION_STRANGER_DIGEST = "0e39292a7c3de4ff"  # the trim's words (c1d54413006885aa at SW-4)
 
 
 @pytest.fixture(scope="module")
@@ -171,13 +171,13 @@ TRIAL_STATION_GALE_FIRST_STATES = [
 # turns for half an hour (36 lines of sails backed and filled, 4 before) before she wears
 # package 58b: 864 lines and 4cb58e9ec1ab55c0, aground at 41415; the tree before it
 # (872aa61) gives 857 and cefe2cf5136fb4d9, aground at 44332 (the pin was stale before 58b)
-# package 127: 49 turn-waits, 1 fill-away (1722 before), the states unmoved
-TRIAL_STATION_GALE_LINES = 1772  # package 88 (1014 on c168c51, aground 42394; 909 at 57)
+# package 127: 26 turn-waits, 1 fill-away (1722 before), the states unmoved
+TRIAL_STATION_GALE_LINES = 1749  # package 88 (1014 on c168c51, aground 42394; 909 at 57)
 # 75's words, passed by the lead by its lines (04f2fcd0fe9023a4 before); package 88
 # (93274bb5f658a34f on c168c51)
 TRIAL_STATION_GALE_DIGEST = (
     # package 127, words alone, the states unmoved: was b12065ef819367b3
-    "c23bf85699eff992"
+    "71a65daa6511cb52"
 )
 
 
@@ -266,8 +266,8 @@ TRIAL_STATION_LEE_SHORE_STATES = [
 # package 88: 1561 lines and 6e88e97cbdffac7b; the trunk before it (c168c51) gives 1597 and
 # 7fad0ce7e46ba366, its pinned ed48ca3d61e52f20 stale before this package (the lead to
 # measure the trunk's figure in the cloud: a digest is the build machine's)
-# package 127: 44 turn-waits, 4 fill-away (1561 before), the states unmoved
-TRIAL_STATION_LEE_SHORE_LINES = 1609  # package 88 (1597 at 58b, judged 2026-10-24; 57: 1669)
+# package 127: 26 turn-waits, 4 fill-away (1561 before), the states unmoved
+TRIAL_STATION_LEE_SHORE_LINES = 1591  # package 88 (1597 at 58b, judged 2026-10-24; 57: 1669)
 TRIAL_STATION_LEE_SHORE_DIGEST = "6e88e97cbdffac7b"  # 88, the builder's container; the cloud
 # 1ecbc08a61efb132 on the merged tree (ed48ca3d61e52f20 at 58b, stale); not asserted, see the test
 
@@ -360,8 +360,8 @@ TRIAL_TRADE_STRANGER_ANCHORED_TICKS: list[int] = []  # 88 ([51849] at 70; [53669
 # package 73: the butcher's bill said once after the brig's fire ("nobody hurt"), and the
 # brig-sloop's captain serving out the small arms on entering the action, so that her fire on
 # the schooner falls differently (the same lines, other texts); docs/dev/TuningNotes.md, 73
-# package 127: 48 turn-waits (1594 before), the states unmoved
-TRIAL_TRADE_STRANGER_LINES = 1642  # package 88 (1247 at 73; 1246 at 71; 1248 at 70; 1407 at 58b)
+# package 127: 23 turn-waits (1594 before), the states unmoved
+TRIAL_TRADE_STRANGER_LINES = 1617  # package 88 (1247 at 73; 1246 at 71; 1248 at 70; 1407 at 58b)
 # decision 45, the pilot's news: 0efa38e1d5d2f172 before; package 37p (a04a80a960eabc53 before)
 # package 43b on the merged tree with 44: every tick and line as on 43b's branch, a line's
 # words 44's (acd7581476d8ee74 on 43b's branch)
@@ -384,7 +384,7 @@ TRIAL_TRADE_STRANGER_DIGEST = (
     # 75's words, passed by the lead by its lines (aa04702e062bc64b before); package 76, item 8
     # (5e7bdba2a4f4770b at 75 SW-4; bf059c3211b7cc9c at 88;
     # package 127, words alone, the states unmoved: was 323b8966ceab6857
-    "bd78b1b9f67bddd8"
+    "7aafdf0eda574cd7"
     # 02313d83240a11d5 at 84 step 6; 11b8a45bdc8c935a at 73)
     # package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose
     # yards are head yards alone, mans her head braces to heave to and fill away (11094, 12493,

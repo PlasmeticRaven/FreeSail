@@ -116,6 +116,36 @@ SLOW_TESTS: frozenset[str] = frozenset(
         # package 76 (step 7): a Spanish chase signalled and read (10 s); three nations' convoys
         "test_known_truths.py::test_truth_7_426_a_spanish_chase_on_mazarredos_numbers_is_read_by_her_consort_alone",
         "test_known_truths.py::test_truth_7_433_a_nations_book_is_added_by_data_alone",
+        # package 125 (D, the lead's list of 2026-11-27): an hour in rising wind under the
+        # game's own captain, the jib kept at its limit (a minute or two a case)
+        *(
+            f"test_captains.py::test_a_jib_kept_at_its_limit_is_taken_in_by_the_captain_before_it_goes[{c}]"
+            for c in (
+                "brig-30.0-11",
+                "brig-35.0-7",
+                "hermaphrodite-brig-30.0-11",
+                "razee-44-28.0-11",
+            )
+        ),
+        # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
+        # shortening run to its end before the helm goes down (6 to 8 s a case)
+        *(
+            f"test_known_truths.py::test_truth_7_762_the_fleet_goes_about_shortened[{s}-{w}-{h}]"
+            for s in (
+                "brig",
+                "cutter",
+                "frigate-36",
+                "hermaphrodite-brig",
+                "lugger",
+                "privateer-schooner",
+                "razee-44",
+                "seventy-four",
+                "sixty-four",
+                "topsail-schooner",
+            )
+            for w in (20, 25)
+            for h in (290.0, 292.5, 295.0)
+        ),
         # package 76 (step 6): the convoy of four under each nation's book, half an hour sailed
         *(
             f"test_signals.py::test_the_convoy_tacks_in_succession_on_one_hoist_of_her_own_book[{r}]"
@@ -266,6 +296,7 @@ SLOW_TESTS: frozenset[str] = frozenset(
         "test_known_truths.py::test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles",
         "test_known_truths.py::test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_she_pays_off",
         "test_known_truths.py::test_truth_7_788_aback_with_no_way_and_headed_the_spanker_in_she_is_boxed_off",
+        "test_known_truths.py::test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort",
         "test_known_truths.py::test_truth_7_342_a_privateers_true_colours_once_shown_before_an_enemy_are_held",
         "test_known_truths.py::test_truth_7_154_the_blockade_is_blown_off_brest_and_the_hortense_slips_out_after_the_gale",
         "test_known_truths.py::test_truth_7_155_the_squadron_keeps_its_line_at_far_detail_and_through_the_promotion",

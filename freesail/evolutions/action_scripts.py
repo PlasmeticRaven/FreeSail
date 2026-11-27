@@ -147,7 +147,10 @@ def _boats_cleared_words(ship: Ship) -> str:
     No boat is hoisted out by clearing for action, and none was: the line said "The boats are
     out and towing astern" of every ship, her boats on the booms all the while, where a shot
     may stave them (`combat.hits`). A ship with no boats is clear."""
-    boats = list(getattr(getattr(ship, "spec", None), "boats", None) or [])
+    spec = getattr(ship, "spec", None)
+    if getattr(spec, "oars", None) is not None:
+        return "The boat is clear."  # a boat's own clearing: she carries no boats of her own
+    boats = list(getattr(spec, "boats", None) or [])
     towed = [b for b in boats if getattr(b, "towed", False)]
     booms = [b for b in boats if not getattr(b, "towed", False)]
     said: list[str] = []
