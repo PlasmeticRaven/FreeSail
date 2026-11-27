@@ -172,11 +172,6 @@ _TRUNK_HANDS_CALLED_FOR = "hands_called_for"
 # 80e703c7, engine-1: `scripts._belay_held_work` and the reading 'the work in hand' were written
 # when a hold could only be a manoeuvre's, and read a post's as one).
 HELD_BY_BELAY = "belay"
-# The scripted work on a spar carried away that a manoeuvre belays as it belays the step-list work
-# in hand (the lead's list of 2026-11-24 for package 126, A3: the 74 boxed off with "only 391
-# hands", the rest shifting a studding-sail boom): the hands go to working her, and the spar's
-# work is taken up again where it stood when they are free (`_try_resume`).
-SPAR_WORK_BELAYED = frozenset({"clear_wreck", "shift_spar", "jury_mast"})
 HELD_BY_POST = "post"
 
 # How many pieces of other work a log line names before it says "at other work".
@@ -1754,23 +1749,6 @@ class Runner:
             posts=True,
         )
         got = self._rob_the_guns(ship, inst, crew, want, got)
-        gives_way = got.outcome == hands.TOO_FEW or (
-            got.outcome == hands.SHORT and not crew.all_hands_called_by_order
-        )
-        if gives_way and self._spar_work_gives_way(ship, inst, crew):
-            # the spar's work is the last claimant of her hands: its hands are this work's, and
-            # it is taken up again when nothing else wants them (`_try_resume`)
-            hands.release(crew, inst.inst_id)
-            got = hands.request(
-                crew,
-                self._quarters_pool(ship, inst, want, self._pool(crew, inst)),
-                inst.inst_id,
-                want,
-                self._subject_mast(ship, inst),
-                aloft=self._aloft(inst),
-                posts=True,
-            )
-            got = self._rob_the_guns(ship, inst, crew, want, got)
         if (
             got.outcome == hands.TOO_FEW
             and not inst.held_up
@@ -1858,53 +1836,6 @@ class Runner:
             self._after_all_hands(ship, inst)
             inst.held_up = False
         return True
-
-    def _spar_work_in_hand(self) -> list[Instance]:
-        """The work on a spar carried away going on with its hands (`SPAR_WORK_BELAYED`)."""
-        return [
-            i
-            for i in self.instances
-            if i.evo.id in SPAR_WORK_BELAYED
-            and not i.paused
-            and not i.waiting
-            and i.assignment is not None
-        ]
-
-    def _spar_work_gives_way(self, ship: Ship, inst: Instance, crew: Crew) -> bool:
-        """Work short of hands, or too few to begin, that is not itself a spar's (her sails
-        handled, her yards braced, her brought to, a repair) holds the spar's work in hand and
-        has its hands (`_hold`, said: "Belayed clearing away the wreck of the fore topmast:
-        hands to shorten sail."), the lead's list of 2026-11-27 for package 126, part two,
-        item 1: the spar's work is the last claimant of her hands, taken up again where it
-        stood when nothing else wants them (`_try_resume`). True if any was held."""
-        if inst.evo.id in SPAR_WORK_BELAYED:
-            return False
-        spar = self._spar_work_in_hand()
-        if not spar:
-            return False
-        reason = f"hands to {self._describe(inst)}"
-        for other in spar:
-            self._hold(ship, crew, other, reason, {"for": inst.evo.id})
-        return True
-
-    def _spar_work_waits(self, inst: Instance, crew: Crew) -> bool:
-        """Whether a spar's work held is still to wait before it has its hands again: while
-        other work waits for hands or goes on short of them (`_spar_work_gives_way`). With all
-        hands called by order (the captain's for a wreck that has hung, `world.captains.
-        WRECK_HANDS_UP_S`, or the player's) the hands are up for the work: it waits only on
-        work too few to begin, and work going on short goes on with the hands there are."""
-        if inst.evo.id not in SPAR_WORK_BELAYED:
-            return False
-        up = bool(crew.all_hands_called_by_order)
-        for other in self.instances:
-            if other is inst or other.paused or other.evo.id in SPAR_WORK_BELAYED:
-                continue
-            if other.waiting and other.waiting_for == WAITING_FOR_HANDS:
-                return True
-            a = other.assignment
-            if a is not None and a.outcome == hands.SHORT and not up:
-                return True
-        return False
 
     def _made_all_hands(self, inst: Instance) -> hands.CrewRequest:
         """Work made all-hands work for itself because the watch is too few for it (package 75,
@@ -2201,9 +2132,7 @@ class Runner:
         reason = self._format(inst, inst.evo.on_start.log).strip().rstrip(".!")
         reason = reason[:1].lower() + reason[1:]
         for other in sorted(self.instances, key=lambda i: i.order):
-            if other is inst or other.waiting or other.paused:
-                continue
-            if other.script is not None and other.evo.id not in SPAR_WORK_BELAYED:
+            if other is inst or other.waiting or other.paused or other.script is not None:
                 continue
             if other.all_hands:
                 continue  # two all-hands evolutions serialise by their holds, as before
@@ -2225,7 +2154,7 @@ class Runner:
     def _try_resume(self, ship: Ship, inst: Instance, crew: Crew) -> None:
         """A belayed instance takes up its work again when all hands are done, if it can
         have its hands; until then it stays belayed, its progress held."""
-        if self._all_hands_at_work() or self._spar_work_waits(inst, crew):
+        if self._all_hands_at_work():
             return
         got = hands.request(
             crew,
