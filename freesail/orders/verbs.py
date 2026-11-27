@@ -399,7 +399,7 @@ def _sail_evolution(
                 "belayed": countermanded,
                 "failed": [],
             }
-            return "work.belayed", belayed_words, data
+            return _countermand_said(ship, group, belayed_words, countermanded, data)
         ship.note("notable", "work.belayed", belayed_words, None, {"belayed": countermanded})
         checks = {sail.id: checks[sail.id] for sail in sails}
     if all(checks.values()):
@@ -456,6 +456,11 @@ def _sail_evolution(
             "belayed": countermanded,
             "failed": failed,
         }
+        if group is not None:
+            # within a group's order, the belay is said by its own line (`_countermand_said`)
+            # and what was not done by the group's
+            data["failed"] = failed
+            return _countermand_said(ship, group, belayed_words, countermanded, data, not_done)
         return "work.belayed", belayed_words + not_done, data
     if not started:
         if len(failed) == 1:
@@ -521,6 +526,27 @@ def _sail_params(order: Order) -> dict[str, Any]:
         if order.modifiers.get("close"):
             params["close"] = True
     return params
+
+
+def _countermand_said(
+    ship: Ship,
+    group: str | None,
+    words: str,
+    belayed: list[dict[str, Any]],
+    data: dict[str, Any],
+    not_done: str = "",
+) -> Result:
+    """The countermand is said once, notable, by whatever order made it: given alone, it is the
+    order's own line (`work.belayed`, its reply); within a group's order (`shorten sail`, `take in
+    all sail`), a line of its own, since the group's line is routine and is not written at all
+    when nothing in it failed (the World leaves a started order's line to the runner), and its
+    part of the group's line is nothing. Before, within a group it was folded into the group's
+    routine line, or said nowhere: the bilander's `shorten sail`, her sails ending otherwise with
+    no line to say why."""
+    if group is None:
+        return "work.belayed", words + not_done, data
+    ship.note("notable", "work.belayed", words, None, {"belayed": belayed})
+    return "evolution.started", not_done.strip(), data
 
 
 def _countermand_the_set(

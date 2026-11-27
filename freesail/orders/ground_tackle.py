@@ -380,7 +380,7 @@ def execute(ship: Any, order: Order) -> Result:
     if _waits_for_the_anchor(ship, runner, evo):
         notes = getattr(ship, "notes", None)
         if isinstance(notes, list):
-            notes[:] = [n for n in notes if not (n[1] == "evolution.waiting" and n[2] == text)]
+            notes[:] = [n for n in notes if not _turn_wait_of(n, text)]
     data = {
         "verb": verb,
         "level": 1,
@@ -503,3 +503,13 @@ def _anchor_in_phrase(phrase: str) -> str | None:
         if re.search(rf"\b{words}\b", low):
             return name
     return None
+
+
+def _turn_wait_of(note: Any, text: str) -> bool:
+    """Whether a ship's note is the runner's line of this work's wait for its turn (`runner.
+    TURN_WAIT`), taken back where the order's own line says it: a wait for hands, said with the
+    same words, keeps its line and its severity."""
+    from freesail.evolutions.runner import TURN_WAIT
+
+    data = note[4] if len(note) > 4 and isinstance(note[4], dict) else {}
+    return note[1] == "evolution.waiting" and note[2] == text and bool(data.get(TURN_WAIT))

@@ -4949,7 +4949,13 @@ class FillAwayScript(Script):
             # which is said when she gathers way (`watch_filled_away`); before, it was said
             # with sternway on her, the lugger and the bilander lying to as they had lain
             filled = "Braced full" if worked else "Her sheets drawn"
-            yet = "; she has no headway on her yet"
+            # the way she has, said as it is at the line: no headway yet, or a little, a tick
+            # before she has the half knot that is way on her (said "no headway" at 0.54 before)
+            yet = (
+                "; she has no headway on her yet"
+                if self.ship.dyn.u <= 0.0
+                else "; she has but little way on her yet"
+            )
             braced = ""
         else:
             filled, yet = "Filled away", ""
@@ -7191,8 +7197,13 @@ def _no_way_words(ship: Ship, u_kn: float, what: str) -> str:
     side = "starboard" if rel >= 0 else "larboard"
     deg = int(round(abs(units.rad_to_deg(rel))))
     if u_kn <= -WAY_ON_KN:
-        knots = max(1, int(round(-u_kn)))
-        way = "a knot of sternway" if knots == 1 else f"{number_words(knots)} knots of sternway"
+        knots = int(round(-u_kn))
+        if -u_kn < 1.0:
+            way = "sternway, under a knot"  # said as it is under a knot (0.54 was "a knot")
+        elif knots == 1:
+            way = "a knot of sternway"
+        else:
+            way = f"{number_words(knots)} knots of sternway"
         doing = f"makes {way}"
     else:
         doing = "lies without way"

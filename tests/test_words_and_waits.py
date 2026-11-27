@@ -34,6 +34,7 @@ from freesail.evolutions import action_scripts
 from freesail.physics import strain
 
 BRIG = "data/ships/brig.yaml"
+BILANDER = "data/ships/bilander.yaml"
 CUTTER = "data/ships/cutter.yaml"
 LUGGER = "data/ships/lugger.yaml"
 SMACK = "data/ships/smack.yaml"
@@ -147,16 +148,17 @@ def test_truth_7_780_an_orders_own_line_does_not_say_the_wait_again():
     assert e.kind == "evolution.started" and "Not done" in e.text
     assert "will follow" not in e.text
     w.run(1)
-    waits = [x[1] for x in _lines(w, t0 - 1, ("evolution.waiting",)) if "will follow" in x[1]]
-    assert sorted(waits) == [
-        "'Reef the fore topsail' will follow 'set the fore topsail', which the hands are still at.",
-        "'Reef the main topsail' will follow 'set the main topsail', which the hands are still at.",
+    waits = [
+        x[1]
+        for x in _lines(w, t0 - 1, ("evolution.waiting",))
+        if "will follow" in x[1] or "waits its turn" in x[1]
     ]
-
-
-# ---------------------------------------------------------------------------
-# 7-781: "Filled away" of a ship with way on her
-# ---------------------------------------------------------------------------
+    # one line for the group's order (the lead's first pass, D4), where before each reef said
+    # its own: "'Reef the fore topsail' will follow 'set the fore topsail', ..." and the main's
+    assert waits == [
+        "Shortening sail: the work waits its turn behind 'set the fore topsail', which the "
+        "hands are still at."
+    ], waits
 
 
 def _filled(ship: str, pre: list[str], lie: str, heading: float, run_s: int = 900):
@@ -201,7 +203,8 @@ def test_truth_7_781_filled_away_she_loses_her_way_and_goes_astern_and_is_told_s
     )
     (lost,) = lines[1:]
     assert lost[0] == "ship.way"
-    assert lost[1].startswith("Filled away, she has lost her way and makes a knot of sternway")
+    # under a knot at the line, said so (the lead's first pass: "a knot" was said at 0.54)
+    assert lost[1].startswith("Filled away, she has lost her way and makes sternway, under a knot")
     assert units.ms_to_knots(w.ship.dyn.u) < -0.5
 
 
@@ -477,3 +480,142 @@ def test_truth_7_785_with_all_hands_up_the_line_never_says_it_waits_for_them():
     w = _make(SMACK, heading=292.5, speed=5.0, start_time=datetime(1805, 6, 1, 9, 5))
     runner = w.ship.extra["evolutions"]
     assert runner._watch_too_few_for(None, SimpleNamespace(all_hands_called=True)) is None
+
+
+# ---------------------------------------------------------------------------
+# The lead's list of the first pass: each mend pinned
+# ---------------------------------------------------------------------------
+
+
+def _shorten_behind_plain_sail(ship: str):
+    w = _make(ship, heading=60.0)
+    w.submit("set plain sail")
+    w.run(60)
+    t0 = w.clock.tick
+    w.submit("shorten sail")
+    w.run(5)
+    return w, [e for e in w.log if e.tick >= t0]
+
+
+def test_truth_7_787_within_shorten_sail_the_countermand_is_said_once_and_notable():
+    """`shorten sail` a minute after `set plain sail`: its take-in of the topgallants
+    countermands their setting. Before, the belay was folded into the group's routine line, or,
+    where nothing in the group failed, said nowhere (the bilander, her sails ending otherwise
+    with no line to say why); now a line of its own, notable, once, on the bilander and on the
+    frigate, and no group line carries it."""
+    for ship in (BILANDER, FRIGATE):
+        _w, lines = _shorten_behind_plain_sail(ship)
+        belays = [e for e in lines if e.kind == "work.belayed"]
+        assert len(belays) == 1, (ship, [e.text for e in belays])
+        assert belays[0].severity.value == "notable"
+        assert "setting the fore topgallant" in belays[0].text, belays[0].text
+        assert not [e for e in lines if e.kind != "work.belayed" and "Belayed setting" in e.text]
+
+
+def test_truth_7_780_a_wait_for_hands_keeps_its_own_notable_line_beside_the_signals():
+    """The bilander, `make the signal to tack` while her watch sets plain sail: the signal's
+    line carries the wait for hands, and the wait's own notable line stands beside it, as on the
+    trunk (only the runner's line of a wait for its turn is taken back)."""
+    w = _make(BILANDER, heading=60.0)
+    w.submit("set plain sail")
+    w.run(5)
+    t0 = w.clock.tick
+    w.submit("make the signal to tack")
+    w.run(2)
+    hands = [
+        e
+        for e in w.log
+        if e.tick >= t0
+        and e.kind == "evolution.waiting"
+        and e.text.startswith("Not hands enough on deck to make the signal")
+    ]
+    assert len(hands) == 1 and hands[0].severity.value == "notable", hands
+
+
+def test_truth_7_780_the_same_work_behind_itself_and_a_groups_wait_said_once():
+    """The brig: `brace the yards sharp up ...` then `square the yards`: the second order's
+    yards wait behind the first's, said in one line for the order, not one a yard; and a second
+    `take in the main topgallant` waits behind the first, said as "the same work", where before
+    it named the same work twice."""
+    w = _make(BRIG, heading=60.0)
+    w.submit("set plain sail")
+    w.run(700)
+    t0 = w.clock.tick
+    w.submit("brace the yards sharp up on the larboard tack")
+    w.submit("square the yards")
+    w.run(2)
+    w.submit("take in the main topgallant")
+    w.submit("take in the main topgallant")
+    w.run(2)
+    turns = [
+        e.text
+        for e in w.log
+        if e.tick >= t0 and e.kind == "evolution.waiting" and "waits its turn" in e.text
+    ]
+    assert turns == [
+        "Bracing the yards: the work waits its turn behind the same work, which the hands are "
+        "still at."
+    ], turns
+    again = [e.text for e in w.log if e.tick >= t0 and "will follow" in e.text]
+    assert again == [
+        "'Take in the main topgallant' will follow the same work, which the hands are still at."
+    ], again
+
+
+def test_truth_7_780_a_turn_wait_leaves_the_worlds_memory_of_a_recurring_line_alone():
+    """`World.record`: the same words of a recurring kind said again are routine; a turn-wait
+    between them, marked (`runner.TURN_WAIT`), is no part of that memory, so the second is
+    routine as it was without it. Unmarked, it would make the second notable."""
+    from freesail.core.events import Severity
+    from freesail.evolutions.runner import TURN_WAIT
+
+    w = _make(BRIG)
+    hands = "Bracing the yards: not hands enough for all at once; the watch takes them in turn."
+    first = w.record(Severity.NOTABLE, "evolution.waiting", hands)
+    w.record(Severity.ROUTINE, "evolution.waiting", "'X' will follow 'Y'.", data={TURN_WAIT: True})
+    second = w.record(Severity.NOTABLE, "evolution.waiting", hands)
+    assert first.severity is Severity.NOTABLE and second.severity is Severity.ROUTINE
+
+
+def test_truth_7_781_the_lines_of_her_way_say_what_is_true_under_a_knot():
+    """Her sternway under a knot is said so ("sternway, under a knot"; it was "a knot" at
+    0.54), and with a little way on her, under the half knot that is way, the line says she has
+    but little (it said "no headway" a tick before she had 0.54)."""
+    from freesail.evolutions import scripts as S
+
+    w = _make(CUTTER)
+    words = S._no_way_words(w.ship, -0.54, "Filled away, she has lost her way")
+    assert "makes sternway, under a knot" in words, words
+    assert "a knot of sternway" in S._no_way_words(w.ship, -1.2, "x")
+    script = S.FillAwayScript(w.ship, {"course_deg": None}, {})
+    w.ship.extra[S.FILLED_WATCH] = {"t": 0.0, "ahead": False, "tack": "larboard"}
+    w.ship.dyn.u = units.knots_to_ms(0.4)
+    assert script.words()["course_words"].endswith("she has but little way on her yet")
+    w.ship.dyn.u = units.knots_to_ms(-0.4)
+    assert script.words()["course_words"].endswith("she has no headway on her yet")
+
+
+def test_truth_7_786_a_boats_own_clearing_names_no_boats():
+    """A boat's own hull cleared for action carries no boats: "The boat is clear.", where she
+    was told "The boats griped fast on the booms; the ship is clear."."""
+    boat = SimpleNamespace(spec=SimpleNamespace(oars=4, boats=[]))
+    assert action_scripts._boats_cleared_words(boat) == "The boat is clear."
+
+
+def test_truth_7_781_the_catalogue_glosses_the_fill_aways_mark_in_the_games_words():
+    """The library's served notes of `fill_away` say what the game fills {filled} with, as they
+    gloss the pole's marks: no mark served bare."""
+    from freesail.agents.tools import _evolution_text
+    from freesail.evolutions import registry
+
+    text = _evolution_text(registry.get("fill_away"))
+    assert "{filled} on the {filled_tack} tack" in text
+    assert 'the game fills {filled} with "Filled away"' in text
+
+
+def test_truth_7_781_she_gathers_headway_is_said_notable_where_filled_away_was():
+    """ "She gathers headway; filled away ..." stands where the old notable "Filled away" line
+    stood, and is notable as it was (the lead's ruling on the first pass)."""
+    w, _lines = _filled(LUGGER, ["set plain sail"], "heave to", 60.0, 300)
+    (gathers,) = [e for e in w.log if e.kind == "ship.way"]
+    assert gathers.text.startswith("She gathers headway") and gathers.severity.value == "notable"

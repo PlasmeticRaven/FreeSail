@@ -20,6 +20,12 @@
 # off, brace up the after yards ... and trim to the course"). A course that
 # cannot be laid is said, and she is kept full and by on her tack. With none she
 # is steered close-hauled on her tack.
+#
+# In its words the game fills {filled} with "Filled away" when she has headway as she is braced
+# full, and with "Braced full" (or "Her sheets drawn", where she works no braces) when she has
+# none yet; then {course_words} ends with "she has no headway on her yet", or "she has but little
+# way on her yet", and a line says when she gathers headway, or that she has not in ten minutes,
+# or that, filled away, she has lost her way and makes sternway.
 id: fill_away
 verb: fill_away
 applies_to: {class: ship}
