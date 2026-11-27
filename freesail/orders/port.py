@@ -257,7 +257,14 @@ def _of_another_ship(world: Any, who: str) -> Any:
     if p is None or _of_this_hull(world, p):
         return None
     key = " ".join(str(who).lower().split()).removeprefix("the ")
-    names = {str(p.name).lower(), str(getattr(p, "surname", "") or "").lower()}
+    whole = " ".join(str(p.name).lower().split())
+    # his name whole, and without its 'Mr' (package 118: "Mr Abel Coffin" answers to
+    # "Abel Coffin" as to his surname)
+    names = {
+        whole,
+        whole.removeprefix("mr ").removeprefix("mister "),
+        str(getattr(p, "surname", "") or "").lower(),
+    }
     bare = key.removeprefix("mr ").removeprefix("mister ")
     return p if key in names or bare in names else None
 

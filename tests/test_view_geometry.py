@@ -160,6 +160,7 @@ SMACK = "data/ships/smack.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2: the Prince de Neufchatel
 BILANDER = "data/ships/bilander.yaml"  # package 75, B4: the bilander
 SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7: the Bellerophon
+DIANA = "data/ships/corvette-20.yaml"  # package 90: the corvette Diana
 # The files whose driver is Steel's boomsail on a lateen cut at the mast, her boom named by the cut
 # (Ext §17): the 64's since her stage B, and the 74's (package 75, B7)
 LATEEN_DRIVEN = {SIXTY_FOUR, SEVENTY_FOUR}
@@ -1300,7 +1301,11 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # where her file has her steeved about 29 (Chapman 1768 Pl. LXII No. 5, measured: Bil-D §4.2). The
 # 74's measured at her step 4 (package 75, B7): her heel on her stem head, 4.87 m above her water at
 # x +26.25, her end 12.66 m, 31.76 degrees where her file has her steeved 31.6 (task 7: measured on
-# ZAZ1357 and ZAZ1359, Bel-D §4.7).
+# ZAZ1357 and ZAZ1359, Bel-D §4.7). The *Diana*'s measured at her landing (package 90): her heel
+# on her rail at her stem, 3.59 m above her water at x +17.31, under her stem head's 5.09 (the
+# lower of the two), her end 8.43 m, 32.13 degrees where her file has her steeved 21.5 from her
+# stem head's top (Dia-D §4.2): the root 1.50 m under that top steeves the drawn spar 10.6 degrees
+# more (for the lead, with `TACK_UP_HER_STAY`).
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1315,6 +1320,7 @@ BOWSPRIT_DRAWN = {
     NEUFCHATEL: (0.555, 19.50),
     BILANDER: (1.270, 28.99),
     SEVENTY_FOUR: (1.235, 31.76),
+    DIANA: (2.014, 32.13),
 }
 # The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
 # the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
@@ -1623,8 +1629,23 @@ CLOSED = """
 # *Neufchatel* (package 75, B2), a privateer of her build, has neither gallery nor light: her lines
 # draw a raked transom with no counter and no quarter gallery, and the two squares at its top on
 # both her body plans are read as stern ports with no gun in them, not lights (Neuf-D §3.3, §3.5:
-# "no galleries, no lights").
-NO_GALLERY_OR_LIGHT = {BRIG, MERCHANT_BRIG, CUTTER, LUGGER, SMACK, SCHOONER, PRIVATEER, NEUFCHATEL}
+# "no galleries, no lights"). The corvette *Diana* (package 90), flush-decked, files neither: her
+# plan draws no quarter gallery and no stern lights (Dia-D §3.1), and a band of lights over her
+# knuckle would stand partly above her bulwark rail with no cabin under a quarterdeck behind it,
+# the flush-decked brig's case (the lead's ruling of nudge 32: none filed, JUDGEMENT, until the
+# owner's sheets show them). Old beside new: her first five commits filed a judged band of four,
+# no gallery, and she was in no set, so this case raised on her gallery.
+NO_GALLERY_OR_LIGHT = {
+    BRIG,
+    MERCHANT_BRIG,
+    CUTTER,
+    LUGGER,
+    SMACK,
+    SCHOONER,
+    PRIVATEER,
+    NEUFCHATEL,
+    DIANA,
+}
 # A recorded departure, not a reading: her main wale is not yet read on her lines (Neuf-D §3.2,
 # `wales_m` "not written until read"; §3.7 task 6, not taken at B2), so her file files none and
 # none is drawn. She leaves the set when the wale is read, or the lead rules her plate without one.
@@ -1634,6 +1655,17 @@ WALE_UNREAD = {NEUFCHATEL}
 # scrollwork, not a gallery (Bil-D §3.2, "Carving and paint in words"), so that she files
 # `lights_m` and no `galleries_m`. Her round stern, as the lugger's, has no transom.
 LIT_WITH_NO_GALLERY = {BILANDER}
+# A recorded departure, not a reading (package 90, for the lead): the *Diana*'s eleven ports a side
+# are cut in her side, each one's middle 0.56 to 0.68 m under her rail, but her one tier, `upper`,
+# also holds the 1817 fit's place over the rail by the mizen (x -12.09, its triple 5 cm under the
+# rail, the 64's convention), whose middle stands 0.28 m over it. The viewer reads a tier's ports
+# as cut in the side only when every one of them is (`portsInSide`, PORT_BANDS), so no band is
+# drawn for her (measured at her landing: no band face). The 64's and the 74's places over the
+# rail stand in tiers of their own (forecastle, roundhouse); a flush-decked ship has no other deck
+# word for hers. She leaves the set when the viewer reads a tier's band by its ports alone (the
+# gun placer's own test, `viewer_guns.is_port`), or the lead rules her place over the rail filed
+# otherwise.
+BAND_UNDRAWN = {DIANA}
 # a ship's boat (package 82: her drawing by rule) has no gallery, no stern light, no head
 # and no ports, a square transom and a rubbing strake for her wale
 RIGHTLY_WITHOUT = {
@@ -1642,7 +1674,7 @@ RIGHTLY_WITHOUT = {
     "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
     "transom": {LUGGER, BILANDER},
     "wale": {SCHOONER, PRIVATEER} | WALE_UNREAD,
-    "band": {LUGGER, SMACK} | set(BOATS),
+    "band": {LUGGER, SMACK} | set(BOATS) | BAND_UNDRAWN,
 }
 # The *Neufchatel*'s stem meets her water at her rabbet's x, 16.35 m, where her `breadth_m` gives
 # the stem's siding at the water, 0.14 m (Neuf-D §3.2), so that her last station stands on her
@@ -1878,6 +1910,14 @@ def test_the_strips_lie_on_the_served_stations_within_a_millimetre(tmp_path, pat
 # knuckle at 4.65 ft (`transom_hb_m` [2.46, 2.41]); re-read at the knuckle's height, 16.6 ft
 # across, her transom tumbles home above it as every other does ([2.46, 2.53]; Neuf-D §3.5).
 FLARED_TRANSOM: set[str] = set()
+# The square sterns that file no round-up, each named with its reason (the lead's ruling of nudge
+# 32: a stern that merely forgets the key still raises here). The corvette *Diana* (package 90):
+# her stern is read on her body plan's aftermost upright line, its knuckle the sheer's (Pages §5.5,
+# JUDGEMENT, the stern's reading not closing), and no round-up of the wing transom is read on it,
+# so her file files none and the viewer draws her transom's foot straight across at the knuckle,
+# with no arch and no tuck under it (`round_up_m` absent is the viewer's 0). She leaves the set
+# when a round-up is read on her plan or on the owner's sheets.
+ROUND_UP_UNREAD = {DIANA}
 
 
 @needs_node
@@ -1892,14 +1932,20 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
     ends); the tuck under the arch closes the stern down to the knuckle; every point of it on the
     stern's line at its height. The face is widest at its knuckle, or at its top on a transom that
     flares above the knuckle (`FLARED_TRANSOM`, empty since package 75's B2b: the *Neufchatel*'s
-    alone at B2, before her knuckle's breadth was read at its height)."""
+    alone at B2, before her knuckle's breadth was read at its height). A stern that files no
+    round-up is named with its reason (`ROUND_UP_UNREAD`, the *Diana*'s since package 90): its
+    foot straight across at the knuckle, no tuck; every other must file one."""
     hull = graph_of(path)["hull"]
     profile = hull["profile"]
     stern = profile["form"]["stern"]
     assert stern["type"] in ("square", "raked")
     zk, (hb_top, hb_knuckle) = stern["knuckle_z_m"], stern["transom_hb_m"]
-    rise = stern["round_up_m"]
-    assert rise > 0.05  # the 64's 4 in, the cutter's 0.07 m
+    unread = path in ROUND_UP_UNREAD
+    assert (stern.get("round_up_m") is None) == unread, (
+        f"{path}: a square stern files its round-up, or is named with its reason in ROUND_UP_UNREAD"
+    )
+    rise = 0.0 if unread else stern["round_up_m"]
+    assert unread or rise > 0.05  # the 64's 4 in, the cutter's 0.07 m
     xt, zt = profile["stern_m"][-1]
     got = run_js(
         tmp_path,
@@ -1924,8 +1970,18 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
     assert (hb_top > hb_knuckle) == (path in FLARED_TRANSOM)
     widest = hb_top if path in FLARED_TRANSOM else hb_knuckle
     assert max(abs(p[1]) for p in pts) == pytest.approx(widest, abs=0.001)
-    # the foot an arch, its crown the knuckle and the round-up at the middle line
+    # the foot an arch, its crown the knuckle and the round-up at the middle line; or, with no
+    # round-up read, straight across at the knuckle with no tuck under it
     tucks = [face for cls, face in got if "tuck" in cls.split()]
+    if unread:
+        assert tucks == []
+        lowest = [face for _cls, face in got if min(q[2] for q in face) < zk + 1e-6]
+        assert len(lowest) == 1
+        foot = [q for q in lowest[0] if abs(q[2] - zk) < 1e-6]
+        assert sorted(round(q[1], 3) for q in foot) == [-round(hb_knuckle, 3), round(hb_knuckle, 3)]
+        for x, _y, z in pts:
+            assert x == pytest.approx(x_at_height(profile["stern_m"], z), abs=0.01), (x, z)
+        return
     assert len(tucks) == 1
     (tuck,) = tucks
     crown = max(tuck, key=lambda p: p[2])
@@ -2528,7 +2584,9 @@ def test_wales_and_bands_are_drawn_only_on_the_outside_of_the_side(tmp_path, pat
 # bilander's one tier, the armed fit's ports cut in her waist bulwark, her highest port's middle
 # 0.17 m under her rail (measured at her landing, B4); the 74's three, as the 64's, her
 # quarterdeck's highest port's middle 0.30 m under her rail, her forecastle's and her poop's places
-# 0.31 m over it (measured at her step 4, B7)
+# 0.31 m over it (measured at her step 4, B7); the *Diana*'s none drawn, her one tier holding her
+# eleven ports cut in the side and the 1817 fit's place over the rail, its middle 0.28 m over it
+# (measured at her landing, package 90: `BAND_UNDRAWN`, a recorded departure)
 TIERS_IN_THE_SIDE = {
     SIXTY_FOUR: {"lower", "upper", "quarterdeck"},
     RAZEE: {"upper", "quarterdeck", "forecastle"},
@@ -2543,6 +2601,7 @@ TIERS_IN_THE_SIDE = {
     NEUFCHATEL: {"upper"},
     BILANDER: {"upper"},
     SEVENTY_FOUR: {"lower", "upper", "quarterdeck"},
+    DIANA: set(),  # BAND_UNDRAWN
 }
 
 
@@ -2588,6 +2647,7 @@ CHORD_OFF_THE_SIDE_M = {
     NEUFCHATEL: 0.001,
     BILANDER: 0.103,
     SEVENTY_FOUR: 0.089,
+    DIANA: 0.004,
 }
 BANDS = """
     const H = P.formHull(d.hull);
@@ -3211,7 +3271,7 @@ def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path, rig):
     its truss, the course a bundle along its after part; then set and sheeted, to leeward of
     the tack the state gives, the yard's fore part to windward, its sheet to the taffrail."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -3220,7 +3280,7 @@ def test_the_course_as_the_game_serves_it_is_drawn_at_its_mast(tmp_path, rig):
     world = make_world(7, str(path), scenario)
     world.tick()  # her tack and her sails' states are read at a tick
     course = world.ship.sails[MIZEN_COURSE]
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         course.state = SailState.SET
         set_sheet_angle(world.ship, course, math.radians(30.0))
@@ -3865,7 +3925,7 @@ def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path, rig):
     braced, each yard turned about its slings by the brace the state gives, and the sprit
     topsail's clews at the spritsail yard's arms."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -3873,7 +3933,7 @@ def test_the_yards_under_the_bowsprit_as_the_game_serves_them(tmp_path, rig):
     scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=10.0, ship_heading_deg=150.0)
     world = make_world(7, str(path), scenario)
     world.tick()
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         yards, sails = sprit_parts(start["graph"])
         for sid in sails:
@@ -4461,6 +4521,7 @@ BOOM_SAIL = {
     SCHOONER: "main.sail",
     PRIVATEER: "main.sail",
     NEUFCHATEL: "main.sail",
+    DIANA: "mizzen.spanker",
 }
 # The files with no boom, so no gaff sail on one: the lugger's lugs, and the bilander's settee on
 # her main and her square sails and staysails (package 75, B4), each sheeted to the rail, a block
@@ -4486,6 +4547,7 @@ FRAME_MOVED_OLD_M = {
     SCHOONER: 6.97,
     PRIVATEER: 6.97,
     NEUFCHATEL: 5.73,  # measured at her landing (B2)
+    DIANA: 4.86,
 }
 # Old, the sheet's end abaft her taffrail in the air by that sail's clew two metres aft, by the
 # sheet at 18 degrees on the larboard tack: x (old, new) metres. New, the taffrail on the
@@ -4500,6 +4562,7 @@ SHEET_END_X_M = {
     SCHOONER: (-22.11, -15.32),
     PRIVATEER: (-22.11, -15.32),
     NEUFCHATEL: (-24.72, -17.96),  # measured at her landing (B2)
+    DIANA: (-24.05, -18.63),  # measured at her landing (package 90)
 }
 
 
@@ -4956,6 +5019,7 @@ BOOM_OVER_TAFFRAIL_M = {
     FRIGATE: (-1.83, -1.33),
     NEUFCHATEL: (0.29, 1.05),
     SEVENTY_FOUR: (3.16, 3.80),
+    DIANA: (0.20, 0.58),
 }
 # The frigate-36's boom still stands under her taffrail, topped up: her file hangs its jaws 2.4 m
 # over her datum, 4.20 m above her water-line against her taffrail's 6.03 m, a file figure for a
@@ -5402,7 +5466,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
     sheeted, the boom and the driver lie to leeward of the tack the state gives, the yard's fore
     part to windward, and the sheet runs from the boom's end to the taffrail."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -5415,7 +5479,7 @@ def test_the_driver_as_the_game_serves_it_is_drawn_on_its_boom(tmp_path, rig):
         world.ship.spars[DRIVER_BOOM].rigged_out = True  # out with it (Ext §17.11)
     world.tick()  # her tack and her sails' states are read at a tick
     driver = world.ship.sails[DRIVER]
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         start = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
         driver.state = SailState.SET
         set_sheet_angle(world.ship, driver, math.radians(30.0))
@@ -5460,7 +5524,7 @@ def test_the_boom_goes_out_and_comes_in_with_the_driver_through_the_games_own_ro
     mizen": the driver down, then the boom served in and gone from the drawing before the course
     goes up. The view's frame and bounds are one through all of it."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -5476,7 +5540,7 @@ def test_the_boom_goes_out_and_comes_in_with_the_driver_through_the_games_own_ro
     states: dict[str, dict] = {}
     seen: list[tuple] = []
 
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
 
         def look() -> None:
             """The two doors the page reads, kept at each change of what they serve of the rig."""
@@ -5874,6 +5938,7 @@ STEM_TACK_Z_M = {
     PRIVATEER: 2.69,
     NEUFCHATEL: 2.80,
     BILANDER: 2.67,  # her stem head's 2.65 (package 75, B4)
+    DIANA: 5.11,  # her stem head's 5.09, 1.50 m over her rail's end (package 90)
 }
 
 
@@ -5963,6 +6028,7 @@ LINES_ON_THE_RAIL[BILANDER] = both_sides(
     "fore.topmast_staysail.sheet",
     "jib.sheet",
 )
+LINES_ON_THE_RAIL[DIANA] = LINES_ON_THE_RAIL[FRIGATE]
 # a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
 LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
 # The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
@@ -5981,6 +6047,7 @@ STEM_TACKED = {
     NEUFCHATEL: {"fore.staysail", "fore.storm_staysail"},  # her storm jib on the jib stay
     BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
     SEVENTY_FOUR: set(),  # cut from her file's corners, as the 64's (package 75, B7)
+    DIANA: {"fore.storm_staysail"},
 }
 # A recorded departure (package 75, B2, for the lead): how far a head sail's tack on a stay to the
 # stem stands off the top of her side, where it is more than 5 cm. The *Neufchatel*'s stem head,
@@ -5991,6 +6058,19 @@ STEM_TACKED = {
 # above her water; the bowsprit's heel and the stem head's height are Neuf-D §3.7 task 7's, not
 # taken.
 TACK_OFF_HER_SIDE_M = {NEUFCHATEL: 0.202}
+# A recorded departure (package 90, for the lead): how far up a stay to the stem the rule raises a
+# head sail's tack, as a fraction of the stay's rise, where it is JIB_TACK_FRACTION or more. The
+# *Diana*'s stem head, measured on her plan at (17.30, 5.09) and filed at x 17.31 (Pages §5.4),
+# stands 1.50 m over her rail's fore end (3.59 m at 17.30), where every other file's stands within
+# 0.14 m of its rail or under it. Her fore stay lands on the rail there (the lower of the two), and
+# the least tack that keeps her storm staysail's foot over the drawn side, its stem head's top
+# among it, stands 2 cm over that top, 10.6% up the stay (measured at her landing), so that it
+# stands 0.53 m abaft her stem head's top, off the top of her side in the air (her row of
+# `TACK_OFF_HER_SIDE_M`). Her bowsprit crosses the stem head on her plan; where the stay should
+# land on so tall a stem head is the viewer's (the root `min(stem head, rail)`), not taken: the
+# same root draws her bowsprit 32.13 degrees steeved, her file's 21.5 (`BOWSPRIT_DRAWN`).
+TACK_UP_HER_STAY = {DIANA: 0.106}
+TACK_OFF_HER_SIDE_M[DIANA] = 0.526
 # The sheets each file leads to a block on her deck (B5.4's rule for a settee's one sheet: Ext §5.9
 # with the lead's ruling on the bilander's §17 lead item 4, `settee_block`): the bilander's settee's
 # (package 75, B4)
@@ -6237,7 +6317,10 @@ def test_a_stay_to_the_stem_lands_on_the_stem_head_and_its_sails_foot_stands_ove
         stay = got["stays"][got["sails"][sid]["stay"]]
         up = [p - q for p, q in zip(stay["head"], stay["foot"], strict=True)]
         fraction = (tack_at[2] - head[2]) / up[2]
-        assert 0.0 <= fraction < JIB_TACK_FRACTION, sid
+        if path in TACK_UP_HER_STAY:
+            assert fraction == pytest.approx(TACK_UP_HER_STAY[path], abs=0.0005), sid
+        else:
+            assert 0.0 <= fraction < JIB_TACK_FRACTION, sid
         assert tack_at == pytest.approx([f + fraction * u for f, u in zip(head, up, strict=True)])
         assert tack_at[2] == pytest.approx(STEM_TACK_Z_M[path], abs=0.005), sid
         off = off_her_side(tack_at, rail)
@@ -6529,7 +6612,7 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
     """Through the game's own doors (`/api/ship`, `/api/state`), a tick on: the served stations
     and the state's yards and sails, and each brace and sheet on the rail or up in the rig."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -6538,7 +6621,7 @@ def test_the_lines_come_down_on_the_rail_as_the_game_serves_her(tmp_path, path):
     for sid in world.ship.groups["plain sail"]:
         world.ship.sails[sid].state = SailState.SET
     world.tick()
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         data = {"graph": client.get("/api/ship").json(), "snap": client.get("/api/state").json()}
     assert data["snap"]["ship"]["tack"] == "larboard"
     got = run_js(tmp_path, data, LINE_ENDS)
@@ -6995,7 +7078,7 @@ def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
     snapshot without it, and the settee drawn aloft to starboard, slung to starboard of the mast,
     its sheet to the starboard block."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import PageClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -7021,7 +7104,7 @@ def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
     def mine(data: dict) -> dict:
         return next(s for s in data["snap"]["sails"] if s["id"] == SETTEE)
 
-    with TestClient(create_app(Driver(world))) as client:
+    with PageClient(create_app(Driver(world))) as client:
         before = served(client)
         world.submit("tack ship")
         for _ in range(600):

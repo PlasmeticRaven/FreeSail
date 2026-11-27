@@ -16,6 +16,7 @@ docs/agents/ConsentBrief.md -text
 tests/fixtures/ConsentBrief-before-37g.md -text
 tests/fixtures/ConsentBrief-before-42a.md -text
 tests/fixtures/ConsentBrief-before-42b.md -text
+tests/fixtures/ConsentBrief-before-117.md -text
 tests/fixtures/saves/*.checkpoint binary
 tests/fixtures/saves/*.json -text
 

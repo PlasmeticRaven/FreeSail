@@ -53,6 +53,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 4.0
     span_m: 3.4
+  # She steers by a tiller on deck: Chapelle 1930 p. 83 reads H.M. schooner Musquidobit, late Lynx (fig. 17), as steered with a tiller, by where her rudder head stands; the deck plan on that page shows the rudder head and a tiller.
+  helm: tiller
   # Her side, deck and ports (Build-Ships.md §5.1), one hull in the two schooners' files, one class in two roles (the owner, 2026-10-28; §5.0 principle 10). A stand-in for the type, S† (§5.7): Lynx's draught as H.M. schooner Musquidobit, taken off at Portsmouth in May 1816, in Chapelle's redrawings (The Baltimore Clipper, 1930, fig. 17 and the two plates after p. 83), measured in docs/design/ships-design/pages-chapelle-fig17.md (the note below) and scaled by §5.0 principle 7 to this file's length and beam: lengths by the load lines, hers over Lynx's 26.84 m rabbet to rabbet; sections by the breadths, hers over Lynx's 24 ft 0 in extreme; 2 in of plank; the side's height from the plate's own lowest sill (the ports' note). Between the water and the sill line a height goes straight, above it by the sections' factor (judgement, the note's §6.2). x forward of the middle of the load line, z above the load water, metres. Her drawn depth and displacement are the generator's report, recorded beside the file's, not moved (principle 8). No wale and no rising line are drawn on the plates, so no line is given for either (read); the owner's photographs of the replica are for the eye only (§5.8).
   profile:
     # The rail cap's top on the sheer plan, taffrail to stem head (measured). The bulwark above the sill line keeps the plate's height by the sections' factor (judgement). A small cap stands higher at the taffrail; it is recorded in the note's §5.3 and not drawn.
@@ -222,31 +224,31 @@ spars:
   length_m: 7.3
   height_m: 4.0
   rating_kn: 5.9
-# fore topmast studding-sail boom, half the topsail yard, at the fore yard's height; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topmast.studdingsail.starboard in 18 kn -> 2.2 kN.
+# fore topmast studding-sail boom, half the topsail yard, at the fore yard's height; rated for its sail in 18 kn. Provisional (truth 9), see gen_ships.py. Rating: fore.topmast.studdingsail.starboard in 18 kn -> 2.6 kN.
 - id: fore.topmast.studdingsail_boom.starboard
   class: studdingsail_boom
   'on': fore.topsail.yard
   side: starboard
   length_m: 5.5
   height_m: 15.5
-  rating_kn: 2.2
+  rating_kn: 2.6
   rigged_out: false
-# Rating: fore.topmast.studdingsail.larboard in 18 kn -> 2.2 kN.
+# Rating: fore.topmast.studdingsail.larboard in 18 kn -> 2.6 kN.
 - id: fore.topmast.studdingsail_boom.larboard
   class: studdingsail_boom
   'on': fore.topsail.yard
   side: larboard
   length_m: 5.5
   height_m: 15.5
-  rating_kn: 2.2
+  rating_kn: 2.6
   rigged_out: false
-# ringtail boom 19 ft, run out on the main boom (Kipping; Steel: 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: ringtail in 18 kn -> 3.9 kN.
+# ringtail boom 19 ft, run out on the main boom (Kipping; Steel: 'lashed occasionally to the outer end of the main-sail-boom'): the ringtail's foot and a third that bears on the boom (judgement); rated for its sail in 18 kn, as a studding sail boom. Provisional (truth 9), see gen_ships.py. Rating: ringtail in 18 kn -> 4.5 kN.
 - id: ringtail_boom
   class: studdingsail_boom
   'on': main.boom
   length_m: 5.7
   height_m: 1.5
-  rating_kn: 3.9
+  rating_kn: 4.5
   rigged_out: false
 sails:
 # fore topsail 85 m2 between its yard and the fore yardarms, 25 ft deep ('the extreme beam, nearly', Fincham); x carried aft by the rake. Canvas No. 2 (as the frigate's topsails (Steel 1794 vol. I, Sail-making, 'Fore-topsail': No. 2 or 3; Luce 1884 ch. X p. 171 (Tables.md §1): No. 2); Steel's 'Sloop's topsail', No. 6 or 7, is a cutter's light flying topsail, not the schooner's reefing topsail (judgement)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.

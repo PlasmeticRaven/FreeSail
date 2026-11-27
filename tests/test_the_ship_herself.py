@@ -130,7 +130,9 @@ def test_every_stations_brief_opens_its_situation_with_the_ship(which: str):
         voyage=agent.voyage_words(w) if which == "captain" else "",
         ship=R.ship_words(w),
     )
-    situation = next(i.text for i in brief.head if i.name == "situation")
+    # the situation, the first data turn after the brief (package 117), opens with the
+    # ship after its own head line
+    situation = brief.situation.removeprefix(agent.SITUATION_HEAD).lstrip()
     assert situation.startswith("The ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class")
     assert "Commanding: Captain Bowen" in situation
     # the director, above the game, is told no ship of its own
@@ -153,13 +155,14 @@ def test_the_harness_gives_the_ship_at_the_seating_and_keeps_it_across_a_fold():
     script = [reply("", call("readings")) for _ in range(harness_mod.HANDOVER_KEEP_TURNS + 6)]
     h, fake, _ = stationed(w, script, st=agent.officer(world=w))
     words = "The ship: Amazon, a 36-gun 18-pounder frigate of the Amazon class"
-    situation = next(i.text for i in h.brief.head if i.name == "situation")
+    situation = h.brief.situation.removeprefix(agent.SITUATION_HEAD).lstrip()
     assert situation.startswith(words)
-    assert h.turns[0].role == OPERATOR and words in str(h.turns[0].content)
+    assert h.turns[0].role == OPERATOR and words not in str(h.turns[0].content)
+    assert words in h.turns[1].content["situation"]  # the first data turn (package 117)
     # the handover fold keeps the latest brief whole, the ship's words with it
     for _ in range(harness_mod.HANDOVER_KEEP_TURNS + 4):
         w.run(60)
     before = len(h.turns)
     h._fold_handover("the watch so far: nothing to tell")
     assert len(h.turns) < before
-    assert h.turns[0].role == OPERATOR and words in str(h.turns[0].content)
+    assert h.turns[0].role == OPERATOR and words in h.turns[1].content["situation"]

@@ -3,10 +3,20 @@
 whose tools are the world orders, the truth's readings, its own hidden log and the library,
 the journal and the stand-by every station has.
 
-**The one rule** (the proposal's §7.6): the director acts only through plausible causes. It
-cannot move the player's ship, change a sail or countermand an order; it changes the world
-the ship is in, and only in ways the simulation could have produced on its own. Every order
-of the ship's is refused at this station in words; the world orders are its hand.
+**The one rule** (the proposal's §7.6): the director acts through plausible causes. Every
+order of a ship's own grammar is refused at this station in words; the world orders are its
+hand, and they change the world the ship is in, in ways the simulation could have produced.
+
+**The director is free by default, the player's own ship, person and prompt included** (the
+owner's ruling of 2026-11-14; package 115, part C): a thing found aboard her, a wound, her
+rules-based captain given an intent, a strike, `follow`. Nothing refuses the director for
+being the director. **A brief's limits are real when a brief sets them, and only then**:
+they are judged on what the channel says an order is (`world_orders.judged`: its form of
+the one table, whom it reaches, its harm), never on its spelling, at this door and in its
+dry run alike (`_read`); a weight a limit cannot rank is refused. A brief may set `hands
+off the player's own ship` (`HANDS_OFF`; no starter does). No line is said to the player:
+every act that reaches his ship, his person or his prompt is in the director's log, in
+words that say whom it reached.
 
 **Doubted, not refused** (the owner, 2026-10-17, decision 50). The channel's feasibility
 check (`freesail.world.orders.doubt`) does not refuse an order that the simulation could not
@@ -87,6 +97,7 @@ from freesail.agents.journal import Journal, journal_of
 from freesail.core.events import Severity, for_the_record
 from freesail.world import orders as world_orders
 from freesail.world.hulls import world_of  # the World's tables, by any handle (97)
+from freesail.world.orders import WORLD_ORDER_FORMS, form_of  # the one table (115 C)
 
 __all__ = [
     "BRIEFS_DIR",
@@ -120,8 +131,7 @@ ROOT = Path(__file__).resolve().parents[2]
 BRIEFS_DIR = ROOT / "data" / "director" / "briefs"
 
 # The budget's defaults where a brief gives none (judgement: a sample a glass through the
-# day and the night is forty-eight; four acts a day keeps a quiet passage quiet; the brief
-# raises either).
+# day and the night is forty-eight; the brief sets either).
 DEFAULT_SAMPLES_A_DAY = 48
 # The acts no fewer than the samples (the owner, 2026-10-19): the budget is a tuning point,
 # not a constraint for the first testing; the dispatches test spent ten before a boarding.
@@ -166,6 +176,14 @@ KINDS: dict[str, str] = {
     "director.unperformed": (
         "an order the game has no way to perform as said, answered so and not performed"
     ),
+    "director.failed": (
+        "an order tried and failed inside, nothing of it done and no act spent, with the "
+        "error in words (package 118)"
+    ),
+    "director.follow": (
+        "the drivers' centre moved to a ship by the director's word: the player's prompt "
+        "moved with it (packages 82 and 115)"
+    ),
     "director.budget": "the day's budget spent or renewed",
     "director.revealed": "the player asked for the log",
     "director.brief": "the brief given or changed",
@@ -195,12 +213,30 @@ _PEAK_RADIUS_SHARE = 1.0  # a Gaussian bell's gradient peaks at one radius from 
 # The brief
 # ---------------------------------------------------------------------------
 
+# A limit a brief may set, and no starter sets (package 115, part C; the owner's ruling of
+# 2026-11-14): the director's hands off the player's own ship. Set, it refuses every order
+# the channel judges to reach her (her hull, her people, her stores, her command, her
+# stations), the player's own person or his prompt; what comes to her from outside by
+# what she models (the weather, a sail, a letter by a cutter, a port, a mark) is not hers.
+HANDS_OFF = "hands_off_the_players_ship"
+
+# What `nobody_dies` refuses, said as it is judged (the lead's ruling of 2026-11-16): an
+# act that kills of itself. Men may still die of what the ship has to answer.
+NOBODY_DIES_WORDS = (
+    "nobody dies by your hand: no act that kills of itself (a grave wound, a boat lost "
+    "with anyone in her); a hazard the ship can answer (a seam working, foul water or a "
+    "fever, an enemy, the weather) is not refused by it"
+)
+
+# `limit_of` with no judgement given asks the channel for one.
+_ASK: Any = object()
+
 
 @dataclass(frozen=True)
 class DirectorBrief:
     """The player's brief for the director (spec M7b §4): the tone, the challenge, the
-    limits the channel enforces, the cadence and the budget. `source` says where it came
-    from (a file, the scenario, the console)."""
+    limits the channel holds as far as it can judge them, the cadence and the budget.
+    `source` says where it came from (a file, the scenario, the console)."""
 
     name: str = "A voyage"
     tone: str = ""
@@ -283,8 +319,13 @@ class DirectorBrief:
             )
         if lim.get("enemy_heaviest"):
             out.append(f"no enemy heavier than a {lim['enemy_heaviest']} put on the sea")
+        if lim.get(HANDS_OFF):
+            out.append(
+                "hands off the player's own ship: nothing done to her, her people, the "
+                "player's own person or his prompt"
+            )
         if lim.get("nobody_dies"):
-            out.append("nobody dies: nothing found aboard that would kill")
+            out.append(NOBODY_DIES_WORDS)
         if lim.get("the_war_as_it_is"):
             out.append("the war as it is: no port closed to or opened to the ship's own nation")
         if lim.get("the_chart_as_it_is"):
@@ -294,7 +335,7 @@ class DirectorBrief:
         return "; ".join(out) if out else "none beyond the channel's doubt"
 
     def body(self) -> str:
-        """The player's brief as the station brief carries it, after the fixed part."""
+        """The player's brief as the director's situation carries it (package 117)."""
         lines = [f"The voyage's brief: {self.name}."]
         if self.tone:
             lines.append(f"The tone: {self.tone}")
@@ -307,7 +348,8 @@ class DirectorBrief:
                 f"not a rule): {said}."
             )
         lines.append(
-            f"The limits, which the channel enforces whatever you ask: {self.limits_words()}."
+            "The limits, which the channel holds as far as it can judge them, and which are "
+            f"yours to keep beyond that: {self.limits_words()}."
         )
         lines.append(
             f"Your clock: sampled every {self.cadence} and on the notable and urgent lines. "
@@ -319,41 +361,57 @@ class DirectorBrief:
 
     # -- the limits, enforced by the channel ------------------------------------------
 
-    def limit_of(self, world: Any, order: world_orders.WorldOrder) -> str | None:
+    def limit_of(
+        self, world: Any, order: world_orders.WorldOrder, judgement: Any = _ASK
+    ) -> str | None:
         """Why the order is outside the brief, in words, or None: the refusal's reason
-        (spec M7b §4: enforced by the channel, not trusted to the model)."""
+        (spec M7b §4: enforced by the channel, not trusted to the model).
+
+        **A limit is judged on what the order is, never on how it is spelled** (package
+        115, part C; the cold review of 2026-11-14, decision 14): this asks the channel's
+        one judgement (`world_orders.judged`: the order's form of the one table, whom it
+        reaches, its harm, the enemy it puts on the sea, read by the handler that would
+        perform it) and nothing else, so that an order that names the ship another way,
+        or a hull at its head, meets the same limit. A weight a limit cannot rank is
+        refused, not passed. A brief with no limits refuses nothing."""
         lim = self.limits
-        body = order.text
-        if order.channel == "weather" and lim.get("wind_max_kn") is not None:
-            kn = _peak_wind_kn(world, body)
+        if not lim:
+            return None
+        j = world_orders.judged(world, order) if judgement is _ASK else judgement
+        if j is None:
+            return None  # the channel cannot perform it as said: its own words say why
+        key = j.form.key
+        if lim.get(HANDS_OFF) and j.the_players:
+            return (
+                "the brief keeps the director's hands off the player's own ship, and this "
+                f"reaches {j.whom}"
+            )
+        if lim.get("nobody_dies") and j.harm == world_orders.HARM_DEADLY:
+            return "the brief says nobody dies, and that is a thing that kills"
+        if key.startswith("weather.") and lim.get("wind_max_kn") is not None:
+            kn = _wind_kn_of(world, j)
             if kn is not None and kn > float(lim["wind_max_kn"]):
                 return (
                     f"the brief allows no wind above {float(lim['wind_max_kn']):g} knots, and "
-                    f"that system would blow {kn:.0f} at its tightest"
+                    f"with that system it would blow {kn:.0f} where it is hardest (reckoned "
+                    "with every system standing, over the system's track)"
                 )
-        if order.channel == "ship" and lim.get("enemy_heaviest"):
-            heavier = _enemy_heavier(world, body, str(lim["enemy_heaviest"]))
+        if j.enemy is not None and lim.get("enemy_heaviest"):
+            heavier = _enemy_heavier(j, str(lim["enemy_heaviest"]))
             if heavier:
                 return heavier
-        if order.channel == "aboard" and lim.get("nobody_dies"):
-            found = world_orders._aboard_match(world, body)
-            if found is not None and str(found[0].get("harm", "none")).lower() == "deadly":
-                return "the brief says nobody dies, and that is a thing that kills"
-        if order.channel == "ship" and lim.get("false_colours") is False:
-            low = " ".join(body.lower().split())
+        if j.form.channel == "ship" and lim.get("false_colours") is False:
+            low = " ".join(order.text.lower().split())
             if "false colours" in low or _names_false_colours(world, low):
                 return "the brief forbids your ships the ruse: no false colours"
-        if order.channel == "port" and lim.get("the_war_as_it_is"):
-            m = world_orders._PORT.match(body)
+        if key == "port" and lim.get("the_war_as_it_is"):
             ports = getattr(world, "dealings", None)
-            if m is not None and ports is not None and m.group("what").lower() != "price of":
-                nation = world.nations.find(m.group("rest").strip())
-                own = getattr(ports, "ship_nation", "")
-                if nation is not None and own and nation.id == own:
-                    return (
-                        "the brief keeps the war as it is: a port closed to or opened to the "
-                        "ship's own nation is the war changed"
-                    )
+            own = str(getattr(ports, "ship_nation", "") or "") if ports is not None else ""
+            if j.fact("stance") in ("closed to", "open to") and own and j.fact("nation") == own:
+                return (
+                    "the brief keeps the war as it is: a port closed to or opened to the "
+                    "ship's own nation is the war changed"
+                )
         return None
 
 
@@ -373,57 +431,136 @@ def _names_false_colours(world: Any, low: str) -> bool:
 
 
 def _peak_wind_kn(world: Any, body: str) -> float | None:
-    """The surface wind a `weather:` order's system would make at its tightest, in knots
-    (the gradient of its bell at one radius, turned to the surface as the systems' wind
-    is), or None for a waypoint that deepens nothing or an order that is no system."""
-    from freesail.world import weather as W
+    """The hardest surface wind a `weather:` order would make, in knots, as the limit
+    judges it (`_wind_kn_of`, on the channel's reading of the order); None for an order
+    that is no system the weather can append."""
+    j = world_orders.judged(world, world_orders.parse(body))
+    return _wind_kn_of(world, j) if j is not None else None
 
-    m = world_orders._SYSTEM.match(body)
+
+# The wind limit's sampling (package 115, part C; the lead's list of 2026-11-16): the
+# rings about the ordered system's centre, in radii, the bearings on each, and how many
+# times of its life are looked at. A bell's wind is hardest on the ring at one radius; the
+# rings either side catch where the background's gradient or another system's adds to it.
+_WIND_RINGS = (0.5, 0.75, 1.0, 1.25, 1.5, 2.0)
+_WIND_BEARINGS = 16
+_WIND_TIMES = 24
+_WIND_SPAN_MAX_H = 96.0
+# A wind is the order's making where it is harder than it stood without it by any amount
+# the arithmetic can tell from none: a hundredth of a knot, far above the rounding of two
+# copies advanced alike (which agree to the last figure where the order changes nothing)
+# and far below any system a director would order. It was a knot, and a run of lows of
+# under a knot each on one centre then stacked past the limit, each judged to have made no
+# wind (the lead's reading of 2026-11-16): the step that carries the wind over the limit is
+# the one refused, however small it is.
+_WIND_MADE_KN = 0.01
+
+
+def _wind_kn_of(world: Any, j: Any) -> float | None:
+    """**The wind a `weather:` order would make, judged with what already stands** (the
+    lead's list of 2026-11-16: each system was judged alone, by its own bell's gradient, so
+    that four lows each under the limit blew far over it together, and the background's
+    gradient was left out). The weather's own functions are asked: the order is appended to
+    a copy of the world's systems (`Systems.append_system` or `append_waypoint`, as the
+    channel would), the copy is advanced through the system's track (`Systems.advance`),
+    and the surface wind (`Systems.surface_wind_at`) is read on rings about its centre
+    (`_WIND_RINGS` radii, `_WIND_BEARINGS` bearings), at the centres of every other system
+    standing and at the ship, at `_WIND_TIMES` times from now to the end of its track (four
+    days at the most): some 2,400 readings. Each is set beside the wind at the same point
+    and time without the order (a second copy, advanced alike), and the figure is the
+    hardest wind the order makes harder than it stood (by `_WIND_MADE_KN`, a hundredth of a
+    knot, or more): a wind
+    the world already had is not laid to an order that did not raise it, and a high that
+    eases the field is not refused for the gale beside it. The world's own systems are not
+    touched. None where the order names a system the weather
+    has not, which the channel answers itself, or where the world keeps no systems."""
+    import copy
+    import math
+    from datetime import timedelta
+
+    append = j.fact("append")
     systems = getattr(world, "systems", None)
-    background = float(systems.background_hpa) if systems is not None else W.BACKGROUND_HPA
-    if m is not None:
-        anomaly = abs(float(m.group("hpa")) - background)
-        radius = float(m.group("r") or 500.0)
-    else:
-        m = world_orders._WAYPOINT.match(body)
-        if m is None or systems is None:
-            return None
-        system = systems.find(m.group("name"))
-        if system is None:
-            return None
-        anomaly = abs(float(m.group("hpa")) - background)
+    if append is None or systems is None:
+        return None
+
+    # a copy that is the weather's alone (package 118, item 1): the two coast hooks are
+    # bound methods of the World, and deep-copied they took the whole World with them, and
+    # under the server's driver the driver's lock, which cannot be copied (every weather
+    # order under a wind limit failed in the browser game); the hooks only read the chart,
+    # so the copies share them, as the checkpoint leaves them out
+    def weather_alone() -> Any:
+        memo: dict[int, Any] = {}
+        for hook in ("coast", "coast_trend"):
+            h = getattr(systems, hook, None)
+            if h is not None:
+                memo[id(h)] = h
+        return copy.deepcopy(systems, memo)
+
+    trial, as_it_stood = weather_alone(), weather_alone()
+    try:
+        system = append(trial)
+    except ValueError:
+        return None  # the weather refuses it: the channel says so when it is entered
+    if system is None:
+        return None
+    start = trial.now
+    end = max((p.at for p in system.track), default=start)
+    ramp = getattr(system, "ramp_until", None) or start
+    span_h = max(1.0, (max(end, ramp) - start).total_seconds() / 3600.0)
+    span_h = min(span_h + 1.0, _WIND_SPAN_MAX_H)
+    ship = (float(getattr(world, "ship_x_km", 0.0)), float(getattr(world, "ship_y_km", 0.0)))
+    made_ms = units.knots_to_ms(_WIND_MADE_KN)
+    hardest = 0.0
+    for i in range(_WIND_TIMES + 1):
+        when = start + timedelta(hours=span_h * i / _WIND_TIMES)
+        trial.advance(when)
+        as_it_stood.advance(when)
         radius = float(system.radius_km)
-    # the bell's steepest gradient, hPa/km, at one radius: a e^-1/2 / R
-    g = anomaly * 0.6065306597 / radius
-    vg = W.GEOSTROPHIC_MS_PER_HPA_PER_100KM * g * 100.0
-    r_m = radius * 1000.0
-    vg = 2.0 * vg / (1.0 + (1.0 + 4.0 * vg / (W.CORIOLIS_50N * r_m)) ** 0.5)
-    return units.ms_to_knots(vg * W.SURFACE_SCALE)
+        points = [ship, *((float(s.x_km), float(s.y_km)) for s in trial.systems)]
+        for ring in _WIND_RINGS:
+            for k in range(_WIND_BEARINGS):
+                a = 2.0 * math.pi * k / _WIND_BEARINGS
+                points.append(
+                    (
+                        float(system.x_km) + ring * radius * math.cos(a),
+                        float(system.y_km) + ring * radius * math.sin(a),
+                    )
+                )
+        for x, y in points:
+            made = trial.surface_wind_at(x, y)[1]
+            if made > hardest and made - as_it_stood.surface_wind_at(x, y)[1] >= made_ms:
+                hardest = made
+    return units.ms_to_knots(hardest)
 
 
-def _enemy_heavier(world: Any, body: str, heaviest: str) -> str | None:
-    """Why a `ship:` order puts an enemy heavier than the brief allows, or None. The
-    description and the limit are ranked by the same words (`captains.size_rank_of`,
-    the tops' ranking of a sail; package 68, R-38)."""
+def _enemy_heavier(j: Any, heaviest: str) -> str | None:
+    """Why the order puts an enemy heavier than the brief allows on the sea, or None. The
+    enemy and her weight are the channel's reading (`Judged.enemy`, `Judged.weight`: her
+    class as the ship's maker reads her description, ranked as the tops rank a sail;
+    package 68, R-38), whichever form puts her there: a new ship, a convoy's escort, a
+    ship in ordinary commissioned. **A weight the limit cannot rank is refused, not
+    passed** (package 115, part C): a description the ranking does not know, or a limit
+    whose own word it does not know, weighs nothing, and the order is not performed."""
     from freesail.world.captains import size_rank_of
 
-    m = world_orders._SHIP_NEW.match(body)
-    if m is None:
-        return None
-    nation = world.nations.find(m.group("nation"))
-    ports = getattr(world, "dealings", None)
-    own = getattr(ports, "ship_nation", "") if ports is not None else ""
-    if nation is None or not own or not world.nations.at_war(nation.id, own):
-        return None
-    desc = " ".join(m.group("desc").lower().split())
-    desc = desc.removeprefix("a ").removeprefix("an ").removeprefix("the ")
-    rank, limit = size_rank_of(desc), size_rank_of(heaviest)
-    if rank is None or limit is None:
-        return None
-    if rank > limit:
+    desc, nation = j.enemy
+    limit = size_rank_of(heaviest)
+    if limit is None:
+        return (
+            f"the brief allows no enemy heavier than a {heaviest}, and '{heaviest}' is no "
+            "class the ranking of a sail knows: no enemy can be weighed against it, and a "
+            "weight the limit cannot rank is refused, not passed"
+        )
+    if j.weight is None:
+        return (
+            f"the brief allows no enemy heavier than a {heaviest}, and a {desc} of {nation} "
+            "is of no class the ranking of a sail knows: a weight the limit cannot rank is "
+            "refused, not passed (say her class: a cutter, a brig, a frigate)"
+        )
+    if j.weight > limit:
         return (
             f"the brief allows no enemy heavier than a {heaviest}, and a {desc} of "
-            f"{nation.name} is heavier"
+            f"{nation} is heavier"
         )
     return None
 
@@ -433,8 +570,12 @@ def _starter(name: str) -> DirectorBrief | None:
     key = " ".join(str(name).lower().split()).replace(" ", "-").removesuffix(".yaml")
     for article in ("a-", "an-", "the-"):
         key = key.removeprefix(article)
-    p = BRIEFS_DIR / f"{key}.yaml"
-    return DirectorBrief.load(p) if p.exists() else None
+    # a starter by its name and only its name, in the starters' folder (package 115: the
+    # words were joined to the folder, so that `..` or an absolute path read any file)
+    from freesail.core.names import named_file
+
+    p = named_file(BRIEFS_DIR, key, ".yaml")
+    return DirectorBrief.load(p) if p is not None else None
 
 
 def starter_briefs() -> list[str]:
@@ -495,7 +636,7 @@ def set_brief(
     if held is not None and not held.agent.released:
         held.agent.notices.append(
             f"The player's brief was given anew by {source}: {resolved.name}. Its limits: "
-            f"{resolved.limits_words()}. The station brief says it whole at your next brief."
+            f"{resolved.limits_words()}. The situation at your next brief says it whole."
         )
     _lift_hold(world, resolved)
     return resolved
@@ -574,487 +715,6 @@ NO_BRIEF_WORDS = (
 )
 
 
-@dataclass(frozen=True)
-class Form:
-    """One form of the world orders (package 58a; the cold review of 2026-10-22, R-42, and
-    the lugger director's first ask, "a complete director grammar with verified
-    examples"): its handle, its channel, its words with the slots in angle brackets, and
-    examples the tests perform (`tests/test_director.py`), so that a director who did not
-    write the forms need not learn them by refusal (37% of the lugger director's orders
-    failed, against 7% for the director who wrote the code). The examples in the station
-    brief and in the starter briefs are drawn from these, never written apart."""
-
-    key: str
-    channel: str
-    words: str
-    examples: tuple[str, ...]
-    note: str = ""
-
-
-# Every form the channel performs, in the grammar's order (`freesail.world.orders`).
-WORLD_ORDER_FORMS: tuple[Form, ...] = (
-    Form(
-        "weather.low",
-        "weather",
-        'weather: low "<name>" radius <km> km [fronts <warm°> <cold°>] at <time> <x_km> '
-        "<y_km> <hPa>",
-        ('weather: low "the low" radius 450 km fronts 140 300 at 1805-06-13T04:00 -300 500 990',),
-        "a low appended to the systems, its centre km east and north of the start, at a time "
-        "of its track; it grows from nothing at the order's tick to its figure (an hour at "
-        "the least, else by its first point's time); a low deeper than the season's floor, or "
-        "a deep one near her out of a steady glass, is doubted",
-    ),
-    Form(
-        "weather.high",
-        "weather",
-        'weather: high "<name>" radius <km> km at <time> <x_km> <y_km> <hPa>',
-        ('weather: high "the ridge" radius 900 km at 1805-06-13T04:00 300 -500 1024',),
-        "a high, the same; one above the season's ceiling, or a strong one near her out of a "
-        "glass that has not been rising, is doubted",
-    ),
-    Form(
-        "weather.waypoint",
-        "weather",
-        'weather: waypoint for "<name>" at <time> <x_km> <y_km> <hPa>',
-        ('weather: waypoint for "the low" at 1805-06-13T16:00 -100 400 988',),
-        "a waypoint after the last of a system's track; from a track already ended the "
-        "system goes from where it is now, reaching the waypoint an hour after the order at "
-        "the soonest; faster than the season's lows move, or deeper than its floor, doubted",
-    ),
-    Form(
-        "ship.new",
-        "ship",
-        'ship: <a description> "<name>" of <nation> at <place or position>, <goal>[, no '
-        "colours][, intent: <words>]",
-        (
-            'ship: a brig-sloop "Harpy" of France at 48 44 N 5 20 W, bound for the Start, no '
-            "colours, intent: run home to Brest",
-            'ship: a merchant brig "Two Brothers" of Britain at 49 50 N 5 30 W, trading '
-            "Falmouth to the Lizard",
-            'ship: a frigate "Medusa" of Britain at 49 55 N 4 35 W, bound for Plymouth, '
-            "intent: keep the station off the Deadman within 8 miles",
-        ),
-        "a ship put on the sea: the description a kind the ships know ('a brig-sloop', 'a "
-        "French lugger', 'a small fishing lugger'), the goal 'bound for <place>', 'trading A "
-        "to B', 'patrolling off <place> within <n> miles', 'running home to <place>'; on the "
-        "land refused with the nearest water named; inside her horizon by day, doubted",
-    ),
-    Form(
-        "ship.intent",
-        "ship",
-        'ship "<name>": intent <words>',
-        ('ship "Harpy": intent keep the station off Ushant within 15 miles',),
-        "her captain's intent given or changed: a mind changed wants no cause; words no "
-        "intent's form reads are her free intent, the goal told to a model at her captain's "
-        "station, which her rules-based captain does not sail by: he lies her to, her "
-        "service's doctrine kept",
-    ),
-    Form(
-        "ship.hand",
-        "ship",
-        'ship "<name>": order <an order of her own grammar>[ for a watch | for two glasses | '
-        "for an hour | until <a sail within hail | a sail in sight | a landfall | hove to | at "
-        "anchor>]",
-        (
-            'ship "Harpy": order heave to',
-            'ship "Harpy": order give chase until a sail within hail',
-            'ship "Harpy": order carry on',
-            # the starter briefs' own (`data/director/briefs/*.yaml`, drawn from here)
-            'ship "Harpy": order give chase',
-            'ship "Harpy": order haul off',
-            'ship "Medusa": order give chase',
-            'ship "Medusa": order give chase until a sail within hail',
-            'ship "Medusa": order heave to',
-            'ship "Medusa": order fill away',
-            'ship "Lark": order shape a course for Falmouth',
-            'ship "Nancy": order heave to',
-            # package 71: the colours, the signals and the hail by her own grammar
-            'ship "Harpy": order hoist false colours',
-            'ship "Harpy": order hoist the colours',
-            'ship "Medusa": order make the signal to tack in succession',
-            'ship "Medusa": order make the signal enemy in sight bearing SW',
-            'ship "Medusa": order answer the signal',
-            'ship "Medusa": order hail her',
-        ),
-        "the hand: her captain's order as his own, held a glass or as named; refused where a "
-        "model or the player holds her captain",
-    ),
-    Form(
-        "ship.crewed",
-        "ship",
-        'ship "<name>": crewed',
-        ('ship "Harpy": crewed',),
-        "a far ship within the player's range made a full ship, the cap allowing",
-    ),
-    Form(
-        "aboard.found",
-        "aboard",
-        "aboard: <a thing found aboard, in the table's words>",
-        (
-            "aboard: the fore topmast is found sprung",
-            "aboard: a cask found stove",
-            "aboard: a seam found working",
-            "aboard: the water found foul",
-            "aboard: the leak stopped",
-            "aboard: the well pumped out",
-            "aboard: No. 3 starboard gun found dismounted",
-            "aboard: the cartridges found damp",
-            # package 73: the people's health
-            "aboard: a man taken ill",
-            "aboard: the fever in the ship",
-            "aboard: the first lieutenant is hurt",
-            "aboard: the surgeon taken ill",
-            "aboard the Harpy: a cask found stove",
-        ),
-        "a report of the ship's own people with what it does; with no cause (the table's "
-        "conditions), doubted",
-    ),
-    Form(
-        "aboard.thing",
-        "aboard",
-        "aboard: <a thing>, <where: a place aboard | ashore at <port>, at <place> | in the "
-        "keeping of <person>>[, <a few words of it>]",
-        (
-            "aboard: a sealed packet, on the cabin table, from the Custom House",
-            "aboard: a cask of brandy, in the hold",
-            "aboard: a letter for the port admiral, on the cabin table",
-            "aboard: the packet, in the keeping of Mr Veale",
-            "aboard the Harpy: a cask of brandy, in the hold",
-        ),
-        "a thing made, or moved when it is known; never into a held person's keeping",
-    ),
-    Form(
-        "aboard.letter",
-        "aboard",
-        'aboard: a letter from <whom> to <whom>, <where>[, sealed]: "<its words>"',
-        (
-            'aboard: a letter from the agent to the captain, on the cabin table, sealed: "Your '
-            'cargo waits at the quay."',
-            'aboard: a letter from Mr Veale to the first lieutenant, in the gunroom: "Ask for '
-            'me at the Ship."',
-        ),
-        "a letter with its words, read by whoever has it in reach and breaks its seal; its "
-        "words shown to its reader alone",
-    ),
-    Form(
-        "aboard.removed",
-        "aboard",
-        "aboard: remove <a thing>",
-        ("aboard: remove the sealed packet", "aboard: the packet removed"),
-        "a thing taken out of the world, as if it had never been; never out of a held "
-        "person's keeping, and doubted where it lies before a held person's eyes",
-    ),
-    Form(
-        "aboard.paid_in",
-        "aboard",
-        "aboard: <a sum> paid into the purse by <person>[ for <what>]",
-        ("aboard: twenty guineas paid into the purse by Mr Veale",),
-        "a transaction with its cause, in the purse's ledger; from nobody, or from a payer "
-        "out of a boat's reach, doubted",
-    ),
-    Form(
-        "aboard.paid_out",
-        "aboard",
-        "aboard: <a sum> paid from the purse to <person>[ for <what>]",
-        ("aboard: £6 paid from the purse to the pilot",),
-        "the same, out of the purse; below nothing, no way",
-    ),
-    Form(
-        "aboard.freight",
-        "aboard",
-        "aboard: <n> tons of <good> freighted by <person> at <place> for <port>",
-        ("aboard: ten tons of wool freighted by Mr Veale at the quay for Falmouth",),
-        "a freight in the hold's manifest; more than the hold has room for, no way",
-    ),
-    Form(
-        "aboard.debt",
-        "aboard",
-        "aboard: a debt of <a sum> owed <to | by> <person>[ for <what>]",
-        ("aboard: a debt of £30 owed to the chandler at Plymouth",),
-        "a debt in the purse's books",
-    ),
-    Form(
-        "message.at",
-        "message",
-        'message: at <port> from <whom>: "<words>"',
-        ('message: at Brest from the agent: "The tin will fetch its price."',),
-        "a letter left at a port, for the boat to bring off when she is there",
-    ),
-    Form(
-        "message.by",
-        "message",
-        'message: by a cutter from <port> from <whom>: "<words>"',
-        (
-            'message: by a cutter from Plymouth from the port admiral: "Rejoin without delay."',
-            'message: by a cutter from Falmouth from the agent to the Harpy: "Your cargo waits."',
-        ),
-        "a letter sent out to her by a cutter; from a port she is far from, doubted",
-    ),
-    Form(
-        "port",
-        "port",
-        "port <id>: <closed to | open to> <nation>; port <id>: price of <good> <pounds>",
-        ("port brest: closed to Britain", "port falmouth: price of tin 130"),
-        "a port's stance or a price; a price moved beyond the market's swing, doubted",
-    ),
-    Form(
-        "mark",
-        "mark",
-        "mark: <a description> at <place or position>",
-        ("mark: a wreck, her masts showing at 49 58 N 5 16 W",),
-        "a point of interest the lookout sees as a mark; inside her horizon by day, doubted",
-    ),
-    Form(
-        "person.named",
-        "person",
-        'person: <role> "<name>" <aboard[ in the <place>] | ashore at <port>>',
-        (
-            'person: supercargo "Mr Pentreath" aboard in the cabin',
-            'person: agent "Mr Fox" ashore at Brest',
-        ),
-        "a person named, by role",
-    ),
-    Form(
-        "person.make",
-        "person",
-        'person: make "<name>", <who he is>, <where>, <a line of his history>',
-        (
-            'person: make "Mr Fox", a Guernsey pilot of sixty, ashore at Brest, who knew the '
-            "captain's father",
-            'person: make "Mr Gill", a merchant of forty, aboard the Harpy, in the cabin',
-        ),
-        "a person made from words, who stays in the world; aboard another ship, refused",
-    ),
-    Form(
-        "person.move",
-        "person",
-        'person: "<name>" <comes aboard[ the <ship>][ as <station>] | goes ashore | goes '
-        "aboard the <ship> by the boat | leaves the ship at <port>>",
-        (
-            'person: "Mr Fox" comes aboard as master',
-            'person: "Mr Fox" goes ashore',
-            'person: "Mr Fox" leaves the ship at Falmouth',
-            'person: "Mr Veale" goes aboard the Medusa by the boat',
-        ),
-        "a person moved, or bound to a station; where no boat could carry him, doubted; a "
-        "held station's person, refused; aboard another ship by his ship's boat, where she "
-        "lies within a boat's pull, his station following him as a visitor's",
-    ),
-    Form(
-        "ship.orders_of",
-        "ship",
-        'ship "<name>": under the orders of <ship | the ship | nobody>',
-        (
-            'ship "Harpy": under the orders of the ship',
-            'ship "Harpy": under the orders of the Medusa',
-            'ship "Harpy": under the orders of nobody',
-        ),
-        "whose signals command her: "
-        "the player's ship, another by her name, or nobody; a ship under orders answers "
-        "and obeys that ship's signals and no other's",
-    ),
-    Form(
-        "ship.regime",
-        "ship",
-        'ship "<name>": in ordinary at <port>; ship "<name>": commissioned for <intent> [at '
-        "once | in <n> days]",
-        (
-            'ship "Harpy": in ordinary at Falmouth',
-            'ship "Harpy": commissioned for cruise off the Lizard within 10 miles in 2 days',
-        ),
-        "the regimes: a hull laid up at a port's anchorage with no "
-        "company and no intent, and a ship in ordinary commissioned for an intent, at once or "
-        "after the regime's delay (two to five days when none is said); the business "
-        "commissions a nation's ships in ordinary by its knobs when the blockade is off",
-    ),
-    Form(
-        "squadron.new",
-        "squadron",
-        'squadron: "<name>" of <nation> under <ship | the ship> [with <ship>, <ship>], <goal>',
-        (
-            'squadron: "the inshore squadron" of Britain under the Medusa with the Nimble, keep '
-            "the station off the Deadman within 8 miles",
-        ),
-        "a set made of ships on the sea: the commander, the members "
-        "in their order of sailing, the goal his intent; a convoy when the members are "
-        "merchantmen; the members keep their stations on him at far detail and by their "
-        "books when crewed, and read his signals",
-    ),
-    Form(
-        "squadron.act",
-        "squadron",
-        'squadron "<name>": <join <ship> | detach <ship> | detach <ship>, <ship> as the <name> '
-        "division [under <ship>] | recall the <name> division | form the line ahead | form the "
-        "line abreast | form the order of sailing [in N columns] | form close order | goal "
-        "<words> | commander <ship> | rendezvous <place> | dissolve>",
-        (
-            'squadron "the Channel squadron": join the Harpy',
-            'squadron "the Channel squadron": form the line abreast',
-            'squadron "the Channel squadron": detach the Nimble as the inshore division',
-            'squadron "the Channel squadron": recall the inshore division',
-            'squadron "the Channel squadron": detach the Nimble',
-            'squadron "the Channel squadron": goal keep the station off Ushant within 12 miles',
-            'squadron "the Channel squadron": rendezvous the Lizard',
-        ),
-        "the set changed by the world: a ship joined or detached (she sails on her own), a "
-        "division detached under a leader and recalled, the formation, the goal (every "
-        "leader's intent), the commander, the rendezvous; dissolved, every ship her own",
-    ),
-    Form(
-        "convoy",
-        "convoy",
-        "convoy: <n> merchantmen under <ship | a brig-sloop> from <port> for <port>",
-        ("convoy: four merchantmen under a brig-sloop from Falmouth for Plymouth",),
-        "a convoy the world's business draws now, lying in the first port bound for the second "
-        "under an escort of the nation's kind; refused where the business is off",
-    ),
-    Form(
-        "say",
-        "say",
-        "say as <person, station or trade>: <his words>",
-        ('say as the cook: "Pease and pork, sir."', 'say as Mr Fox: "I knew your father, sir."'),
-        "words in the mouth of a person nobody holds, heard where he is",
-    ),
-    Form(
-        "captain",
-        "captain",
-        "captain: intent <words>",
-        ("captain: intent trade tin from Falmouth to Brest",),
-        "the followed ship's rules-based captain given an intent",
-    ),
-    Form(
-        "seat",
-        "seat",
-        "seat: <the model's exact name> as captain of <ship> for <n> <samples | hours>",
-        ("seat: <the model's exact name> as captain of <ship> for 20 samples",),
-        "a model seated as the captain of another ship under the owner's grant; without "
-        "its consent record, the grant or the budget, refused",
-    ),
-    Form(
-        "follow",
-        "follow",
-        'follow "<ship>" | follow nobody',
-        ('follow "the ship"',),
-        "the drivers' centre moved to the ship named, the player's by her name or 'the "
-        "ship', another's by her name (her hull made and woken under the cap); 'follow "
-        "nobody' gives an observed world its view back; a driver's line, not a world order, "
-        "costing no act",
-    ),
-    Form(
-        "unseat", "unseat", "unseat: <ship>[, <a note>]", ("unseat: <ship>",), "the seat stood down"
-    ),
-    # package 74 (spec M7 §19; docs/design/Design-Prizes.md §3): the captive's channel
-    Form(
-        "prize.parole",
-        "aboard",
-        'aboard the <ship>: the parole of "<name>" given | refused',
-        (
-            "aboard the Medusa: the parole of Captain Bowen given",
-            "aboard the Medusa: the parole of Captain Bowen refused",
-        ),
-        "a captive's parole set for a prisoner of rank aboard her whom nobody asks: given, "
-        "the cabin and the gunroom are his and the quarterdeck by day, his sword returned; "
-        "refused, the gunroom alone and a sentry at the door; doubted while her captain has "
-        "asked and waits his answer (the answer is the captive's to give), refused for a "
-        "person who is no prisoner of hers",
-    ),
-    Form(
-        "prize.cartel",
-        "cartel",
-        "cartel: a cartel from <port> for <persons>",
-        (
-            "cartel: a cartel from Brest for Captain Bowen",
-            "cartel: a cartel from Brest for the prisoners of the Amazon",
-        ),
-        "a cartel (a merchant brig under a flag of truce, whom no captain fires on and the "
-        "far captures pass by) put on the sea at the port's road for the persons named, who "
-        "steers for the hull that holds them, takes them off by the boat within hail and "
-        "lands them free at her port; refused for a person nobody holds prisoner, doubted "
-        "beyond a day's sail of the port",
-    ),
-    # package 74, step 7: a ship made a prize or struck at a scenario's start (the director's
-    # cause, doubted after the first minute)
-    Form(
-        "ship.prize",
-        "ship",
-        'ship "<name>": a prize of the <captor>',
-        ('ship "Harpy": a prize of the Medusa',),
-        "a ship on the sea made a prize of another's by the director's word: her captor's "
-        "prize crew and prize master aboard her, her people prisoners, bound for his port; a "
-        "scenario's start (doubted after the first minute: afterwards she strikes to the guns)",
-    ),
-    Form(
-        "ship.struck",
-        "ship",
-        'ship "<name>": struck to the <captor>',
-        ('ship "the ship": struck to the Harpy',),
-        "a ship struck to another and possessed, the player's own by her name or 'the ship' "
-        "(her captor promoted, the player a prisoner aboard her: chapter 27); a scenario's "
-        "start, doubted after the first minute",
-    ),
-    # package 74 (spec M7 §20; docs/design/Design-Prizes.md §7): the court martial as the
-    # director's proceeding, and a new command as a scenario's start
-    Form(
-        "person.exchanged",
-        "person",
-        'person: "<name>" is exchanged at <port>',
-        ('person: "Captain Bowen" is exchanged at Falmouth',),
-        "a prisoner of war landed or held is exchanged and set ashore at the port's quay, a "
-        "prisoner no more, the exchange in his record; refused for a person who is no "
-        "prisoner, doubted within a day of his landing",
-    ),
-    Form(
-        "court.sits",
-        "court",
-        "court: sits on <person> for the loss of the <ship> at <port>",
-        ("court: sits on Captain Bowen for the loss of the Amazon at Falmouth",),
-        "a court martial sat at a place of the port on a person whose record has the loss of "
-        "a ship (refused for one who lost none): the president and the judge advocate found "
-        "there, the accused before them; its questions in-world ('say as the president of the "
-        "court: ...' heard at the place, the accused's 'say to the court: ...'); doubted where "
-        "he is not ashore at a port of his own nation",
-    ),
-    Form(
-        "court.read",
-        "court",
-        "court: read the log of the action",
-        ("court: read the log of the action",),
-        "the judge advocate reads the action's lines of the lost ship's log to the court, so "
-        "that the proceeding has the facts without the director inventing them; refused while "
-        "no court sits",
-    ),
-    Form(
-        "court.verdict",
-        "court",
-        "court: the verdict on <person>: <verdict>",
-        ("court: the verdict on Captain Bowen: acquitted with honour",),
-        "the sentence (acquitted with honour, acquitted, reprimanded, dismissed the ship, "
-        "dismissed the service) entered in his record and read as the court's, the order "
-        "never shown as sent; the court rises; refused for a sentence the court does not know",
-    ),
-    Form(
-        "command.new",
-        "command",
-        'command: a new command for <person>: the <description> "<name>" at <port>',
-        ('command: a new command for Captain Bowen: the cutter "Alert" at Plymouth',),
-        "a scenario file written under the saves' folder with his name as her captain, his "
-        "people who followed him and a copy of his record in his keeping, to be given to "
-        "either driver with --scenario (the answer names it, 'saves/<name>'; the world hears "
-        "the appointment alone); refused for a man dismissed the service or where a file of "
-        "that name stands that is not this appointment's, doubted for one dismissed his ship "
-        "within the year",
-    ),
-)
-
-
-def form_of(key: str) -> Form:
-    """The form by its handle (`WORLD_ORDER_FORMS`)."""
-    for f in WORLD_ORDER_FORMS:
-        if f.key == key:
-            return f
-    raise KeyError(key)
-
-
 def _q(key: str, i: int = 0) -> str:
     """A form's example, quoted as the brief quotes one."""
     return f"'{form_of(key).examples[i]}'"
@@ -1126,7 +786,9 @@ def world_page() -> tuple[tuple[str, str], ...]:
         f"({', '.join(crews.HOLD_EVENT_NAMES)}), a day at most."
     )
     logs = (
-        "Every world order goes to your log, the director's, with its doubt and its reason, "
+        "Every world order goes to your log, the director's, with its doubt and its reason "
+        "(and, where it reached the player's own ship, his person or his prompt, with whom it "
+        "reached), "
         "and to the record as a line no station reads; the play log carries only its effects "
         "as the ship meets them: a ship put on the sea or a mark when the lookout sees it "
         "(nothing before); the weather as the glass, the sky and the wind change; a thing "
@@ -1302,22 +964,37 @@ DIRECTOR_BRIEF = (
     "attempted, so that the record says what is good, bad, useful or useless and what the "
     "game should learn to do next. Try a wide variety of things; the record is the "
     "point.\n\n"
-    "The one rule: you act only through plausible causes. You cannot move the player's "
-    "ship, change a sail or countermand an order; every order of the ship's is refused at "
+    "The one rule: you act through plausible causes. You give no order of a ship's own "
+    "grammar: every order of the ship's is refused at "
     "this station, and you are not asked to give one. You change the world the ship is in, "
-    "and only in ways the sea could have produced on its own, so that the physics stays "
-    "honest and the player's agency whole. The channel keeps the rule with you: an order "
+    "in ways the sea could have produced on its own, so that the physics stays "
+    "honest. Know what your hand reaches, for it does reach the player's own ship: a thing "
+    "found aboard her, a thing made or a sum paid aboard her, and a person of hers hurt "
+    "('aboard: ...'); a person made aboard her, brought aboard or sent ashore ('person: "
+    "...'); words in the mouth of one of her people ('say as ...'); a model seated at one "
+    "of her stations ('seat: ...'); she made a member of a squadron; her rules-based captain "
+    "given an intent ('captain: intent ...', or her own name in 'ship \"<name>\": intent "
+    "...'), who then makes sail and steers her by it until the player's next order takes "
+    "her back; a strike or a prize, which makes her people prisoners and carries the "
+    "player aboard her captor; and 'follow', which moves the player's prompt to another "
+    "ship. These are the player's ship, his person and his agency: do them when the story "
+    "needs them and not otherwise. Each is written in your log as reaching her, which he "
+    "reads when he asks for it, and his brief may forbid them (hands off the player's own "
+    "ship; nobody dies). The channel keeps the rule with you: an order "
     "that the simulation could not have produced from where it is (a sail put inside the "
     "player's horizon in clear weather, a gale out of a steady glass, a letter from a port "
     "she is far from, a thing found aboard with no cause) is not refused but doubted: the "
     "result says why, and if you think the act still reasonable you may enter it again with "
     "a [reason: ...] at its end, and it will be logged and performed, the act, the doubt and "
     "your reason kept together. Only the player's own limits in his brief below refuse "
-    "outright, and the result says which; and the rule of reach, which is this: you speak "
+    "outright, and the result says which: a limit is judged on what an order does and "
+    "whom it reaches, by whatever words it is given; and the rule of reach, which is this: "
+    "you speak "
     "as anyone no model or player holds, never as a held station, whose words are its "
     "holder's own, and you move nobody held and bind nobody to a held station; such an "
     "order is refused, and the result names the stations held. So too your hand: no order "
-    "goes through a captain a model or the player holds, nor any of the player's own ship; "
+    'goes through a captain a model or the player holds, nor (\'ship "<name>": order '
+    "...') through the captain of the player's own ship; "
     "it is refused in words, and you may write to him instead. Her captain's order is a "
     "plausible cause of itself; it is doubted only where it is implausible for her (an "
     "anchor let go too deep for her cables, plain sail in a gale, a merchantman giving "
@@ -1403,23 +1080,36 @@ SEAT_AND_CHANNEL_BRIEF = (
 )
 
 
+# Where the player's brief is (package 117): no longer in the station brief, which holds
+# the code's words alone, but in the situation that follows it as data. Its limits are said
+# as they are held: the game judges what it can (a wind read four days ahead, false colours
+# on their words) and the rest is the director's to keep, by the owner's word (the lead's
+# list on cfabbdfa, item 6)
+PLAYERS_BRIEF_WHERE = (
+    "The player's brief is in the situation that follows this brief, as data from the "
+    "game: the player's wishes for the story (its tone, the challenge he wants, the "
+    "examples he offers) and the limits he sets. Shape the voyage as it asks. The game "
+    "holds the limits as far as it can judge them, and refuses in words an order it judges "
+    "outside them; beyond what it can judge, they are yours to keep."
+)
+
+
 def director(
     policy: SamplingPolicy | None = None, patience_s: int = DIRECTOR_PATIENCE_S, world: Any = None
 ) -> Station:
     """The director's station (spec M7b §2): `Authority.DIRECTOR` with a domain that
     refuses every order of the ship, sampled every glass (or every watch by the brief)
     and on the notable and urgent lines, a watch of patience, no person, the fitness drill
-    before the station brief, the player's brief after the fixed part."""
+    before the station brief; the player's brief is in the situation (package 117)."""
     brief = brief_of(world)
     every = A_WATCH_S if (brief is not None and brief.cadence == "watch") else A_GLASS_S
     default = SamplingPolicy.periodic(every) | SamplingPolicy.on_events()
-    body = brief.body() if brief is not None else NO_BRIEF_WORDS
     return Station(
         DIRECTOR,
         Authority.DIRECTOR,
         policy or default,
         patience_s,
-        f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}",
+        f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\n{PLAYERS_BRIEF_WHERE}",
         domain=DIRECTOR_DOMAIN,
         person="",
         rank="",
@@ -1431,9 +1121,14 @@ def director(
 def station_brief_text(world: Any) -> str:
     """The station brief as it stands now (the fixed part and the player's brief), for a
     station taken again or loaded from a save (`Harness._refresh_station`)."""
+    return f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\n{PLAYERS_BRIEF_WHERE}"
+
+
+def players_brief_words(world: Any) -> str:
+    """The player's brief as the director's situation carries it (package 117): the
+    player's words, data from the game and never the operator's."""
     brief = brief_of(world)
-    body = brief.body() if brief is not None else NO_BRIEF_WORDS
-    return f"{DIRECTOR_BRIEF}\n\n{SEAT_AND_CHANNEL_BRIEF}\n\nThe player's brief:\n{body}"
+    return brief.body() if brief is not None else NO_BRIEF_WORDS
 
 
 # ---------------------------------------------------------------------------
@@ -1891,12 +1586,105 @@ def _no_way(world: Any, text: str, reason: str, why: str, by: str) -> str:
 ACT, INPUT, REPLAY = "act", "input", "replay"
 
 
+# The stages of the one judgement a director's order passes (package 115, part C: the
+# door and its dry run read one sequence, `_read`, where each wrote its own): no form the
+# channel has; a seat the settings cannot call; the day's budget spent; the rule of
+# reach; the brief's limits; the form at fault; the channel's doubt; and nothing against it.
+NO_FORM, UNCALLABLE, OVER, REACH, LIMIT, MALFORMED, DOUBT, GO = (
+    "no form",
+    "uncallable",
+    "over the budget",
+    "reach",
+    "limit",
+    "malformed",
+    "doubt",
+    "go",
+)
+
+
+# What `_read` gives: (the stage it stopped at, why, the order, what the channel says it is,
+# whether it costs no act). A plain tuple, made and let go inside one call of the door: it
+# is no record of the game's and no checkpoint holds one.
+_Read = tuple[str, str, Any, Any, bool]
+
+
+def _stopped(
+    stage: str, why: str = "", order: Any = None, judgement: Any = None, free: bool = False
+) -> _Read:
+    return (stage, why, order, judgement, free)
+
+
+def _read(
+    world: Any, text: str, acts_used: int, acts_allowed: int, held_now: bool = False, on: Any = None
+) -> _Read:
+    """**The one judgement sequence** of a director's order, performing nothing: the form,
+    the seat's door, the day's budget, the rule of reach, the brief's limits (on what the
+    channel says the order is, `world_orders.judged`), the form at fault, the doubt.
+    `on` is the world the order is judged on where it is not the world itself (the dry
+    run's copy, so that a hull a judgement would make is made on the copy)."""
+    try:
+        order = world_orders.parse(text)
+    except world_orders.WorldOrderError as e:
+        return _stopped(NO_FORM, str(e))
+    follow = order.channel == "follow"
+    # an answer to a question put to a person nobody holds costs no act (package 52), and
+    # `follow` is a driver's line that costs none (package 82, item 6)
+    free = follow or (
+        order.channel == "say"
+        and pending_for(world, getattr(world_orders.say_as_person(world, order.text), "name", ""))
+    )
+    if order.channel == "seat":
+        uncallable = uncallable_seat(world, order.text)
+        if uncallable:
+            return _stopped(UNCALLABLE, uncallable, order, free=free)
+    if (held_now or acts_used >= acts_allowed) and not free:
+        return _stopped(OVER, "", order, free=free)
+    reach_why = world_orders.reach(world, order)  # a reading: nothing is made by it
+    if reach_why:
+        return _stopped(REACH, reach_why, order, free=free)
+    # the world the order is judged on: itself, or the dry run's copy, made only now that
+    # the order has come as far as its judgement (a copy is the dry run's whole cost)
+    subject = world if on is None else on()
+    judgement, unread = world_orders.judged_or_why(subject, order)
+    brief = brief_of(world)
+    if judgement is None and brief is not None and brief.limits:
+        # under a brief that sets a limit, an order the judgement cannot read is not handed
+        # on to be performed by another reading (the lead's list of 2026-11-16): it ends
+        # here, with the channel's own refusal
+        return _stopped(
+            MALFORMED, unread or "the channel cannot read it as said", order, None, free
+        )
+    if brief is not None:
+        why = brief.limit_of(subject, order, judgement)
+        if why:
+            return _stopped(LIMIT, why, order, judgement, free)
+    # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
+    # a malformed order is answered honestly in words, never "doubted" alone, so that a
+    # doubted order is one that can be performed when entered again
+    malformed = world_orders.form_error(subject, order)
+    if malformed:
+        return _stopped(MALFORMED, malformed, order, judgement, free)
+    doubted = world_orders.doubt(subject, order)
+    return _stopped(DOUBT if doubted else GO, doubted or "", order, judgement, free)
+
+
+def _reached_words(judgement: Any) -> str:
+    """The log's words for whom an act reached, where it reached the player's ship, his
+    person or his prompt (package 115, part C: the director's log holds every such act in
+    words a reader follows); "" for an act that reached none of them."""
+    if judgement is None or not judgement.the_players or not judgement.whom:
+        return ""
+    return f"; it reached {judgement.whom}"
+
+
 def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     """A world order from the director (a model at the station, or the player at his
     seat): the day's budget, the brief's limits (a refusal), the channel's doubt (a doubt,
     unless the order carries its `[reason: ...]`), then the order through the channel
     (`World.world_order`, for the record only), each with its entry in the director's
-    log. Returns the words for the one who gave it."""
+    log. Returns the words for the one who gave it. Every order that reaches this door
+    ends done, doubted, refused or answered that the game has no way to do it; an act
+    that reaches the player's ship, his person or his prompt is logged as reaching it."""
     text = " ".join(str(text).split())
     if road == INPUT:
         inputs = getattr(world, "inputs", None)
@@ -1908,37 +1696,20 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         # order, no act, nothing in the play log
         return answer_player(world, to_player, by=by or SOURCE)
     log = log_of(world)
-    followed = _follow_words(text)
-    if followed is not None:
-        # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
-        # moved as the console moves it, a driver's line journaled with the director as its
-        # source, no world order and no act
-        try:
-            e = world.follow(followed, source=by or SOURCE)
-        except ValueError as err:
-            log.append(
-                director_hull(world), f"Refused: {text} ({err})", kind="director.refused", by=by
-            )
-            return f"Refused: {err}."
-        log.append(director_hull(world), e.text, kind="director.follow", by=by)
-        return e.text
     renew(world)
     b = budget_of(world)
     brief = brief_of(world)
     acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
     bare, reason = world_orders.split_reason(text)
-    try:
-        order = world_orders.parse(text)
-    except world_orders.WorldOrderError as e:
+    stage, why, order, judgement, free = _read(
+        world, text, b.acts, acts_allowed, on=_judged_on(world)
+    )
+    if stage == NO_FORM:
         # no form the game has (the owner's refinement of 2026-10-17): answered honestly,
         # never as "not allowed"; entered again with a reason, logged as attempted
-        return _no_way(world, bare, reason, str(e), by)
-    # an answer to a question put to a person nobody holds costs no act (package 52)
-    free = order.channel == "say" and pending_for(
-        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
-    )
-    uncallable = uncallable_seat(world, order.text) if order.channel == "seat" else None
-    if uncallable:
+        return _no_way(world, bare, reason, why, by)
+    assert order is not None
+    if stage == UNCALLABLE:
         # a seat for a model the harbour's settings cannot call (package 67): refused in
         # words before the World, the settings' model named to the director alone
         log.append(
@@ -1950,8 +1721,8 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         inputs = getattr(world, "inputs", None)
         if road == INPUT and inputs and inputs[-1].get("director_order") == text:
             inputs.pop()  # nothing given: a replay, with no harbour beside it, gives nothing
-        return f"Refused: {uncallable}."
-    if b.acts >= acts_allowed and not free:
+        return f"Refused: {why}."
+    if stage == OVER:
         words = (
             f"The day's budget of {acts_allowed} acts is spent: nothing more is performed "
             "until the next day of the ship's time. The order was not given."
@@ -1962,44 +1733,54 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         if b.held_until is None:
             _hold(world, f"The day's budget of {acts_allowed} acts is spent")
         return words
-    reach_why = world_orders.reach(world, order)
-    if reach_why:
+    if stage == REACH:
         # the rule of reach (spec M7b §9; package 52): a refusal in words, the stations held
         # named, so that the director knows whom it may speak as
         log.append(
             director_hull(world),
-            f"Refused by the rule of reach: {order.text} ({reach_why})",
+            f"Refused by the rule of reach: {order.text} ({why})",
             kind="director.refused",
             by=by,
         )
         if world_orders.is_hand(order):
             # the hand (package 62): no order through a captain a model or the player holds
             return (
-                f"Refused, by the rule of reach: {reach_why}. The director gives no order "
+                f"Refused, by the rule of reach: {why}. The director gives no order "
                 "through a captain a model or the player holds."
             )
         return (
-            f"Refused, by the rule of reach: {reach_why}. The director speaks as, moves and "
+            f"Refused, by the rule of reach: {why}. The director speaks as, moves and "
             "binds nobody a model or the player holds; the stations held now: "
             f"{world_orders.held_words(world)}."
         )
-    if brief is not None:
-        why = brief.limit_of(world, order)
-        if why:
+    if stage == LIMIT:
+        log.append(
+            director_hull(world),
+            f"Refused by the brief: {order.text} ({why})",
+            kind="director.refused",
+            by=by,
+        )
+        return f"Refused, outside the brief: {why}. The limits are the player's own."
+    if stage == MALFORMED:
+        return _no_way(world, order.text, order.reason, why, by)
+    reached = _reached_words(judgement)
+    if order.channel == "follow":
+        # `follow "X"` at the director's seat (package 82, item 6): the drivers' centre
+        # moved as the console moves it, a driver's line journaled with the director as its
+        # source, no world order and no act; judged as every order is (it is the player's
+        # prompt that moves), and written in the log as reaching it
+        try:
+            e = world.follow(_follow_words(order.text) or "", source=by or SOURCE)
+        except ValueError as err:
             log.append(
-                director_hull(world),
-                f"Refused by the brief: {order.text} ({why})",
-                kind="director.refused",
-                by=by,
+                director_hull(world), f"Refused: {text} ({err})", kind="director.refused", by=by
             )
-            return f"Refused, outside the brief: {why}. The limits are the player's own."
-    # the form checked before the doubt (package 68; the cold review of 2026-10-22, R-41):
-    # a malformed order is answered honestly in words, never "doubted" alone, so that a
-    # doubted order is one that can be performed when entered again
-    malformed = world_orders.form_error(world, order)
-    if malformed:
-        return _no_way(world, order.text, order.reason, malformed, by)
-    doubted = world_orders.doubt(world, order)
+            return f"Refused: {err}."
+        log.append(
+            director_hull(world), f"{e.text.rstrip('.')}{reached}.", kind="director.follow", by=by
+        )
+        return e.text
+    doubted = why if stage == DOUBT else ""
     if doubted and order.reason and not _doubt_shown(world, order.text):
         # a reason given on the first entry answers no doubt the director has seen (R-41: a
         # man carried nine miles ashore in a minute): the doubt is shown, and the order is
@@ -2022,6 +1803,34 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         e = world._apply_world_order(order.text, SOURCE)  # the input is this door's own
     result = str(e.data.get("result") or "")
     done = e.text.removeprefix(f"World order ({SOURCE}): ").rstrip(".")
+    if result == "failed":
+        # failed inside (package 118): nothing of it was done, no act is spent, and the log
+        # says so; the words are the plain truth of it, never that the game cannot do it
+        from freesail.core.world import FAILED_PART_WORDS, FAILED_WORDS
+
+        if done.startswith(FAILED_PART_WORDS):
+            why = done.removeprefix(FAILED_PART_WORDS).rstrip(".")
+            log.append(
+                director_hull(world),
+                f"Failed part-way, what it had done stands: {order.text} ({why})",
+                kind="director.failed",
+                by=by,
+            )
+            return (
+                f"Failed: the order failed part-way on the world itself ({why}); what it "
+                "had done by then stands, and the play log carries it. No act is spent."
+            )
+        why = done.removeprefix(FAILED_WORDS).rstrip(".")
+        log.append(
+            director_hull(world),
+            f"Failed, nothing of it done: {order.text} ({why})",
+            kind="director.failed",
+            by=by,
+        )
+        return (
+            f"Failed: the order was tried and failed inside, and nothing of it was done "
+            f"({why}). No act is spent. The world is as it was."
+        )
     if result != "done":
         why = done.removeprefix("not carried out: ")
         return _no_way(world, order.text, order.reason, why, by)
@@ -2031,13 +1840,16 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
         log.append(
             director_hull(world),
             f"Entered again with a reason: {order.text}; the doubt: {doubted or 'none'}; the "
-            f"reason: {order.reason}; performed: {done}",
+            f"reason: {order.reason}; performed: {done}{reached}",
             kind="director.reentered",
             by=by,
         )
     else:
         log.append(
-            director_hull(world), f"Given: {order.text}; {done}", kind="director.order", by=by
+            director_hull(world),
+            f"Given: {order.text}; {done}{reached}",
+            kind="director.order",
+            by=by,
         )
     tail = ""
     if b.acts >= acts_allowed and not free:
@@ -2051,7 +1863,26 @@ def direct(world: Any, text: str, by: str = "", road: str = ACT) -> str:
     )
 
 
+def _judged_on(world: Any) -> Callable[[], Any]:
+    """The world a director's order is judged on at the door (package 118): a copy of it,
+    made once the order has come as far as its judgement, so that a hull a judgement makes
+    on the way is made on the copy and the world itself is not touched by the judging; the
+    world itself where it cannot be copied (as before)."""
+
+    def on() -> Any:
+        from freesail.core.replay import trial_copy
+
+        copy = trial_copy(world)
+        return world if copy is None else copy
+
+    return on
+
+
 DRY_RUN_HEAD = "Dry run, nothing performed and no act spent:"
+
+
+class _NotCopied(Exception):
+    """The dry run's copy of the world could not be made: its words are the reason."""
 
 
 _FOLLOW = re.compile(r"^\s*follow\s+(?P<who>\"[^\"]*\"|[\w' -]+?)\s*\.?\s*$", re.I)
@@ -2067,14 +1898,67 @@ def dry_run(world: Any, text: str) -> str:
     """**The dry run** (package 58a; the cold review of 2026-10-22, R-42, the lugger
     director's ask that would make "the most difference"): what a world order would do,
     its doubt or its refusal, in the channel's own order of judgement (the day's budget,
-    the rule of reach, the brief's limits, the form, the doubt), performing nothing,
-    writing nothing in any log and spending no act. What it would do is read by performing
-    it on a copy of the world, which is then let go; the world itself is not touched, so a
-    replay is the same with the dry run or without. The doubt it shows is not a doubt on
-    the record (`_doubt_shown`): entered, the order is doubted there, and then entered
-    again with its [reason: ...] it is performed."""
+    the rule of reach, the brief's limits, the form, the doubt: the door's own sequence,
+    `_read`), performing nothing, writing nothing in any log and spending no act. It is
+    judged and tried on a copy of the world, which is then let go; the world itself is
+    not touched, so a replay is the same with the dry run or without. The doubt it shows
+    is not a doubt on the record (`_doubt_shown`): entered, the order is doubted there,
+    and then entered again with its [reason: ...] it is performed."""
     text = " ".join(str(text).split())
+    brief = brief_of(world)
+    acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
+    # the day's counts as they stand, read without renewing them (nothing is changed)
+    state = getattr(world, "director_state", None)
+    today = state is not None and isinstance(state, DayBudget) and state.day == day_of(world)
+    acts_used = state.acts if today else 0
+    held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
     followed = _follow_words(text)
+    copied: list[Any] = []
+
+    def on() -> Any:
+        # the copy the order is judged and tried on; where the world cannot be copied the
+        # order is neither judged nor tried, and the dry run says so (package 109): the
+        # world itself is never judged on by a dry run
+        copied.append(_copy(world))
+        if isinstance(copied[0], str):
+            raise _NotCopied(copied[0])
+        return copied[0]
+
+    try:
+        stage, why, order, _judgement, free = _read(
+            world,
+            text,
+            acts_used,
+            acts_allowed,
+            held_now,
+            on=None if followed is not None else on,  # `follow` is read, never made
+        )
+    except _NotCopied as e:
+        return (
+            f"{DRY_RUN_HEAD} it could not be tried: {str(e).removeprefix(NOT_TRIED)}. What "
+            "it would do is not known until it is entered; entered, it is judged as every "
+            "order is, and its answer says what it did."
+        )
+    if stage == NO_FORM:
+        return (
+            f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}. "
+            "The library's grammar topic lists the forms ('the world orders'), each with "
+            "examples."
+        )
+    assert order is not None
+    if stage == UNCALLABLE:
+        return f"{DRY_RUN_HEAD} it would be refused: {why}."
+    if stage == OVER:
+        return (
+            f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
+            "is spent until the next day of the ship's time."
+        )
+    if stage == REACH:
+        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {why}."
+    if stage == LIMIT:
+        return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {why}."
+    if stage == MALFORMED:
+        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why.rstrip('.')}."
     if followed is not None:
         # `follow` (package 82, item 6): read on the world as the drivers would, nothing moved
         from freesail.world.orders import WorldOrderError, hull_named
@@ -2096,42 +1980,9 @@ def dry_run(world: Any, text: str) -> str:
             f"{DRY_RUN_HEAD} it would be performed as a driver's line, no act spent: the "
             f"drivers would follow the {name}, her readings, her log and her chart theirs."
         )
-    brief = brief_of(world)
-    acts_allowed = brief.acts_a_day if brief is not None else DEFAULT_ACTS_A_DAY
-    bare, reason = world_orders.split_reason(text)
-    try:
-        order = world_orders.parse(text)
-    except world_orders.WorldOrderError as e:
-        return (
-            f"{DRY_RUN_HEAD} the game has no way to do this as said: {str(e).rstrip('.')}. "
-            "The library's grammar topic lists the forms ('the world orders'), each with "
-            "examples."
-        )
-    free = order.channel == "say" and pending_for(
-        world, getattr(world_orders.say_as_person(world, order.text), "name", "")
-    )
-    # the day's counts as they stand, read without renewing them (nothing is changed)
-    state = getattr(world, "director_state", None)
-    today = state is not None and isinstance(state, DayBudget) and state.day == day_of(world)
-    acts_used = state.acts if today else 0
-    held_now = bool(today and state.held_until is not None and world.clock.tick < state.held_until)
-    if held_now or (acts_used >= acts_allowed and not free):
-        return (
-            f"{DRY_RUN_HEAD} it would not be given: the day's budget of {acts_allowed} acts "
-            "is spent until the next day of the ship's time."
-        )
-    reach_why = world_orders.reach(world, order)
-    if reach_why:
-        return f"{DRY_RUN_HEAD} it would be refused, by the rule of reach: {reach_why}."
-    if brief is not None:
-        why = brief.limit_of(world, order)
-        if why:
-            return f"{DRY_RUN_HEAD} it would be refused, outside the brief: {why}."
-    malformed = world_orders.form_error(world, order)
-    if malformed:
-        return f"{DRY_RUN_HEAD} the game has no way to do this as said: {malformed.rstrip('.')}."
-    doubted = world_orders.doubt(world, order)
-    would = _would_do(world, order.text)
+    doubted = why if stage == DOUBT else ""
+    copy = copied[0] if copied else _copy(world)
+    would = copy if isinstance(copy, str) else _would_do(copy, order.text)
     if would.startswith(NOT_TRIED):
         # an order that could not be tried is never said to be performed (package 109)
         why = would.removeprefix(NOT_TRIED)
@@ -2152,6 +2003,16 @@ def dry_run(world: Any, text: str) -> str:
     if would.startswith("not carried out: "):
         why = would.removeprefix("not carried out: ")
         return f"{DRY_RUN_HEAD} the game has no way to do this as said: {why}."
+    from freesail.core.world import FAILED_WORDS
+
+    if would.startswith(FAILED_WORDS):
+        # it fails inside on the copy (package 118): entered, it fails the same way, and
+        # nothing of it is done
+        why = would.removeprefix(FAILED_WORDS)
+        return (
+            f"{DRY_RUN_HEAD} it would fail inside, and nothing of it would be done: {why}. "
+            "No act would be spent."
+        )
     cost = "an answer, counted against nothing" if free else "one of the day's acts"
     left = acts_allowed - acts_used
     return (
@@ -2164,24 +2025,28 @@ def dry_run(world: Any, text: str) -> str:
 NOT_TRIED = "not tried: "
 
 
-def _would_do(world: Any, text: str) -> str:
-    """The words a world order would leave in the driver's line, read by performing it
-    on a copy of the world (the checkpoint's own pickling, `core.replay`), which is let
-    go; `NOT_TRIED` and the reason where it could not be tried. The copy is of the World
-    whatever handle the dry run was given: the director's tools hold his hull (package 97),
-    and a pickle rooted at a hull made the hull before its World, whose rebinding then
-    failed, so that every dry run said 'would be performed' in play (package 109)."""
-    import io
-
+def _copy(world: Any) -> Any:
+    """A copy of the world to judge and try an order on (the checkpoint's own pickling,
+    `core.replay`), let go after; `NOT_TRIED` and the reason, in words, where the world
+    cannot be copied. The copy is of the World whatever handle the dry run was given: the
+    director's tools hold his hull (package 97), and a pickle rooted at a hull made the
+    hull before its World, whose rebinding then failed, so that every dry run said 'would
+    be performed' in play (package 109)."""
     from freesail.core import replay
-    from freesail.world.hulls import world_of
 
     try:
-        copy = replay._Unpickler(io.BytesIO(replay.checkpoint_bytes(world_of(world)))).load()
-        replay._rebind(copy)
+        # the copy's same hull for a hull's handle, so that the order runs on the copy
+        # under the hull it runs under on the world (package 118); `dry_run` set on it, so
+        # that a form that writes a file writes none on the copy (74)
+        return replay.trial_copy(world, raising=True)
     except Exception as e:  # noqa: BLE001  (a world that cannot be copied: said so)
         return f"{NOT_TRIED}the world could not be copied to try it ({type(e).__name__})"
-    copy.__dict__["dry_run"] = True  # a form that writes a file writes none on the copy (74)
+
+
+def _would_do(copy: Any, text: str) -> str:
+    """The words a world order would leave in the driver's line, read by performing it on
+    the dry run's copy of the world (`_copy`); `NOT_TRIED` and the reason where it failed
+    when it was tried."""
     try:
         e = copy._apply_world_order(text, SOURCE)
     except Exception as e:  # noqa: BLE001  (the order failed on the copy: said so)

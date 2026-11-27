@@ -42,5 +42,10 @@ on_fail: {log: "Could not let go {anchor}: {reason}.", kind: evolution.failed, s
 # 1808, 'Anchoring', p. 97: "Hands stationed at the Stopper and Shank Painter, and every
 # thing clear of the Range of the Cable"; Luce 1884 ch. XX, the forecastlemen "the head,
 # anchors and headsails"). A dozen: judgement.
-crew: {hands: 12, rating: ordinary, stations: [forecastle]}
+# Package 116 (card 5, the lead's word of 2026-11-16): `too_few: all hands`, the form of the
+# settee's files and the boat's (`hands.CrewRequest.calls_all_hands`): a watch on deck too few
+# to begin it at all calls all hands for it, piped down when she is brought up. The merchant
+# brig's larboard watch of three, with her master, was four against the half of eleven the
+# work begins at, and the anchor waited for ever (docs/dev/TuningNotes.md).
+crew: {hands: 12, rating: ordinary, stations: [forecastle], too_few: all hands}
 source: "Luce 1866, ch. XXXIV Anchoring, pp. 568-569, 574; Lever 1808, 'Anchoring', p. 97 (fig. 519: 'the proper Scope of cable is veered away according to the strength of the wind, the Stopper is clapped on forwards, the Bight of the Cable thrown over the Bitts')"

@@ -1875,7 +1875,9 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "world_order",
-            "The director's hand: an order to the world, not to any ship, in "
+            "The director's hand: an order to the world, the player's own ship being "
+            "part of it (a thing found aboard her, her captain's intent, a strike and "
+            "'follow' reach her, and your log says so), in "
             "the channel's words ('weather: ...', 'ship: ...', 'ship \"X\": intent ...', "
             "'aboard: ...', 'message: ...', 'port <id>: ...', 'mark: ...', 'person: make "
             "\"<name>\", ...', 'person: \"<name>\" comes aboard as <station>', 'say as "

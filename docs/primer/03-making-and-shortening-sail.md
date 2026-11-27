@@ -202,24 +202,26 @@ rig out the weather fore topmast studdingsail
 
 ### How close they may be carried
 
-Luce: the weather topmast and topgallant studding sails may be set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam" (Luce 1866, ch. XXIII; Luce 1884, ch. XXIII). The game refuses none of it. The wind does: forward of its angle a studding sail's lift falls away over a point and it shakes in its gear, the snatching comes on its boom, and kept so the boom carries away. The frigate in 13 knots of wind with her five weather studding sails drawing at nine points, brought up to six:
+Luce: the weather topmast and topgallant studding sails may be set "with the wind one point free, or forming an angle of seven points with the keel", the lower studding sail "only ... with the wind abaft the beam" (Luce 1866, ch. XXIII; Luce 1884, ch. XXIII). The game refuses none of it. The wind does: forward of its angle a studding sail's lift falls away over a point and it shakes in its gear, the snatching comes on its boom, and kept so the boom carries away. The frigate in 15 knots of wind with her five weather studding sails drawing at nine points, brought up to six and her sails trimmed each minute:
 
 ```
-  Morning watch (04:38)  Order: steer 292.
-* Morning watch (04:38)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
-* Morning watch (04:38)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
-* Morning watch (04:39)  Starboard fore topmast studdingsail shaking in its gear; she is too near the wind to carry it.
+  Morning watch (04:35)  Order: steer 292.
+* Morning watch (04:35)  Starboard fore lower studdingsail shaking in its gear; she is too near the wind to carry it.
+* Morning watch (04:35)  Starboard fore lower studdingsail boom whipping as the starboard fore lower studdingsail flogs; she is too near the wind for it.
   ...
-* Morning watch (04:39)  Starboard fore topmast studdingsail boom whipping as the starboard fore topmast studdingsail flogs; she is too near the wind for it.
-! Morning watch (04:40)  Starboard main topmast studdingsail boom carried away; the starboard main topmast studdingsail hanging to leeward.
-! Morning watch (04:41)  Starboard fore topmast studdingsail boom carried away; the starboard fore topmast studdingsail hanging to leeward.
-  Morning watch (04:43)  Order: steer 259.
-  Morning watch (04:44)  Starboard fore topgallant studdingsail drawing again.
-  Morning watch (04:44)  Starboard main topgallant studdingsail drawing again.
-  Morning watch (04:44)  Starboard fore lower studdingsail drawing again.
+* Morning watch (04:35)  Starboard fore topgallant studdingsail shaking in its gear; she is too near the wind to carry it.
+  ...
+* Morning watch (04:35)  Starboard fore topgallant studdingsail boom whipping as the starboard fore topgallant studdingsail flogs; she is too near the wind for it.
+  ...
+! Morning watch (04:37)  Starboard fore topgallant studdingsail boom carried away; the starboard fore topgallant studdingsail hanging to leeward.
+! Morning watch (04:38)  Starboard fore lower studdingsail boom carried away; the starboard fore lower studdingsail hanging to leeward.
+! Morning watch (04:39)  Starboard main topmast studdingsail boom carried away; the starboard main topmast studdingsail hanging to leeward.
+  Morning watch (04:39)  Order: steer 259.
+  Morning watch (04:39)  Starboard fore topmast studdingsail drawing again.
+  Morning watch (04:39)  Starboard main topgallant studdingsail drawing again.
 ```
 
-Two booms gone in three minutes; borne away to nine points again, the three still aloft draw. In 12 knots every boom whips and none goes in ten minutes; in 15 they go within minutes. A studding sail shaking in its gear also wears three times as fast as one drawing (below). Going about takes them in and the booms in before anything else (chapter 5).
+Three booms gone in four minutes; borne away to nine points again, the two still aloft draw. In 12 knots every boom whips and none goes in ten minutes, and in 13 none goes in half an hour; in 14 the first goes after a quarter of an hour, and in 15 within two minutes. A studding sail shaking in its gear also wears three times as fast as one drawing (below). Going about takes them in and the booms in before anything else (chapter 5).
 
 ## The ringtail, the save-alls and the water sail
 
@@ -393,6 +395,8 @@ A spar that carries away takes with it everything that stands on it or hangs fro
 `unbend` takes a sail out of a wreck where it hangs, to the sail room if it is whole, and `send down the <spar>` sends a spar's wreck down on deck: the same work as cutting it away, refused for a wreck that is over the side. A sound spar is not sent down by itself; the refusal names the order that sends it down with its fellows ("The fore topgallant mast stands sound; the topgallant masts go down together: 'send down the topgallant masts'.").
 
 Cleared, the spar is still gone. The ship remembers it until a spare is put in its place: a studding sail is not bent to a boom that carried away, nor its boom rigged out, and the refusal says why ("The larboard fore topmast studdingsail boom is carried away; shift it for a spare first."). **`shift the <spar>`** (or `... for a spare`) sends a spare of its class up from the booms, the spare spars stowed amidships ("the spare topmasts, yards, &c. stowed on the boat skids", Steel 1794), and rigs it as the old one was (Luce 1884, ch. XXXII Shifting Sails and Spars, 'To Shift a Topmast Studding-sail Boom', 'To Shift a Topsail Yard', 'To Shift a Topmast'); then the sail that belongs on it can be bent again. A spar that went with another waits for that one ("The fore topsail yard went with the fore topmast; shift the fore topmast first."). The frigate carries Luce's spares (1866, ch. XVII, 'Stowing Booms'): two topmasts, two stump topgallant masts, the fore and main topsail yards, four topmast studding-sail booms, a jib-boom and a flying jib-boom; the schooner a topmast, a topsail yard and two studding-sail booms. With none of the class aboard the shift is refused: "No spare studding-sail boom aboard; the dockyard must supply one." `the booms` (or `the spare spars`) at the prompt says what is left, as `the sail room` does for canvas.
+
+The work on a spar carried away (cutting away its wreck, shifting it, a jury mast) is the last claimant of her hands. Work ordered after it that is short of hands, or too few to begin, takes its hands: the spar's work is held where it stood, and the log says so ("Belayed clearing away the wreck of the fore topmast: hands to take in the mainsail."). It is taken up again where it stood once nothing else has waited for hands or gone on short for five minutes, with all hands called or without. A manoeuvre belays it as it belays the sail work in hand (chapter 6).
 
 ```orders frigate
 the booms

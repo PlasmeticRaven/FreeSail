@@ -160,10 +160,11 @@ def test_the_captains_station_has_the_players_whole_surface_and_the_deck_by_righ
 
 
 def test_the_captains_brief_head_says_the_voyage_the_ship_the_people_and_the_book():
-    """Spec M6 §3 (M4 §11 extended): the head's five items in order, and the situation
-    item opening with the voyage: the scenario's name, the intent or the book, the ship
-    and her nation, the people with their outlines; the authority item saying he has the
-    deck and carrying the book he inherits (the rules-based captain's state book)."""
+    """Spec M6 §3 (M4 §11 extended): the head's items in order, and the situation (the
+    first data turn after the brief since package 117) carrying the voyage: the scenario's
+    name, the intent or the book, the ship and her nation, the people with their outlines,
+    and the book he inherits (the rules-based captain's state book); the authority item
+    saying he has the deck."""
     world = scenario_world(INTENT)
     world.run(C.JUDGE_FIRST_S + 1)  # the rules-based captain enters his first state
     words = voyage_words(world)
@@ -175,14 +176,17 @@ def test_the_captains_brief_head_says_the_voyage_the_ship_the_people_and_the_boo
     brief = h.brief
     assert brief is not None
     text = brief.text()
-    assert text.index("This is a message from the harness") < text.index("The voyage: ")
+    situation = brief.situation
+    assert text.startswith("This is a message from the harness") and "The voyage: " in situation
+    assert "The voyage: " not in text
     assert "You have the deck, since" in text
-    assert "The captain's night orders" in text
+    assert "The captain's night orders" in text and "The captain's night orders" in situation
     # the in-port state's book is empty (the buying and the sailing are judgements): the
     # situation says the state through `the captain`, and the intent is in the voyage
-    assert "trade tin from Falmouth to Brest" in text
-    assert "  captain: " in text and "in port" in text
+    assert "trade tin from Falmouth to Brest" in situation
+    assert "  captain: " in situation and "in port" in situation
     assert h.turns[0].role == OPERATOR and h.turns[0].content == text
+    assert h.turns[1].content == brief.situation_turn()
     assert "primer 17" in text and "primer 16" in text
 
 
@@ -435,7 +439,7 @@ def test_the_session_a_station_is_told_is_true_and_no_captain_is_told_a_human_ca
     is told it is in a race, whatever its door asked (`tools/regatta.py` sets the desk's
     `race`; its local runner's test says so too)."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.agents.agent import (
@@ -460,7 +464,7 @@ def test_the_session_a_station_is_told_is_true_and_no_captain_is_told_a_human_ca
         app = create_app(driver, game="g", consent_records=records, saves_dir=tmp_path / "s")
         driver.desk.race = race
         said = {"model_name": weights, "door": "mcp"} | body
-        a = TestClient(app).post(f"/api/agents/{station}", json=said)
+        a = DoorClient(app).post(f"/api/agents/{station}", json=said)
         assert a.status_code == 200 and a.json()["phase"] == "station", a.text
         h = world.agents.get(station)
         if h is None:  # a station on another ship lives on her own World

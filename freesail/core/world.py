@@ -48,7 +48,7 @@ FOLLOWED_BODY = "at her truth"
 # `SAVE_FORMAT` do not move for it, and a save without a stamp is read as "unstamped,
 # before 37d" (`UNSTAMPED_WORDS`). A replay is promised only on the build that wrote the
 # save (`core.replay.load`): the same fingerprint.
-BUILD_NAME = "m6c"
+BUILD_NAME = "m7"
 BUILD_RULES_DIGITS = 16
 UNSTAMPED_WORDS = "unstamped, before 37d"
 
@@ -431,6 +431,7 @@ ORDER_ACTOR = "order_actor"
 
 
 class World:
+    _fog_said: tuple[Any, ...] | None = None  # a checkpoint's from before package 126
     # The log's `wind.shift` line (package 37c, the owner's ruling of 2026-10-03, closing
     # the M5 spec's open item 11): the ten-minute mean wind, as the readings and the
     # `a wind shift` event read it, two points from where the log last put it, and held
@@ -849,6 +850,9 @@ class World:
         self.glass: Any = None
         self.conditions: Any = None  # the sky and the weather at the ship, once a minute
         self._last_conditions: Any = None
+        # the fog's last step said (tick, thicker, its words' key, the sight said), for the quiet
+        # between two (`_say_the_fog`); None before any, and in a checkpoint written before
+        self._fog_said: tuple[int, bool, str, str] | None = None
         self.sea: Any = None  # the sea and the motion (spec M5 §4), made below
         self.motion: Any = None
         if self.scenario.systems or self.scenario.climatology:
@@ -1299,7 +1303,10 @@ class World:
                 said = self._recurring_said = {}
             if sev is Severity.NOTABLE and said.get(kind) == text:
                 sev = Severity.ROUTINE  # the same words again: no news (package 58a)
-            said[kind] = text
+            if not (data or {}).get("turn_wait"):
+                # a wait behind other work (`runner.TURN_WAIT`), routine of itself, is no part
+                # of the memory: the lines about it keep the severity they had without it
+                said[kind] = text
         e = self.log.append(
             Event(
                 tick=self.clock.tick,
@@ -1734,22 +1741,67 @@ class World:
         return self._apply_world_order(text, source, by)
 
     def _apply_world_order(self, text: str, source: str, by: str = "") -> Event:
+        """**A world order runs whole or not at all** (package 118, item 2): the one door
+        every world order goes through (the director's, the owner's live order, the
+        scenario's, an act given again). The order is tried first on a copy of the world
+        (the checkpoint's own pickling, `core.replay.trial_copy`), and performed on the
+        world itself only where the copy did it: one refused there is refused in its own
+        words, and one that failed inside (any error, not the channel's refusal) is
+        answered "failed" in words, the world as it was; either way it is in the record
+        (`world_orders`, the driver's line). Before it, an order that failed part-way left
+        its first half done and no record of it (a passenger brought aboard, then the
+        station's binding raised). A world that is itself a copy (the dry run's, the
+        trial's) performs the order directly. A save written before this door replays its
+        orders by the door it was played under (`world_order_door_from`)."""
+        if self.clock.tick < int(self.__dict__.get("world_order_door_from") or 0):
+            return self._apply_world_order_before_118(text, source, by)
         from freesail.world import orders as world_orders
 
         channel = ""
         try:
-            # the reading inside the refusal's reach as the carrying out is (the cold review
-            # of 2026-11-14, 5.3 item 12; package 115 D4): a line that is no world order is
-            # refused in words, never raised through the console's or the socket's loop, and
-            # a replay of the journal gives the same refusal again
             order = world_orders.parse(text)
             channel = order.channel
             if by:
                 order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
-            words, data = world_orders.apply(self, order)
-            result = "done"
         except world_orders.WorldOrderError as e:
-            words, data, result = f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+            return self._world_order_record(
+                text, source, channel, f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+            )
+        if channel == "court":
+            # the world's own rule before the order (the lead's list of 2026-11-19): a court
+            # whose accused is dead or gone is dissolved at the next minute or at the next
+            # form that names the court, the form refused after it; that is the court's own
+            # doing and not the order's, so it is done here, on the world itself, and does not
+            # hang on the order being done on the copy
+            from freesail.world.court import dissolve_if_gone
+
+            dissolve_if_gone(self)
+        if not self.__dict__.get("dry_run"):
+            from freesail.core.replay import trial_copy
+
+            trial = trial_copy(self)
+            if trial is not None:
+                words, data, result = _performed(trial, order)
+                if result != "done":
+                    # refused or failed on the copy: the world itself is not touched
+                    return self._world_order_record(text, source, channel, words, {}, result)
+        words, data, result = _performed(self, order)
+        if result == "failed" and not self.__dict__.get("dry_run"):
+            # failed on the world itself, after the copy did it or where none could be made:
+            # what it had done by then stands, and the record says so (the reader of
+            # 2026-11-19: never "nothing of it was done" where something may have been)
+            words = FAILED_PART_WORDS + words.removeprefix(FAILED_WORDS)
+        return self._world_order_record(text, source, channel, words, data, result)
+
+    def _world_order_record(
+        self,
+        text: str,
+        source: str,
+        channel: str,
+        words: str,
+        data: dict[str, Any],
+        result: str,
+    ) -> Event:
         self.world_orders.append(
             {
                 "tick": self.clock.tick,
@@ -1767,6 +1819,25 @@ class World:
             data={"order": text, "source": str(source), "channel": channel, "result": result}
             | data,
         )
+
+    def _apply_world_order_before_118(self, text: str, source: str, by: str = "") -> Event:
+        """The door as it was before package 118, for the orders of a save written under it
+        (a replay's): the order performed on the world itself, and an error that is not the
+        channel's refusal raised out of it with its first half done and nothing recorded,
+        as the play had it (the replay passes it by, `core.replay`)."""
+        from freesail.world import orders as world_orders
+
+        channel = ""
+        try:
+            order = world_orders.parse(text)
+            channel = order.channel
+            if by:
+                order = world_orders.WorldOrder(order.channel, order.text, order.reason, str(by))
+            words, data = world_orders.apply(self, order)
+            result = "done"
+        except world_orders.WorldOrderError as e:
+            words, data, result = f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+        return self._world_order_record(text, source, channel, words, data, result)
 
     def _tick_world_orders(self) -> None:
         """The scenario's world orders due at this tick, in their order (a function of
@@ -1839,11 +1910,53 @@ class World:
             if self.glass is not None:
                 self.glass.mark_watch()  # the reference for the first change of the watch
 
+    def _say_the_fog(self, now: Any, was: Any) -> None:
+        """The fog's sight closing or opening, said a step at a time from the sight the log
+        last said of it (`_fog_said`). A step is put off within `FOG_LINE_QUIET_S` of a step
+        the other way, or of the same words (the lead's list, B3: off Ushant "The fog is
+        thickening." and a minute later "The fog is thinning."), and said when the quiet is
+        over if the sight is not back where the log left it: the sight is read as it is, and
+        the log says the fog's turn once it has held."""
+        from freesail.world.weather import FOG_LINE_QUIET_S, FOG_LINES, VISIBILITY_NM
+
+        said = self._fog_said
+        if said is not None and len(said) < 4:  # a mark from before it kept the sight
+            said = (*said, was.visibility)
+        last = str(said[3]) if said is not None else str(was.visibility)
+        if last not in VISIBILITY_NM or now.visibility == last:
+            return
+        thicker = VISIBILITY_NM[now.visibility] < VISIBILITY_NM[last]
+        # notable where the sight a ship is handled by has changed: shut in thick, or first
+        # opening from a cable; the steps between are routine
+        key = (
+            ("thick" if now.visibility == "a cable" else "thickening")
+            if thicker
+            else ("clearing" if last == "a cable" else "thinning")
+        )
+        if (
+            said is not None
+            and self.clock.tick - int(said[0]) < FOG_LINE_QUIET_S
+            and (bool(said[1]) != thicker or said[2] == key)
+        ):
+            return  # put off: said when the quiet is over, if it has held
+        self._fog_said = (self.clock.tick, thicker, key, now.visibility)
+        self.record(
+            Severity.NOTABLE if key in ("thick", "clearing") else Severity.ROUTINE,
+            "weather.fog",
+            FOG_LINES[key],
+            data={
+                "weather": now.weather,
+                "visibility": now.visibility,
+                "was": last,
+                "fog": float(getattr(now, "fog", 0.0)),
+            },
+        )
+
     def _tick_weather(self) -> None:
         """The minute's weather lines: the sky and the weather when they change, the
         hour's line with the glass, and at the watch's change the glass's fall or rise
         since the watch before (spec M5 §5). No line names a front or a centre."""
-        from freesail.world.weather import WEATHER_LINES
+        from freesail.world.weather import FOG_LINES, VISIBILITY_NM, WEATHER_LINES
 
         self._observe_weather()
         t = self.clock.ship_time
@@ -1858,12 +1971,25 @@ class World:
             )
         if was is not None and now.weather != was.weather:
             text = WEATHER_LINES.get((was.weather, now.weather)) or WEATHER_LINES[now.weather]
+            if now.weather == "fog" and 0.0 < float(getattr(now, "fog", 0.0)) < 1.0:
+                text = FOG_LINES["settling"]  # it comes on by degrees
+            elif was.weather == "fog" and now.weather != "fine":
+                # gone into other weather (behind a front): it lifted, and the weather said
+                text = f"{WEATHER_LINES[('fog', 'fine')]} {text}"
+            # the sight the log last said of a fog: as it settles, and none once it is gone
+            self._fog_said = (
+                (self.clock.tick, True, "settling", now.visibility)
+                if now.weather == "fog"
+                else None
+            )
             self.record(
                 Severity.NOTABLE if now.weather == "fog" else Severity.ROUTINE,
                 "weather.change",
                 text,
                 data={"weather": now.weather, "was": was.weather, "visibility": now.visibility},
             )
+        elif was is not None and now.weather == "fog" and now.visibility in VISIBILITY_NM:
+            self._say_the_fog(now, was)
         self._last_conditions = now
         if t.minute != 0:
             return
@@ -2671,6 +2797,11 @@ class World:
             # M5 §26, package 36); a replay applies the scenario's again from the scenario
             # and the harness's from `inputs`
             "world_orders": [dict(o) for o in self.world_orders],
+            # the door the world orders went through (package 118): 2, whole or not at all;
+            # a save without it was played under the door before, and a game loaded from
+            # one keeps that door for the ticks it was played under
+            "world_order_door": 2,
+            "world_order_door_from": int(self.__dict__.get("world_order_door_from") or 0),
             # the player's pencil on the chart (package 37n), for the chart alone; a replay
             # makes none of it, and the door that draws the chart takes it up from here
             "chart_marks": [dict(m) for m in self.chart_marks],
@@ -2959,3 +3090,25 @@ def _hundredths(change_in: float) -> str:
     else:
         amount = f"{n} hundredths"
     return f"{verb} {amount}"
+
+
+def _performed(world: Any, order: Any) -> tuple[str, dict[str, Any], str]:
+    """A world order performed on `world`: (its words, its data, its result), the result
+    "done", "refused" (the channel's refusal in its own words) or "failed" (an error inside
+    it, in words; package 118)."""
+    from freesail.world import orders as world_orders
+
+    try:
+        words, data = world_orders.apply(world, order)
+        return words, data, "done"
+    except world_orders.WorldOrderError as e:
+        return f"not carried out: {str(e).rstrip('.')}", {}, "refused"
+    except Exception as e:  # noqa: BLE001  (any error inside an order: failed, in words)
+        why = str(e).rstrip(".") or type(e).__name__
+        return f"{FAILED_WORDS}{why}", {}, "failed"
+
+
+# The words of a world order that failed inside (package 118): nothing of it is done.
+FAILED_WORDS = "failed, and nothing of it was done: "
+# ... and of one that failed on the world itself, part-way: what it had done stands.
+FAILED_PART_WORDS = "failed part-way, and what it had done by then stands: "

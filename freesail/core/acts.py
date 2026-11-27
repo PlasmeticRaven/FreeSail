@@ -444,11 +444,15 @@ def _world_order(world: Any, station: str, payload: Any) -> None:
     channel with its source, as the tool did (its line is the driver's, written by the
     carrying out; the director's log's entries are the station's notes, given apart)."""
     d = payload or {}
-    world._apply_world_order(str(d.get("text") or ""), str(d.get("source") or "the director"))
+    e = world._apply_world_order(str(d.get("text") or ""), str(d.get("source") or "the director"))
     from freesail.agents import director as director_mod
 
-    if d.get("source") == director_mod.SOURCE:
-        director_mod.budget_of(world).acts += 1  # the day's count, as the tool counted it
+    done = str((getattr(e, "data", None) or {}).get("result") or "") == "done"
+    if d.get("source") == director_mod.SOURCE and done:
+        # the day's count, as the door counted it: only an order done spends an act
+        # (package 118: a refused one was counted here and not in play, and a replay could
+        # be held by a budget the play was not)
+        director_mod.budget_of(world).acts += 1
 
 
 # Appliers for acts of other kinds (`record`), by kind: `fn(world, station, payload)`.
@@ -495,10 +499,21 @@ def decode(v: Any) -> Any:
             module, _, name = str(v["__class__"]).partition(":")
             if not module.startswith("freesail."):
                 raise ValueError(f"an act names {module}:{name}, which an act may not hold")
+            # a record of the game's, defined in that module of the game by that name
+            # (package 115, part B: the same cause as the checkpoint's, a name from a file
+            # walked through whatever a module of the game imports; no walk now leaves the
+            # module the name says, and nothing but a record class is made)
             cls: Any = importlib.import_module(module)
             for part in name.split("."):
-                cls = getattr(cls, part)
-            if not dataclasses.is_dataclass(cls):
+                cls = cls.__dict__.get(part) if isinstance(cls, type) else vars(cls).get(part)
+                if cls is None:
+                    break
+            if (
+                not isinstance(cls, type)
+                or not dataclasses.is_dataclass(cls)
+                or cls.__module__ != module
+                or cls.__qualname__ != name
+            ):
                 raise ValueError(f"an act names {module}:{name}, which is no record of the game")
             return cls(**{k: decode(x) for k, x in v["fields"].items()})
         return {k: decode(x) for k, x in v.items()}

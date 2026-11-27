@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from freesail.evolutions.scripts import PhasedScript
+from freesail.evolutions.scripts import PhasedScript, helm_words
 from freesail.ship import parts
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, LineState, Spar
@@ -914,7 +914,9 @@ class RelievingTacklesScript(PhasedScript):
     tiller's end below and manned there; at its end the helm answers again, steered from the
     gunroom by the tackles (the cold review of 2026-11-14, 5.3 item 8; package 115 D4 (e): the
     hit's own line promised it and nothing kept the promise). What steering she has
-    meanwhile is the physics' as before (the rudder held where it was)."""
+    meanwhile is the physics' as before (the rudder held where it was). On a hull steered by a
+    tiller, the tiller shot away, they are hooked to its stump and manned on deck: its words
+    are her helm's (`helm_words`; package 90, A3), its time and its hands the same."""
 
     holds_subject = False
 
@@ -928,12 +930,29 @@ class RelievingTacklesScript(PhasedScript):
             return "the helm answers; there is no need of the relieving tackles"
         return None
 
+    def standing(self, words: dict[str, Any]) -> str | None:
+        """Through the work: the helm is still shot away. It may be mended while the tackles
+        lie held (the two hold different gear), and then they are not taken up again."""
+        if not self.ship.extra.get("helm_lost"):
+            return f"{helm_words(self.ship)['mended']}; the relieving tackles are not wanted"
+        return None
+
     def begin(self, words: dict[str, Any]) -> None:
         self.start_phases(["reeve"])
 
+    unwanted = False
+
     def end_phase(self, name: str) -> None:
         lost = self.ship.extra.pop("helm_lost", None)
-        self.ship.extra["helm_by_tackles"] = str(lost or "the wheel shot away")
+        if lost is None:
+            # the helm mended while they were reeving (package 116; the reader's finding):
+            # she steers by it, and the tackles are not wanted
+            self.unwanted = True
+            return
+        self.ship.extra["helm_by_tackles"] = str(lost or helm_words(self.ship)["lost"])
+        # by the tackles she answers at a share of the wheel's rate (package 116, card 5:
+        # the file's `helm_rate_share`, read by `physics.hull.steer`)
+        self.ship.extra["helm_rate_share"] = self.timing_value("helm_rate_share", 0.5)
 
     def left_words(self) -> str | None:
         """Belayed before they are rove: what is so (the lead's reading of part D at
@@ -941,10 +960,62 @@ class RelievingTacklesScript(PhasedScript):
         return "the tackles not rove, the helm lost as the shot left it"
 
     def words(self) -> dict[str, Any]:
-        return {
-            "done": "The relieving tackles are rove to the tiller and manned below: the helm "
-            "answers again, steered by the tackles.",
-        }
+        helm = helm_words(self.ship)
+        if self.unwanted:
+            mended = helm["mended"]
+            done = f"{mended[0].upper()}{mended[1:]}; the relieving tackles are not wanted."
+        else:
+            done = helm["tackles_rove"]
+        return {"begin": helm["tackles_begin"], "done": done}
+
+
+class RepairWheelScript(PhasedScript):
+    """The wheel repaired (package 116, card 5): one phase, `mend`, new wheel-ropes rove and
+    the wheel made good by the carpenter's crew; at its end she steers by the wheel again at
+    the wheel's rate, and the relieving tackles, if they were rove, are cast off
+    (`helm_lost`, `helm_by_tackles` and `helm_rate_share` cleared). Ordered with the tackles
+    rove or without them: without, the rudder is held where the shot left it until it is
+    done. The wheel made good can be shot away again (`combat.hits`). On a hull steered by a
+    tiller it is the spare tiller shipped in the rudder head, and named so (`work`): its words
+    are her helm's (`helm_words`; package 90, A3), its time and its hands the same."""
+
+    holds_subject = False
+
+    DEFAULTS = {"mend": 1800.0}
+
+    def holds(self) -> set[str]:
+        return {helm_words(self.ship)["holds"]}
+
+    @classmethod
+    def work_of(cls, ship: Ship) -> str | None:
+        return helm_words(ship)["mend"]
+
+    def check(self, words: dict[str, Any]) -> str | None:
+        extra = self.ship.extra
+        if not extra.get("helm_lost") and not extra.get("helm_by_tackles"):
+            return helm_words(self.ship)["whole"]
+        return None
+
+    def begin(self, words: dict[str, Any]) -> None:
+        self.start_phases(["mend"])
+
+    def end_phase(self, name: str) -> None:
+        self.by_tackles = bool(self.ship.extra.pop("helm_by_tackles", None))
+        self.ship.extra.pop("helm_lost", None)
+        self.ship.extra.pop("helm_rate_share", None)
+
+    by_tackles = False
+
+    def left_words(self) -> str | None:
+        left = helm_words(self.ship)["not_mended"]
+        if self.ship.extra.get("helm_by_tackles"):
+            return f"{left}, and she steers by the relieving tackles still"
+        return f"{left}, the helm lost as the shot left it"
+
+    def words(self) -> dict[str, Any]:
+        helm = helm_words(self.ship)
+        cast_off = "; the relieving tackles are cast off" if self.by_tackles else ""
+        return {"begin": helm["mend_begin"], "done": f"{helm['mend_done']}{cast_off}."}
 
 
 REPAIR_SCRIPTS: dict[str, type[PhasedScript]] = {
@@ -957,4 +1028,5 @@ REPAIR_SCRIPTS: dict[str, type[PhasedScript]] = {
     "rig_preventers": RigPreventersScript,
     "set_up_rigging": SetUpRiggingScript,
     "relieving_tackles": RelievingTacklesScript,
+    "repair_wheel": RepairWheelScript,
 }

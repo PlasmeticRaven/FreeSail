@@ -465,13 +465,17 @@ class Squadron:
         role = str(getattr(getattr(body, "brain", None), "role", "") or "")
         if role in ("kings-ship", "cruiser", "commodore"):
             return True
-        # the men of war by their descriptions (package 75 adds the new ships' keys)
+        # the men of war by their descriptions (package 75 adds the new ships' keys, and package
+        # 90 its three: docs/design/Plan-Package90.md §5.1 item 7)
         return str(getattr(body, "description", "") or "") in (
             "frigate",
             "brig-sloop",
             "sixty-four",
             "razee",
             "seventy-four",
+            "corvette",
+            "three-decker",
+            "xebec",
         )
 
     def stations(self, world: Any) -> dict[str, Position]:
@@ -1572,9 +1576,19 @@ COVER_NM = 2.0
 # data/captains/indiaman.yaml), and this one set makes a captor of every role in it as well
 # as a cover, so her cover of a straggler of her nation is left out with the captor's part
 _ARMED_ROLES = frozenset({"privateer", "cruiser", "kings-ship", "commodore", "revenue"})
-# package 75 adds the new ships' descriptions, keyed before their files come
+# package 75 adds the new ships' descriptions, keyed before their files come, and package 90
+# its three the same way (docs/design/Plan-Package90.md §5.1 item 7)
 _MAN_OF_WAR_DESCRIPTIONS = frozenset(
-    {"frigate", "brig-sloop", "sixty-four", "razee", "seventy-four"}
+    {
+        "frigate",
+        "brig-sloop",
+        "sixty-four",
+        "razee",
+        "seventy-four",
+        "corvette",
+        "three-decker",
+        "xebec",
+    }
 )
 
 
@@ -1634,6 +1648,8 @@ def _covered(world: Any, prey: Any) -> bool:
     for o in world.vessels.vessels:
         if o is prey or getattr(o, "done", False) or str(o.nation) != str(prey.nation):
             continue
+        if o.id == PLAYER_ID:
+            continue  # her own shadow: by her service below, not by her hull's word (pkg 121)
         brain = getattr(o, "brain", None)
         role = getattr(brain, "role", "") if brain is not None else ""
         if (
@@ -1647,9 +1663,12 @@ def _covered(world: Any, prey: Any) -> bool:
     ports = getattr(world, "dealings", None)
     own_nation = getattr(ports, "ship_nation", None) if ports is not None else None
     if shadow_pos is not None and own_nation == str(prey.nation):
-        from freesail.world.captains import _is_kings_ship
+        from freesail.world.service import kings_force
 
-        if R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM) and _is_kings_ship(world):
+        # the King's ships protect the trade; a privateer by her papers was not in that
+        # business (`service_of`; package 121), nor a prize under her prize-master
+        covering = kings_force(world)
+        if covering and R.still(world, prey, PLAYER_ID, R.SUPPORT, within_nm=COVER_NM):
             return True
     return False
 

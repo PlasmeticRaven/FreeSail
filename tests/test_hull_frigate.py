@@ -484,6 +484,24 @@ FILED = {
 }
 
 
+# Package 90, item 37 (step A0): her booms' ratings, kN, old beside new, each a pair but the
+# ringtail's (TuningNotes, "Package 90, A0").
+ITEM_37 = {
+    **{
+        f"{boom}.studdingsail_boom.{side}": ratings
+        for boom, ratings in (
+            ("fore.lower", (4.2, 4.9)),
+            ("fore.topmast", (5.6, 6.4)),
+            ("fore.topgallant", (1.8, 2.1)),
+            ("main.topmast", (7.0, 8.1)),
+            ("main.topgallant", (2.3, 2.6)),
+        )
+        for side in ("starboard", "larboard")
+    },
+    "ringtail_boom": (4.0, 4.6),
+}
+
+
 def without_the_drawing(doc):
     """Her document with what her lines may touch taken out: the profile, and each gun's `deck`
     and `height_m`. Each height is read by nothing in the engine (Build-Ships.md §5.3), so every
@@ -498,7 +516,8 @@ def without_the_drawing(doc):
 
 def test_no_figure_the_physics_or_the_gunnery_reads_moved(spec):
     """Her file against git at the commit before her lines: the whole document but the profile and
-    each gun's `deck` and `height_m`, every other key equal. The hull's figures are held here too,
+    each gun's `deck` and `height_m`, every other key equal but those a ruled move names, old
+    beside new (package 75's SW-4; package 90's item 37). The hull's figures are held here too,
     so that this bites on a checkout without that commit."""
     for key, value in FILED.items():
         assert getattr(spec, key) == value, key
@@ -525,6 +544,17 @@ def test_no_figure_the_physics_or_the_gunnery_reads_moved(spec):
         "fit": "amazon class 1795",
         "roles": ["kings-ship", "commodore"],
     }
+    # Package 90, item 37 (step A0; the owner's choice (a) of its question 2, 2026-11-18;
+    # docs/design/Design-Package90-Engine.md §1.5), old beside new: the generator's peak for
+    # the studding class read from the engine's curves, 1.44 for 1.25, so her studding-sail
+    # booms and her ringtail boom are rated as the rule intended. The eleven ratings it writes
+    # and no other, put back here only.
+    spars_old = {s["id"]: s for s in old["spars"]}
+    spars_new = {s["id"]: s for s in new["spars"]}
+    moved = {sid: (spars_old[sid]["rating_kn"], spars_new[sid]["rating_kn"]) for sid in ITEM_37}
+    assert moved == ITEM_37
+    for sid in ITEM_37:
+        spars_new[sid]["rating_kn"] = spars_old[sid]["rating_kn"]
     assert without_the_drawing(new) == without_the_drawing(old)
 
 

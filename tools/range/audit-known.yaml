@@ -234,13 +234,13 @@ known:
   owner: a data fault for milestone 7c
   reason: the description's one fit is of a later year than the day. An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
   most: 1
-- key: v-nation-unknown:cruiser.stations
-  what: the table is keyed by names the nations' table has not, each of which the business reads as a nation
-  years: 1792-1825
+- key: v-fit-ahead:corvette-20:carronadas de a 30 1810
+  what: a corvette sails the fit 'carronadas de a 30 1810' on days before 1810 (a scenario may name her)
+  years: 1792-1809
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'data/captains/cruiser.yaml: package 74''s prize keys (`mans_prizes`, `prize_crew_share`, `burns_when` and ten more) stand under `stations:` where the other doctrines have them under `thresholds:`, so the business reads thirteen of them as nations with stations (none is at war, so none is drawn) and the cruiser''s own prize doctrine is read by its defaults. The keys moved under `thresholds:` clear it. Found when the vessels'' check was made to stand on the tables'
-  most: 13
+  reason: the description's default fit is of a later year than the day (package 90, the Diana; her file's earlier fits, of 1807 and 1809, are a scenario's to name). An earlier fit, or an earlier class, for that description clears it by today's readers; a fit chosen by the day would want a reader first (u-ships)
+  most: 1
 - key: f-colours:britain
   what: she wears colours whose own dates do not hold the day's year (the colours' dates are read by nothing)
   years: 1792-1800
@@ -351,8 +351,8 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading)'
-  most: 17
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading). 17 before the Diana''s file (package 90), whose era notes date her building, her taking and her service'
+  most: 18
 - key: e-year:freesail/api/viewer_flags.py
   what: a year or a date fixed in the code
   years: 1792-1825
@@ -449,8 +449,8 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'the ship schema has no key for a year and no reader chooses a class or a fit by the day: no change of data clears a count of every ship file. When the schema has such a key the check must count the ship files that lack it, and the days on which a description has no ship afloat; the lead''s ruling C on the ground report'
-  most: 18
+  reason: 'the ship schema has no key for a year and no reader chooses a class or a fit by the day: no change of data clears a count of every ship file. When the schema has such a key the check must count the ship files that lack it, and the days on which a description has no ship afloat; the lead''s ruling C on the ground report. 18 before the Diana''s file (package 90), the nineteenth'
+  most: 19
 - key: u-trade
   what: who trades, in what, as a neutral or not, and at what price is one value for the range
   years: 1792-1825

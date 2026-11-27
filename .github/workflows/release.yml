@@ -2,14 +2,28 @@ name: gate release
 
 # A gate is packaged as a GitHub release. It is triggered in one of two ways:
 #
-# 1. A branch named gates/mN is created at the gate commit (this is how the
-#    build session does it: its credentials can push branches but not tags).
+# 1. A branch named gates/mN is created at the gate commit, or moved forward to it (this is
+#    how the build session does it: its credentials can push branches but not tags).
 # 2. Someone presses "Run workflow" on this workflow in the Actions tab and
 #    types the gate name, e.g. m0, to package the current commit of a branch.
 #
 # Either way the workflow re-runs the checks, tags the commit gate-mN, and
 # creates a release whose notes are docs/gates/gate-mN.md with a zip of the
 # whole project attached. See docs/gates/README.md.
+#
+# The checks are the whole suite's own (.github/workflows/whole-suite.yml): the lint, and
+# both tiers without the pace tests in six shards, each on its own runner. Until gate m7
+# they ran in one job; by then the suite had outgrown a job's six hours (the second
+# release run of gate m7 was five hours and fifty-eight minutes into its checks when it
+# was stopped), so they are sharded as the whole suite is (the owner, 2026-11-20:
+# "Sharding the release is fine"). The pace tests are not a gate here, as they are not
+# there: their floors are the build machine's, not a shared runner's.
+#
+# Every runner is pinned to ubuntu-24.04 as the whole suite's are (the lead, 2026-11-20):
+# the floating image is 26.04, whose libm differs in the last place, and nine recorded
+# passages pinned on 24.04 move by a line or a minute there (docs/dev/TuningNotes.md, "the
+# nine passages that moved in the cloud (2026-11-05)"). The first release run of gate m7
+# failed on exactly those nine for this.
 
 on:
   push:
@@ -25,8 +39,45 @@ permissions:
   contents: write
 
 jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      - run: |
+          python -m ruff check .
+          python -m ruff format --check .
+
+  checks:
+    name: the suite, shard ${{ matrix.shard }} of 6
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONUTF8: "1"
+      FREESAIL_SHARD: ${{ matrix.shard }}/6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -e ".[dev,server]"
+      # The whole suite, both tiers (`--slow`; package 32c), this shard's part of it
+      # (`FREESAIL_SHARD`, tests/conftest.py), each module-scoped day built once on one
+      # worker (`--dist loadgroup`), without the pace tests.
+      - name: Both tiers, this shard, without the pace tests
+        run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
+
   release:
-    runs-on: ubuntu-latest
+    name: release
+    needs: [lint, checks]
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Work out the gate name
@@ -42,20 +93,6 @@ jobs:
           f="docs/gates/gate-$gate.md"
           test -f "$f" || { echo "missing $f"; exit 1; }
           echo "report=$f" >> "$GITHUB_OUTPUT"
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      # The whole suite, both tiers (`--slow`; package 32c), each module-scoped day built
-      # once on one worker (`--dist loadgroup`, the groups set in tests/conftest.py).
-      - name: Run the checks the gate relies on
-        run: |
-          pip install -e ".[dev,server]"
-          ruff check .
-          # The pace measurements (truth 51 and its kin, marked `pace` in tests/conftest.py)
-          # read the load when they share the runner with the other workers' days: the
-          # suite runs without them, then they run alone, one at a time.
-          python -m pytest -n auto --dist loadgroup --slow -m "not pace"
-          python -m pytest --slow -m pace
       - name: Build the gate zip
         run: |
           git archive --format=zip --prefix="FreeSail-${{ steps.gate.outputs.tag }}/" \

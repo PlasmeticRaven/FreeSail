@@ -575,6 +575,29 @@ def judge_course(
         )
         return Judgement("full_and_by", course, words, full_and_by=True, tack=own)
     if crossing == "eye":
+        strong = lateen_strong_wind_kn(ship)  # package 90, A1c: a lateen in a strong wind
+        if strong is not None and speed >= units.knots_to_ms(stay_kn):
+            room = no_room_to_wear(ship)
+            if room:
+                # tacked regardless where there is no room to wear (ruled), as `put_about_choice`
+                # tacks her with the land to leeward
+                way = "she is put about for it" if laid else "she is put about"
+                return Judgement(
+                    "tack",
+                    target,
+                    f"{what}; the wind {strong:.0f} knots, but there is no room to wear with "
+                    f"{room}: {way}{tail}",
+                    full_and_by,
+                    said_tack,
+                )
+            way = "worn round for it" if laid else "worn round"
+            return Judgement(
+                "wear",
+                target,
+                f"{what}; the wind {strong:.0f} knots{LATEEN_STAYS_WORDS}, and she is {way}{tail}",
+                full_and_by,
+                said_tack,
+            )
         if speed >= units.knots_to_ms(stay_kn):
             way = "she is put about for it" if laid else "she is put about"
             return Judgement("tack", target, f"{what}; {way}{tail}", full_and_by, said_tack)
@@ -769,6 +792,13 @@ def keep_course_pending(ship: Any, dt: float) -> None:
 # more than a helmsman's yaw before it).
 STERN_CROSSED_DEG = 11.25
 STERN_WATCH = "stern_watch"  # `ship.extra`: the side the wind was last on, a plain dict
+# The wind round ahead (package 90, A1a; Design-Package90-Engine.md §2.3 item 1): a shift of wind
+# through her bow outside a manoeuvre takes her round onto the other tack, and leaves a whole
+# lateen, or a lugger's dipping lug, on the bad hand against its mast, which the stern watch did
+# not hear (the silent bad hand of package 75's B3.3b). Said once a crossing, when the wind is
+# this far past dead ahead on the new bow (a point, as astern), and only where there is a sail to
+# say it of, so that no other ship's watch keeps anything more (`STERN_WATCH`'s "bow", pending).
+BOW_CROSSED_DEG = 11.25
 
 
 def _whole_ship_work(ship: Any) -> bool:
@@ -805,10 +835,20 @@ def watch_the_stern(ship: Any) -> None:
         extra[STERN_WATCH] = {"side": side}
         return
     if side == watch.get("side"):
+        if watch.get("bow") == side and abs(awa) >= math.radians(BOW_CROSSED_DEG):
+            # a point past dead ahead on the new bow: the crossing's line (package 90, A1a)
+            del watch["bow"]
+            _across_the_bow(ship, side)
         return
     if abs(awa) < math.pi / 2.0:
-        # through the eye or before the beam: a tack's, or the wind's shift ahead
+        # through the eye or before the beam: a tack's, or the wind's shift ahead; outside a
+        # manoeuvre, with a whole lateen or a lugger's lug left on its mast, pending the bow's
+        # line (package 90, A1a)
         watch["side"] = side
+        watch.pop("bow", None)
+        if any(_on_the_bad_hand(ship, side)) and not _whole_ship_work(ship):
+            if not extra.get("aground"):
+                watch["bow"] = side
         return
     if math.pi - abs(awa) < math.radians(STERN_CROSSED_DEG):
         return  # not yet a point past dead astern on the new quarter
@@ -820,39 +860,131 @@ def watch_the_stern(ship: Any) -> None:
         _yards_aback_for,
         boom_sails,
         dipping_lugs,
-        names_of_sails,
+        whole_lateens,
     )
 
     lee = "larboard" if side == "starboard" else "starboard"
     lugs = [sl for sl in dipping_lugs(ship) if sl.lug_side is not None and sl.lug_side != lee]
+    # a whole lateen left on the old side reads as a dipping lug does (package 90, A1a)
+    lateens = [sl for sl in whole_lateens(ship) if sl.lug_side is not None and sl.lug_side != lee]
     sign = 1.0 if side == "starboard" else -1.0
     yards = _yards_aback_for(ship, sign)
-    if not lugs and not yards:
+    if not lugs and not yards and not lateens:
         return
     said = []
     if lugs:
-        one = len(lugs) == 1
-        names = names_of_sails(ship, lugs)
-        said.append(
-            f"{names} {'is' if one else 'are'} against {'its mast' if one else 'their masts'}; "
-            f"dip {'it' if one else 'them'} when you will"
-        )
+        said.append(_against_their_masts(ship, lugs, "dip"))
+    if lateens:
+        said.append(_lies_on_the_mast(ship, lateens))
     if yards:
         said.append(
             f"the yards are braced for the {old} tack, by the lee; brace them round when you will"
         )
     booms = [sl.id for sl in boom_sails(ship)]
+    data: dict[str, Any] = {
+        "side": side,
+        "lugs": [sl.id for sl in lugs],
+        "yards": [y.id for y in yards],
+        "booms": booms,
+    }
+    if lateens:
+        data["lateens"] = [sl.id for sl in lateens]  # package 90, A1a: only where she has one
     ship.note(
         "notable",
         "sail.across_the_stern",
         f"The wind has come across the stern to the {side} quarter: " + "; and ".join(said) + ".",
         ship.name,
-        {
-            "side": side,
-            "lugs": [sl.id for sl in lugs],
-            "yards": [y.id for y in yards],
-            "booms": booms,
-        },
+        data,
+    )
+
+
+def _against_their_masts(ship: Any, lugs: list[Any], verb: str) -> str:
+    """'the mainsail is against its mast; dip it when you will' (package 58b's words)."""
+    from freesail.evolutions.scripts import names_of_sails
+
+    one = len(lugs) == 1
+    names = names_of_sails(ship, lugs)
+    return (
+        f"{names} {'is' if one else 'are'} against {'its mast' if one else 'their masts'}; "
+        f"{verb} {'it' if one else 'them'} when you will"
+    )
+
+
+def _lies_on_the_mast(ship: Any, lateens: list[Any]) -> str:
+    """'the mainsail lies on the mast; shift it when you will': a whole lateen left on the bad
+    hand (package 90, A1a; Design-Package90-Engine.md §2.3 item 1, JUDGEMENT on the words)."""
+    from freesail.evolutions.scripts import sails_listed
+
+    one = len(lateens) == 1
+    names = sails_listed(ship, lateens)  # in their order, the order taken as said (nudge 77)
+    return (
+        f"{names} {'lies on the mast' if one else 'lie on their masts'}; "
+        f"shift {names} when you will"
+    )
+
+
+def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
+    """'the mainsail is aback against the mast; shift the mainsail or box her off': a whole
+    lateen held aback by the wind come round ahead onto its cloth (package 90, A1d;
+    Design-Package90-Engine.md §2.4.3a, JUDGEMENT on the words). The line names what is measured
+    to relieve it, in the orders she will take, as the strain's warning does
+    (`strain.pressed_reliefs`; the lead's nudge 60, item 3): the yard shifted, or her head boxed
+    off where she has head yards to brace abox, which shifts it (A1b); not the sheet let fly,
+    which eases it no more than doing nothing, nor "bear away", which on that tack keeps it
+    aback. Before nudge 60, "let fly its sheet, shift it or box her off", the box offered to the
+    xebec, which refuses it; before nudge 53, "shift it when you will", said of yards at 1.2 to
+    1.7 of their ratings."""
+    from freesail.evolutions.scripts import sails_listed
+    from freesail.physics.strain import pressed_reliefs
+
+    one = len(lateens) == 1
+    names = sails_listed(ship, lateens)  # in their order, the order taken as said (nudge 77)
+    return (
+        f"{names} {'is aback against the mast' if one else 'are aback against their masts'}; "
+        f"{pressed_reliefs(ship, 'aback', names)}"
+    )
+
+
+def _on_the_bad_hand(ship: Any, side: str) -> tuple[list[Any], list[Any]]:
+    """The lugger's dipping lugs (never a settee: `lugger_lugs`) and the whole lateens set whose
+    yards hang on the weather side of their masts, the wind on `side` (package 90, A1a)."""
+    from freesail.evolutions.scripts import lugger_lugs, whole_lateens
+
+    lee = "larboard" if side == "starboard" else "starboard"
+    lugs = [sl for sl in lugger_lugs(ship) if sl.lug_side is not None and sl.lug_side != lee]
+    lateens = [sl for sl in whole_lateens(ship) if sl.lug_side is not None and sl.lug_side != lee]
+    return lugs, lateens
+
+
+def _across_the_bow(ship: Any, side: str) -> None:
+    """The wind come round ahead through her bow outside a manoeuvre (package 90, A1a): one line,
+    once the crossing, where a lugger's lug or a whole lateen lies on its mast; nothing is
+    ordered (the captain's next order: the rules captain's at A1c)."""
+    if _whole_ship_work(ship) or (getattr(ship, "extra", None) or {}).get("aground"):
+        return
+    lugs, lateens = _on_the_bad_hand(ship, side)
+    if not lugs and not lateens:
+        return
+    said = []
+    if lugs:
+        said.append(_against_their_masts(ship, lugs, "dip"))
+    if lateens:
+        from freesail.evolutions import trim as yard_trim
+
+        # held aback (package 90, A1d): the wind come round ahead onto the side its cloth lies
+        # on, pressed on its mast; else drawn round it to leeward, on the bad hand (A1a's words)
+        aback = [sl for sl in lateens if yard_trim.read_sheet(ship, sl).held_to_windward]
+        lying = [sl for sl in lateens if sl not in aback]
+        if aback:
+            said.append(_aback_against_the_mast(ship, aback))
+        if lying:
+            said.append(_lies_on_the_mast(ship, lying))
+    ship.note(
+        "notable",
+        "sail.across_the_bow",
+        f"The wind has come round ahead to the {side} bow: " + "; and ".join(said) + ".",
+        ship.name,
+        {"side": side, "lugs": [sl.id for sl in lugs], "lateens": [sl.id for sl in lateens]},
     )
 
 
@@ -1042,6 +1174,42 @@ WEAR_WIND_KN = 30.0
 TACK_REGARDLESS_NM = 2.0
 MISSED_STAYS_WITHIN_S = 3600
 CLOSE_REEF = 3
+# Package 90, A1c (the lead's ruling of 2026-11-18, nudge 18; docs/design/Design-Package90-
+# Engine.md §2.3 item 6): a whole lateen is not put in stays in a strong wind (Forfait 1788
+# p. 119: taken aback, her lateens cost the masts or the yards). Over this mean true wind, with
+# a whole lateen set, `put her about` and the course's judgement wear her, and tack her regardless
+# where there is no room to wear; an ordered `tack ship` is obeyed and warned. A module constant
+# beside `WEAR_WIND_KN`, since neither reads a captain's book: so it serves every voice, the
+# player's, a model's, the director's and the rules captain's. JUDGEMENT on the figure:
+# Beaufort's strong breeze.
+LATEEN_TACK_KN = 22.0
+LATEEN_STAYS_WORDS = ": a lateen is not put in stays in a strong wind"
+
+
+def mean_true_wind_kn(ship: Any) -> float | None:
+    """The readings' mean true wind in knots (the true wind where it has no mean): the wind
+    `put_about_choice` reads its strong wind against, and the course's judgement and the tack's
+    warning with it (package 90, A1c). None with no readings."""
+    from freesail.orders.prompt import world_of
+
+    readings = getattr(world_of(ship), "readings", None)
+    if readings is None:
+        return None
+    w = readings.value("mean_true_wind_speed")
+    if w is None:
+        w = readings.value("true_wind_speed")
+    return units.ms_to_knots(float(w)) if w is not None else None
+
+
+def lateen_strong_wind_kn(ship: Any) -> float | None:
+    """The mean true wind in knots where a whole lateen is set and it is over `LATEEN_TACK_KN`
+    (package 90, A1c), else None: every other ship's choice as it was."""
+    from freesail.evolutions.scripts import whole_lateens
+
+    if not whole_lateens(ship):
+        return None
+    kn = mean_true_wind_kn(ship)
+    return kn if kn is not None and kn > LATEEN_TACK_KN else None
 
 
 # The room a wear takes (package 88, item 2; 57's station gale: the frigate beating for her
@@ -1192,8 +1360,11 @@ def put_about_choice(ship: Any) -> tuple[str, str]:
         if w is None:
             w = readings.value("true_wind_speed")
         wind_kn = units.ms_to_knots(float(w)) if w is not None else None
+    lateen = lateen_strong_wind_kn(ship) is not None  # package 90, A1c
     if wind_kn is not None and wind_kn > WEAR_WIND_KN:
-        reasons.append(f"the wind {wind_kn:.0f} knots")
+        reasons.append(f"the wind {wind_kn:.0f} knots{LATEEN_STAYS_WORDS if lateen else ''}")
+    elif lateen and wind_kn is not None:
+        reasons.append(f"the wind {wind_kn:.0f} knots{LATEEN_STAYS_WORDS}")
     log = getattr(world, "log", None)
     tick = world.clock.tick
     if log is not None:
@@ -1206,11 +1377,31 @@ def put_about_choice(ship: Any) -> tuple[str, str]:
     return "tack ship", "her sail is whole and the wind moderate"
 
 
-def put_about(ship: Any) -> Result:
-    """`put her about`: tacks or wears by `put_about_choice`, the choice and its reason
-    said before the manoeuvre's own line."""
-    from freesail import orders
+def _lateen_clause_after(ship: Any, rest: str) -> str:
+    """The words after `put her about` that are the whole lateens' clause ("and leave the
+    lateens"; package 90, A1b), on a hull with a whole lateen alone; "" otherwise, every other
+    word after the order passed over as it always was."""
+    from freesail.orders.grammar import whole_lateen_hull
+    from freesail.orders.vocabulary import key, load_vocabulary
 
+    said = key(rest)
+    leads = load_vocabulary().lateen_clause
+    if not said or not any(said == lead or said.startswith(lead + " ") for lead in leads):
+        return ""
+    return rest if whole_lateen_hull(ship) else ""
+
+
+def put_about(ship: Any, rest: str = "") -> Result:
+    """`put her about`: tacks or wears by `put_about_choice`, the choice and its reason
+    said before the manoeuvre's own line. The whole lateens' clause after it ("put her about
+    and leave the lateens") goes with the tack or the wear chosen, read before the choice is
+    said, so that a clause refused says nothing of the choice."""
+    from freesail import orders
+    from freesail.orders.grammar import parse
+
+    clause = _lateen_clause_after(ship, rest)
+    if clause:
+        parse(ship, f"tack ship {clause}")  # refused here, in the clause's words, if it is
     verb, why = put_about_choice(ship)
     choice = "wearing" if verb == "wear ship" else "tacking"
     # the choice said as a note of the ship's (the World drops an evolution order's own
@@ -1223,7 +1414,7 @@ def put_about(ship: Any) -> Result:
             f"Put about: {choice}, {why}.",
             data={"put_about": verb, "why": why},
         )
-    kind, text, data = orders.handle(ship, verb)
+    kind, text, data = orders.handle(ship, f"{verb} {clause}" if clause else verb)
     data = dict(data or {})
     data["put_about"] = verb
     data["why"] = why
@@ -1590,7 +1781,7 @@ def execute(ship: Any, order: Order) -> Result:
         text, data = nav.allow_set(knots, toward)
         return "reckoning.set_allowance", _whose(ship, text), {"verb": verb, "level": 1} | data
     if verb == "put her about":
-        return put_about(ship)
+        return put_about(ship, rest)
     if verb == "shape a course for":
         if not rest:
             raise OrderError("Shape a course for where? Name a place of the chart.")

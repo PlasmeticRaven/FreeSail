@@ -30,6 +30,7 @@ from freesail.agents.agent import (
     OFFICER,
     PASSENGER,
     PASSENGER_DOMAIN,
+    PERSON_WORDS,
     STATION_FACTORIES,
     cadence_policy,
     lookout,
@@ -180,8 +181,10 @@ def test_a_station_bound_to_a_new_person_at_run_time_is_taken_by_a_door_with_his
     assert world.stations.holder(MASTER) is second
     h = seated(world, MASTER, [Reply()])
     assert h.station.person == second.name
-    assert f"You are the master, in the place of {second.name}" in h.brief.text()
-    assert second.outline_words() in h.brief.text()
+    # his name and outline are the game's, in the situation after the brief (package 117)
+    assert f"You are the master, in the place of {PERSON_WORDS}" in h.brief.text()
+    assert f"whose place you take: {second.name}" in h.brief.situation
+    assert second.outline_words() in h.brief.situation and second.name not in h.brief.text()
     assert world.stations.words()[3] == f"the master ({second.name})"
     # a second passenger's station under its own name, a kind's station by another name
     world.stations.bind("supercargo", None, kind=PASSENGER)
@@ -717,7 +720,7 @@ def test_the_doors_ask_the_worlds_binding_and_a_held_station_is_refused_to_a_sec
     a station the ship has not got refused in words; the cadence a setting of the
     seating, said in the stationed line and in the brief."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import DoorClient
 
     from freesail.ui.server import Driver, create_app
 
@@ -730,7 +733,7 @@ def test_the_doors_ask_the_worlds_binding_and_a_held_station_is_refused_to_a_sec
         ).write(records)
     driver = Driver(world, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with TestClient(app) as http:
+    with DoorClient(app) as http:
         a = http.post(
             "/api/agents/master", json={"model_name": WEIGHTS, "door": "mcp", "cadence": "events"}
         ).json()
@@ -863,7 +866,8 @@ def test_a_game_with_three_seated_checkpoints_and_each_reseated_station_reads_it
         h.take_over(Fake([reply("", call("read_journal", kind="notes"))]))
         read = tools_mod.call(back, name, "read_journal", {"kind": "notes"})
         assert any(e["text"] == note for e in read["entries"]), name
-        assert note in h.brief.text() or "The station's journal" in h.brief.text()
+        told = h.brief.situation  # the journal's last note is the game's (package 117)
+        assert note in told or "The station's journal" in told
     read = tools_mod.read_journal(back, MASTER, kind="notes")
     assert any(e["text"] == "The master's own note, by the player." for e in read["entries"])
     assert (

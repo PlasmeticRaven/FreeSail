@@ -90,9 +90,10 @@ _LEVELS = ("mast", "topmast", "topgallant_mast", "royal_mast")
 UPPER_YARDS_IN_DEG = 2.0
 
 
-def _level(ship: Ship, yard: Spar) -> str:
-    parent = ship.parent_of(yard)
-    return parent.cls if parent is not None else ""
+def _level(ship: Ship, yard: Spar) -> int:
+    """A yard's level on its mast, 0 the course up (`Ship.yard_level`; package 90, A5: read from
+    its order on its lower mast, so that a pole mast's yards are staggered as a topmast's)."""
+    return max(ship.yard_level(yard), 0)
 
 
 def stagger(
@@ -121,7 +122,7 @@ def stagger(
     out = dict(targets)
     limits = {yid: ship.spars[yid].brace_limit for yid in targets}
     masts: dict[str, Spar] = {}
-    by_level: dict[tuple[str, str], str] = {}
+    by_level: dict[tuple[str, int], str] = {}
     for yid in targets:
         yard = ship.spars[yid]
         mast = ship.mast_of(yard)
@@ -148,7 +149,7 @@ def stagger(
             ref = by_level.get((main.id, level))
             if mast_id == head.id and ref is not None:
                 out[yid] = max(0.0, min(out[yid], out[ref] - step))
-    for level in _LEVELS:
+    for level in sorted({lv for _, lv in by_level}):
         h, m = by_level.get((head.id, level)), by_level.get((main.id, level))
         if h is not None and m is not None:
             return out, units.rad_to_deg(out[m] - out[h])
@@ -171,9 +172,7 @@ def by_level(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
         mast = ship.mast_of(yard)
         if mast is None or ship.under_bowsprit(yard):
             continue
-        level = _level(ship, yard)
-        rank = _LEVELS.index(level) if level in _LEVELS else 0
-        by_mast.setdefault(mast.id, []).append((rank, yid))
+        by_mast.setdefault(mast.id, []).append((_level(ship, yard), yid))
     for yards in by_mast.values():
         yards.sort()
         for (_, below), (_, yid) in zip(yards, yards[1:], strict=False):
@@ -203,7 +202,7 @@ def heavy_weather_trim(ship: Ship) -> bool:
         if sail.cls != "square" or not sail.is_set or sail.reefs <= 0:
             continue
         yard = ship.yard_of(sail)
-        if yard is None or _level(ship, yard) != "topmast":
+        if yard is None or _level(ship, yard) != 1:
             continue
         if sail.reefs >= min(HEAVY_WEATHER_REEFS, sail.reef_bands):
             return True
@@ -222,8 +221,7 @@ def eased_lowest(ship: Ship, targets: dict[str, float]) -> dict[str, float]:
         mast = ship.mast_of(yard)
         if mast is None or ship.under_bowsprit(yard):
             continue
-        level = _level(ship, yard)
-        rank = _LEVELS.index(level) if level in _LEVELS else 0
+        rank = _level(ship, yard)
         if mast.id not in lowest or rank < lowest[mast.id][0]:
             lowest[mast.id] = (rank, yid)
     for _, yid in lowest.values():
@@ -424,6 +422,14 @@ class SheetReading:
     working: Line | None
 
 
+def keeps_its_side(sail: Sail) -> bool:
+    """A whole lateen (class `lateen`, `dipping`, not cut at the mast; package 90, A1d;
+    docs/design/Design-Package90-Engine.md §2.4.3): its one sheet, held to no side, holds its
+    cloth on its yard's side (`Sail.lug_side`), the mast standing between the cloth and the other
+    side, and a side its sheet is drawn to is kept, the lee included. No committed sail is one."""
+    return sail.cls == "lateen" and bool(sail.dipping) and not sail.cut_at_mast
+
+
 def lee_side_sign(ship: Ship) -> float:
     """The lee side as the deck reads the apparent wind: +1 starboard, -1 larboard."""
     return -1.0 if ship.dyn.apparent_wind_angle >= 0.0 else 1.0
@@ -473,6 +479,10 @@ def read_sheet(ship: Ship, sail: Sail) -> SheetReading:
     working = belayed[0]
     if working.held_side is not None and working.hauled > 0.0:
         side = 1.0 if working.held_side == "starboard" else -1.0
+    elif sail.lug_side is not None and working.hauled > 0.0 and keeps_its_side(sail):
+        # a whole lateen's cloth lies on its yard's side, as its mast keeps it (package 90, A1d):
+        # not blown over to the deck's lee as the wind comes round ahead, but held aback there
+        side = 1.0 if sail.lug_side == "starboard" else -1.0
     else:
         side = lee
     angle = geo.angle_from_hauled(working.hauled)
@@ -550,6 +560,10 @@ def set_sheet_angle(ship: Ship, sail: Sail, angle: float, side: str | None = Non
         lee = side_name(lee_side_sign(ship))
         weather = "larboard" if lee == "starboard" else "starboard"
         line.held_side = {None: None, "lee": None, "weather": weather, lee: None}.get(side, side)
+        if keeps_its_side(sail):
+            # a whole lateen keeps the side its sheet is drawn to, the lee included (package 90,
+            # A1d): when the wind comes round ahead onto it, it is held aback there
+            line.held_side = {None: lee, "lee": lee, "weather": weather}.get(side, side)
     else:
         for other in ship.sheets_of(sail):
             if other is not line and other.state is LineState.BELAYED:

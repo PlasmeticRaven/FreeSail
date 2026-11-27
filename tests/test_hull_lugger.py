@@ -574,8 +574,17 @@ HULL_AS_FILED = {
 }
 
 
+# Package 90, A3 (the helm's kind; docs/dev/TuningNotes.md, "Package 90, A3"), old beside new: her
+# hull's `helm`, said nowhere before (the wheel, the key's default) and the tiller now, the one key
+# the step writes into her file, before the profile. The physics reads it not: only the helm's
+# words do (`evolutions.scripts.helm_words`).
+HELM_A3 = (None, "tiller")
+
+
 def test_no_hull_figure_the_physics_reads_moved(doc):
     hull = {k: v for k, v in doc["hull"].items() if k != "profile"}
+    # package 90, A3: her helm, held to its move and taken out here only
+    assert hull.pop("helm", None) == HELM_A3[1]
     assert hull == HULL_AS_FILED
     assert list(doc["hull"])[-1] == "profile"
 
@@ -609,6 +618,9 @@ def test_a_diff_of_her_files_physics_keys_against_git_shows_none(doc):
     if old is None:
         pytest.skip(f"no git history for {BEFORE} here; HULL_AS_FILED holds the hull's figures")
     assert "profile" not in old["hull"]
-    assert {k: v for k, v in doc["hull"].items() if k != "profile"} == old["hull"]
+    hull = {k: v for k, v in doc["hull"].items() if k != "profile"}
+    # package 90, A3, old beside new: her helm, the one key it writes, taken out here only
+    assert (old["hull"].get("helm"), hull.pop("helm", None)) == HELM_A3
+    assert hull == old["hull"]
     for section in ("spars", "sails", "lines", "groups", "aliases"):
         assert doc[section] == old[section], section

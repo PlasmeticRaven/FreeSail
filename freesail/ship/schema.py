@@ -120,6 +120,30 @@ station at the beat when she carries that fit, where they differ from the bill's
 the default fit's), each a whole number no more than the men of its station, in the bill's
 `trimmers` form. Only the razee's 'as razeed 1795' carries them; a fit without them keeps the
 bill's, and a fit pickled before them reads as one without them.
+
+Package 90's stage 0 (docs/design/Plan-Package90.md §5.1 items 3 to 5) adds three keys, each
+parsed, refused in words where it is wrong, and carried by no file, so each is inert until a
+ship's builder writes it and an engine step reads it:
+- a top-level `sweeps:` (`SweepsSpec`, the xebec's design §6): a ship's own sweeps, their number,
+  the men at each and the law's three figures for a man (package 82's, as the boats' oars). It is
+  refused on a hull that has `oars:` and on a boat's rig: the boats pull oars, and a file with
+  `oars:` is a boat to the game. A fit's own `sweeps` (a number of sweeps, or none) is refused
+  where the file has no `sweeps:` section;
+- a boat's `towed` (`BoatSpec.towed`): true, the boat towed astern, not stowed on deck; false by
+  default (it was refused at the load before, as a key a boat does not take);
+- the hull's `helm` (`HullSpec.helm`): `wheel` or `tiller`, `wheel` by default. Since package
+  90's A3 the six files steered by a tiller carry it, and the helm's words read it
+  (`evolutions.scripts.helm_words`): what is shot away, rigged round and mended, and how each
+  is said.
+Each is left out of its spec's pickle while it holds its default, so that a spec without it,
+and one pickled before it, is pickled as before it.
+
+Package 90's stage 0L (docs/design/Plan-Package90.md §5.2; Design-Package90-Engine.md §2.3 item
+1) allows `dipping: true` on a whole lateen, a sail of class `lateen` that is not `cut_at_mast`
+(the tartane's, the polacre's and the xebec's), so that its yard keeps the side of the mast it
+hangs on as a dipping lug's does. A lateen cut at the mast (the 64's and the 74's mizen course
+and driver) is refused it, as is every class but the lug, in the words they were refused in
+before. No file carries it, and nothing acts on it for a lateen until the engine's step A1a.
 """
 
 from __future__ import annotations
@@ -297,6 +321,7 @@ FIT_KEYS = (
     "powder_barrels",
     "exercise_charges",
     "shot",
+    "sweeps",  # package 90, stage 0: the sweeps she ships on this fit, of the file's `sweeps:`
     "marines",  # package 75, B1: the marines the bill keeps on this fit
     "trimmers",  # package 75, Phase 5 (the lead's ruling 13): the bill's trimmers on this fit
 )
@@ -304,6 +329,8 @@ FIT_KEYS = (
 # she carries it (`crew.quarters`): the marines kept in their division (package 75, B1) and the
 # trimmers (Phase 5, the lead's ruling 13). Each is left out of a fit's pickle while None.
 FIT_OWN_BILL = ("marines", "trimmers")
+# A fit's keys left out of its pickle while None: the bill's own, and its sweeps (package 90).
+_FIT_LEFT_OUT_WHILE_NONE = (*FIT_OWN_BILL, "sweeps")
 ARMAMENT_KEYS = ("default", "fits", "numbering")
 # How a file numbers its broadside guns (package 75, B7.d's stage 0: the 74's design,
 # docs/design/Design-Ship-Bellerophon.md §5.2 and §12.1 item 2): the one word an armament's
@@ -381,6 +408,10 @@ STERN_KEYS = (
 STERN_TYPES = ("square", "raked", "round")
 HEAD_WORDS = ("none", "knee", "scroll", "billet", "figure")
 MARK_WORDS = ("sourced", "stand-in", "rule", "judged")
+# What a hull steers by (package 90, stage 0; docs/design/Plan-Package90.md §5.1 item 5): the
+# hull's `helm`, the wheel unless the file says the tiller.
+HELM_WHEEL = "wheel"
+HELM_KINDS = (HELM_WHEEL, "tiller")
 # A gun placed so has a port, and stands on one of the profile's port decks where it gives
 # them; a pivot and a rail gun fire over the rail (`combat.ports.PORT_PLACES`).
 _PORT_GUN_PLACES = ("broadside", "bow", "stern")
@@ -587,13 +618,19 @@ class HullSpec:
     # Package 75: the hull's profile (`HullProfile`); None, a file that gives none (the eight
     # until the shared work writes theirs), drawn and gunned as before.
     profile: HullProfile | None = None
+    # Package 90, stage 0: what she steers by, one of `HELM_KINDS`; a file that says nothing
+    # steers by a wheel. Read by the helm's words since A3 (`evolutions.scripts.helm_words`).
+    helm: str = HELM_WHEEL
 
     def __getstate__(self) -> dict[str, Any]:
         """Its state for the checkpoint, the profile only where the file gives one (package
-        75), so that a hull without one is pickled as before it."""
+        75) and the helm only where it is not the wheel (package 90), so that a hull without
+        them is pickled as before them."""
         state = dict(self.__dict__)
         if state.get("profile") is None:
             state.pop("profile", None)
+        if state.get("helm", HELM_WHEEL) == HELM_WHEEL:
+            state.pop("helm", None)
         return state
 
 
@@ -661,7 +698,10 @@ class SailSpec:
     # its yard slung at a third of its length on one side of the mast and its tack shifted
     # in going about (Forfait 1788 pp. 5 to 6; Steel 1794 vol. I, LUGGER), which must be
     # dipped round the mast to the new lee side; a standing lug (a mizen, the taille-vent
-    # tacked at the foot of the mast) is not dipped.
+    # tacked at the foot of the mast) is not dipped. Package 90's stage 0L: a whole lateen
+    # (class lateen, not `cut_at_mast`) may carry it too, its yard changed round its mast in
+    # going about or left on the bad hand (Design-Package90-Engine.md §2.3), acted on by nothing
+    # for a lateen until the engine's step A1a.
     dipping: bool = False
     # Package 57 (the owner's note of 2026-10-17 on the lug topsail; Steel 1794 vol. I p. 214,
     # ROYALS "Are set flying"): a sail set flying, its yard swayed up from the deck with the
@@ -906,13 +946,17 @@ class FitSpec:
     # bill's own `trimmers` (the default fit's); None, the bill's. Left out of the pickle while
     # None, as the marines are.
     trimmers: dict[str, int] | None = None
+    # package 90, stage 0 (the xebec's design §6): the sweeps she ships when she carries this fit,
+    # of the file's `sweeps:`; None, no sweeps on this fit. Read by nothing yet (step A7). Left
+    # out of the pickle while None, as the marines are.
+    sweeps: int | None = None
 
     def __getstate__(self) -> dict[str, Any]:
-        """Its state for the checkpoint, its marines (package 75, B1) and its trimmers (Phase
-        5, the lead's ruling 13) only where the fit gives them, so that a fit without them is
-        pickled as before them."""
+        """Its state for the checkpoint, its marines (package 75, B1), its trimmers (Phase 5,
+        the lead's ruling 13) and its sweeps (package 90) only where the fit gives them, so
+        that a fit without them is pickled as before them."""
         state = dict(self.__dict__)
-        for key in FIT_OWN_BILL:
+        for key in _FIT_LEFT_OUT_WHILE_NONE:
             if state.get(key) is None:
                 state.pop(key, None)
         return state
@@ -1003,6 +1047,17 @@ class BoatSpec:
     # package 82 (item 4): her own ship file, by which she is manned as a hull; None, a boat
     # of the script's errands alone
     file: str | None = None
+    # package 90, stage 0 (the engine's note §3): towed astern, not stowed on deck; read by
+    # nothing yet (step A4). Left out of the pickle while false.
+    towed: bool = False
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, `towed` only where the boat is towed (package 90), so
+        that a boat on deck is pickled as before it."""
+        state = dict(self.__dict__)
+        if not state.get("towed"):
+            state.pop("towed", None)
+        return state
 
 
 @dataclass
@@ -1013,6 +1068,22 @@ class OarsSpec:
     (`tiring_h`). Read by `physics/oars.py` and by nothing else of the physics."""
 
     number: int
+    thrust_n: float
+    power_w: float
+    tiring_h: float
+
+
+@dataclass
+class SweepsSpec:
+    """A ship's own sweeps (package 90, stage 0; docs/design/Design-Ship-Xebec.md §6, the
+    engine's note §5): how many, the men at each, and for a man the law of the boats' oars
+    (package 82): the pull he sustains on the loom at no way (`thrust_n`), the power he
+    delivers over hours (`power_w`) and the hours at the sweeps that halve his strength
+    (`tiring_h`). A ship's and never a boat's: the boats pull `oars:`. Read by nothing yet
+    (step A7 builds the thrust and the orders)."""
+
+    number: int
+    men_each: int
     thrust_n: float
     power_w: float
     tiring_h: float
@@ -1059,11 +1130,18 @@ GEAR_KEYS = ("id", "kind", "name", "beam_ft", "length_fathoms", "nets", "hooks")
 
 BOAT_KINDS = ("launch", "long-boat", "barge", "pinnace", "cutter", "yawl", "jolly boat", "punt")
 # `file` (package 82, item 4): the boat's own ship file, by which she is manned as a hull of
-# the world; a boat without one keeps her errands as the script runs them.
-BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons", "file")
+# the world; a boat without one keeps her errands as the script runs them. `towed` (package 90,
+# stage 0): the boat towed astern, not stowed on deck.
+BOAT_KEYS = ("id", "kind", "name", "length_ft", "oars", "crew", "tons", "file", "towed")
 # The `oars:` section (package 82, item 4; docs/design/Design-BoatAndPersonAboard.md §5.2):
 # the one new key for the one new figure, the oar force a boat's hull is driven by.
 OARS_KEYS = ("number", "thrust_n", "power_w", "tiring_h")
+# The `sweeps:` section (package 90, stage 0; docs/design/Design-Ship-Xebec.md §6): a ship's
+# own sweeps, the oars' figures for a man with the sweeps' number and the men at each.
+SWEEPS_KEYS = ("number", "men_each", "thrust_n", "power_w", "tiring_h")
+# The rig of a boat's own file (package 82; `ui/harbour.py`'s `_is_boat` reads it so): a boat
+# pulls oars, and is given no sweeps.
+BOAT_RIG = "boat"
 PERSON_ROLE_KEYS = ("role", "station", "rating", "messenger")
 # A post of the crew's `flag:` party (package 75, the 74's stage 0c): the posts' own form.
 FLAG_POST_KEYS = ("post", "name")
@@ -1098,6 +1176,17 @@ class ShipSpec:
     # hands}, taken over the evolution file's (package 75, the lead's (C2) of 2026-11-14: the
     # bilander's heave-to and filling away, six of her); none: every evolution's own number
     hands: dict[str, int] = field(default_factory=dict)
+    # package 90, stage 0: her own sweeps (`SweepsSpec`); None, she has none. Left out of the
+    # pickle while None.
+    sweeps: SweepsSpec | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Its state for the checkpoint, the sweeps only where the file gives them (package
+        90), so that a ship without them is pickled as before them."""
+        state = dict(self.__dict__)
+        if state.get("sweeps") is None:
+            state.pop("sweeps", None)
+        return state
 
 
 # ---------------------------------------------------------------------------
@@ -1174,6 +1263,7 @@ def parse_ship(data: dict[str, Any], source: str = "<memory>") -> ShipSpec:
         oars=_parse_oars(data["oars"], source) if data.get("oars") is not None else None,
         timing=_parse_timing(data["timing"], source) if data.get("timing") is not None else {},
         hands=_parse_hands(data["hands"], source) if data.get("hands") is not None else {},
+        sweeps=_parse_sweeps(data["sweeps"], source) if data.get("sweeps") is not None else None,
     )
     validate(spec)
     return spec
@@ -1386,7 +1476,22 @@ def _parse_fit(name: str, raw: Any, source: str) -> FitSpec:
         trimmers=_parse_trimmers(raw["trimmers"], where, source)
         if raw.get("trimmers") is not None
         else None,
+        # package 90, stage 0: of the file's `sweeps:` (`validate`, which has the section)
+        sweeps=_fit_sweeps(raw.get("sweeps"), where, source),
     )
+
+
+def _fit_sweeps(raw: Any, where: str, source: str) -> int | None:
+    """A fit's `sweeps` (package 90, stage 0; the xebec's design §6): the sweeps she ships on
+    it, a whole number of one or more; none where the fit does not give the key."""
+    if raw is None:
+        return None
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw < 1:
+        raise ShipFileError(
+            f"{source}: {where} ships {raw!r} sweeps; say the number of sweeps she ships on it, "
+            "or leave the key out for none."
+        )
+    return raw
 
 
 def _by_kind(raw: Any, what: str, where: str, source: str) -> list[tuple[Any, Any, str]]:
@@ -1618,6 +1723,14 @@ def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
             raise ShipFileError(
                 f"{source}: {where} is of kind '{kind}'; say one of {', '.join(BOAT_KINDS)}."
             )
+        # package 90, stage 0: a null `towed` reads as the key left out (on deck), as the
+        # hull's null `helm` reads as the wheel and a fit's null `sweeps` as none
+        towed = False if b.get("towed") is None else b["towed"]
+        if not isinstance(towed, bool):
+            raise ShipFileError(
+                f"{source}: {where} has towed = {towed!r}; say true (towed astern) or false "
+                "(stowed on deck)."
+            )
         boats.append(
             BoatSpec(
                 id=bid,
@@ -1628,6 +1741,7 @@ def _parse_boats(raw: Any, source: str) -> list[BoatSpec]:
                 crew=_count(b.get("crew"), f"{where}'s crew", source),
                 tons=_num(b, "tons", where, source),
                 file=_str(b, "file", where, source, required=False) or None,
+                towed=towed,
             )
         )
         if boats[-1].length_ft <= 0.0 or boats[-1].crew <= 0:
@@ -1652,6 +1766,31 @@ def _parse_oars(raw: Any, source: str) -> OarsSpec:
             f"{source}: the oars want a number, a thrust, a power and hours over nought."
         )
     return OarsSpec(number=number, thrust_n=thrust, power_w=power, tiring_h=tiring)
+
+
+def _parse_sweeps(raw: Any, source: str) -> SweepsSpec:
+    """The `sweeps:` section (package 90, stage 0; the xebec's design §6): the number of
+    sweeps, the men at each, and a man's pull, power and the hours that halve his strength.
+    Whether the file may have them at all (not a boat's) is `validate`'s."""
+    if not isinstance(raw, dict):
+        raise ShipFileError(f"{source}: 'sweeps' is not a mapping.")
+    for key in raw:
+        if key not in SWEEPS_KEYS:
+            raise ShipFileError(
+                f"{source}: the sweeps have '{key}', which they do not take; the keys are "
+                f"{', '.join(SWEEPS_KEYS)}."
+            )
+    number = _count(raw.get("number"), "the number of sweeps", source)
+    men = _count(raw.get("men_each"), "the men at each sweep", source)
+    thrust = _num(raw, "thrust_n", "the sweeps", source)
+    power = _num(raw, "power_w", "the sweeps", source)
+    tiring = _num(raw, "tiring_h", "the sweeps", source)
+    if number <= 0 or men <= 0 or thrust <= 0.0 or power <= 0.0 or tiring <= 0.0:
+        raise ShipFileError(
+            f"{source}: the sweeps want a number, the men at each, a thrust, a power and hours "
+            "over nought."
+        )
+    return SweepsSpec(number=number, men_each=men, thrust_n=thrust, power_w=power, tiring_h=tiring)
 
 
 def _parse_gear(raw: Any, source: str) -> list[GearSpec]:
@@ -1756,6 +1895,12 @@ def _parse_hull(h: Any, source: str) -> HullSpec:
         rate_deg_s=_num(r, "rate_deg_s", "hull.rudder", source, required=False) or 4.0,
         span_m=_num(r, "span_m", "hull.rudder", source, required=False),
     )
+    # what she steers by (package 90, stage 0): a word of HELM_KINDS, the wheel unless said
+    helm = HELM_WHEEL if h.get("helm") is None else h["helm"]
+    if helm not in HELM_KINDS:
+        raise ShipFileError(
+            f"{source}: the hull's helm is {helm!r}; she steers by a {' or a '.join(HELM_KINDS)}."
+        )
     return HullSpec(
         length_waterline_m=_num(h, "length_waterline_m", where, source),
         beam_m=_num(h, "beam_m", where, source),
@@ -1768,6 +1913,7 @@ def _parse_hull(h: Any, source: str) -> HullSpec:
         deck_height_m=_num(h, "deck_height_m", where, source, required=False) or 1.5,
         rudder=rudder,
         profile=_parse_profile(h["profile"], source) if h.get("profile") is not None else None,
+        helm=helm,
     )
 
 
@@ -2360,7 +2506,12 @@ def _parse_sail(s: Any, i: int, source: str) -> SailSpec:
     dipping = s.get("dipping", False)
     if not isinstance(dipping, bool):
         raise ShipFileError(f"{source}: {where} has dipping = {dipping!r}; say true or false.")
-    if dipping and cls != "lug":
+    # a lug is dipped, and since package 90's stage 0L a whole lateen: a lateen whose
+    # `cut_at_mast` is left out or said false (one said otherwise, true, null or not a bool,
+    # is refused here first, as before; one not a bool meets its own key's words once the
+    # dipping is mended)
+    whole_lateen = cls == "lateen" and s.get("cut_at_mast", False) is False
+    if dipping and cls != "lug" and not whole_lateen:
         raise ShipFileError(f"{source}: {where} is a {cls} sail; only a lug is dipped.")
     flying = s.get("flying", False)
     if not isinstance(flying, bool):
@@ -2777,6 +2928,25 @@ def validate(spec: ShipSpec) -> None:
                             f"{src}: the fit '{fit.name}' has two No. {g.number} guns to {g.side}."
                         )
                     pairs.add(key)
+    # a ship's own sweeps (package 90, stage 0): never a boat's, which pulls oars, and a hull
+    # with `oars:` is a boat to the game (`world.boats.is_boat`); a fit ships the file's sweeps
+    if spec.sweeps is not None and spec.oars is not None:
+        raise ShipFileError(
+            f"{src}: the file gives both 'sweeps' and 'oars'; a hull with oars is a boat, and "
+            "sweeps are a ship's: give the one or the other."
+        )
+    if spec.sweeps is not None and spec.rig == BOAT_RIG:
+        raise ShipFileError(
+            f"{src}: a boat's file gives 'sweeps'; a boat pulls oars (the 'oars' section), and "
+            "sweeps are a ship's."
+        )
+    if spec.armament is not None and spec.sweeps is None:
+        for fit in spec.armament.fits.values():
+            if fit.sweeps is not None:
+                raise ShipFileError(
+                    f"{src}: the fit '{fit.name}' ships {fit.sweeps} sweeps, and the file gives "
+                    "no 'sweeps' section for them; give her sweeps, or leave the fit without."
+                )
     # a fit's own marines kept (package 75, B1) are men she bears, as the bill's are
     if spec.armament is not None:
         bears = spec.crew.stations.get("marines", 0) if spec.crew is not None else 0

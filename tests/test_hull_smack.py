@@ -570,8 +570,23 @@ def test_the_stem_head_stands_narrow_and_square_as_the_plate_draws_it(hull):
 # -- nothing the physics reads has moved -------------------------------------------------------
 
 
+# Package 90, A3 (the helm's kind; docs/dev/TuningNotes.md, "Package 90, A3"), old beside new: her
+# hull's `helm`, said nowhere before (the wheel, the key's default) and the tiller now, the one key
+# the step writes into her file, with its note, after her existing keys and before her lines. The
+# physics reads it not: only the helm's words do (`evolutions.scripts.helm_words`).
+HELM_A3 = (None, "tiller")
+HELM_A3_LINES = (
+    "  # She steers by a tiller on deck: by the rule only, as the cutter (Falconer 1780, HELM: a "
+    "wheel save in small vessels, which need none; Lever 1827, the Rudder, fig. 373); no draught "
+    "of hers is read for it. Judgement.\n"
+    "  helm: tiller\n"
+)
+
+
 def test_no_figure_the_physics_reads_has_moved_by_the_pins(raw):
     hull = _her_hull_without_lines(raw)
+    # package 90, A3: her helm, held to its move and taken out here only
+    assert list(hull)[-1] == "helm" and hull.pop("helm", None) == HELM_A3[1]
     assert hull == PHYSICS_KEYS
     assert list(hull) == list(PHYSICS_KEYS)  # the existing keys keep their order: §5.1
 
@@ -608,6 +623,8 @@ def test_her_file_but_for_her_lines_is_what_it_was_against_git(raw):
     assert after["crew"].pop("quarter_bill")["helm"] == 1
     words = after["ship"]["descriptions"]["smack"]
     assert (words.pop("fit"), words.pop("roles")) == ("unarmed", ["fisherman"])
+    # package 90, A3, old beside new: her helm, the one key it writes, taken out here only
+    assert (before["hull"].get("helm"), after["hull"].pop("helm", None)) == HELM_A3
     assert after == before
     assert list(after) == list(before)
     # and in her text the same three, the bill and the armament between her people and her hold
@@ -621,6 +638,9 @@ def test_her_file_but_for_her_lines_is_what_it_was_against_git(raw):
     # the file's head says where her lines are, as the cutter's does; that sentence and no more
     assert now.count(HEAD_SAYS) == 1
     now = now.replace(HEAD_SAYS, "")
+    # package 90, A3: her helm's two lines, the note and the key, just before her lines
+    assert now.count(HELM_A3_LINES) == 1 and now.index(HELM_A3_LINES) < now.index("  # Her lines")
+    now = now.replace(HELM_A3_LINES, "")
     start = now.index("  # Her lines, drawn only")
     end = now.index("spars:\n", start)
     assert now[:start] + now[end:] == was

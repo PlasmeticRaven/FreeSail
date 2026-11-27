@@ -232,7 +232,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
     station, said in her log, with no reseat. A ship without a captain of her own, or not
     on the sea, is refused in words."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.ui.server import Driver, create_app
@@ -252,7 +252,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with TestClient(app) as http:
+    with DoorClient(app) as http:
         r = http.post(
             "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "Lark"}
         )
@@ -269,7 +269,7 @@ def test_truth_89_a_fake_captain_on_another_ship_keeps_her_through_the_doors_acr
         crew = b.crew
         h = crew.agents["captain"]
         assert "captain" not in w.agents and h.world is crew
-        brief = h.brief.text()
+        brief = h.brief.situation  # the voyage's words: data (package 117)
         assert "X at full detail" in brief or "at full detail" in brief
         assert crew.captain.seated and not crew.captain.commands
         # the station's first sample says the shape
@@ -372,7 +372,7 @@ def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tm
     held no captain's station, and the bridge asked for the station again in place of the
     shelve's result. The read again names the ship as every other call does."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.agents.model import Reply, ToolCall
@@ -393,8 +393,8 @@ def test_a_door_on_another_ship_reads_its_turns_again_after_a_book_is_shelved(tm
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with TestClient(app) as http:
-        game = GameClient("http://testserver", "captain", http=http, ship="X")
+    with DoorClient(app) as http:
+        game = GameClient("http://localhost:8000", "captain", http=http, ship="X")
         a = game.station(weights, "mcp")
         assert a["phase"] == "station" and game.key
         game.reply(Reply(calls=(ToolCall("library", {"topic": "primer 3", "section": "reefing"}),)))
@@ -415,7 +415,7 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
     the free words in the same words as before. A captain seated on her is told the free
     intent is his goal, and that the rules-based captain will not follow it."""
     pytest.importorskip("fastapi")
-    from fastapi.testclient import TestClient
+    from own_page import DoorClient
 
     from freesail.agents import consent
     from freesail.ui.server import Driver, create_app
@@ -455,12 +455,12 @@ def test_a_free_intent_is_taken_for_a_ship_on_the_sea_with_the_warning(tmp_path)
     ).write(records)
     driver = Driver(w, compression=60.0)
     app = create_app(driver, game="a test", consent_records=records, saves_dir=tmp_path / "saves")
-    with TestClient(app) as http:
+    with DoorClient(app) as http:
         a = http.post(
             "/api/agents/captain", json={"model_name": weights, "door": "mcp", "ship": "X"}
         ).json()
         assert a["phase"] == "station"
-        brief = b.crew.agents["captain"].brief.text()
+        brief = b.crew.agents["captain"].brief.situation  # the voyage: data (package 117)
         assert f"The intent the scenario gives the ship: {goal}. It is a free intent" in brief
         assert "the rules-based captain will not follow it" in brief
         http.post(
@@ -1077,3 +1077,19 @@ def test_the_pace_rules_open_samples_name_every_hulls_station_once():
     w.follow("X")
     names = [name for name, _h, _w in all_agents(w)]
     assert sorted(names) == ["captain", f"captain of {w.players.ship.name}"]
+
+
+def test_a_held_stations_own_course_ends_with_the_plans_last_mark_said_as_before():
+    """Package 118, item 4, kept to the director's course (the reader of 2026-11-19): a
+    station holding a far hull steers her by the far shape's own road, and at the end of her
+    course she lies to with the plan's last mark said to the station (`plan.ended`), as
+    before; the director's course's own ending does not take that line from her."""
+    w = hove_to_world()
+    v, crew = _held_far_cutter(w, "49 40 N 5 40 W")
+    e = crew.submit("steer north", actor="the captain")
+    assert e.kind == "helm.set", e.text
+    n = len(list(crew.log))
+    w.run(12 * 3600)
+    assert v.plan[:1] == [("lie_to", float("inf"))] and not v.done and v.station_held()
+    ended = [x.text for x in list(crew.log)[n:] if x.kind == "plan.ended"]
+    assert len(ended) == 1 and ended[0].startswith("The plan's last mark reached"), ended
