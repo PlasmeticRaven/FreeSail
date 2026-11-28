@@ -2455,23 +2455,37 @@ def ship_class_words(spec: Any, name: str = "") -> str:
     taken out of it where the note names her, and the rig by the file's word where the
     clause does not say it. A hull sailing under another name than her file's (a far
     ship made from the frigate's or the brig's lines) keeps the file's class and loses
-    the file's ship's name."""
+    the file's ship's name. Her name goes with the prefix that is hers ('HMS Bellerophon,
+    a 74-gun ship ...'); a first clause that names her and her state, and no class ('HMS
+    Indefatigable as built, a 64-gun ship ...', '... as razeed, 1795: the Ardent-class
+    64 ...'), gives its class after its comma or else the next clause's; only a leading
+    article is made small, and 'the' before a possessive ('The Navy's smack') is kept
+    (carried fault 24: "hMS as razeed, 1795", "hMS a 74-gun ship", "a Navy's smack")."""
     note = str(getattr(spec, "era_notes", "") or "").strip()
-    head = re.split(r"[(:]", note, maxsplit=1)[0].strip().rstrip(",;") if note else ""
+    clauses = re.split(r"([(:])", note, maxsplit=1) if note else [""]
+    head = clauses[0].strip().rstrip(",;")
     file_name = str(getattr(spec, "name", "") or "")
     if head and file_name:
         # 'H.M. brig-sloop Harpy of the Diligence class' -> 'H.M. brig-sloop of the
         # Diligence class'; 'A 36-gun ... frigate of the Amazon class' keeps the class
-        head = re.sub(rf"(?<!the ){re.escape(file_name)}\b,?\s*", "", head)
+        head = re.sub(rf"(?<!the )(?:H\.?M\.?S\.?\s+)?{re.escape(file_name)}\b,?\s*", "", head)
         head = re.sub(r"^L'\s*,?\s*", "", head).strip(" ,")
         head = re.sub(r"\s+", " ", head)
+    if head and not re.match(r"(?i:a|an|the)\b|H\.M\.", head):
+        appositive = re.search(r",\s*((?i:a|an|the)\s.*)$", head)
+        nxt = clauses[2] if len(clauses) > 2 and clauses[1] == ":" else ""
+        nxt = re.split(r"[(;:]", nxt, maxsplit=1)[0].strip(" ,")
+        head = appositive.group(1) if appositive else (nxt or head)
     rig = str(getattr(spec, "rig", "") or "").replace("-", " ")
     if not head:
         return f"a {rig}" if rig else "a ship"
-    if head[:1].isupper() and not head.startswith("H.M."):
+    if re.match(r"(A|An|The)\b", head):
         head = head[:1].lower() + head[1:]
-    if head.startswith("the "):
-        head = "a " + head[4:]
+    elif head[:1].isupper() and not head.startswith("H.M."):
+        # 'Spanish xebec of the Mahón station': her class with its article, the word kept
+        head = ("an " if head[:1] in "AEIOU" else "a ") + head
+    if head.startswith("the ") and not re.match(r"the \S+'s\b", head):
+        head = ("an " if re.match(r"[aeiouAEIOU8]|1[18]\b", head[4:]) else "a ") + head[4:]
     rigged = f", {rig}-rigged" if rig and rig.split()[-1] not in head.lower() else ""
     return f"{head}{rigged}"
 
@@ -2535,9 +2549,11 @@ def ship_words(world: Any) -> str:
             "revenue": "a revenue cutter",
             "indiaman": "an Indiaman",
         }.get(role, "a merchantman")
-        if cls.startswith("H.M. "):
-            # the hull's lines are a King's vessel's (the file's history); she is not
-            cls = cls[5:]
+        mark = next((m for m in ("H.M. ", "the Navy's ") if cls.startswith(m)), "")
+        if mark:
+            # the hull's lines are a King's vessel's (the file's history); she is not (the
+            # smack out of Falmouth, "the Navy's smack; a merchantman": carried fault 24)
+            cls = cls[len(mark) :]
             cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
     of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
     parts = [f"The ship: {name}, {cls}; {service}{of}{escort}{duty}."]

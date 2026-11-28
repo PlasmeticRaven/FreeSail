@@ -2728,3 +2728,483 @@ The lens (`test_lateen_whole`, `test_boat_towed`, `test_knowledge`, `test_strain
 **The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against b35aaaba's code, which is 111b1b5's: its fast tier is the l72t run of 111b1b5 and its slow likewise. The eighteen in gales and A2's harness run on it too, since `strain.py` moves. The results follow in a section of their own; the commit after this one touches this report alone.
 
 **For the coordinating session:** the branch to watch is **`…/pkg-90-lateen2`**, this section's commit, pushed, its tiers running.
+
+## The lateen hulls' list, its third pass (nudge 77): on `…/pkg-90-lateen3`, items 1, 3, 4 and 5 built and pinned; item 2 waiting for package 127 (2026-11-24)
+
+**The branch:** **`…/pkg-90-lateen3`**, cut from `…/pkg-90` at its tip **86fa56d3** (the trunk at 86fa56d3, the second pass merged there at 474eff8b), as the coordinating session asks.
+- `…/pkg-90` is still at 86fa56d3, and the trunk at b547cf88 by one record of docs. **Packages 125 to 127 have not landed**, so there is nothing to merge before this hash, and **no line was resolved by hand.**
+- The work is one commit of code and tests, **64d45bf**, and this one of the notes and report.
+- Its files:
+  - `freesail/world/boats.py` and `dealings.py`;
+  - `freesail/evolutions/scripts.py`, `runner.py` and `action_scripts.py` (the engine track's);
+  - `freesail/physics/strain.py` (the widened words);
+  - `freesail/orders/navigation.py` and `orders/grammar.py` (the shift of a whole lateen hull, the engine track's lateen rows);
+  - `tests/test_lateen_whole.py` and `tests/test_boat_towed.py`.
+
+**The equations are read, not changed.** The measures, old beside new, are in `docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list, its third pass".
+
+1. **A towed boat stove and cut adrift is lost by the lost road** (`boats.stove_in_tow`, `lose_boat`): sent, laid out and gone to by nobody till the yard replaces her, and said so.
+   - **The kedge refused no lost boat at all** (`LayOutKedgeScript.check`), on any ship: mended at the cause.
+   - `clear for action` no longer says a lost boat is out and towing astern.
+   - Proofs: `test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms` (now with the three orders refused and the line of her loss) and `test_clearing_for_action_her_boat_lost_says_no_boat_out`.
+2. **A spar lost while its shift waits:** the dire step, by package 127's rule when it lands, as the lead asks. **Not built; 127 has not landed.** Items 1, 3, 4 and 5 do not wait for it: the lead to say whether they go alone.
+3. **A relief that waits behind work in hand is said to wait:** "...: shift the mainsail or box her off when the hands are done trimming the mainsail." (the tartane: her shift begun 182 s and her box 82 s after the order).
+   - **Coming to, the box is neither offered nor taken:** "She is heaving to; she will not box off while she comes to.". It was taken, and did nothing. **The refusal is every ship's,** the box having done nothing so on any.
+   - Proofs: `test_a_relief_that_waits_behind_work_on_its_sail_is_said_to_wait` and `test_coming_to_she_is_neither_offered_nor_given_boxing_off`.
+4. **Pins:**
+   - "waits its turn" not said while her own shift runs, and the hands named shifting, not waiting: `test_waits_its_turn_is_said_only_while_her_own_shift_waits_and_names_the_hands_shifting`;
+   - the `towed` key, in the stove case above;
+   - two towed boats: `test_of_two_boats_towed_each_is_in_tow_and_one_stove_leaves_the_other`.
+5. **The bow's line in her sails' order, a seaman's list, and the order taken as said:** "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.", and "shift the foresail, the mainsail and the mizen" taken (a whole lateen hull's `shift` alone reads a comma list).
+   - "shift it when you will" names its sail.
+   - Proof: `test_the_bows_list_in_her_sails_order_is_taken_as_said`.
+   - Three pins of the old words moved, old beside new: the stern's line, the bow's, and the bow's with the mizen on its mast.
+
+**Each pin fails with its mend undone**, run so, eight faults:
+- the stove boat not lost;
+- the kedge with a lost boat;
+- the box taken coming to;
+- the box offered coming to;
+- the list out of order;
+- the comma list refused;
+- the held sail unsaid;
+- the boats said out though lost.
+
+The lens (the lateen, boat, knowledge, strain, combat, action, grammar, orders, ports, evolutions, probes and rig-words files): 1,589 passed.
+
+**For the lead:**
+- Two of these reach past a lateen hull, each mended at its cause:
+  - the kedge's refusal of a lost boat;
+  - the box refused while a heave-to or a lie a-try is in hand.
+- No committed file has a whole lateen or a towed boat, and the gales and the harness below are run to show their lines unmoved.
+
+**Checked on this commit:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers:** the fast and the slow tier whole run on this commit's hash, test by test against 86fa56d3's code, which is b88f3bc's: its tiers are the l76t runs of b88f3bc. The eighteen in gales and A2's harness run on it too. The results follow in a section of their own; the commit after this one touches this report alone.
+
+**For the coordinating session:** the branch is **`…/pkg-90-lateen3`**, this section's commit, pushed, its tiers running. Item 2 waits for package 127.
+
+## The third pass's changes on ships in the game, declared (nudge 79): old beside new on every committed ship, by a player's orders (2026-11-24)
+
+**The lead's word (nudge 79):** the third pass comes whole, after package 127, as one hash. Until 127 lands, this declaration is the work.
+- Two of its mends reach today's ships: the kedge refused with her boat lost, and the box refused while she comes to.
+- A third follows from the first: `clear for action` with her boat lost.
+
+Each is declared here as a change on ships in the game, with every other difference a player or a seat is served.
+
+**Mended while measuring, before any hash:** the commit after 5b122eb (its tiers run, and kept as the record of 5b122eb).
+- **The box's refusal now counts only a heave-to or lie a-try already begun.** One given and still waiting may fail its own check, and a box behind it is wanted then. Measured on the merchant brig, whose `lie a-try` waits behind her sail and fails 114 s on with her main topsail not set: her box was carried out on the old side, and was refused at the order by 5b122eb. It is carried out again now.
+- **Where she has no head yards, the refusal gives that reason**, as the box itself would. The lugger: "She has no head yards to brace abox.", not "She is heaving to".
+- **The boat lost is named as her file names her**, as the orders refused say it: "the launch lost", not "the boat lost".
+
+**How measured** (`n77/declare.py` in the session's scratch). Every committed ship file was run, old the trunk's code at 86fa56d3, new this branch. Each case:
+- **kedge:** at anchor in Carrick Road (the ports' tests' start), `cut the boat adrift`, then `lay out a kedge`, 900 s;
+- **box:** at sea in 15 kn, plain sail set and settled 600 s, `heave to`, then at once `box her off`, 900 s;
+- **try:** the same with `lie a-try` first;
+- **clear:** at sea as above, `cut the boat adrift`, then `clear for action`, 1,200 s.
+
+Every reply and every line after the first order is compared.
+
+**1. A lost boat lays out no kedge.** 13 ships moved, every one with a boat. The five boats' own files carry no boat to lose and cannot anchor there, the same both sides.
+
+| A player's orders | Before | Now |
+|---|---|---|
+| `cut the boat adrift`, then `lay out a kedge` (the frigate) | "Order: lay out a kedge."; "Hoist out the launch; the kedge and a hawser into her."; 695 s, "The launch away with the kedge over her stern, paying out the hawser toward SW by S."; 775 s, "The kedge let go from the launch ninety fathoms to the SW by S.": the boat cut adrift laid it out | "Order not carried out ('lay out a kedge'): the launch is lost: cut adrift on the 10th" |
+| the same, the other twelve | each as the frigate's, by her own boat's name (the bilander's and the hermaphrodite brig's long-boat, the cutter's boat, ...) | each refused so, by her boat's name |
+
+**2. A box given while she comes to is refused at the order.**
+- `heave to` then `box her off` moved on 9 ships: the brig, the cutter, the frigate, the hermaphrodite brig, the lugger, the razee, the 74, the 64 and the smack.
+- `lie a-try` then `box her off` moved on 4: the hermaphrodite brig, the razee, the 74 and the 64.
+- On the rest (9 for the heave-to, 14 for the lie a-try) the two sides are the same: her heave-to or lie a-try is refused, or waits to begin, and the box behind it is taken and carried out, or refused, as before.
+
+| A player's orders | Before | Now |
+|---|---|---|
+| `heave to`, then `box her off` (the frigate) | "Order: box her off."; 172 s, "Could not box her off: She is hove to; fill away first, or wear." | "Order not carried out ('box her off'): She is heaving to; she will not box off while she comes to." |
+| the same, the lugger | "Order: box her off."; 82 s, "Could not box her off: She has no head yards to brace abox." | "Order not carried out ('box her off'): She has no head yards to brace abox." |
+| `lie a-try`, then `box her off` (the 74) | "Order: box her off."; 280 s, "Could not box her off: She is hove to; fill away first, or wear." | refused at the order as above; and **one line more:** "Piped down; the starboard watch has the deck." at 280 s, as she lies a-try with no box waiting on her hands |
+
+Of the box cases that moved, the box did nothing on any of them on the old side: each was taken and failed later. Nothing she does moves but that.
+
+**3. `clear for action` with her boat lost.** 13 ships moved, on the one line of the boats:
+
+| | Before | Now |
+|---|---|---|
+| the bilander (one boat) | "The boats are out and towing astern; the ship is clear." | "The ship is clear; the long-boat is lost." |
+| the brig (her launch lost, others left) | the same | "The rest of her boats are out and towing astern, the launch lost; the ship is clear." |
+| the other eleven | the same | each as the brig's, by her boat's name |
+
+Every tick is the same; the line alone moves. That the line says the boats towing astern of boats left on the booms is the trunk's, older, and the lead's.
+
+**Every other difference a player or a seat is served:** none on a committed ship.
+- The catalogue of evolutions a seat is served (`agents/tools._evolution_text`): all 113 entries byte for byte.
+- No data file moves.
+- The rest of the third pass is keyed to a whole lateen or a towed boat, which no committed file has:
+  - the strain's words;
+  - the bow's and the stern's lines;
+  - a `shift` order reading a list with commas, on a hull with a whole lateen alone;
+  - a towed boat stove and lost.
+- The eighteen in gales and A2's harness run on the hash with its tiers, as on every hash.
+
+**Pinned** (each run against its fault):
+- `test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge` (the frigate);
+- `test_on_a_committed_ship_clearing_for_action_with_her_boat_lost` (the brig);
+- `test_on_a_committed_ship_boxing_off_while_she_comes_to_is_refused_at_the_order` (the frigate, the lugger and the 74);
+- `test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out` (the merchant brig).
+
+**The tiers of 5b122eb** run now and are kept as its record. The hash sent comes after 127, merged through `…/pkg-90`, with item 2 by 127's rule, and is tiered whole on its own exact hash.
+
+**For the coordinating session:** the declaration is this section's commit on `…/pkg-90-lateen3`, pushed. Item 2 waits for 127, which I am told of when it is on `…/pkg-90`.
+
+## The record of 5b122eb (nudges 77 and 79): its tiers, kept; not the hash to send (2026-11-24)
+
+5b122eb (the third pass as first reported) was tiered whole before the lead's word that the pass comes as one hash after package 127. Its tiers are kept here as its record. The hash sent comes after 127 and is tiered on its own.
+
+The runs are against 86fa56d3, whose code is b88f3bc's, so its runs are b88f3bc's:
+- **Fast tier whole:** 9,011: 9,002 passed, 8 skipped, 1 xfailed, **0 failed** (1 h 17 min, the declaration's runs beside it).
+  - Every one the same outcome, none gone.
+  - **6 new, all passed**, the third pass's own: `tests/test_lateen_whole.py` 4 and `tests/test_boat_towed.py` 2.
+- **Slow tier whole:** 569: 558 passed, 11 xfailed, **0 failed** (1 h 20 min 48 s), every one the same outcome.
+- **The eighteen in gales:** 360 runs, byte for byte.
+- **A2's harness:** 270 runs, byte for byte.
+
+4ec821b, after it (the declaration and its three mends), is not tiered: its code moves again with 127's merge, and the tiers run on that hash.
+
+## The third pass whole, with package 127 (nudge 83): `…/pkg-90` merged at e87714d7, item 2 by 127's rule; the hash 801c309, tiered whole against e87714d7 (2026-11-27)
+
+**The hash to send: 801c309** on **`…/pkg-90-lateen3`**, pushed. **The commit after it touches this report alone.** It is two commits on fed9e3a (the record of 5b122eb):
+- **d73a4bd**, the merge of `…/pkg-90` at **e87714d7** (package 127 on the trunk at 572133ac); its parents fed9e3a and e87714d7.
+- **801c309**, item 2 by 127's rule: its pin, two pins moved, and the notes (`docs/dev/TuningNotes.md`, "Package 90, the lateen hulls' list, its third pass with package 127").
+
+Old, everywhere below, is **e87714d7**, the merged trunk's code.
+
+**The lines resolved by hand in the merge:**
+- **`docs/dev/TuningNotes.md`**, the one conflict git found: both sides added sections at the end. Each is kept whole, the third pass's first and 127's after it, with one blank line before "## Package 127: words and waits on today's ships".
+- **`freesail/evolutions/action_scripts.py`**, merged by git with no conflict, but holding two `_boats_cleared_words`: 127's, and the third pass's own at the end of the file.
+  - The third pass's is removed. Her lost boat is folded into 127's one function: left out of the boats griped or towing, and said lost by her file's name.
+  - `_lost_boat` is added beside it. It is guarded for a ship with no World about her, which 127's truth 7-786 passes.
+- **`freesail/evolutions/runner.py`**: `heave_to_in_hand` imported beside 127's names.
+- **`tests/test_boat_towed.py`**: the two clearing pins moved to 127's words, old beside new in each pin's comment.
+  - `test_clearing_for_action_her_boat_lost_says_no_boat_out`
+  - `test_on_a_committed_ship_clearing_for_action_with_her_boat_lost`
+
+**Taken by git from 127's side, not by hand:** the list's branch for an order to a whole lateen waiting its turn (nudge 60's item 2, said at the order and notable) is gone in the merge. 127 had replaced it on the trunk with its `TURN_WAIT` line, said for every order and routine. The notes at 801c309 call it "the third pass's own branch". It is the list's first pass's, and is corrected here.
+
+**The equations are read, not changed.**
+
+**What 127 brings, item by item:**
+
+1. **A wait is said once, routine, and marked (`TURN_WAIT`).** Item 3's "when the hands are done trimming the mainsail" is a clause of the strain's warning. The strain's count rules it (`warning_due`), as every strain warning is notable. It is not a wait note: it is not marked, and neither signals nor ground tackle take it back. The order then given says its own wait by 127's road. The tartane in 40 kn, her lateens put on the bad hand while her watch is at her trims:
+   - **Unordered:** at 726 s, 1.51, "Main lateen yard bending like a whip, the mainsail aback against the mast; she will carry it away: shift the mainsail or box her off when the hands are done trimming the mainsail." (old: "... shift the mainsail or box her off.").
+   - **The shift and the box ordered at 640 s and 641 s:** each wait is said once, routine and marked:
+     - "'Shift the mainsail' will follow 'trim the mainsail', which the hands are still at."
+     - "'Box off' will follow 'trim the mainsail', which the hands are still at."
+   - **The warning at 726 s** then says "...: its shift waits its turn.", and the shift begins at 812 s.
+2. **A take-in or a furl countermanding a setting in hand is said notable.** This is 127's own code (`verbs._countermand_the_set`), and the third pass touches no line of `orders/verbs.py`. It was measured on the lateen probes, old beside new, the same line for line:
+   - **The xebec, `take in the mainsail` with her mainsail half set:** "Belayed setting the mainsail; the mainsail left loosed and hanging from the yard." (notable). It is then brailed in from where it is: "Took in the mainsail; brailed up to its yard."
+   - **The xebec, `furl the foresail`, and the tartane, `take in the mainsail`, with the setting waiting:** "Belayed setting the foresail; the foresail left furled." and "Belayed setting the mainsail; the mainsail left furled.", each the order's own reply and notable.
+   - **Inside `shorten sail`:** no lateen hull's shorten sail takes in a lateen, so it has nothing of the lateen's to countermand. The polacre's group is the studdingsails and the flying jib taken in, and the main topsail reefed. It is the same both sides.
+3. **Item 2, a spar lost while its shift waits: the dire step by 127's rule.** A whole lateen's cause is counted by `strain.warning_due`, as every part is: one warning a part and its cause in ten minutes, and the dire one said whatever lesser one came within them (`last_dire_s`). A cause that comes again begins its dire count afresh (`_causes_come`). At e87714d7 the cause kept its own old rule (the lead's choice at nudge 56), and 127 left it so.
+   - **The xebec in 40 kn,** the wind through her bow, her sheets let fly onto the bad hand, the wind then to 56 kn: her mizzen yard is warned "working" at 1.05 at 613 s.
+     - Old: nothing more, and carried away at 1,080 s.
+     - New: "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; she will carry them away: shift the mizen." at 1.77 at 701 s, then carried away at 1,080 s as before. **No load moves.**
+   - **The pin:** `test_within_one_cause_a_yard_risen_to_dire_is_warned_before_it_goes`.
+   - **One pin moved, its two cases,** old beside new in its docstring: `test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning_names`. The xebec's main yard, warned at once at 1.28, is now warned dire as it passes 1.5 within the same cause. Before, nothing was said till the ten minutes were out.
+   - **Run against its fault** (the cause's old rule put back in `_warn`): all three fail.
+   - **Not pinned: the dire count begun afresh when a cause comes again** (`_causes_come`'s one added line). With it removed, `tests/test_lateen_whole.py` passes whole, 279. It matters where a cause said dire gives way to another and comes back within the ten minutes. Measured on the probe after the tiers began, on the hash and with the line removed (`n83/seqsev.py` in the session's scratch):
+     - **The case:** the xebec in 50 kn, her lateens on the bad hand at 600 s, the wind eight points through her bow at 620 s and back at 660 s.
+     - **Where both agree:** every yard is warned dire "lying on the mast" at 601 s to 604 s, then dire "aback against the mast" at 621 s, then "working ... lying on the mast" again at 688 s to 690 s.
+     - **On the hash:** at 715 s the three yards are warned "bending like a whip ... lying on the mast; she will carry it away" at 1.51.
+     - **Without the line:** nothing more, the yards at 1.57 to 1.60 to the run's end at 900 s.
+     - No spar is lost in either, and no load moves.
+
+     **For the lead:** a pin of this case in the next hash, if wanted. It is not added here, so that the hash tiered is the hash sent.
+4. **The boats' line of `clear for action`, in 127's words.** "The boats griped fast on the booms; the ship is clear." for a ship, and "The boat is clear." for a boat. The lost boat's clause follows them.
+   - **A ship with boats on the booms and one lost** (the brig, her launch cut adrift): **"The boats griped fast on the booms; the launch lost; the ship is clear."**
+   - Her one boat lost (the bilander): "The long-boat lost; the ship is clear."
+   - The tartane probe, her towed boat stove, her punt on the booms: "The punt griped fast on the booms; the boat lost; the ship is clear."
+5. **The convoy of six's privateer, a cable nearer:** no run of mine uses the convoy of six (the gales, the harness, the declaration, the probes). In the tiers, `test_known_truths` and `test_the_ship_herself` use her, the same both sides, the base carrying her where 127 put her.
+
+**The declaration's table 3, restated on the merged tree.** The case: `cut the boat adrift`, then `clear for action`, at sea in 15 kn. Old is e87714d7, new 801c309. 13 ships moved, every one with a boat, on the one line of the boats and at the same second:
+
+| Ship | Old (the merged trunk) | New |
+|---|---|---|
+| the brig, the frigate, the razee, the 74, the 64 | "The boats griped fast on the booms; the ship is clear." | "The boats griped fast on the booms; the launch lost; the ship is clear." |
+| the hermaphrodite brig, the privateer schooner, the topsail schooner | the same | "The yawl griped fast on the booms; the long-boat lost; the ship is clear." |
+| the merchant brig | the same | "The jolly boat griped fast on the booms; the long-boat lost; the ship is clear." |
+| the cutter | the same | "The punt griped fast on the booms; the boat lost; the ship is clear." |
+| the bilander (one boat) | "The long-boat griped fast on the booms; the ship is clear." | "The long-boat lost; the ship is clear." |
+| the lugger, the smack (one boat) | "The boat griped fast on the booms; the ship is clear." | "The boat lost; the ship is clear." |
+
+On the old side, a boat cut adrift is still said to be griped fast on the booms, though she is gone. Every tick is the same; the line alone moves.
+
+**Checked on 801c309:**
+- `ruff check` and `ruff format --check` clean;
+- no carriage return in the diff from e87714d7;
+- no line of the diff's Python over 100 characters;
+- `python tools/gen_ships.py <scratch>`: 18 of 18 byte for byte.
+
+**The tiers, whole on 801c309, test by test against e87714d7** (each run in a worktree of its own exact hash):
+- **Fast tier:** 9,051: 9,042 passed, 8 skipped, 1 xfailed, **0 failed** (59 min 36 s). The base: 9,038: 9,029 passed, 8 skipped, 1 xfailed (1 h 0 min 27 s).
+  - Every test of the base is there with the same outcome, and none is gone.
+  - **13 new, all passed**, the third pass's own: `tests/test_lateen_whole.py` 9 and `tests/test_boat_towed.py` 4. They are the third pass's first pins (6), the declaration's (4 tests, the box's in 3 cases), and item 2's.
+- **Slow tier:** 571: 560 passed, 11 xfailed, **0 failed** (1 h 6 min 45 s), and the base the same (1 h 7 min 33 s). Every one has the same outcome; none is new or gone.
+- **The eighteen in gales:** 360 runs, **byte for byte**. That is 6,532 events and 64,800 part samples: 1,973 strain warnings, 412 sails blown out, 47 spars carried away and 4 lines parted, each the same.
+- **A2's harness:** 270 runs, **byte for byte**.
+
+**The declaration's three changes, measured again: old e87714d7 (the merged trunk) beside new 801c309** (`n77/declare.py`, every committed ship in each case, as at 86fa56d3). Of 72 cases, 33 are the same and **39 moved, the same ships as at 86fa56d3**: the kedge 13, the box 9, the lie a-try 4, and the clearing 13. Each moved case was read line by line, and each moved only as follows.
+1. **A lost boat lays out no kedge** (13 ships, every one with a boat). Old: "Order: lay out a kedge.", then the boat cut adrift hoisted out with the kedge. On ten she laid it out within the 900 s, "The kedge let go from the launch ninety fathoms to the SW by S." (the frigate); on three she was still at it. New: "Order not carried out ('lay out a kedge'): the launch is lost: cut adrift on the 10th", by her boat's name.
+2. **A box given while she comes to is refused at the order:**
+   - `heave to` then `box her off`: 9 ships, the same nine as at 86fa56d3.
+     - Old: "Order: box her off.", then 127's "'Box off' will follow 'heave to', which the hands are still at." at 2 s, then "Could not box her off: She is hove to; fill away first, or wear." (the frigate, 172 s; the lugger "She has no head yards to brace abox.", 82 s).
+     - New: refused at the order, "She is heaving to; she will not box off while she comes to." (the lugger: "She has no head yards to brace abox.").
+     - **127's wait line goes with the box:** the old side says one line more than it did at 86fa56d3, where that wait was not said.
+   - `lie a-try` then `box her off`: 4 ships, the same four.
+     - The same as above.
+     - On each of the four, one line more: "Piped down; the starboard watch has the deck.", as she lies a-try with no box waiting on her hands (the 74, at 280 s).
+3. **`clear for action` with her boat lost:** table 3 above.
+
+Nothing else moved in any case: every other reply and line is the same.
+
+**For the coordinating session:** the hash to send is **801c309** on **`…/pkg-90-lateen3`**, tiered whole above. The commit after it, this section's, touches this report alone. One thing waits on the lead's word: a pin for the dire count begun afresh (item 3 above), in the next hash if wanted.
+
+## After the staged third pass (nudge 84): the dire count's pin and carried fault 24, built above 5cffbfe; the hash held for the reader's report (2026-11-27)
+
+**The staged hash is untouched:** 801c309, with its report at 5cffbfe. The work below is above them on **`…/pkg-90-lateen3`**, pushed. **It is not a hash to send:** it is held until the reader's report on 801c309 comes back, so that its list and these go together, `…/pkg-90` merged again before the hash.
+
+**The commits:**
+- **8dd313b**, the merge of `…/pkg-90` at **939de7d6** (the Diana). The one line resolved by hand is the notes', `docs/dev/TuningNotes.md`: each side added sections at the end, and each is kept whole, the Diana's beside the third pass's (every line of both sides in it).
+  - **Its message is wrong in one word:** it names package 126's second part, which 939de7d6 does not hold.
+  - The Diana's, the lateen work's and the rig words' tests run on the merge: 544 passed.
+- **becaedb**, carried fault 24, the ships' class words: the mend, and three pins.
+- **ab809fe**, the pin of the dire count begun afresh, and the notes for both (`docs/dev/TuningNotes.md`, "Package 90, after the staged third pass").
+
+**1. The dire count begun afresh when a cause comes again** (`strain._causes_come`, 801c309's line; the lead's yes at nudge 84): `test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes`.
+- **The case:** the xebec in 50 kn, her lateens on the bad hand, the wind eight points through her bow 20 s on, and back 40 s after.
+- **On 801c309:** the main yard is warned dire "lying on the mast; she will carry it away" as it passes 1.5 again.
+- **With the line removed:** the test fails, the yard warned "working" alone.
+
+**2. Carried fault 24, the ships' class words** (`readings.ship_class_words`), mended at the cause for every file. **Words alone:** nothing a ship does moves. It is the reading's few lines: in `readings.py`, 25 in and 9 out with the docstring and comments, about 15 of them code, in `ship_class_words` and `ship_words`.
+- **Her name is taken out with the "HMS" that goes with it.** Before, only her name went, and "HMS" was left at the head.
+- **Only a leading article is made small**, where any leading capital was ("hMS"). A class that opens with a word of its own keeps it and is given its article: "a Spanish xebec ..." (no committed file has one).
+- **A first clause naming her and her state, and no class, is read past to her class:**
+  - the class after its comma: "HMS Indefatigable as built, a 64-gun ship ..." gives "a 64-gun ship ...";
+  - or else the next clause's, after its colon: "HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a frigate ...".
+- **"the" before a possessive is kept**, where it was made "a" ("a Navy's smack"). An "a" made from "the" before a vowel is "an".
+- **"the Navy's" goes where she is not a King's ship, as "H.M." does** (`readings.ship_words`). The smack out of Falmouth is a merchantman.
+
+| Ship | Old (939de7d6) | New |
+|---|---|---|
+| the razee | "hMS as razeed, 1795, ship-rigged" | "an Ardent-class 64 of 1784 cut down to a frigate by the Navy Office's draught of September 1794, ship-rigged" |
+| the 64 | "hMS as built, a 64-gun ship of the Ardent class" | "a 64-gun ship of the Ardent class" |
+| the 74 | "hMS a 74-gun ship of the Arrogant class" | "a 74-gun ship of the Arrogant class" |
+| the smack | "a Navy's smack" | "the Navy's smack" |
+| the smack out of Falmouth (`smack-falmouth`), the ship reading | "The ship: Culloden, a Navy's smack; a merchantman of Britain." | "The ship: Culloden, a smack; a merchantman of Britain." |
+
+- **The other ten committed ships' class words are the same, byte for byte**, the Diana's among them. Of the 49 committed scenarios' ship sentences, only the smack's moves.
+- **For the lead, what the razee's words now say:** a class, but long, the clause after her note's colon whole to its parenthesis. A shorter one ("an Ardent-class 64 cut down to a frigate") needs her note's first clause written so, at her generator (`tools/ships/indefatigable.py`), or a rule I would rather not guess. It is the lead's to say.
+- **The pins:**
+  - `test_every_committed_ships_class_words_read_as_her_class`, over every committed ship file, after the Diana's doubled-article test: an article or "H.M." at the head, no word made small at it, no article before a possessive, none doubled; and the four by their words.
+  - `test_a_class_opening_with_a_name_of_its_own_keeps_its_capital_and_takes_an_article`.
+  - `test_the_navys_smack_under_a_merchants_papers_is_a_smack`.
+  - **Each of the mend's eight parts, undone, fails one of them.**
+- The files that read the ship's words run on becaedb: `test_the_ship_herself`, `test_diana`, `test_neufchatel`, `test_bilander`, `test_subtypes`, `test_company_moved`, `test_boat_director`, `test_in_world`, `test_readings`, `test_indefatigable` and `test_bellerophon`, 704 passed.
+
+**Checked on ab809fe:** `ruff check` and `ruff format --check` clean.
+
+**Next:** the reader's list, when it comes, then `…/pkg-90` merged again, then the hash, tiered whole against a base on the merged tree, with the eighteen (now nineteen, the Diana's file among them) in gales, A2's harness and the declaration measured again.
+
+**For the coordinating session:** nothing here is the hash; the hash is held as asked.
+
+## Where the fourth pass stands (nudge 95): its hash 4e32dec, its tiers running (2026-11-28, 09:10 UTC)
+
+**The hash to send will be 4e32dec** on **`…/pkg-90-lateen3`**, pushed. **This commit, and each after it until the full report, touches this report alone.**
+
+**What 4e32dec holds:**
+- **e2a7f62**: nudge 86's list (the box that saves her where it did, the "Piped down" declared truly, the kedge's "; a new one is the yard's", and my word on the one-boat model, which I mean to stay), with all before it: the `_causes_come` pin (ab809fe), fault 24 (becaedb), the razee's note at her generator (fd2722a), and the merges 8dd313b and 5bf87b9. Nothing more.
+- **`…/pkg-90` at a174cca2 merged**, as nudge 95 asks (the trunk at 962c5569: A9 and the viewer's V1 and V2). Only `docs/dev/TuningNotes.md` was resolved by hand, each side's sections kept whole: the fourth pass's four and the viewer's one. Ruff is clean on the merged tree, and the generator writes 19 of 19 byte for byte. The branch's tip past a174cca2, 8a95cb6, adds a playtest preview's README alone and is not merged.
+
+**Why no report since e2a7f62.** Its tiers against 93cf624c were begun, and these finished:
+- both fast tiers: 9,219 tests beside 9,198, outcome changed 0, the 21 new all passed;
+- the base's slow tier: 593 passed, 11 xfailed;
+- `tests/test_mends_126.py --slow` on e2a7f62 itself: 45 passed, truth 7-779-b's 28 cells among them, so its 19 declared exceptions held exactly.
+
+But the container was reclaimed while the session sat idle, and the hash's slow tier was lost each time. Then nudge 95 moved the base. Those results are informative now, not the tier.
+
+**Now running** (each step resumable):
+- the fast and the slow tier whole on a174cca2 and on 4e32dec, test by test;
+- the hash's slow tier with the reach tracer watching. It observes and changes nothing, and names the slow files the change reaches, file by file. `tests/test_mends_126.py --slow` runs among it;
+- the nineteen in gales, A2's harness, and the declaration measured again with the corvette among the files.
+
+The full report comes when they end, under its own heading.
+
+**Then the served step** (nudges 88 and 90), its own hash on `…/pkg-90-served`. It is built (162bb5f, f977ad6, 764cf7c, abcb50a): the towed boat served, the lateen's change in a manoeuvre served, `_square_foot_m` at one datum, and the tréou and the great lateen taking each other in. Its proof on 6c29d1d: today's nineteen files' graph and snapshot are byte for byte the same through rest, a tack, a wear and a box off, 6,916 readings. It will be merged with `…/pkg-90` and tiered after this.
+
+**Found since, on e2a7f62 and not carried in it:** a towed boat cut adrift at home is kept in tow, her drag on the ship. It is A4's fault, it reaches no committed file, and it is mended in the served step (162bb5f).
+
+## The engine track taken over (2026-11-28, 10:25 UTC): both branches read in and checked; what runs now
+
+**A new builder has the engine track**, on a fresh machine, the owner's start of 2026-11-28. The last machine ran out; everything of it was pushed. Lost with it: its unfinished test runs, and its scratch scripts outside the tree (A2's harness, the eighteen-in-gales run, `n77/declare.py`). **The three scripts are rebuilt from this report's own descriptions**, as faithfully as I can, and each result below says it is from the rebuilt script.
+
+**Both branches checked:**
+- **`…/pkg-90-lateen3`** at **050f8114** (this report alone), its parent **4e32dece**: the fourth pass, the hash to send. Its parents are e2a7f62 and a174cca2.
+- **`…/pkg-90-served`** at **db499555**, the served step merged with `…/pkg-90` at a174cca2.
+- **`…/pkg-90`** is at **8a95cb6**, one commit past a174cca2: the preview's README alone. **It is not merged into the fourth pass**, so the hash tiered stays the hash sent. It is merged into the served step when that step comes.
+
+**The coordinating session's news of nudge 96 is received:** the fourth pass is staged on the trunk at 962c5569, and the cloud's run 189 is on it. Nothing in this section moves 4e32dece's code.
+
+**Running now, in this order** (each in its own worktree of its exact hash, in shards with their own junits, results written to files as they go):
+1. **The fast tier whole** on 4e32dece and on a174cca2, compared test by test.
+2. **`tests/test_mends_126.py --slow`** on 4e32dece (truth 7-779-b and its declared exceptions).
+3. **The three rebuilt proofs, old a174cca2 beside new 4e32dece:** the nineteen committed files in gales, A2's harness, and the declaration's cases (nudge 79's four, and nudge 86's failing heave-to with the corvette among the files).
+4. **The slow tier whole** on both, and the slow files the change can reach, named file by file.
+5. **The checks:** ruff and `ruff format --check` (ruff 0.15.8, the project's pin), LF only, no Python line over 100 characters, `python tools/gen_ships.py <scratch>` 19 of 19.
+
+**Then** the full report of 4e32dece under its own heading, and after it the served step to its own hash.
+
+## The fourth pass's three proofs (nudge 96): the nineteen in gales, A2's harness and the declaration, old a174cca2 beside new 4e32dec; `test_mends_126.py --slow` passed; the tiers running (2026-11-28, 11:40 UTC)
+
+**The hash is 4e32dec** (4e32dece36ff) on **`…/pkg-90-lateen3`**, pushed. Its code is as the last builder left it: nothing in it is changed. **The commits after it touch this report alone** (050f811, d7c2906 and this one). **The hash is reported with its tiers, in the next section**, as the coordinating session's nudge 96 asks. This section gives the three proofs now, so that they need not wait on the tiers. It is **e2a7f62** with **`…/pkg-90` at a174cca2** merged (the trunk at 962c5569: A9, and the viewer's V1 and V2):
+- e2a7f62: nudge 86's list (the box that saves her where it did, the "Piped down" declared truly, the kedge's "; a new one is the yard's", and the one-boat model, which stays);
+- with all before it: the `_causes_come` pin (ab809fe), fault 24, the ships' class words (becaedb), the razee's note at her generator (fd2722a), and the merges 8dd313b and 5bf87b9.
+
+**Old, everywhere below, is a174cca2**, the merged trunk's code. Each run is from a worktree of its own exact hash. `…/pkg-90` at 8a95cb6 (the preview's README alone) is not merged here, so the hash tiered is the hash sent.
+
+**Three scripts are rebuilt**, from this report's own descriptions, since the last machine's scratch was lost with it. Each is said below with what it does, and where my rebuilding had to choose. **They are rebuilt, not the same files**, so their counts are not the old runs' counts. Every comparison is old beside new by the same script, from the two worktrees.
+- **The gales** (`n55/gales.py`): as "A4's hash (nudge 55)" describes it, word for word. The parts' samples are kept as one digest a sample, of every part's load, condition, state and wreck.
+- **A2's harness** (`a2/harness_v2.py`): its five starts and fifteen runs a file, as Step A2 and A5 and A6's table give them. **My choices:** the "off the wind" start is her head 225 (the wind on her starboard quarter), plain sail trimmed; the scud and a course across the stern (`steer SE`) run from it. The course across the eye is `steer ENE`, and the fill away for a course is `fill away and steer W`. Each run lasts 600 s after its order, the anchor runs as described.
+- **The declaration** (`n77/declare.py`): nudge 79's four cases as described, every committed file. To them I add **nudge 86's**, on every file and not only the reader's five:
+  - the heave-to failing (the wind four points onto her bow 20 s on), the box given when she is first said aback or 60 s on, in 12 and 25 kn;
+  - the corvette's case in 30 kn with no shift, the box at 0, 60 and 300 s;
+  - and the same with `lie a-try`.
+  - It also keeps what a seat is served: each file's class words, her ship reading, each committed scenario's ship reading, and every evolution's text of the catalogue.
+
+**The gales' script sees what the old one saw:** with `WARNING_INTERVAL_S` cut from 600 to 540 in process (nothing of the tree edited), the cutter's, the brig's, the frigate's and the lugger's 80 runs give **53 runs different**, the count the old script gave at nudge 55.
+
+### The nineteen in gales, old beside new
+
+The rebuilt `n55/gales.py`, every committed file, the Diana's among them: 35 and 50 kn gusting, the ten orders, 900 s each.
+
+| | Old (a174cca2) beside new (4e32dec) |
+|---|---|
+| Runs | **380, the same in every event, tick, part sample and trace; the two files byte for byte** |
+| Events | 9,373, of 41 kinds, every strain warning line and its tick among them |
+| Strain warnings | 2,240 |
+| Sails blown out | 474 |
+| Spars carried away | 52 |
+| Lines parted | 4 |
+| Part samples | 68,400 (every part, each five seconds) |
+| Trace rows | 34,200 |
+
+No committed file carries a whole lateen or tows a boat, and no gale run boxes her off while she comes to, so none of the pass's lines is met here.
+
+### A2's harness, old beside new
+
+The rebuilt `a2/harness_v2.py`, every committed file, fifteen runs each: **285 runs, byte for byte**, the two files the same. That is 4,494 events and 31,920 trace rows, every tick, kind, line and trace row the same.
+
+### The declaration measured again: old a174cca2 beside new 4e32dec
+
+The rebuilt `n77/declare.py`, every committed file, the corvette among them, 14 cases each. **Of 266 cases, 148 are the same and 118 moved.** Every moved case was read line by line, with her trace beside it, and each moved only as follows.
+
+**1. A lost boat lays out no kedge** (at anchor in Carrick Road, `cut the boat adrift`, then `lay out a kedge`, 900 s). **14 ships moved, every one with a boat**: the thirteen of nudge 79 and the corvette. The five boats cannot anchor there and carry no boat; they are the same both sides.
+- Old: "Order: lay out a kedge.", then the boat cut adrift hoisted out with the kedge. On ten she laid it out within the 900 s, between 721 and 845 s ("The kedge let go from the launch ninety fathoms to the SW by S.", the frigate, 775 s). These are the brig, the corvette, the frigate, the hermaphrodite brig, the lugger, the privateer schooner, the razee, the 74, the 64 and the topsail schooner. On four she was still at it: the bilander, the cutter, the merchant brig and the smack.
+- New: "Order not carried out ('lay out a kedge'): the launch is lost: cut adrift on the 10th; a new one is the yard's", by her boat's name.
+- **What she does moves** where the old side's kedge was let go: there she rode to it after, and now she rides to her bower alone. Her trace parts on five ships, from the second the old side's kedge was let go. On the corvette her place is within 0.04 m and her head within 0.15 degrees by the run's end. On the frigate, the razee and the two schooners she is within 0.01 m and 0.005 degrees.
+
+**2. A box given while she comes to waits, as on the trunk, and is belayed truly where she comes to** (nudge 86's ruling).
+- **At sea in 15 kn, `heave to` then at once `box her off`:** 12 ships moved.
+  - **On eleven, by one line at the same second:** "Could not box her off: She is hove to; fill away first, or wear." is now "Belayed boxing off: she is hove to." (notable). These are the brig, the corvette, the cutter, the frigate, the hermaphrodite brig, the privateer schooner, the razee, the 74, the 64, the smack and the topsail schooner.
+  - **The lugger** is refused at the order: "Order not carried out ('box her off'): She has no head yards to brace abox.". Old: taken, "'Box off' will follow 'heave to', which the hands are still at.", and failed 82 s on with those words.
+  - The bilander, the merchant brig and the five boats are the same both sides.
+- **The same with `lie a-try`:** 9 ships moved, by one line becoming two at the same second: "Belayed boxing off: she is hove to." and **"Piped down; the starboard watch has the deck."**. These are the brig, the corvette, the frigate, the hermaphrodite brig, the privateer schooner, the razee, the 74, the 64 and the topsail schooner. Her trace is the same to 900 s on each of the nine.
+- **Nudge 86's cases, every file** (the heave-to failing, the wind four points onto her bow 20 s on, the box when she is first said aback or 60 s on, in 12 and 25 kn; in 30 kn with no shift, the box at 0, 60 and 300 s; and the same with `lie a-try`). 69 cases moved:
+  - each by the belayed line at the same second where she came to;
+  - the piped-down line with it where she lay a-try;
+  - the lugger's refusal at the order, in four of them.
+- **Where her coming to failed on the trunk, the box saves her as it did.** These are 18 cases: the brig in 12 and 25 kn (both timings); the corvette in 25 kn (both) and in 30 kn (all six); the frigate in 12 kn (both); the merchant brig lying a-try in 15 kn; and the smack lying a-try in 30 kn (all three). In each, her heave-to or lie a-try failed and the waiting box began then and boxed her off, **byte for byte the same both sides**. **No case ends worse than on the trunk.**
+- **Said truly:** in every moved case but the kedge's, her trace is the same to the run's end, 104 cases of 900 s to 1,500 s. "Piped down" sends the watch below, and what she does after may move by it: the lead's reader found her spanker set 16 s and her main topgallant 1 s sooner on the brig lying a-try in 30 kn. None of my runs met such a case within its time.
+
+**3. `clear for action` with her boat lost** (at sea, `cut the boat adrift`, then `clear for action`, 1,200 s). 14 ships moved, on the one line of the boats and at the same second, her trace the same:
+
+| Ship | Old (a174cca2) | New |
+|---|---|---|
+| the brig, the corvette, the frigate, the razee, the 74, the 64 | "The boats griped fast on the booms; the ship is clear." | "The boats griped fast on the booms; the launch lost; the ship is clear." |
+| the hermaphrodite brig, the privateer schooner, the topsail schooner | the same | "The yawl griped fast on the booms; the long-boat lost; the ship is clear." |
+| the merchant brig | the same | "The jolly boat griped fast on the booms; the long-boat lost; the ship is clear." |
+| the cutter | the same | "The punt griped fast on the booms; the boat lost; the ship is clear." |
+| the bilander (one boat) | "The long-boat griped fast on the booms; the ship is clear." | "The long-boat lost; the ship is clear." |
+| the lugger, the smack (one boat) | "The boat griped fast on the booms; the ship is clear." | "The boat lost; the ship is clear." |
+
+**4. What a seat or a player is served** (carried fault 24 and the razee's note, words alone):
+- **The ship reading** (`readings.ship_words`, the player's `the ship` and every station's brief), each file at sea: 4 of 19 moved.
+  - the razee: "The ship: Indefatigable, hMS as razeed, 1795, ship-rigged; a King's ship of Britain. ..." -> "The ship: Indefatigable, a razee of 44 guns, cut down from a 64-gun ship of the Ardent class; a King's ship of Britain. ...";
+  - the 64: "..., hMS as built, a 64-gun ship of the Ardent class; ..." -> "..., a 64-gun ship of the Ardent class; ...";
+  - the 74: "..., hMS a 74-gun ship of the Arrogant class; ..." -> "..., a 74-gun ship of the Arrogant class; ...";
+  - the smack: "The ship: Culloden, a Navy's smack; a merchantman of Britain. ..." -> "The ship: Culloden, a smack; a merchantman of Britain. ...".
+- **The 49 committed scenarios' ship readings:** 1 moved, `smack-falmouth`'s, as the smack's above.
+- **The class words** (`readings.ship_class_words`), each file: 8 of 19 moved.
+  - Four are the ships above (the smack's own: "a Navy's smack" -> "the Navy's smack", which her reading as a merchantman then drops).
+  - **Four more, not declared before: the boats'.** "a brig's cutter, a six-oared boat with a lug" -> "the brig's cutter, ...", and so of the frigate's first cutter, the brig's launch and the frigate's launch. This is the rule keeping "the" before a possessive: their notes open "The brig's cutter, ...".
+  - **No reading serves them.** `ship_words` is their only caller, and it reads a boat by `_boat_words`, which says none of them ("The boat: a ship's boat, ..."). The fault-24 section counted the ships alone.
+- **The catalogue of evolutions** a seat is served (`agents/tools._evolution_text`): all 113 entries byte for byte.
+
+Nothing else moved in any case: every other reply and line is the same.
+
+### Checked on 4e32dec
+
+- `ruff check` and `ruff format --check` clean, with ruff 0.15.8, the project's pin (429 files formatted).
+- No carriage return in the diff from a174cca2.
+- No line over 100 characters in the 13 Python files of that diff.
+- `python tools/gen_ships.py <scratch>`: 19 of 19 byte for byte.
+
+### `tests/test_mends_126.py --slow` on 4e32dec (the lead's nudge 87)
+
+**45 passed** (36 min 59 s). Truth 7-779-b's 29 cases passed: its 28 cells of 140 cell-seeds, and the trunk's stand-in. Each cell asserts that the cell-seeds outside its rule are exactly those declared (`PASSAGE_DECLARED`, 19), **so the declared exceptions hold exactly**. The file is the same at both hashes.
+
+### Running now
+
+Each runs in shards with their own junits:
+- **The fast tier whole**, on 4e32dec and on a174cca2. Of 8 shards, the first is done both ways: 1,189 tests on the hash against 1,185, outcome changed 0, gone 0, and **4 new, all passed** (`tests/test_boat_towed.py`).
+- **Then the slow tier whole** on both. The hash's runs with a reach tracer watching, which observes and changes nothing; it names the slow files the change reaches, file by file.
+
+**For the coordinating session:** the three proofs, the checks and truth 7-779-b are above, on the exact hash. The tiers' section comes next, and in it the hash is reported. One thing is new in the declaration: **the four boats' class words** move ("a brig's cutter" -> "the brig's cutter"), and no reading serves them.
+
+## The fourth pass's hash reported (nudge 99): 4e32dec, its fast tier whole test by test against a174cca2 (2026-11-28, 13:30 UTC)
+
+**The hash to send: 4e32dec** (4e32dece36ff) on **`…/pkg-90-lateen3`**, pushed. Its code is unchanged since the last builder pushed it. **The commits after it touch this report alone:** 050f811, d7c2906, d3b3e9b and this one. Its three proofs, its checks and `tests/test_mends_126.py --slow` are in the section above ("The fourth pass's three proofs (nudge 96)"). The nudge 99 the coordinating session relayed is received: the cloud's run 189 green and the lead's reader's pass.
+
+### The fast tier whole, on 4e32dec and on a174cca2, test by test
+
+From the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, each side in a worktree of its own exact hash. Each tier ran as eight shards of the test files, the same files both ways, each with its own `--junitxml` and each under 25 minutes. The junits were compared test by test by the test's id, with the xdist group's `@...` stripped.
+
+| | 4e32dec | a174cca2 |
+|---|---|---|
+| **Fast tier whole** | 9,340: 9,331 passed, 8 skipped, 1 xfailed, **0 failed** (69 min 42 s, the shards' sum) | 9,319: 9,310 passed, 8 skipped, 1 xfailed, 0 failed (68 min 30 s) |
+
+- **Every test of the base is there with the same outcome; none is gone.**
+- **21 new, all passed**, the pass's own: `tests/test_lateen_whole.py` 12, `tests/test_the_ship_herself.py` 5 and `tests/test_boat_towed.py` 4.They are:
+  - the box's six: belayed where she comes to (the frigate heaving to, the 74 lying a-try), behind a heave-to still waiting, the lugger refused, behind a lie a-try that fails its own check, and begun where her heave-to fails;
+  - the strain's: the dire step within one cause, and a cause come again;
+  - the polacre coming to, not offered the box;
+  - the relief that waits;
+  - "waits its turn";
+  - the bow's list taken as said;
+  - the boats': the kedge and the clearing on a committed ship, two boats towed, and the clearing with no boat out;
+  - the class words: every committed ship's, a class with a name of its own, the Navy's smack under a merchant's papers, and two cases of a class read past her state.
+- The 8 skipped and the 1 xfailed are the same cases both sides.
+- No harbour or browser test failed on either side.
+
+**The guard set of §10.2**, tallied from the junits: every case has the same outcome on both sides.Each set passed whole:
+  - the byte test and the golden classing table (`tests/test_ship_particulars.py`, `tests/test_rig_classing.py`): 95;
+  - `tests/test_schooner_mast.py` 76, `tests/test_probes_90.py` 90, `tests/test_check_viewer_guns.py` 22;
+  - `tests/test_lug.py` 5 and the settee's `tests/test_settee.py` 75;
+  - the going-about set (`test_gale`, `test_rig_geometry`, `test_staying`, `test_lying_to`, `test_evolutions`, `test_captain_trials`, `test_catalogue`) 261, and `tests/test_grammar_book.py` 9;
+  - the pass's own files: `tests/test_lateen_whole.py` 287 (275 at the base), `tests/test_boat_towed.py` 43 (39) and `tests/test_the_ship_herself.py` 19 (14).
+
+### The slow tier
+
+**The slow tier whole runs next** on both, after the served step's fast tier: the hash's with the reach tracer watching, then the base's. Its result follows in a section of its own, with the slow files the change reaches, named file by file. **By the coordinating session's word, it does not hold the hash:** the cloud's run 189 ran both tiers whole on it. Already run on the hash: `tests/test_mends_126.py --slow`, 45 passed, truth 7-779-b's declared exceptions held exactly (above).
+
+**For the coordinating session:** **the hash is 4e32dec**, reported with its fast tier whole: outcome changed 0, gone 0, and the 21 new all passed. **The served step's hash follows on `…/pkg-90-served`**, after this one, with the reader's question answered there. Its proofs are run already: graph and snapshot byte for byte on the nineteen files; the gales, A2's harness and every sail's `set` byte for byte. Its fast tier whole runs now, before the slow tiers.
