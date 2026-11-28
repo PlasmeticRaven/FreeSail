@@ -613,7 +613,11 @@ def test_truth_7_799_the_names_of_a_checkpoint_are_read_without_loading_it_and_s
     world = make_scenario_world(sf)
     begin(world, sf)
     world.run(60)
-    world.scenario.planted_place = Path("/a/place/of/saves")
+    place = Path("/a/place/of/saves")
+    world.scenario.planted_place = place
+    # a second path, of the same class: the pickle names the class once and fetches it from
+    # its memo after, and this place is told as its own
+    world.consent_records_dir = Path("/the/records")
     save = tmp_path / "planted.json"
     replay_mod.save_to_file(world, save)
 
@@ -624,10 +628,17 @@ def test_truth_7_799_the_names_of_a_checkpoint_are_read_without_loading_it_and_s
     monkeypatch.setattr(pickle, "load", never)
     monkeypatch.setattr(pickle, "loads", never)
     refused = H.not_admitted(H.pickle_of(save.with_suffix(".checkpoint")))
-    assert len(refused) == 1, [h.line() for h in refused]
-    (path,) = refused
+    assert len(refused) == 2, [h.line() for h in refused]
+    path, records = refused
     assert path.module.startswith("pathlib") and path.name.endswith("Path")
+    assert (records.module, records.name) == (path.module, path.name)
     assert path.keys[-1] == "planted_place"
-    assert "freesail.core.world.Scenario" in path.within
-    assert path.words[0] == "/a/place/of/saves"
+    assert records.keys[-1] == "consent_records_dir"
+    # the objects it is part of, outermost first: the scenario, within the world
+    assert path.within[-1] == "freesail.core.world.Scenario"
+    assert "freesail.core.world.World" in path.within
+    assert records.within[-1] == "freesail.core.world.World"
+    assert "freesail.core.world.Scenario" not in records.within
+    # its words: whole on a later Python, its parts on 3.11
+    assert Path(*path.words) == place and Path(*records.words) == Path("/the/records")
     assert H.main([str(save.with_suffix(".checkpoint"))]) == 1

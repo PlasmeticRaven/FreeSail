@@ -107,31 +107,115 @@ def test_truth_7_790_a_trader_lying_at_the_little_road_sails_for_dover(monkeypat
     laid = _count_layings(monkeypatch)
     w = _channel_east()
     v, port = _lying_at_the_little_road(w, "trade 33 tons of brandy from the Havre to Dover")
-    w.run(4 * 3600)
+    w.run(12 * 3600)
     brain = v.brain
     off_nm = bearing_and_distance(port.anchorage.position, v.position)[1] / units.NAUTICAL_MILE
     states = [s for _t, s in brain.history]
-    assert states[0] == "at anchor", brain.history  # beyond the reach of the Great Road
-    assert brain.state != "at anchor" and "on passage" in states, brain.history
+    # in port by the world's own rule (`Ports.in_port_at`): within the port's reach of its
+    # anchorage, three miles inside the Great Road
+    assert states[0] == "in port", brain.history
+    assert brain.state not in ("in port", "at anchor") and "on passage" in states, brain.history
     assert off_nm > 3.0, off_nm
     assert laid["trader"] <= 2, laid
-    # her course out begins with the track's next mark, never the anchor she lay at
-    assert not any(leg[0] == "anchor" and leg[1] == port.id for leg in v.plan), v.plan
+    # her course out begins with the track's next mark, never the anchor she lay at; and it
+    # ends at an anchor in Dover, the destination's anchorage laid where her track out had
+    # held the only anchorage of the passage
+    anchors = [leg for leg in v.plan if leg[0] == "anchor"]
+    assert anchors == [("anchor", "dover")], v.plan
 
 
-def test_truth_7_791_a_weigh_that_leaves_her_at_anchor_is_not_tried_every_minute(monkeypatch):
-    laid = _count_layings(monkeypatch)
-    w = _channel_east(hour=8)
-    # her voyage's end is where she lies: every plan laid anchors her there again
-    v, port = _lying_at_the_little_road(
-        w, "run home to the Little Road of Havre", "homeward", departing=False
+def test_truth_7_790_a_ship_bound_home_to_the_port_she_weighed_from_comes_to_in_it():
+    """The lead's finding (1) of c22aa834: the anchorage left out is the one she lies at as
+    she weighs, and only it. A smack twelve miles off Dover, the port she weighed from, runs
+    home and comes to in it. OLD (c22aa834): every anchorage of that port was left out of
+    every passage, and she ended her voyage off it, `done` at sea and "on passage"."""
+    from freesail.world.geo import Position, destination
+    from freesail.world.ships import vessel_from_spec
+
+    road = {"lat_deg": 51.1145, "lon_deg": 1.32}  # Dover's road
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 6, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        position=destination(Position(**road), 150.0, 30 * units.NAUTICAL_MILE).to_dict(),
+        region="channel-east",
+        ports=["dover"],
     )
-    w.run(5 * 3600)
+    w = make_world(1805, "data/ships/brig.yaml", sc)
+    port = w.dealings.ports["dover"]
+    off = destination(port.outer_road.position, 150.0, 12 * units.NAUTICAL_MILE)
+    spec = {
+        "id": "smack",
+        "description": "smack",
+        "name": "Brothers",
+        "nation": "britain",
+        "position": off.to_dict(),
+        "goal": "run home to Dover",
+        "intent": "run home to Dover",
+        "departing": port.id,
+    }
+    v = vessel_from_spec(w, spec, w.vessels.serial + 1)
+    w.vessels.serial += 1
+    w.vessels.add(v)
     brain = v.brain
+    brain._departing = port.id
+    for _hour in range(8):
+        w.run(3600)
+        if v.done:
+            break
+    assert [s for _t, s in brain.history][-1] == "in port", brain.history
+    assert v.done and brain.intent.done
+    nm = bearing_and_distance(port.anchorage.position, v.position)[1] / units.NAUTICAL_MILE
+    assert nm <= 0.5, nm
+
+
+def test_truth_7_791_a_weigh_that_leaves_her_at_anchor_waits_longer_each_time(monkeypatch):
+    """A ship at anchor at sea, out of any port's reach, whose every weigh lays a plan that
+    anchors her where she lies: each weigh that leaves her riding there doubles the wait
+    before the next, from an hour (`AT_ANCHOR_LEAST_S`) to a day (`AT_ANCHOR_MOST_S`), and
+    is tried by day. OLD (the trunk): every minute of daylight; c22aa834: every hour."""
+    from freesail.world.ships import vessel_from_spec
+
+    weighs: list[int] = []
+    plan = B.FarCaptain._plan
+
+    def counted(self):
+        if str(self.vessel.id) == "rider" and self.state is not None:  # not her making
+            weighs.append(int(self.world.clock.tick))
+        return plan(self)
+
+    monkeypatch.setattr(B.FarCaptain, "_plan", counted)
+    w = _channel_east(hour=6)
+    here = {"lat_deg": 50.9, "lon_deg": 0.75}  # Rye Bay, some miles off: no port's reach
+    spec = {
+        "id": "rider",
+        "description": "brig",
+        "name": "Patience",
+        "nation": "britain",
+        "position": here,
+        "goal": "run home to 50 54 N 0 45 E",
+        "intent": "run home to 50 54 N 0 45 E",
+    }
+    v = vessel_from_spec(w, spec, w.vessels.serial + 1)
+    w.vessels.serial += 1
+    w.vessels.add(v)
+    v.saved_plan = None
+    v.plan = [("anchor", "")]
+    brain = v.brain
+    brain.state = None
+    brain.planned = True
+    w.run(24 * 3600)
     assert brain.state == "at anchor", brain.history
-    # an hour at anchor, then a weigh an hour: four or five in five hours, never one a minute
-    assert 1 <= laid["homeward"] <= 5, laid
-    assert int(brain._business[B.WEIGHED]) > 3 * 3600, brain._business
+    assert [s for _t, s in brain.history] == ["at anchor"], brain.history
+    gaps = [b - a for a, b in zip(weighs, weighs[1:], strict=False)]
+    # an hour, two, four, then eight, the night waited through: four in the day
+    assert 4 <= len(weighs) <= 6, weighs
+    assert gaps[0] >= 2 * 3600 - 60, gaps
+    assert all(b >= a for a, b in zip(gaps, gaps[1:], strict=False)), gaps
+    assert all(g <= B.AT_ANCHOR_MOST_S + 12 * 3600 for g in gaps), gaps
+    assert int(brain._business[B.WEIGH_TRIES]) == len(weighs), brain._business
 
 
 def test_truth_7_792_a_passage_laid_again_reads_its_tiles_from_the_cache_and_lays_the_same(
