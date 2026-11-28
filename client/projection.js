@@ -104,7 +104,9 @@
   var HOISTED_STATES = { set: 1, goose_winged: 1, blown_out: 1, wrecked: 1 };
   // the steps of the square sail's evolutions that move its yard (data/evolutions/*_square.yaml):
   // hoisting or settling the halyards, halfway; reefing or shaking out, down on the cap
-  var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0 };
+  // and a pole's upper yard let go and lowered onto the yard below as its sail is clewed up there
+  // (package 90, V2: take_in_pole.yaml's and furl_pole.yaml's step), halfway
+  var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0, lower_and_clew_up: 0.5 };
   // Package 57 (the owner's notes 4 and 5 of the Éclair's first cruise; the lead's finding
   // of 18:29). A square yard is slung before its mast, the sail hanging before the yard, so
   // that from ahead the sail hides the mast and from astern the mast hides the sail: the
@@ -118,6 +120,10 @@
   var YARD_BEFORE_MAST_OF_BEAM = 0.05;
   var LUG_LEE_OF_MAST_OF_BEAM = 0.03;
   var ON_DECK_M = 0.6;
+  // A lateen yard with no cut slopes up toward its after end this much (radians; judgement, the
+  // figure the viewer always gave one). Package 90 (V1) makes a whole lateen's cut from it where
+  // its file gives none (`lateenCorners`).
+  var LATEEN_TILT = 0.8;
   // Package 75 (B5.3; docs/design/Design-ShipsEngineExtensions.md §6.2). A yard under the
   // bowsprit or the jib-boom (the spritsail yard, the sprit-topsail yard) stands at its own
   // station, where its file has it. Its braces lead to the fore stay and up to the fore top,
@@ -355,6 +361,105 @@
     ];
   }
 
+  /** Package 90 (nudge 93, the launch's lug): cut a closed path ([[P], [C, P] or [P], ...]) by the
+   *  plane x = x0 as `splitAtX` cuts a polygon, keeping its curves: [the part forward of it, the
+   *  part abaft it], each a path ending where it began, its cut a straight edge. Each quadratic
+   *  edge is split where it crosses the plane (de Casteljau) and its pieces kept, curved, on their
+   *  sides. The cut was made on the outline sampled at CURVE_SAMPLES points an edge, so a sail cut
+   *  at its mast drew each curved edge as six straight ones cornered between them: seen from the
+   *  quarter, a lug's luff lying along its mast showed its corners against it as a kink. */
+  function splitPathAtX(path, x0) {
+    var edges = []; // [from, control or null, to], each wholly on one side of the plane
+    function onPlane(p) {
+      return [x0, p[1], p[2]];
+    }
+    function line(p, q) {
+      if ((p[0] - x0) * (q[0] - x0) < 0) {
+        var m = onPlane(lerp(p, q, (x0 - p[0]) / (q[0] - p[0])));
+        edges.push([p, null, m], [m, null, q]);
+      } else edges.push([p, null, q]);
+    }
+    function curve(p, c, q) {
+      // x(t) = p + 2t(c - p) + t^2 (p - 2c + q) = x0, for 0 < t < 1
+      var A = p[0] - 2 * c[0] + q[0], B = 2 * (c[0] - p[0]), C = p[0] - x0;
+      var ts = [];
+      if (Math.abs(A) < 1e-12) {
+        if (Math.abs(B) > 1e-12) ts.push(-C / B);
+      } else if (B * B - 4 * A * C > 0) {
+        var r = Math.sqrt(B * B - 4 * A * C);
+        ts.push((-B - r) / (2 * A), (-B + r) / (2 * A));
+      }
+      ts = ts
+        .filter(function (t) {
+          return t > 1e-9 && t < 1 - 1e-9;
+        })
+        .sort(function (a, b) {
+          return a - b;
+        });
+      var from = p, ctrl = c, done = 0;
+      ts.forEach(function (t) {
+        var u = (t - done) / (1 - done); // along what is left of the edge
+        var a = lerp(from, ctrl, u), b = lerp(ctrl, q, u), m = onPlane(lerp(a, b, u));
+        edges.push([from, a, m]);
+        from = m;
+        ctrl = b;
+        done = t;
+      });
+      edges.push([from, ctrl, q]);
+    }
+    var prev = path[0][0];
+    for (var i = 1; i < path.length; i++) {
+      var seg = path[i], to = seg[seg.length - 1];
+      if (seg.length === 2) curve(prev, seg[0], to);
+      else line(prev, to);
+      prev = to;
+    }
+    if (len(sub(prev, path[0][0])) > 1e-9) line(prev, path[0][0]);
+    function part(keep) {
+      var out = [], pen = null;
+      edges.forEach(function (e) {
+        var mid = e[1] ? add(mul(add(e[0], e[2]), 0.25), mul(e[1], 0.5)) : lerp(e[0], e[2], 0.5);
+        if (!keep(mid[0])) return;
+        if (pen === null || len(sub(pen, e[0])) > 1e-9) out.push([e[0]]); // along the cut
+        out.push(e[1] ? [e[1], e[2]] : [e[2]]);
+        pen = e[2];
+      });
+      if (out.length && len(sub(pen, out[0][0])) > 1e-9) out.push([out[0][0]]); // back along the cut
+      return out;
+    }
+    return [
+      part(function (x) {
+        return x >= x0;
+      }),
+      part(function (x) {
+        return x < x0;
+      }),
+    ];
+  }
+
+  /** Package 90 (the owner's note T-v2 of 2026-11-28, "a pinched section" at a lateen's forward
+   *  end): the control point of one edge of a sail, from `p` to `q`, bellied by `belly`, the
+   *  sail's own belly (BELLY of `ref`, the length it is reckoned by, twice over: a quadratic peaks
+   *  halfway to its control), but never more than BELLY of the edge's own length. The belly was
+   *  reckoned once for the whole sail and laid on every edge whatever its length, so a short edge
+   *  bellied into a thin tongue: a whole lateen's luff at its car, 0.30 m long, 2.56 m out on the
+   *  tartane's great lateen; a settee's, a lug's. An edge at least `ref` long is as it was. */
+  function edgeControl(p, q, belly, ref) {
+    var L = len(sub(q, p));
+    var k = ref > L ? L / ref : 1;
+    return add(lerp(p, q, 0.5), mul(belly, k));
+  }
+
+  /** Package 90 (nudge 93): the sag of a drawing sail's foot from C to D, straight down, by the
+   *  rule the belly is laid by (`edgeControl`): FOOT_SAG of the sail's depth, twice over, but
+   *  never more than FOOT_SAG of the foot's own length. A ringtail's foot has no length, its clew
+   *  and tack at one point; by the depth alone it hung a spike straight down from its clew once the
+   *  foot's belly was laid by its own length, 0.80 m on the corvette's to 1.12 m on the
+   *  schooners'. */
+  function footSag(C, D, depth) {
+    return v(0, 0, -2 * FOOT_SAG * Math.min(depth, len(sub(D, C))));
+  }
+
   /**
    * Build the skeleton. `graph` is /api/ship; `snapshot` is /api/state (may be
    * null for a static drawing: then brace angles and states come from the graph).
@@ -370,10 +475,14 @@
     var wind = windVector(snapshot && snapshot.wind ? snapshot.wind.apparent_angle : Math.PI);
     var busy = {};
     var stepOn = {}; // the step in hand on each subject (package 37n: a yard's hoist)
+    // package 90 (V1): a whole lateen shifted round its mast by itself (`change_lateen`, its
+    // subject the sail): its yard peaked up while it is in its gear for it
+    var shifting = {};
     ((snapshot && snapshot.evolutions_in_progress) || []).forEach(function (e) {
       if (e.waiting) return;
       busy[e.subject] = e.id;
       if (e.step) stepOn[e.subject] = e.step;
+      if (e.id === "change_lateen") shifting[e.subject] = true;
     });
 
     var sailsBySpar = {}; // spar id -> sails with a role on it
@@ -509,6 +618,102 @@
         normal: cross(along, [0, 0, 1]),
         onDeck: down,
         block: block,
+      };
+    }
+    /** Package 90 (V1; docs/design/Plan-Package90.md §6; Design-Package90-Engine.md §2, §11): a
+     *  whole lateen, the engine's (`scripts.is_whole_lateen`): class `lateen` with `dipping`, not
+     *  cut at the mast. The 64's and the 74's mizen course and driver are never one. */
+    function wholeLateen(spec) {
+      return !!(spec && spec.class === "lateen" && spec.dipping && !spec.cut_at_mast);
+    }
+    /** A whole lateen's corners [tack, throat, peak, clew] (x, height above the deck): its file's
+     *  cut (tools/ships/lateen.py's contract), or, with none (the engine's probes), one made from
+     *  its yard and its area (judgement): the head the whole yard at LATEEN_TILT, slung a third of
+     *  it from the car on its mast's raked line at the yard's height, the tack at the car, and the
+     *  clew a loose foot's height above the deck, as far aft as gives the triangle its area, and
+     *  no farther aft than the penne nor forward of the car. */
+    function lateenCorners(spec, yard, M) {
+      if (spec.corners_m && spec.corners_m.length === 4) return spec.corners_m;
+      if (!yard || !M || !M.xAt) return null;
+      var L = yard.length_m || 0, H = yard.height_m || 0;
+      var sx = M.xAt(deck + H), run = Math.cos(LATEEN_TILT), rise = Math.sin(LATEEN_TILT);
+      var car = [sx + (L / 3) * run, H - (L / 3) * rise];
+      var penne = [sx - ((2 * L) / 3) * run, H + ((2 * L) / 3) * rise];
+      var cz = LOOSE_FOOT_HEIGHT_M;
+      var under = (penne[0] - car[0]) * (cz - car[1]); // twice the area with the clew under the car
+      var cx = car[0] - (2 * (spec.area_m2 || 0) - under) / Math.max(penne[1] - car[1], 1e-6);
+      return [car, car, penne, [Math.min(Math.max(cx, penne[0]), car[0]), cz]];
+    }
+    /** A whole lateen drawn (V1): three corners on its yard, the yard slung a third of its length
+     *  from its car (the lower, fore end) on its mast's raked line, where its head crosses the
+     *  yard's height in its file's cut (Lescallier 1791 p. 379; tools/ships/lateen.py), a mast's
+     *  half-diameter to the side it hangs on (`lug_side`, the engine's side: `lugSideSign`); the
+     *  whole cut swung about its slings by its sheet's angle, as a lug's. The cloth lies to the lee
+     *  of the tack wherever the yard hangs, so that on the bad hand, its yard to windward, it lies
+     *  against the mast, as a settee's does; held aback (`backed`, the engine's A1d: its cloth
+     *  held on the weather side, the wind on its outer face) it lies to windward, pressed on the
+     *  mast. Its yard is never lowered, as a lug's is: aloft to set, take in and furl it. While it
+     *  is shifted round its mast (`peaked`, read by the caller) the yard is peaked up by its
+     *  halyard and stands up the mast's raked line abaft the mast, its car passed round there (the
+     *  lead's ruling: Willaumez, MUDER), slung where it was and raised only as far as keeps its car
+     *  above the deck. `inPlane`: in the fore-and-aft plane, unswung, slung on the middle line (the
+     *  fixed frame's rig). Returns {pts, sling, car, penne, peaked, along, normal, cloth,
+     *  pivotMast, reach, heights}, or null for any other sail. */
+    function lateenCut(spec, mastAt, inPlane) {
+      if (!wholeLateen(spec)) return null;
+      var yard = sparSpecs[(spec.roles || {}).yard];
+      var M = yard && yard.parent ? mastAt(yard.parent) : null;
+      var c = lateenCorners(spec, yard, M);
+      if (!c) return null;
+      var throat = c[1], peak = c[2];
+      var hx = peak[0] - throat[0], hz = peak[1] - throat[1];
+      var headL = Math.hypot(hx, hz);
+      if (headL < 1e-6) return null;
+      var ux = hx / headL, uz = hz / headL; // along the head, toward the peak
+      var H = yard && yard.height_m != null ? yard.height_m : throat[1] + hz / 3;
+      var t = Math.abs(hz) > 1e-6 ? (H - throat[1]) / hz : 1 / 3;
+      if (!(t >= 0 && t <= 1)) t = 1 / 3;
+      var sx = throat[0] + t * hx, sz = throat[1] + t * hz;
+      var L = Math.max((yard && yard.length_m) || 0, headL);
+      var mx = M && M.xAt ? M.xAt(deck + sz) : sx;
+      var dyn = sailDyn(spec);
+      var a = inPlane ? 0 : dyn.sheet_angle || 0;
+      var ss = inPlane ? 0 : lugSideSign(spec);
+      var leeSign = tack === "starboard" ? -1 : 1;
+      var sw = dyn.backed ? -leeSign : leeSign; // the side the cloth lies on
+      var ca = Math.cos(a), sa = Math.sin(a);
+      function place(q) {
+        var dx = q[0] - sx;
+        return v(mx + dx * ca, ss * lugLee - sw * dx * sa, deck + q[1]);
+      }
+      var carQ = [sx - (ux * L) / 3, sz - (uz * L) / 3];
+      var penneQ = [sx + (ux * 2 * L) / 3, sz + (uz * 2 * L) / 3];
+      // peaked: up the mast's raked line, a mast's half-diameter abaft it on the middle line
+      var axis = M && M.xAt ? norm(v(M.xAt(deck + sz + 1) - mx, 0, 1)) : [0, 0, 1];
+      var base = v(mx - lugLee, 0, deck + sz);
+      var under = deck + ON_DECK_M - (base[2] - (axis[2] * L) / 3);
+      if (under > 0) base = add(base, mul(axis, under / axis[2]));
+      function up(d) {
+        return add(base, mul(axis, d));
+      }
+      var pts = c.map(place);
+      var reach = 0;
+      [carQ, penneQ].concat(c).forEach(function (q) {
+        reach = Math.max(reach, Math.abs(q[0] - sx));
+      });
+      var along = [-ca, sw * sa, 0];
+      return {
+        pts: pts,
+        sling: v(mx, ss * lugLee, deck + sz),
+        car: place(carQ),
+        penne: place(penneQ),
+        peaked: { sling: base, car: up(-L / 3), penne: up((2 * L) / 3), throat: up(-t * headL), peak: up((1 - t) * headL) },
+        along: along,
+        normal: cross(along, [0, 0, 1]),
+        cloth: sw,
+        pivotMast: M,
+        reach: reach + lugLee,
+        heights: [deck + carQ[1], deck + penneQ[1], deck + c[0][1], deck + c[3][1]],
       };
     }
     /** Package 75 (B5.2; docs/design/Design-ShipsEngineExtensions.md §6.1): a lateen cut at
@@ -675,6 +880,72 @@
     function onCap(spec) {
       return spec.class === "yard" && sparState(spec.id) === "sent_down" && (sparSpecs[spec.parent] || {}).class === "topmast";
     }
+    /** Package 90 (V2; A6; docs/design/Design-Ship-Polacre.md §5.1, §13): the yards above the
+     *  lowest on a pole mast, the mast and topmast in one stick, read from the parts as filed as
+     *  the engine reads them (`Ship.on_pole`, `Ship.is_pole_mast`, `Ship.yard_level`): a yard on a
+     *  lower mast with no topmast stepped on it, above another yard on that mast by the file's
+     *  heights and order, or with no yard below it set over a lateen yard on the mast, its sail's
+     *  foot above that yard (the engine's own arithmetic, `_square_foot_m`). The smack's topsail
+     *  yard is the one committed. A pole is drawn as the one spar it is filed, with no doubling. */
+    var poleYard = {};
+    (function () {
+      var yards = graph.spars.filter(function (s) {
+        return s.class === "yard";
+      });
+      var levels = ["mast", "topmast", "topgallant_mast", "royal_mast"];
+      yards.forEach(function (y, order) {
+        var root = sparSpecs[chainTop(y)];
+        var mast = sparSpecs[y.parent];
+        if (!root || !mast || mast.class !== "mast" || mast.parent) return;
+        var stepped = graph.spars.some(function (s) {
+          return s.parent === mast.id && s.class === "topmast";
+        });
+        if (stepped) return;
+        var level = Math.max(levels.indexOf(mast.class), 0);
+        yards.forEach(function (o, i) {
+          var oh = o.height_m || 0, yh = y.height_m || 0;
+          if (o.parent === y.parent && (oh < yh || (oh === yh && i < order))) level += 1;
+        });
+        if (level === 0) {
+          var sq = squareSailOn(y.id);
+          var foot = sq ? 2 * (sq.centre_height_m || 0) - (y.height_m || 0) : null;
+          graph.spars.forEach(function (lat) {
+            if (level || foot === null || lat.class !== "lateen_yard" || chainTop(lat) !== root.id) return;
+            var ls = (sailsBySpar[lat.id] || []).filter(function (s) {
+              return (s.roles || {}).yard === lat.id;
+            })[0];
+            var lh = lat.height_m || 0;
+            if (ls && ls.class === "lateen" && !ls.cut_at_mast && lh < (y.height_m || 0) && foot > lh) level = 1;
+          });
+        }
+        if (level > 0) poleYard[y.id] = true;
+      });
+    })();
+    /** Whether the yard below stands to take a sail's clews or a yard lowered onto it: aloft, not
+     *  sent down nor on deck with its flying sail (package 90, V2: the tartane's tréou's yard in
+     *  her plain sail, served `sound` and drawn on deck, `yardOnDeck`). A yard below that does not
+     *  stand is no yard below: the sail over it hangs from its own yard, loose-footed along it,
+     *  as every square sail with no yard below does, and its sheets come down to the side. */
+    function standsBelow(B) {
+      return !!(B && B.arm && !sentDown(B) && !B.onDeck);
+    }
+    /** Where a pole's upper yard is lowered to (package 90, V2; A6's `take_in_pole`, "amener en
+     *  paquet", Lescallier 1791 p. 371): onto the yard below where that stands (`resolve`d), its
+     *  slings a little above that yard's (YARD_ON_CAP_M); where none stands, down to the hounds,
+     *  at the height the file gives the highest yard below it on its mast, of any class (the
+     *  tartane's tréou's, swayed up to the hounds, and her lateen's slings; the polacre's mizen
+     *  lateen's), as the engine's words say ("down to the hounds"). */
+    function poleLowered(spec, resolve) {
+      var belowId = yardBelowId[spec.id];
+      var B = belowId ? resolve(belowId) : null;
+      if (standsBelow(B)) return B.centre[2] + YARD_ON_CAP_M;
+      var hounds = null;
+      graph.spars.forEach(function (s) {
+        if (s === spec || s.parent !== spec.parent || !YARD_CLASSES[s.class]) return;
+        if ((s.height_m || 0) < (spec.height_m || 0) && (hounds === null || s.height_m > hounds)) hounds = s.height_m || 0;
+      });
+      return deck + (hounds === null ? spec.height_m || 0 : hounds) + YARD_ON_CAP_M;
+    }
     /** How far up a hoisting yard is: 1 at its hoist, 0 lowered, a half while the halyards
      *  are worked (STEP_HOIST). */
     function hoistFraction(spec) {
@@ -805,6 +1076,41 @@
             r.reach = Math.max(r.reach, len(sub(other.pts[2], truss)));
             r.heights.push(other.pts[2][2], other.pts[0][2], other.pts[3][2]); // peak, tack, clew
           });
+        } else if (spec.class === "lateen_yard" && lateenCut(sailOnYard(id), resolve, !where)) {
+          // package 90 (V1): a whole lateen's yard (`lateenCut`), from its car to its penne along
+          // its head, slung a third of it from the car on its mast's raked line, swung with its
+          // sail; aloft in every state, and peaked up abaft the mast while its sail is in its gear
+          // to be shifted round (`shifting`). The frame takes it in the file's plane and reaches
+          // its swing about its slings every way at the heights of its ends and its sail's tack
+          // and clew, and the yard peaked up (`framePts`), so that the view does not rescale as it
+          // is sheeted, shifted or furled; and each whole lateen filed on the yard, bent or not (the
+          // tartane's bouffette, bent in the great lateen's place)
+          var wsp = sailOnYard(id);
+          var wl = lateenCut(wsp, resolve, !where);
+          var peaked = !!(where && shifting[wsp.id] && sailDyn(wsp).state === "in_the_gear");
+          r.x = wl.pivotMast ? wl.pivotMast.x : spec.x_m || 0;
+          r.a = peaked ? wl.peaked.car : wl.car;
+          r.b = peaked ? wl.peaked.penne : wl.penne;
+          r.centre = peaked ? wl.peaked.sling : wl.sling;
+          r.half = len(sub(r.b, r.a)) / 2;
+          r.arm = norm(sub(r.b, r.a));
+          r.normal = wl.normal;
+          r.brace = 0;
+          r.hoist = 1;
+          r.peaked = peaked;
+          r.pivot = wl.sling;
+          r.reach = wl.reach;
+          r.heights = wl.heights.slice();
+          r.everyWay = true;
+          r.framePts = [wl.peaked.car, wl.peaked.penne];
+          (sailsBySpar[id] || []).forEach(function (s) {
+            if (s === wsp || (s.roles || {}).yard !== id) return;
+            var other = lateenCut(s, resolve, true);
+            if (!other) return;
+            r.reach = Math.max(r.reach, other.reach);
+            r.heights.push.apply(r.heights, other.heights);
+            r.framePts.push(other.peaked.car, other.peaked.penne);
+          });
         } else if (
           where &&
           (spec.class === "lug_yard" || spec.class === "lateen_yard") &&
@@ -858,15 +1164,22 @@
           // what the reefs take out above the yard below
           var z = deck + H;
           r.hoist = 1;
-          if (where && parent && parent.parent && (onCap(spec) || hoists(spec))) {
-            var lowered = parent.parent.head[2] + YARD_ON_CAP_M;
+          // package 90 (V2; A6): a pole's upper yard is lowered as a topmast's is, onto the yard
+          // below or down to the hounds (`poleLowered`) while its sail is not set; a pole yard with
+          // no square sail bent stands where it is filed
+          var pole = !!(where && parent && poleYard[id] && squareSailOn(id));
+          if (poleYard[id]) r.onPole = true;
+          if (where && parent && ((parent.parent && (onCap(spec) || hoists(spec))) || pole)) {
+            var lowered = pole ? poleLowered(spec, resolve) : parent.parent.head[2] + YARD_ON_CAP_M;
             var hoisted = z;
             var sailOn = squareSailOn(id);
             var belowId = yardBelowId[id];
             var bare = bareFoot(spec);
             if (sailOn && !onCap(spec)) {
               var rf = reefFraction(sailOn, sailDyn(sailOn));
-              if (belowId) {
+              // the yard below where it stands (package 90, V2: not one on deck with its flying
+              // sail, which the sail's reefs are not taken out above)
+              if (belowId && standsBelow(resolve(belowId))) {
                 var below = resolve(belowId);
                 var gap = z - (deck + (sparSpecs[belowId].height_m || 0));
                 hoisted = below.centre[2] + gap * rf;
@@ -901,7 +1214,7 @@
           r.arm = [Math.sin(th), Math.cos(th), 0]; // direction of the starboard yardarm
           r.half = L / 2;
           r.brace = th;
-          var tilt = spec.class === "lateen_yard" ? 0.8 : spec.class === "lug_yard" ? 0.35 : 0;
+          var tilt = spec.class === "lateen_yard" ? LATEEN_TILT : spec.class === "lug_yard" ? 0.35 : 0;
           if (tilt) {
             // a lug or lateen yard slopes up toward its after end
             r.arm = norm([r.arm[0] * Math.cos(tilt), r.arm[1] * Math.cos(tilt), Math.sin(tilt)]);
@@ -1234,13 +1547,14 @@
       var A = corners[0], B = corners[1], C = corners[2], D = corners[3];
       var depth = depthHint || len(sub(D, A));
       var width = len(sub(B, A));
-      // control points sit at twice the offset: a quadratic curve peaks halfway to its control
+      // control points sit at twice the offset: a quadratic curve peaks halfway to its control;
+      // each edge bellied no more than BELLY of its own length (`edgeControl`, package 90)
+      var ref = Math.min(depth, width);
       var belly = [0, 0, 0];
-      if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, width));
-      var sag = mul(v(0, 0, -1), 2 * FOOT_SAG * depth);
-      var midBC = add(lerp(B, C, 0.5), belly);
-      var midCD = add(add(lerp(C, D, 0.5), belly), DRAWING[dyn.state] ? sag : [0, 0, 0]);
-      var midDA = add(lerp(D, A, 0.5), belly);
+      if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * ref);
+      var midBC = edgeControl(B, C, belly, ref);
+      var midCD = add(edgeControl(C, D, belly, ref), DRAWING[dyn.state] ? footSag(C, D, depth) : [0, 0, 0]);
+      var midDA = edgeControl(D, A, belly, ref);
       return [[A], [lerp(A, B, 0.5), B], [midBC, C], [midCD, D], [midDA, A]];
     }
 
@@ -1250,8 +1564,9 @@
     function gooseWingPath(corners, normal, tackSide, depth) {
       var t = gooseWingTriangle(corners, tackSide);
       var lee = t[0], weather = t[1], clew = t[2];
-      var belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, len(sub(weather, lee))));
-      return [[lee], [lerp(lee, weather, 0.5), weather], [add(lerp(weather, clew, 0.5), mul(belly, 0.5)), clew], [add(lerp(clew, lee, 0.5), belly), lee]];
+      var ref = Math.min(depth, len(sub(weather, lee)));
+      var belly = mul(bellyDirection(normal, wind), 2 * BELLY * ref);
+      return [[lee], [lerp(lee, weather, 0.5), weather], [edgeControl(weather, clew, mul(belly, 0.5), ref), clew], [edgeControl(clew, lee, belly, ref), lee]];
     }
 
     /** A bundle along a spar from a to b: a thin lens. */
@@ -1350,16 +1665,20 @@
         var mx = m.xAt ? m.xAt(fig.centre[2]) : m.x;
         if (mx <= minX + 0.3 || mx >= maxX - 0.3) continue;
         var halves = splitAtX(pts, mx);
+        // package 90 (nudge 93): each piece drawn with its curves (`splitPathAtX`); its centre,
+        // which places it along the view axis, and its share of the view's bounds from its
+        // outline sampled, as before (a curve's control stands off it, past the frame on the
+        // yawl's lug seen from ahead heeled, which would rescale the view while the lug is set)
+        var parts = splitPathAtX(fig.path, mx);
         var out = [];
         halves.forEach(function (poly, k) {
-          if (poly.length < 3) return;
+          if (poly.length < 3 || parts[k].length < 2) return;
           var piece = {};
           Object.keys(fig).forEach(function (key) {
             piece[key] = fig[key];
           });
-          piece.path = poly.map(function (p) {
-            return [p];
-          });
+          piece.path = parts[k];
+          piece.sampled = poly; // its outline sampled, which holds its share of the view (`project`)
           piece.centre = centroid(poly);
           piece.piece = k === 0 ? "forward" : "abaft";
           piece.mast = m.id;
@@ -1391,7 +1710,8 @@
       var belowId = yardBelowId[Y.id];
       var B = belowId ? spars[belowId] : null;
       var gap = belowId ? (Y.spec.height_m || 0) - (sparSpecs[belowId].height_m || 0) : 0;
-      if (B && B.arm && !sentDown(B) && gap > 0.5) {
+      // package 90 (V2): only a yard below that stands takes the clews (`standsBelow`)
+      if (standsBelow(B) && gap > 0.5) {
         var along = underBowsprit(Y.spec) ? len(sub(Y.centre, B.centre)) : gap;
         var foot = CLEW_SPREAD * B.half * 2;
         var head = Math.min(Math.max((2 * spec.area_m2) / along - foot, 0.5 * L), L);
@@ -1503,6 +1823,39 @@
           var cut = squareCut(spec, dyn, Y);
           corners = cut.corners;
           depth = cut.depth;
+        } else if (wholeLateen(spec) && Y.pivot) {
+          // package 90 (V1): a whole lateen on its cut (`lateenCut`), three-cornered, its head along
+          // its yard, on its side of the mast and against it on the bad hand; set, drawing its
+          // cloth to the side it lies on. In its gear, brailed up under its yard aloft, its
+          // festoons straight down by the gear's share of its depth square to the yard, the clew in
+          // the after festoon (the settee's rule); furled, a bundle along its head aloft; shifted
+          // round its mast, a bundle along its yard peaked up (`Y.peaked`), its sheet not drawn
+          var wc = lateenCut(spec, function (mid) {
+            return spars[mid];
+          }, false);
+          var wp = wc.pts; // tack, throat, peak, clew
+          var wfig = sailFigure(spec, dyn, [wp[1], wp[2], wp[3], wp[0]], wc.normal, Y, len(sub(wp[2], wp[3])));
+          if (Y.peaked) {
+            wfig.path = bundle(wc.peaked.throat, wc.peaked.peak, 0.35);
+            wfig.peaked = true;
+            wfig.corners = [wc.peaked.throat, wc.peaked.peak, wc.peaked.peak, wc.peaked.throat];
+            wfig.centre = lerp(wc.peaked.throat, wc.peaked.peak, 0.5);
+          } else if (dyn.state === "furled") {
+            wfig.path = bundle(wp[1], wp[2], 0.3);
+          } else if (dyn.state === "in_the_gear") {
+            var headW = sub(wp[2], wp[1]);
+            var deepW = len(cross(headW, sub(wp[3], wp[1]))) / Math.max(len(headW), 1e-9);
+            wfig.path = gathered(wp[1], wp[2], deepW, [0, 0, -1]);
+            wfig.clewAt = add(lerp(wp[1], wp[2], 2 / 3), v(0, 0, -deepW * IN_GEAR_DEPTH));
+          }
+          wfig.cloth = wc.cloth;
+          // cut at its mast for the painter while it stands about it; peaked, it is abaft it
+          wfig.cutMast = Y.peaked ? null : wc.pivotMast;
+          wfig.mastId = wc.pivotMast ? wc.pivotMast.id : null;
+          piecesAtMast(wfig).forEach(function (f) {
+            figures.push(f);
+          });
+          return;
         } else if ((cls === "lug" || cls === "lateen") && spec.corners_m) {
           // package 57: a lug from its cut, on its side of the mast (`lugCut`); and a whole
           // lateen with its cut (package 75, B5.2; Ext §6.1), as a standing lug on its lee side
@@ -1594,7 +1947,7 @@
         // (the lead's ruling of 2026-10-30): no sag below it, and furled it lies on the boom. By
         // the rule for the rest the foot hung 0.62 m under the boom and the bundle 0.35 m, through
         // her taffrail (the razee, measured)
-        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = add(fig.path[3][0], v(0, 0, 2 * FOOT_SAG * luff));
+        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = sub(fig.path[3][0], footSag(clew, tackPt, luff));
         if (dyn.state === "furled") {
           var bundleT = 0.3 + 0.02 * (Bm ? Bm.spec.length_m || 0 : 0);
           fig.path = cutG
@@ -1698,12 +2051,16 @@
         } else if (dyn.state === "wrecked") {
           figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), v(0, 0, -2)), add(clewJ, v(0, 0, -1.5))], [lerp(clewJ, tackJ, 0.5), tackJ]];
         } else {
-          var bellyJ = dyn.state === "set" ? mul(bellyDirection(normalJ, wind), 2 * BELLY * Math.min(len(sub(clewJ, tackJ)), len(sub(head, tackJ)))) : [0, 0, 0];
-          figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ]];
+          // its leech and its foot each bellied no more than BELLY of its own length (`edgeControl`)
+          var refJ = Math.min(len(sub(clewJ, tackJ)), len(sub(head, tackJ)));
+          var bellyJ = dyn.state === "set" ? mul(bellyDirection(normalJ, wind), 2 * BELLY * refJ) : [0, 0, 0];
+          var leechJ = edgeControl(head, clewJ, bellyJ, refJ);
+          var footJ = edgeControl(clewJ, tackJ, mul(bellyJ, 0.6), refJ);
+          figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [leechJ, clewJ], [footJ, tackJ]];
           if (nockJ) {
             // four-sided: the head from the nock to the peak along the stay, the bunt from
             // the tack up to the nock
-            figJ.path = [[nockJ], [lerp(nockJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ], [lerp(tackJ, nockJ, 0.5), nockJ]];
+            figJ.path = [[nockJ], [lerp(nockJ, head, 0.5), head], [leechJ, clewJ], [footJ, tackJ], [lerp(tackJ, nockJ, 0.5), nockJ]];
             figJ.centre = centroid([tackJ, nockJ, head, clewJ]);
           }
         }
@@ -1775,7 +2132,7 @@
     function yardBelow(Y) {
       var id = yardBelowId[Y.id];
       var B = id ? spars[id] : null;
-      return B && B.arm && !sentDown(B) ? B : null;
+      return standsBelow(B) ? B : null; // package 90 (V2): not one on deck with its flying sail
     }
 
     graph.lines.forEach(function (ln) {
@@ -1841,6 +2198,14 @@
           // clew (hauled up in its gear, or on deck with its yard lowered) to its block on the deck
           // a fathom abaft the clew at its floor, on the lee side (`lugCut`)
           pts = [sf.clewAt || sf.corners[2], sf.block];
+        } else if (wholeLateen(sheetSpec) && sf.cloth) {
+          // package 90 (V1): a whole lateen's one sheet, hauled aft and to leeward (Lescallier 1791
+          // p. 379), from its clew (brailed in with the sail in its gear) to the side its cloth lies
+          // on two metres abaft, as any single sheet; while its yard is peaked to be shifted round
+          // its mast it is not drawn
+          if (sf.peaked) return;
+          var wClew = sf.clewAt || sf.corners[2];
+          pts = [wClew, sideEnd(sf.cloth, wClew[0] - 2)];
         } else if ((sf.cls === "lug" || sf.cls === "lateen") && sheetSpec.corners_m) {
           // package 57: a lug's sheet from its clew aft to the lee side, and a whole lateen's
           // drawn as a lug (package 75); a lug topsail's is at its lower lug's peak, where its
@@ -1984,6 +2349,7 @@
       if (!r) return;
       var ends = r.full || [r.a, r.b];
       pts.push(ends[0], ends[1]);
+      if (r.framePts) pts.push.apply(pts, r.framePts); // a whole lateen's yard peaked (package 90, V1)
       if (!SWINGING[s.class]) return;
       var pivot, reach;
       if (r.pivot) {
@@ -3667,7 +4033,9 @@
         g.pts = f.pts.map(proj);
         all = g.pts;
       }
-      all.forEach(note);
+      // package 90 (nudge 93): a sail cut at its mast holds its share of the bounds by its outline
+      // sampled, as it did when it was drawn so (`piecesAtMast`)
+      (f.sampled ? f.sampled.map(proj) : all).forEach(note);
       // package 75 (B5.6): a figure on one face of the hull (a stern light, a wale or a band on
       // the outside of the side, a deck's top, a side of the head) is seen only from that face's
       // side, and not edge on (within rounding: dead astern, sin(pi) leaves a hair)
@@ -4717,6 +5085,9 @@
     gooseWingTriangle: gooseWingTriangle,
     flattenPath: flattenPath,
     splitAtX: splitAtX,
+    splitPathAtX: splitPathAtX,
+    footSag: footSag,
+    edgeControl: edgeControl,
     sortFigures: sortFigures,
     actionFigures: actionFigures,
     actionFrame: actionFrame,

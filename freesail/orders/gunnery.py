@@ -76,6 +76,17 @@ its deck: "No. 3 starboard gun of the lower deck" (its name), "No. 3 on the lowe
 lower deck's No. 3", "No. 2 gun of the poop", the deck in the words a deck is named by above. A
 bare number names no gun of hers, and "fire" refuses it in words, naming the decks that have one.
 Every other ship's numbers are said as before, bare.
+
+**A deck of a ship of three gun decks** (package 90, A9:
+`docs/design/Design-Ship-PurisimaConcepcion.md` §5.5, the lead's ruling 7 of 2026-11-18), keyed on
+broadside guns on a `middle` deck, which no two-decker carries: "the middle deck" names it, as it
+did; "the second deck" names it too and "the third deck" her upper deck (James's words for the
+Spanish prizes' middle and upper decks, vol. 2 p. 51; Falconer's "the second or middle deck"), in
+every form a deck is named by above, with a number or without. "The main deck", the upper deck's
+word on a two-decker, is no deck's word on her (the word is ambiguous in the period on a
+three-decker), and "fire" refuses it in words naming her three gun decks. On a two-decker "the
+second deck" and "the third deck" name no gun of hers, as before, and "the main deck" her upper
+deck, as before.
 """
 
 from __future__ import annotations
@@ -209,9 +220,12 @@ _GUN_NUMBER = re.compile(r"^(?:the\s+)?(?:no|number|num)?\s*(\d+)\s*(?:gun|carro
 # decks with "deck" and their guns or not; the quarterdeck and the forecastle with their guns;
 # the poop with them or not. A trailing "to" is the side's ("the lower deck to starboard").
 _WHAT = r"(?:\s+(?P<what>guns?|carronades?|battery|tier))"
+# The gun decks' words before "deck": "second" and "third" a three-decker's alone (package 90, A9;
+# the module's head), read by `_deck_of_word`
+_GUN_DECK_WORDS = r"lower|upper|main|middle|second|third|gun"
 _DECK_NAMED = re.compile(
     r"^(?:the\s+)?(?:"
-    r"(?P<gun_deck>lower|upper|main|middle|gun)(?:\s+|-)deck(?:'s)?" + _WHAT + "?"
+    rf"(?P<gun_deck>{_GUN_DECK_WORDS})(?:\s+|-)deck(?:'s)?" + _WHAT + "?"
     r"|(?P<place>quarterdeck|quarter deck|quarter-deck|forecastle)(?:'s)?"
     + _WHAT.replace("what", "what_p")
     + r"|(?P<poop>poop)(?:'s)?"
@@ -223,19 +237,26 @@ _DECK_OF_WORD = {
     "upper": "upper",
     "main": "upper",
     "middle": "middle",
+    "second": "middle",
+    "third": "upper",
     "quarterdeck": "quarterdeck",
     "quarter deck": "quarterdeck",
     "quarter-deck": "quarterdeck",
     "forecastle": "forecastle",
     "poop": "roundhouse",
 }
+# The words that name a deck only on a ship of three gun decks (package 90, A9), and the word that
+# names none there (the module's head)
+_THREE_DECKERS_WORDS = ("second", "third")
+_NOT_ON_THREE_DECKS = "main"
 # A number with its deck on a ship numbered by deck (package 75, B7.d; the module's head), its side
 # already taken out: "No. 3 gun of the lower deck", "No. 3 on the lower deck", "the lower deck's
 # No. 3", "the poop's No. 2".
 _A_DECK = (
-    r"(?P<deck>(?:lower|upper|main|middle|gun)(?:\s+|-)deck|quarterdeck|quarter deck|quarter-deck"
+    rf"(?P<deck>(?:{_GUN_DECK_WORDS})(?:\s+|-)deck|quarterdeck|quarter deck|quarter-deck"
     r"|forecastle|poop)"
 )
+_A_GUN_DECK = re.compile(rf"^({_GUN_DECK_WORDS})(?:\s+|-)deck$")
 _A_NUMBER = r"(?:no|number|num)?\s*(?P<n>\d+)\s*(?:gun|carronade)?"
 _NUMBER_OF_A_DECK = re.compile(rf"^(?:the\s+)?{_A_NUMBER}\s+(?:of|on)\s+(?:the\s+)?{_A_DECK}$")
 _A_DECKS_NUMBER = re.compile(rf"^(?:the\s+)?{_A_DECK}(?:'s)?\s+{_A_NUMBER}$")
@@ -870,6 +891,9 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
     on_each = _a_number_on_each_deck(ship, w)
     if on_each:
         raise OrderError(on_each)
+    main_deck = _the_main_deck_of_three(ship, w)
+    if main_deck:
+        raise OrderError(main_deck)
     raise OrderError(
         f"Fire what? Say 'fire' for the broadside at the word, 'fire the starboard broadside', "
         f"'fire No. 3 gun{_of_her_gun_deck(ship)}', 'fire the bow chaser', 'fire the pivot gun', "
@@ -880,6 +904,47 @@ def _fire_words(ship: Any, said: str, dry: bool = False) -> dict[str, Any]:
 def _numbered_by_deck(guns: dict[str, Gun]) -> bool:
     """Whether her guns are numbered by deck (package 75, B7.d: her file's armament says so)."""
     return any(g.by_deck for g in guns.values())
+
+
+def _of_three_gun_decks(broadside: list[Gun]) -> bool:
+    """Whether her broadside guns stand on a `middle` deck: a ship of three gun decks (package 90,
+    A9), the only ships whose deck words differ."""
+    return any(g.deck == "middle" for g in broadside)
+
+
+def _deck_of_word(word: str, broadside: list[Gun]) -> str | None:
+    """The deck a gun deck's word names on her (`_DECK_OF_WORD`), or None where it names none of
+    hers: "the second deck" and "the third deck" off a ship of three gun decks, and "the main
+    deck" on one (package 90, A9; the module's head); "the gun deck" her lowest deck with
+    broadside guns, None with none."""
+    if word == "gun":
+        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
+        return min(decks, key=DECK_WORDS.index) if decks else None
+    three = _of_three_gun_decks(broadside)
+    if (word in _THREE_DECKERS_WORDS and not three) or (word == _NOT_ON_THREE_DECKS and three):
+        return None
+    return _DECK_OF_WORD[word]
+
+
+def _the_main_deck_of_three(ship: Any, w: str) -> str:
+    """The words "the main deck" refused on a ship of three gun decks, naming them (package 90,
+    A9; the lead's ruling 7 of 2026-11-18): 'She has three gun decks, the lower deck, the middle
+    deck and the upper deck, and 'the main deck' names none of them: name the deck, as 'fire the
+    middle deck' (or 'the second deck'; 'the third deck' is the upper).' Empty where the words do
+    not name the main deck, or she is no ship of three gun decks."""
+    guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
+    broadside = [g for g in guns.values() if g.place == "broadside"]
+    if not _of_three_gun_decks(broadside):
+        return ""
+    words = [x for x in w.lower().replace(".", " ").split() if x not in ("starboard", "larboard")]
+    if not re.search(r"\bmain(?:\s+|-)deck", " ".join(x for x in words if x != "port")):
+        return ""
+    decks = [d for d in ("lower", "middle", "upper") if any(g.deck == d for g in broadside)]
+    return (
+        f"She has three gun decks, {_and([DECK_SAID[d] for d in decks])}, and 'the main deck' "
+        "names none of them: name the deck, as 'fire the middle deck' (or 'the second deck'; "
+        "'the third deck' is the upper)."
+    )
 
 
 def _of_her_gun_deck(ship: Any) -> str:
@@ -961,18 +1026,16 @@ def _deck_said(w: str) -> str | None:
 def _guns_of_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[str] | None:
     """The broadside guns of the deck the words name, its carronades alone where they are said
     (package 75, B7.b; the module's head), on the side if one was said; None where the words
-    name no deck, and [] where the deck carries no gun of hers."""
+    name no deck, and [] where the deck carries no gun of hers, or the word names no deck of hers
+    (`_deck_of_word`: package 90, A9)."""
     m = _DECK_NAMED.match(w2)
     if m is None:
         return None
     broadside = [g for g in guns.values() if g.place == "broadside"]
-    if m.group("gun_deck") == "gun":
-        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
-        if not decks:
+    if m.group("gun_deck"):
+        deck = _deck_of_word(m.group("gun_deck"), broadside)
+        if deck is None:
             return []
-        deck = min(decks, key=DECK_WORDS.index)
-    elif m.group("gun_deck"):
-        deck = _DECK_OF_WORD[m.group("gun_deck")]
     elif m.group("place"):
         deck = _DECK_OF_WORD[m.group("place")]
     else:
@@ -990,22 +1053,20 @@ def _number_on_a_deck(guns: dict[str, Gun], w2: str, side: str | None) -> list[s
     """The broadside guns of the number on the deck the words name ('No. 3 gun of the lower deck',
     'the lower deck's No. 3', 'No. 2 on the poop'; package 75, B7.d, on a ship numbered by deck),
     on the side if one was said; None where the words say no number with a deck, and [] where
-    that deck has no such number of hers."""
+    that deck has no such number of hers, or the word names no deck of hers (`_deck_of_word`:
+    package 90, A9)."""
     m = _NUMBER_OF_A_DECK.match(w2) or _A_DECKS_NUMBER.match(w2)
     if m is None:
         return None
     broadside = [g for g in guns.values() if g.place == "broadside"]
     said = m.group("deck")
-    gun_deck = re.match(r"^(lower|upper|main|middle|gun)(?:\s+|-)deck$", said)
+    gun_deck = _A_GUN_DECK.match(said)
     if gun_deck is None:
         deck = _DECK_OF_WORD[said]
-    elif gun_deck.group(1) == "gun":
-        decks = [g.deck for g in broadside if g.deck in DECK_WORDS]
-        if not decks:
-            return []
-        deck = min(decks, key=DECK_WORDS.index)
     else:
-        deck = _DECK_OF_WORD[gun_deck.group(1)]
+        deck = _deck_of_word(gun_deck.group(1), broadside)
+        if deck is None:
+            return []
     n = int(m.group("n"))
     return [
         g.id
