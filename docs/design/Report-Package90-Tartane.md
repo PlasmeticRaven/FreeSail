@@ -69,6 +69,11 @@ Answered now:
 
 By the primer's orders, on today's tree, she gets under way from rest on all eight points.
 
+**For a player: from rest, order her trim.** Give `set plain sail` and her course. Once her sails
+are up, give the trim for her point: `trim for close hauled`, `for the wind abeam`, `for the wind
+large` or `to run`, or `trim sails` once she has way. Without it her topsail may stand aback with its
+yard square, and she gathers sternway. Today's ships want the same (§16.3, §17.4).
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -1278,3 +1283,8 @@ her side. Each case is run in steady wind and in the default gusts:
 - In her hash's proof she lies as near as she will on her close-hauled courses, by her polar, not at
   67.5. From the three courses abaft the beam she is brought by the wind before she tacks, as the
   refusal tells a player.
+
+**The lead's nudge 91** (trunk 9c6a5c3e, read whole): this run is the shape her hash's proof should
+have. The helm's lost course (§17.3) is carried as the engine's fault 29, beside 27, and her hash
+does not wait on it. `yard_lowered` for a whole lateen is carried as wanted seamanship. The line for
+a player, that from rest she wants her trim ordered, stands in "In short" above.
