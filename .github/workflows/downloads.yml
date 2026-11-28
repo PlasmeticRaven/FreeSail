@@ -14,10 +14,9 @@ name: downloads
 #    downloads beside the project's zip once their smoke tests have passed.
 # 3. A push that changes the downloads' own files (the paths below): builds and smoke-tests
 #    them (and when pyproject.toml, whose dependencies the locks follow, changes), so that
-#    the macOS runners run when a download has changed and not on every push.
-#    A push whose head commit's message has a line of its own `[preview name]` (the name in
-#    small letters, figures, dots and dashes) also publishes, as a DRAFT
-#    (not public): a builder's proof of the publishing, not a build for players.
+#    the macOS runners run when a download has changed and not on every push. A push
+#    publishes nothing: a release is made by a hand (1) or by a gate (2), never by the words
+#    of a commit.
 #
 # Every action is pinned by its commit (the tag it was in the comment beside it); every
 # third-party file a download carries is pinned by version and sha256 in tools/bundle.py
@@ -61,7 +60,6 @@ jobs:
     outputs:
       name: ${{ steps.name.outputs.name }}
       publish: ${{ steps.name.outputs.publish }}
-      draft: ${{ steps.name.outputs.draft }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -75,17 +73,13 @@ jobs:
           GIVEN: ${{ inputs.name }}
           CALLED: ${{ inputs.called }}
           EVENT: ${{ github.event_name }}
-          MESSAGE: ${{ github.event.head_commit.message }}
           SHA: ${{ github.sha }}
         run: |
           publish=false
-          draft=false
           if [ "$CALLED" = "true" ]; then
             name="${GIVEN/gates\//}"           # the gate's release: gate-gates/m7 -> gate-m7
           elif [ "$EVENT" = "workflow_dispatch" ]; then
             name="preview-$GIVEN"; publish=true
-          elif [[ "$MESSAGE" =~ (^|$'\n')\[preview\ ([a-z0-9][a-z0-9.-]*)\]($'\n'|$) ]]; then
-            name="preview-${BASH_REMATCH[2]}"; publish=true; draft=true  # a builder's proof
           else
             name="trial-${SHA:0:12}"
           fi
@@ -95,7 +89,6 @@ jobs:
           fi
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "publish=$publish" >> "$GITHUB_OUTPUT"
-          echo "draft=$draft" >> "$GITHUB_OUTPUT"
           echo "::notice title=downloads::building FreeSail-$name (publish: $publish)"
       - name: Build the Windows download
         env:
@@ -189,7 +182,7 @@ jobs:
     needs: [build, smoke]
     if: needs.build.outputs.publish == 'true'
     runs-on: ubuntu-24.04
-    # two runs of one name (a typed run and a pushed one) publish one after the other
+    # two typed runs of one name publish one after the other
     concurrency:
       group: publish-${{ needs.build.outputs.name }}
       cancel-in-progress: false
@@ -206,7 +199,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           NAME: ${{ needs.build.outputs.name }}
-          DRAFT: ${{ needs.build.outputs.draft }}
           SHA: ${{ github.sha }}
           REF: ${{ github.ref_name }}
         run: |
@@ -214,13 +206,7 @@ jobs:
           gh release delete "$NAME" --cleanup-tag --yes 2>/dev/null || true
           # a tag of the name left without its release would hold the new one to an old commit
           gh api -X DELETE "repos/$GH_REPO/git/refs/tags/$NAME" 2>/dev/null || true
-          if [ "$DRAFT" = "true" ]; then
-            kind=(--draft)
-            notes="A builder's proof of the downloads' publishing, from the branch $REF at ${SHA:0:12}: not a build for players."
-          else
-            kind=(--prerelease)
-            notes="FreeSail's downloads for Windows and the Mac, from the branch $REF at ${SHA:0:12}: a preview between gates, not a gate. Unpack the zip for your computer and read START HERE.txt in it."
-          fi
-          gh release create "$NAME" dist/*.zip "${kind[@]}" --target "$SHA" \
+          notes="FreeSail's downloads for Windows and the Mac, from the branch $REF at ${SHA:0:12}: a preview between gates, not a gate. Unpack the zip for your computer and read START HERE.txt in it."
+          gh release create "$NAME" dist/*.zip --prerelease --target "$SHA" \
             --title "FreeSail $NAME (a preview)" --notes "$notes"
-          echo "::notice title=published::$NAME (${kind[0]#--}), from $REF at ${SHA:0:12}"
+          echo "::notice title=published::$NAME (pre-release), from $REF at ${SHA:0:12}"

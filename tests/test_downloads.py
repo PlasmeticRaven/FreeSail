@@ -213,7 +213,9 @@ def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit(
     """Truth 7-803: every interpreter a download carries is pinned by version and sha256 at
     its maker's own place (python.org; python-build-standalone's releases); and every
     action the downloads' workflow and the gate's release use is pinned by a commit, not a
-    tag; neither workflow is run by a pull request; and only the publishing jobs may write."""
+    tag; neither workflow is run by a pull request; each gives its token reading alone and
+    writing only to its publishing job; nothing an outsider writes is spliced into a script
+    of either; and no commit's message publishes anything."""
     for which, pin in bundle.INTERPRETERS.items():
         assert re.fullmatch(r"[0-9a-f]{64}", pin.sha256), which
         assert pin.url.startswith(
@@ -232,12 +234,18 @@ def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit(
                 continue
             assert re.fullmatch(r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", u), f"{name}: {u}"
         assert "pull_request" not in text, name
+        assert text.count("contents: write") == 1, name
+        assert "\npermissions:\n  contents: read\n" in text, name
+        # nothing an outsider writes is put into a script as text: only through the environment
+        for run in re.findall(r"run: \|\n((?:\s{10,}.*\n)+)", text):
+            assert "${{" not in run, f"{name}: {run}"
     downloads = (ROOT / ".github" / "workflows" / "downloads.yml").read_text(encoding="utf-8")
-    assert downloads.count("contents: write") == 1
     assert "persist-credentials: false" in downloads
-    # nothing an outsider writes is put into a script as text: only through the environment
-    for run in re.findall(r"run: \|\n((?:\s{10,}.*\n)+)", downloads):
-        assert "${{" not in run, run
+    # a release is made by a hand or by a gate, never by the words of a commit
+    assert "head_commit" not in downloads and "--draft" not in downloads
+    release = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+    job = release.split("\n  release:\n", 1)[1]
+    assert "contents: write" in job
 
 
 def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must():
