@@ -539,3 +539,167 @@ each state. With her guns run out, each port is two figures, the port open and i
 - **V3, and the lateen's change in a manoeuvre,** wait for the engine's served step (nudge 88).
 
 I stop here and wait for the coordinating session's word.
+
+## 2026-11-28: the three drawing rules, a hash of their own: f66f8e9 on `claude/pkg-90-viewer-rules`
+
+**The reported hash is f66f8e9, on a new branch of mine, `claude/pkg-90-viewer-rules`** (nudge
+98: the lead's yes to a small hash of its own, ahead of V3 and V4).
+- It is cut from `claude/pkg-90` at 8a95cb6, as the lead's word asked, and is one commit on it.
+  - `claude/pkg-90` has since moved to 8a27d9b, the engine's fourth pass: nineteen files, neither
+    of these two among them.
+  - f66f8e9 merges onto 8a27d9b with no conflict (`git merge-tree`). I have merged 8a27d9b into
+    nothing.
+- It changes `client/projection.js` and `tests/test_view_geometry.py` alone.
+- It holds the three rules alone: none of V4's words, and none of nudge 95's pin.
+
+| Hash | What |
+|---|---|
+| f66f8e9 | a foot before its deck; a band's end steps with the side; a brace past its own mast |
+
+`claude/pkg-90-viewer` merges it (8d8c113), and V3 and V4 follow there, as before.
+- My hash of the first two rules, b6f56c4 on `claude/pkg-90-viewer`, is superseded by this one. It
+  goes no further on its own.
+- Nudge 97's section above, its two rules and its measures, holds for f66f8e9, which carries the
+  same changes line for line.
+- The notes' subsection is on `claude/pkg-90-viewer`, as the lead's word keeps this hash to the
+  two files: "Nudges 97 and 98: three drawing rules met by the Concepción's file". It comes in with
+  V3 and V4's hash. Every move is declared here too, below.
+
+Her file was read from her branch, at b451dea4, into a scratch folder outside the tree. Her two
+changed lines since 3d073ee5 are comments. It was never committed, and her branch was not merged.
+
+### The third rule: a brace led to its own yard's mast (`mastAftOf`)
+
+- **The cause.** A brace leads to the nearest lower mast more than half a metre abaft its yard,
+  else to the side. A square yard is slung before its mast, by 0.05 of her beam. So where a mast
+  stands upright, or nearly, in a broad ship, its yards hang more than half a metre forward of its
+  foot, and the rule found the yard's own mast.
+- **More than her mizzen.** Her nine yards hang 0.83 m forward of their masts, and all eighteen of
+  her braces led to their own masts.
+  - On today's files, the fore yards of the 74, the 64 and the razee did the same: their braces
+    ended on their own fore mast, not the main mast.
+  - The 74's mizzen, raked 2.91 degrees, carries her yards aft of its foot, so her mizzen braces
+    came to her rail.
+- **The mend:** a yard's own lower mast, found by its parents, is never the mast its brace leads
+  to. Her builder suggested this road.
+- **On her file:**
+  - her fore yards' braces now lead to her main mast;
+  - her main yards' to her mizzen;
+  - her mizzen yards' six to her rail, at x -22.51 to -26.75. That is the 74's set, which her
+    builder filed as her row.
+
+### Today's nineteen files: every move, old beside new
+
+I compared every skeleton figure on every file, old (8a95cb6) beside new (f66f8e9), point for
+point, in three states: as filed, under plain sail braced up, and with no snapshot. **Nothing
+differs but eighteen braces.** These are the fore yards' braces of three files, either side; each
+end stands 0.3 m off the middle line:
+
+| File | Brace | Old end: x, height | New end: x, height |
+|---|---|---|---|
+| the 74 | fore yard's | her fore mast, 19.84; 20.66 m | her main mast, -2.81; 20.66 m |
+| the 74 | fore topsail yard's | 19.84; 24.36 | -2.81; 25.66 |
+| the 74 | fore topgallant yard's | 19.84; 24.36 | -2.81; 27.56 |
+| the 64 | fore yard's | 19.23; 19.62 | -2.78; 19.62 |
+| the 64 | fore topsail yard's | 19.23; 23.02 | -2.78; 24.32 |
+| the 64 | fore topgallant yard's | 19.23; 23.02 | -2.78; 25.62 |
+| the razee | fore yard's | 19.22; 18.19 | -2.84; 18.19 |
+| the razee | fore topsail yard's | 19.22; 21.59 | -2.84; 22.89 |
+| the razee | fore topgallant yard's | 19.22; 21.59 | -2.84; 24.09 |
+
+- **The 74's raked mizzen is among the cases, unmoved.** Her six mizzen braces end on her rail, as
+  before.
+- **The paint order and the picture.** I painted every file as the page paints it, old beside new,
+  in the same 8,208 views: each figure in its page colour, at 20 pixels a metre. Two side strips,
+  which the page fills and strokes alike, paint the same. Besides the eighteen braces themselves,
+  where they were and where they are:
+  - the frigate's mizzen mast's foot now over her quarterdeck, 49 pixels in 14 views from near
+    ahead: rule 1's fault, mended;
+  - on the 74, the 64 and the razee, their far side seen from inside: 65, 123 and 82 pixels, in 21,
+    18 and 12 views.
+    - The painter lays each of those strips after the last rig figure in front of it
+      (`sortFigures`), and the moved braces were among those figures.
+    - The pixels lie between their far side's strips and their fore lower studding sail booms, a
+      channel wale, a band, guns run out, open lids and outlines. Every one is on the far side.
+  - **Nothing else, on any file.**
+
+### Each rule pinned: it fails with the rule taken out
+
+- **The foot** (2 cases): the frigate with a long strip under her main mast, and with two strips
+  meeting at her foot.
+  - Mutants: the clamp out, 2 fail; no clearance, 2; the first strip alone, 1.
+- **The band** (1 case): the 74 with a port in her closure, across her knuckle.
+  - Mutants: the step out, 1 fails; the ends by their stations' heights alone, 1.
+- **The brace:**
+  - `test_a_brace_leads_aft_to_the_next_mast_and_never_to_its_own`, 14 cases, on every file with a
+    hull profile;
+  - `test_an_upright_mizzens_yards_brace_to_the_rail_as_a_raked_ones_do`, 4 cases: the 74's mizzen
+    as filed and stood upright, on either tack.
+
+  With her own mast not skipped, 5 fail: the 74, the 64 and the razee, and the upright mizzen on
+  either tack. Before the mend, the upright mizzen's six braces ended up her own mizzen.
+- **Pins moved: none.** No threshold moved, and `tests/test_pictures.py` is untouched.
+  - Two scripts of this package changed, as nudge 97's section says: `FOOT_SORTED` and `BANDS`.
+  - New: 21 cases against 8a95cb6, none of its cases removed or renamed.
+
+### Her cases
+
+All pass on her file at f66f8e9, with her branch's rows:
+- the foot's;
+- the band's, with her row in `CHORD_OFF_THE_SIDE_M`: her worst chord is 0.273 m;
+- her four line cases, `LINES_ON_THE_RAIL`, the 74's set.
+
+On 8a95cb6 all six of these fail: her four line cases, her foot's and her band's. The fifth line
+case, as the game serves her, passes on both.
+
+### The tests on f66f8e9
+
+All on f66f8e9 in its own worktree, beside its base 8a95cb6:
+
+| The fast tier whole | 8a95cb6 | f66f8e9 |
+|---|---|---|
+| passed | 9,310 | 9,330 |
+| skipped | 8 | 8 |
+| xfailed | 1 | 1 |
+| failed | 0 | 1 |
+
+Test by test against the base:
+- **New:** 21, every one passed.
+- **Gone:** none.
+- **Outcome changed:** one, the tide's timing truth
+  `test_truth_7_284_the_blend_adds_a_membership_and_not_a_gauge`.
+  - It failed once, under the whole tier's load, at 0.0156 s against the eleven gauges' 0.0099
+    s, where it must be within a quarter.
+  - It is Python alone, the engine's tide, and draws on neither file of this hash.
+  - Run alone on f66f8e9 three times, it passed each time.
+
+**The slow tier of the touched files** on f66f8e9: 1,506 passed, none failed or skipped.
+
+| File | Passed |
+|---|---|
+| `test_view_geometry.py` | 1,213 |
+| `test_view_action.py` | 99 |
+| `test_server.py` | 61 |
+| `test_harbour.py` | 50 |
+| `test_flag_drawings.py` | 27 |
+| `test_practice.py` | 25 |
+| `test_browser_probe.py` | 13 |
+| `test_map_view.py` | 9 |
+| `test_boat_drawing.py` | 7 |
+| `test_pictures.py` | 2 |
+
+- The viewer's truths (`-k "truth_7_43 or truth_7_44"`, with `--slow`): 20 passed.
+- **No harbour or browser test failed**, in either tier.
+- `ruff check` and `ruff format --check` are clean.
+- No Python line is over 100 characters, old or new.
+- `git diff 8a95cb6..f66f8e9` holds no carriage return.
+- `test_view_geometry.py` collects 1,192 cases on 8a95cb6 and 1,213 on f66f8e9.
+- The commit's author is as the cloud gives it, with no trailer.
+
+### Held
+
+- **V3, and the lateen's change in a manoeuvre,** wait for the engine's served step (nudge 88).
+- **V4** is on `claude/pkg-90-viewer` and merges this hash (8d8c113). It follows as before when the
+  lead's watcher has f66f8e9.
+
+I stop here and wait for the coordinating session's word.
