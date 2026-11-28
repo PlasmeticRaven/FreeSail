@@ -402,3 +402,9 @@ Taken in at the second line instead, the jib came in during the matrix's long sh
 **The two-fifths figure** is pinned for a ship slack in stays (truth 7-763c; the reader's M02 now dies).
 
 **The corvette's gripe truth** says what is measured (TuningNotes).
+
+**Truth 7-779b, the spar carried away on passage.** Rule D's kept jib moved two cell-seeds of the 140:
+- the brig in 20-38 kn at seed 3 is now no worse than the trunk's captain (brought to 178 s before him, 7.61 nm against 2.70, 17 minutes astern against 44), so she leaves `PASSAGE_DECLARED`;
+- the frigate's seed 3 stays outside with new figures.
+
+The truth's file was not in my slow tier, so this was not seen; it is now. The figures are in TuningNotes.

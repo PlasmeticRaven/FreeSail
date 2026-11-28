@@ -40439,6 +40439,26 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - `tests/test_captains.py::test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_its_dire_line` (fast). It fails with the take-in off.
   - `..._on_a_players_ship_is_taken_in_before_it_goes`, the four hours of `KEPT_JIB_HOURS` as a player's ship, in the slow tier: taken in where it comes to its dire line, standing under it with its line said where it does not.
 
+**Truth 7-779b, the spar carried away on passage (the lead's item of 2026-11-28, 02:15).** Its brig cell in 20-38 kn failed (`assert set() == {3}`): the brig at seed 3 had come inside the rule, where `PASSAGE_DECLARED` had her outside.
+- **Why it was not seen:** `tests/test_mends_126.py` was not among the 55 files of my slow tier, so the truth was not run on this branch after rule D went in. It fails on the lead's machine too.
+- **Measured:** every `PASSAGE_CELLS` cell at every seed (140), the three passages on the trunk e3d50aac and on this tree. Two cell-seeds moved, and no other figure.
+- **Old beside new** (way made good in nm, minutes astern, times aback, brought to in s):
+
+  | cell-seed | passage | trunk | this tree |
+  |---|---|---|---|
+  | brig 20-38, seed 3 | the trunk's captain | 2.70, 44, 6, 6274 | the same |
+  | | the wreck cleared at once | 14.19, 2, 1, 6223 | the same |
+  | | this tree's | 10.61, 18, 4, 6963 (outside: brought to late) | 7.61, 17, 5, 6096 (inside) |
+  | frigate 20-38, seed 3 | the trunk's captain | 12.34, 17, 5, 5293 | 12.56, 17, 5, 5291 |
+  | | the wreck cleared at once | 22.60, 0, 0, 5442 | the same |
+  | | this tree's | 13.29, 24, 2, 5838 (outside: astern, brought to late) | 15.77, 12, 1, 5945 (outside: brought to late) |
+
+- **The cause:** rule D's kept jib at the captain's `shorten sail`. With `HELM_IN_HAND_SHARE` at 99 (no jib kept) both return exactly to the trunk's figures. With the hands' take-in off they keep the new ones.
+- **`PASSAGE_DECLARED`:**
+  - the brig's seed 3 is taken out. She is now no worse than the trunk's captain on every count: brought to 178 s before him, 4.9 nm more made good, 27 fewer minutes astern, one fewer time aback. A good move. Her way is 3.0 nm less than this tree's captain made before rule D;
+  - the frigate's seed 3 stays outside (brought to 654 s after the trunk's captain, where it was 545). Its words give the new figures: 15.77 nm against 12.56, 12 minutes astern against 17.
+- **The slow tier from now on** takes `tests/test_mends_126.py`, `tests/test_captains.py` and `tests/test_known_truths.py` whole.
+
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
 **One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
