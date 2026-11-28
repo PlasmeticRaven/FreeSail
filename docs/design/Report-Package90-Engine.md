@@ -3017,3 +3017,29 @@ Nothing else moved in any case: every other reply and line is the same.
 **Next:** the reader's list, when it comes, then `…/pkg-90` merged again, then the hash, tiered whole against a base on the merged tree, with the eighteen (now nineteen, the Diana's file among them) in gales, A2's harness and the declaration measured again.
 
 **For the coordinating session:** nothing here is the hash; the hash is held as asked.
+
+## Where the fourth pass stands (nudge 95): its hash 4e32dec, its tiers running (2026-11-28, 09:10 UTC)
+
+**The hash to send will be 4e32dec** on **`…/pkg-90-lateen3`**, pushed. **This commit, and each after it until the full report, touches this report alone.**
+
+**What 4e32dec holds:**
+- **e2a7f62**: nudge 86's list (the box that saves her where it did, the "Piped down" declared truly, the kedge's "; a new one is the yard's", and my word on the one-boat model, which I mean to stay), with all before it: the `_causes_come` pin (ab809fe), fault 24 (becaedb), the razee's note at her generator (fd2722a), and the merges 8dd313b and 5bf87b9. Nothing more.
+- **`…/pkg-90` at a174cca2 merged**, as nudge 95 asks (the trunk at 962c5569: A9 and the viewer's V1 and V2). Only `docs/dev/TuningNotes.md` was resolved by hand, each side's sections kept whole: the fourth pass's four and the viewer's one. Ruff is clean on the merged tree, and the generator writes 19 of 19 byte for byte. The branch's tip past a174cca2, 8a95cb6, adds a playtest preview's README alone and is not merged.
+
+**Why no report since e2a7f62.** Its tiers against 93cf624c were begun, and these finished:
+- both fast tiers: 9,219 tests beside 9,198, outcome changed 0, the 21 new all passed;
+- the base's slow tier: 593 passed, 11 xfailed;
+- `tests/test_mends_126.py --slow` on e2a7f62 itself: 45 passed, truth 7-779-b's 28 cells among them, so its 19 declared exceptions held exactly.
+
+But the container was reclaimed while the session sat idle, and the hash's slow tier was lost each time. Then nudge 95 moved the base. Those results are informative now, not the tier.
+
+**Now running** (each step resumable):
+- the fast and the slow tier whole on a174cca2 and on 4e32dec, test by test;
+- the hash's slow tier with the reach tracer watching. It observes and changes nothing, and names the slow files the change reaches, file by file. `tests/test_mends_126.py --slow` runs among it;
+- the nineteen in gales, A2's harness, and the declaration measured again with the corvette among the files.
+
+The full report comes when they end, under its own heading.
+
+**Then the served step** (nudges 88 and 90), its own hash on `…/pkg-90-served`. It is built (162bb5f, f977ad6, 764cf7c, abcb50a): the towed boat served, the lateen's change in a manoeuvre served, `_square_foot_m` at one datum, and the tréou and the great lateen taking each other in. Its proof on 6c29d1d: today's nineteen files' graph and snapshot are byte for byte the same through rest, a tack, a wear and a box off, 6,916 readings. It will be merged with `…/pkg-90` and tiered after this.
+
+**Found since, on e2a7f62 and not carried in it:** a towed boat cut adrift at home is kept in tow, her drag on the ship. It is A4's fault, it reaches no committed file, and it is mended in the served step (162bb5f).
