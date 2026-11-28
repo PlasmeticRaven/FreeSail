@@ -176,9 +176,10 @@ jobs:
           PYTHONUTF8: "1"
           LABEL: ${{ matrix.label }}
         run: python tools/bundle_smoke.py downloaded/FreeSail-*.zip --title "smoke test on $LABEL"
-      # The smoke test's poison check has teeth: the same zip, unpacked afresh, with -I taken
-      # out of its launcher (and on Windows the interpreter's ._pth), must run the poison in
-      # the user's site-packages and in the folder it is started from.
+      # The smoke test's poison check has teeth: the same zip, unpacked afresh, with -I and
+      # PYTHONNOUSERSITE taken out of its launcher (and on Windows the interpreter's ._pth),
+      # must run the poison in the user's site-packages and in the folder it is started from.
+      # Neither step can be passed over, nor either let fail unheeded (truth 7-807).
       - name: The poison check's teeth, without isolation
         shell: bash
         env:

@@ -72,6 +72,7 @@ import platform
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -79,12 +80,11 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+from collections.abc import Mapping
 from pathlib import Path
 
 WINDOWS = sys.platform.startswith("win")
 MAC = sys.platform == "darwin"
-PORT = 8000
-BASE = f"http://localhost:{PORT}"
 SAVE_NAME = "smoke-proof"
 
 
@@ -266,25 +266,111 @@ def poison(work: Path, home: Path, started_from: Path) -> tuple[Path, Path]:
     return marks, named
 
 
-def hidden_env(home: Path, named: Path) -> dict[str, str]:
-    env = {k: v for k, v in os.environ.items() if not k.upper().startswith("PYTHON")}
+# What the launcher is given of the machine's own environment: these names and no other,
+# read from the machine only on Windows, where Python and the system cannot start without
+# them (the Windows folder; the processor, which Python's `platform` reads). Everything else
+# the launcher sees is made here, pointed into the test's own folder: no FREESAIL_* (the
+# settings file a person names), no home, no temporary folder of a person's gets through.
+FROM_THE_MACHINE = {
+    "windows": ("SystemRoot", "SystemDrive", "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS"),
+    "mac": (),
+    "linux": (),
+}
+
+
+def launcher_env(
+    system: str, machine: Mapping[str, str], home: Path, work: Path, named: Path
+) -> dict[str, str]:
+    """The whole environment the launcher is started with, built from nothing (a pure
+    function of its arguments: `machine` is the caller's environment, of which only
+    FROM_THE_MACHINE[system] is taken). The player's places (`player_env`) and the
+    temporary folder lie in the test's folder; the PATH is the system's own; and the three
+    PYTHON* variables name the poison's folder, which the launchers must clear."""
+    env = {k: machine[k] for k in FROM_THE_MACHINE[system] if machine.get(k)}
     env.update(player_env(home))
-    if WINDOWS:
-        sysroot = os.environ.get("SystemRoot", r"C:\Windows")
+    temp = str(work / "temp")
+    if system == "windows":
+        root = env.setdefault("SystemRoot", r"C:\Windows")
         env["PATH"] = ";".join(
             [
-                rf"{sysroot}\System32",
-                sysroot,
-                rf"{sysroot}\System32\Wbem",
-                rf"{sysroot}\System32\WindowsPowerShell\v1.0",
+                rf"{root}\System32",
+                root,
+                rf"{root}\System32\Wbem",
+                rf"{root}\System32\WindowsPowerShell\v1.0",
             ]
         )
+        env["windir"] = root
+        env["ComSpec"] = rf"{root}\System32\cmd.exe"
+        env["PATHEXT"] = ".COM;.EXE;.BAT;.CMD"
+        env["TEMP"] = env["TMP"] = temp
     else:
         env["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
+        env["TMPDIR"] = temp
+        env["LANG"] = "en_US.UTF-8" if system == "mac" else "C.UTF-8"
     env["PYTHONPATH"] = str(named)
     env["PYTHONHOME"] = str(named)
     env["PYTHONSTARTUP"] = str(named / "startup.py")
     return env
+
+
+def this_system() -> str:
+    return "windows" if WINDOWS else "mac" if MAC else "linux"
+
+
+def free_port() -> int:
+    """A port no one listens on now, the system's choice: the test's game runs there, never
+    on the 8000 a person's own game is on."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def answers(port: int) -> bool:
+    """Whether anything at all listens on the port, by IPv4 or IPv6 (localhost is either)."""
+    for family, host in ((socket.AF_INET, "127.0.0.1"), (socket.AF_INET6, "::1")):
+        try:
+            with socket.socket(family, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                if s.connect_ex((host, port)) == 0:
+                    return True
+        except OSError:
+            pass
+    return False
+
+
+def inside(path: str, home: Path) -> bool:
+    return os.path.normcase(path).startswith(os.path.normcase(str(home)) + os.sep)
+
+
+def its_own_game(window: str, home: Path, proc: subprocess.Popen, page: Page) -> str:
+    """Why what answers is not the test's own game, or "" when it is. Asked before a
+    single order, by reads alone: the launcher still running, no word of its port being
+    taken, the game's window naming its settings file inside the test's home, and the
+    server itself saying so (the harbour's state names the settings file it holds, which
+    no other game would have inside the test's folder)."""
+    if proc.poll() is not None:
+        return f"the test's launcher has ended (code {proc.returncode}), yet a server answers"
+    if PORT_WORDS in window:
+        return "the game said its port is taken"
+    line = next((ln.strip() for ln in window.splitlines() if "The settings: " in ln), "")
+    named = line.partition("The settings: ")[2].split(" (not read")[0]
+    if not named:
+        return "the game's window names no settings file"
+    if not inside(named, home):
+        return f"the game's settings are not the test's: {named}"
+    try:
+        harbour = page.ask("GET", "/harbour", timeout=30)
+        m = re.search(r'<meta name="freesail-page" content="([^"]+)"', str(harbour))
+        if not m:
+            return "what answers has no harbour page of the game's"
+        page.mark = m.group(1)
+        state = page.ask("GET", "/api/harbour/state", timeout=30)
+        held = str(((state or {}).get("settings") or {}).get("path", ""))
+    except Exception as e:  # noqa: BLE001 - any answer but the game's own is not it
+        return f"what answers is not the game's harbour: {type(e).__name__}: {e}"
+    if not inside(held, home):
+        return f"the server holds settings that are not the test's: {held or 'none'}"
+    return ""
 
 
 def without_isolation(top: Path) -> str:
@@ -307,11 +393,14 @@ def without_isolation(top: Path) -> str:
     return " and ".join(taken)
 
 
-def start(top: Path, env: dict[str, str], log: Path, cwd: Path) -> subprocess.Popen:
+def start(top: Path, env: dict[str, str], log: Path, cwd: Path, port: int) -> subprocess.Popen:
+    """The launcher run as a player runs it, on the test's own port (the launchers pass
+    their arguments on to the game)."""
     out = open(log, "wb")
+    flags = ["--no-browser", "--port", str(port)]
     if WINDOWS:
         return subprocess.Popen(
-            ["cmd.exe", "/c", str(top / LAUNCHER), "--no-browser"],
+            ["cmd.exe", "/c", str(top / LAUNCHER), *flags],
             cwd=cwd,
             env=env,
             stdin=subprocess.PIPE,
@@ -320,7 +409,7 @@ def start(top: Path, env: dict[str, str], log: Path, cwd: Path) -> subprocess.Po
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         )
     return subprocess.Popen(
-        ["/bin/bash", str(top / LAUNCHER), "--no-browser"],
+        ["/bin/bash", str(top / LAUNCHER), *flags],
         cwd=cwd,
         env=env,
         stdin=subprocess.DEVNULL,
@@ -333,31 +422,32 @@ def start(top: Path, env: dict[str, str], log: Path, cwd: Path) -> subprocess.Po
 class Page:
     """The harbour's page in a browser on the machine: its mark in every request."""
 
-    def __init__(self) -> None:
+    def __init__(self, base: str) -> None:
+        self.base = base
         self.mark = ""
 
     def ask(self, method: str, path: str, body: dict | None = None, timeout: float = 120):
-        headers = {"Origin": BASE}
+        headers = {"Origin": self.base}
         if self.mark:
             headers["x-freesail-page"] = self.mark
         data = None
         if body is not None:
             data = json.dumps(body).encode("utf-8")
             headers["Content-Type"] = "application/json"
-        req = urllib.request.Request(BASE + path, data=data, headers=headers, method=method)
+        req = urllib.request.Request(self.base + path, data=data, headers=headers, method=method)
         with urllib.request.urlopen(req, timeout=timeout) as r:
             raw = r.read()
             kind = r.headers.get("content-type", "")
         return json.loads(raw) if "json" in kind else raw.decode("utf-8", "replace")
 
 
-def wait_for_server(proc: subprocess.Popen, seconds: float) -> float:
+def wait_for_server(proc: subprocess.Popen, seconds: float, base: str) -> float:
     began = time.time()
     while time.time() - began < seconds:
         if proc.poll() is not None:
             return -1.0
         try:
-            urllib.request.urlopen(BASE + "/harbour", timeout=2).read()
+            urllib.request.urlopen(base + "/harbour", timeout=2).read()
             return time.time() - began
         except (urllib.error.URLError, OSError):
             time.sleep(1)
@@ -541,9 +631,20 @@ def main(argv: list[str] | None = None) -> int:
             "poison planted where the launchers clear nothing",
             "; ".join(str(p) for p in [*user_sites(home), started_from]),
         )
-        env = hidden_env(home, named)
+        env = launcher_env(this_system(), os.environ, home, work, named)
+        (work / "temp").mkdir()
+        port = free_port()
+        base = f"http://localhost:{port}"
+        # nothing of anyone's is ever spoken to: if anything answers on the test's own port
+        # before its launcher runs (a person's game, another program), the test stops here
+        if not f.check(
+            not answers(port),
+            "nothing answers on the test's own port before its launcher runs",
+            f"port {port}",
+        ):
+            return 1
         began = time.time()
-        proc = start(top, env, log, started_from)
+        proc = start(top, env, log, started_from, port)
         if teeth:
             places = (
                 ("started-from", "the folder it is started from"),
@@ -554,7 +655,7 @@ def main(argv: list[str] | None = None) -> int:
                 left = [p.name for p in marks.iterdir()]
                 if all(any(m.startswith(k + "-") for m in left) for k, _ in places):
                     break
-                if up < 0 and wait_for_server(proc, 1) >= 0:
+                if up < 0 and wait_for_server(proc, 1, base) >= 0:
                     up = time.time() - began
                 time.sleep(1)
             if proc.poll() is None:
@@ -570,16 +671,22 @@ def main(argv: list[str] | None = None) -> int:
                 )
             f.ok("the server", f"answered after {up:.0f} s" if up >= 0 else "did not answer")
             return 0 if f.passed else 1
-        up = wait_for_server(proc, 240)
+        up = wait_for_server(proc, 240, base)
         window = log.read_text("utf-8", "replace")
         if not f.check(up >= 0, "the server answers", f"after {up:.0f} s" if up >= 0 else ""):
             return 1
-        f.check(
+        # before a single order: what answers is the test's own game, or the run ends here
+        if not f.check(
             PORT_WORDS not in window,
             "a first start says nothing of its port being taken",
             next((ln.strip() for ln in window.splitlines() if PORT_WORDS in ln), "no such word"),
-        )
-        the_game(Page(), f)
+        ):
+            return 1
+        page = Page(base)
+        why = its_own_game(window, home, proc, page)
+        if not f.check(not why, "what answers is the test's own game", why or f"port {port}"):
+            return 1
+        the_game(page, f)
         time.sleep(1)
         running = interpreters()
         here = os.path.normcase(str(top.resolve()))
@@ -601,7 +708,7 @@ def main(argv: list[str] | None = None) -> int:
         road = stopped(proc, f)
         window = log.read_text("utf-8", "replace")
         try:
-            urllib.request.urlopen(BASE + "/harbour", timeout=3).read()
+            urllib.request.urlopen(base + "/harbour", timeout=3).read()
             gone = False
         except (urllib.error.URLError, OSError):
             gone = True
@@ -662,7 +769,22 @@ def main(argv: list[str] | None = None) -> int:
             pass
     finally:
         if proc is not None and proc.poll() is None:
-            proc.kill()
+            # the game stopped as asked, then the whole of it ended (its window's process
+            # group, not the launcher alone), on every road out, a refusal's too
+            stop(proc)
+            try:
+                proc.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                if WINDOWS:
+                    subprocess.run(
+                        ["taskkill", "/T", "/F", "/PID", str(proc.pid)], capture_output=True
+                    )
+                else:
+                    try:
+                        os.killpg(proc.pid, signal.SIGKILL)
+                    except OSError:
+                        pass
+                proc.kill()
         f.report(window)
         shutil.rmtree(work, ignore_errors=True)
     return 0 if f.passed else 1

@@ -328,7 +328,7 @@ def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must()
     Each "start here" page says how to start, the warning its system gives the first time
     and how to pass it, what the player will see, how to stop, where the saves and
     settings live, and where to tell what went wrong; and of a model at a station only
-    that it is optional and needs a key of his own."""
+    that it is optional and needs a key of their own."""
     cmd = (bundle.HERE / "FreeSail.cmd").read_text(encoding="utf-8")
     assert '"%HERE%python\\python.exe" -I -B -X utf8 -m freesail %*' in cmd
     assert "Extract All" in cmd and ":notunpacked" in cmd
@@ -336,6 +336,9 @@ def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must()
     assert "the folder FreeSail-{{NAME}}-windows" in cmd
     windows_page = (bundle.HERE / "START-HERE-windows.txt").read_text(encoding="utf-8")
     assert "It makes one folder, FreeSail-{{NAME}}-windows, and opens it" in windows_page
+    # another tool's "Extract Here" would spill the zip's loose files: a folder of its own
+    assert "unpack into a new folder of its\n     own" in windows_page
+    assert '"Extract Here" spills them' in windows_page
     mac = (bundle.HERE / "FreeSail.command").read_text(encoding="utf-8")
     assert mac.startswith("#!/bin/bash\n")
     assert '"$PY" -I -B -X utf8 -m freesail "$@"' in mac
@@ -550,45 +553,157 @@ def test_truth_7_807_the_teeth_take_out_every_guard_of_both_launchers(
     assert [ln for ln in after.splitlines() if ln in kept] == kept
 
 
-@pytest.mark.skipif(sys.platform.startswith("win"), reason="the trial's launcher is bash")
-def test_truth_7_807_the_smoke_test_touches_nothing_of_a_persons(tmp_path, monkeypatch):
-    """Truth 7-807 (the reader's finding 1): the smoke test, run on a person's own machine,
-    removes and writes nothing of his. Everything it writes lies in one temporary folder
-    of its own, removed at its end: the game and Python are given a home inside it (the
-    launcher sees HOME there), and his saves, on every system's road, and a folder named
-    as the old test's unpacking folder, are as they were. Run here on a trial zip whose
-    launcher says the home it sees and stops; and the script reads no person's place."""
-    import zipfile
+# The variables a person's machine may hold, every one of which must stay out of the
+# launcher's environment unless FROM_THE_MACHINE names it (truth 7-807).
+_PERSONS = {
+    "HOME": "/Users/a-person",
+    "USERPROFILE": r"C:\Users\a-person",
+    "APPDATA": r"C:\Users\a-person\AppData\Roaming",
+    "LOCALAPPDATA": r"C:\Users\a-person\AppData\Local",
+    "XDG_CONFIG_HOME": "/home/a-person/.config",
+    "XDG_DATA_HOME": "/home/a-person/.local/share",
+    "TEMP": r"C:\Users\a-person\AppData\Local\Temp",
+    "TMP": r"C:\Users\a-person\AppData\Local\Temp",
+    "TMPDIR": "/var/folders/a-person/T/",
+    "FREESAIL_SETTINGS": "/Users/a-person/elsewhere/settings.yaml",
+    "FREESAIL_ANYTHING": "a-person",
+    "PATH": "/Users/a-person/bin:/usr/bin",
+    "PYTHONPATH": "/Users/a-person/lib",
+    "PYTHONUSERBASE": "/Users/a-person/.pybase",
+    "HOMEDRIVE": "C:",
+    "HOMEPATH": r"\Users\a-person",
+    "USERNAME": "a-person",
+    "SystemRoot": r"C:\Windows",
+    "SystemDrive": "C:",
+    "PROCESSOR_ARCHITECTURE": "AMD64",
+    "NUMBER_OF_PROCESSORS": "4",
+}
 
+
+@pytest.mark.parametrize("system", ["windows", "mac", "linux"])
+def test_truth_7_807_the_launchers_environment_is_built_from_nothing(tmp_path, monkeypatch, system):
+    """Truth 7-807 (the reader's second finding 1a): the environment the smoke test gives
+    the launcher is built from nothing by an allowlist, never the caller's less a few names.
+    A pure function, tested here on every system's road: of a person's environment only
+    FROM_THE_MACHINE's names come through (on Windows the system folder and the processor;
+    on the Mac and elsewhere none); no FREESAIL_*, no home, no temporary folder, no PATH of
+    the person's; every place of the player's lies in the test's home; and the process's own
+    environment is never read."""
     import bundle_smoke
 
+    home, work, named = tmp_path / "home", tmp_path, tmp_path / "named"
+    machine = dict(_PERSONS)
+    monkeypatch.setattr(bundle_smoke.os, "environ", {"FREESAIL_SETTINGS": "never read"})
+    env = bundle_smoke.launcher_env(system, machine, home, work, named)
+    assert machine == _PERSONS  # nothing of the caller's changed
+    assert env == bundle_smoke.launcher_env(system, dict(_PERSONS), home, work, named)
+    taken = set(bundle_smoke.FROM_THE_MACHINE[system])
+    assert taken == (
+        {"SystemRoot", "SystemDrive", "PROCESSOR_ARCHITECTURE", "NUMBER_OF_PROCESSORS"}
+        if system == "windows"
+        else set()
+    )
+    made = {
+        "HOME",
+        "USERPROFILE",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "XDG_CONFIG_HOME",
+        "XDG_DATA_HOME",
+        "PATH",
+        "PYTHONPATH",
+        "PYTHONHOME",
+        "PYTHONSTARTUP",
+    }
+    made |= (
+        {"windir", "ComSpec", "PATHEXT", "TEMP", "TMP"}
+        if system == "windows"
+        else {"TMPDIR", "LANG"}
+    )
+    assert set(env) == made | taken
+    for name in taken:
+        assert env[name] == _PERSONS[name]
+    for name, value in env.items():
+        if name not in taken:
+            assert "a-person" not in value, (name, value)
+    assert not any(k.upper().startswith("FREESAIL") for k in env)
+    for name in (
+        "HOME",
+        "USERPROFILE",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "XDG_CONFIG_HOME",
+        "XDG_DATA_HOME",
+    ):
+        assert Path(env[name]).is_relative_to(home), name
+    for name in ("TEMP", "TMP", "TMPDIR"):
+        if name in env:
+            assert Path(env[name]).is_relative_to(work), name
+
+
+def _trial_zip(path: Path, launcher: str) -> Path:
+    import zipfile
+
+    with zipfile.ZipFile(path, "w") as z:
+        info = zipfile.ZipInfo("FreeSail-trial-mac/FreeSail.command")
+        info.external_attr = 0o755 << 16
+        z.writestr(info, launcher)
+    return path
+
+
+def _a_persons_home(tmp_path: Path, monkeypatch) -> Path:
+    """A person's home with saves on every system's road, a settings file of their own
+    named by FREESAIL_SETTINGS (whose saves lie beside it), and their home's variables set."""
     person = tmp_path / "a person's home"
     for saves in (
         person / ".config" / "freesail" / "saves",
         person / "Library" / "Application Support" / "FreeSail" / "saves",
         person / "AppData" / "Roaming" / "FreeSail" / "saves",
+        person / "elsewhere" / "saves",
         person / "Free Sail Proof ä",
     ):
         saves.mkdir(parents=True)
-        (saves / "precious.json").write_text("his", encoding="utf-8")
+        (saves / "precious.json").write_text("theirs", encoding="utf-8")
+    (person / "elsewhere" / "settings.yaml").write_text("places: {}\n", encoding="utf-8")
     for name, value in {
         "HOME": person,
         "USERPROFILE": person,
         "APPDATA": person / "AppData" / "Roaming",
         "XDG_CONFIG_HOME": person / ".config",
+        "FREESAIL_SETTINGS": person / "elsewhere" / "settings.yaml",
     }.items():
         monkeypatch.setenv(name, str(value))
     monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    return person
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="the trial's launcher is bash")
+def test_truth_7_807_the_smoke_test_touches_nothing_of_a_persons(tmp_path, monkeypatch):
+    """Truth 7-807 (the reader's findings 1 and 1a): the smoke test, run on a person's own
+    machine, removes and writes nothing of theirs, a FREESAIL_SETTINGS of theirs set or not.
+    Everything it writes lies in one temporary folder of its own, removed at its end: the
+    game and Python are given a home inside it (the launcher sees HOME there), and the
+    person's saves, on every system's road and beside the settings their FREESAIL_SETTINGS
+    names, and a folder named as the old test's unpacking folder, are as they were. Run here
+    on a trial zip whose launcher says the home it sees, writes a save where a
+    FREESAIL_SETTINGS would send the game's (as the game does), and stops; and the script
+    reads no person's place."""
+    import bundle_smoke
+
+    person = _a_persons_home(tmp_path, monkeypatch)
     seen = tmp_path / "the home the launcher saw.txt"
-    monkeypatch.setenv("SMOKE_TRUTH_OUT", str(seen))
     temp = tmp_path / "temp"
     temp.mkdir()
     monkeypatch.setattr(bundle_smoke.tempfile, "tempdir", str(temp))
-    trial = tmp_path / "FreeSail-trial-mac.zip"
-    with zipfile.ZipFile(trial, "w") as z:
-        info = zipfile.ZipInfo("FreeSail-trial-mac/FreeSail.command")
-        info.external_attr = 0o755 << 16
-        z.writestr(info, '#!/bin/bash\necho "$HOME" > "$SMOKE_TRUTH_OUT"\nexit 1\n')
+    trial = _trial_zip(
+        tmp_path / "FreeSail-trial-mac.zip",
+        "#!/bin/bash\n"
+        f"echo \"$HOME\" > '{seen}'\n"
+        'if [ -n "$FREESAIL_SETTINGS" ]; then\n'
+        '  echo saved > "$(dirname "$FREESAIL_SETTINGS")/saves/smoke-proof.json"\n'
+        "fi\n"
+        "exit 1\n",
+    )
     before = _snapshot(person)
     assert bundle_smoke.main([str(trial)]) == 1  # the trial's game never answers
     assert _snapshot(person) == before
@@ -598,6 +713,96 @@ def test_truth_7_807_the_smoke_test_touches_nothing_of_a_persons(tmp_path, monke
     source = Path(bundle_smoke.__file__).read_text(encoding="utf-8")
     assert "Path.home()" not in source and "expanduser" not in source
     assert 'environ["APPDATA"]' not in source and 'environ.get("APPDATA' not in source
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="the trial's launcher is bash")
+@pytest.mark.parametrize("road", ["seen before the launcher", "begun after the look"])
+def test_truth_7_807_the_smoke_test_never_drives_a_game_not_its_own(tmp_path, monkeypatch, road):
+    """Truth 7-807 (the reader's finding 1b): with a person's own game already answering,
+    the smoke test sends it not a single order. Seen before its launcher runs (on the port
+    the test chose), the test stops there and its launcher never runs; begun between the
+    look and the launch (the look fooled here), the test reads that what answers is not its
+    own game (no settings of the test's) and stops before any order: the person's game is
+    asked for its harbour page at most, and nothing is begun, saved or run on it."""
+    import http.server
+    import threading
+
+    import bundle_smoke
+
+    person = _a_persons_home(tmp_path, monkeypatch)
+    asked: list[tuple[str, str]] = []
+
+    class APersonsGame(http.server.BaseHTTPRequestHandler):
+        def _answer(self):
+            asked.append((self.command, self.path))
+            body = b'<html><meta name="freesail-page" content="theirs"></html>'
+            if self.path.startswith("/api/"):
+                body = b'{"settings": {"path": "/Users/a-person/settings.yaml"}}'
+            self.send_response(200)
+            kind = "application/json" if self.path.startswith("/api/") else "text/html"
+            self.send_header("content-type", kind)
+            self.send_header("content-length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        do_GET = do_POST = _answer
+
+        def log_message(self, *args):
+            pass
+
+    game = http.server.ThreadingHTTPServer(("127.0.0.1", 0), APersonsGame)
+    threading.Thread(target=game.serve_forever, daemon=True).start()
+    monkeypatch.setattr(bundle_smoke, "free_port", lambda: game.server_address[1])
+    if road == "begun after the look":
+        monkeypatch.setattr(bundle_smoke, "answers", lambda port: False)
+    ran = tmp_path / "the launcher ran"
+    temp = tmp_path / "temp"
+    temp.mkdir()
+    monkeypatch.setattr(bundle_smoke.tempfile, "tempdir", str(temp))
+    trial = _trial_zip(
+        tmp_path / "FreeSail-trial-mac.zip",
+        f"#!/bin/bash\necho ran > '{ran}'\nsleep 20\n",
+    )
+    before = _snapshot(person)
+    try:
+        assert bundle_smoke.main([str(trial)]) == 1
+    finally:
+        game.shutdown()
+    assert [m for m, _ in asked if m != "GET"] == []  # not one order
+    assert {p for _, p in asked} <= {"/harbour"}
+    if road == "seen before the launcher":
+        assert asked == [] and not ran.exists()
+    assert _snapshot(person) == before
+    assert list(temp.iterdir()) == []
+
+
+def test_truth_7_807_the_smoke_and_its_teeth_run_on_all_three_and_cannot_be_passed_over():
+    """Truth 7-807 (the reader's 3a): the teeth cannot run outside the three machines, so
+    what is held here is that the downloads workflow runs both the smoke test and its teeth
+    (`--without-isolation`) on Windows, a Mac with Apple silicon and a Mac with Intel, and
+    that neither can be passed over: no `continue-on-error` anywhere in the workflow, no
+    `if:` on the smoke job or on either step, the matrix not cut short by a first failure,
+    and publishing waiting on the smoke job."""
+    import yaml
+
+    text = (ROOT / ".github" / "workflows" / "downloads.yml").read_text(encoding="utf-8")
+    assert "continue-on-error" not in text
+    jobs = yaml.safe_load(text)["jobs"]
+    smoke = jobs["smoke"]
+    assert "if" not in smoke and smoke["needs"] == "build"
+    assert smoke["strategy"]["fail-fast"] is False
+    assert "exclude" not in smoke["strategy"]["matrix"]
+    runners = sorted(row["runner"] for row in smoke["strategy"]["matrix"]["include"])
+    assert runners == ["macos-15", "macos-15-intel", "windows-2025"]
+    assert smoke["runs-on"] == "${{ matrix.runner }}"
+    runs = [st for st in smoke["steps"] if "bundle_smoke.py" in st.get("run", "")]
+    assert len(runs) == 2
+    plain, teeth = runs
+    assert "--without-isolation" not in plain["run"] and "--without-isolation" in teeth["run"]
+    for st in runs:
+        assert "if" not in st and "continue-on-error" not in st
+        assert "|| true" not in st["run"] and "||" not in st["run"]
+    assert "smoke" in jobs["publish"]["needs"]
 
 
 def test_truth_7_808_the_build_ships_no_link_and_no_interpreter_baggage(tmp_path):
