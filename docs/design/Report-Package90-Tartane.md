@@ -46,6 +46,14 @@ pieds) and the lateen's hoist (Forfait p. 121, as read) stand. The topsail's dep
 cutter's rule with no source behind it, and it does not stand. §15.3 gives the re-cut for the
 lead to rule, owed with her hash.
 
+**The lead's nudge 89 (§16).** Ruled for her hash: her topsail re-cut 3 pieds clear, with the foot
+0.9 of its own yard. On the tréou's yard, no source sets the tréou and the great lateen together on
+one mast. Because the engine keeps a taken-in lateen's yard aloft, I propose the great lateen taken
+in for the tréou and the tréou's yard hoisted 1 pied below the slings. The preview's finding is
+reproduced: from rest she cannot be got under way on five of the eight points, her topsail set
+aback with its yard square. Her proof runs on the trunk that holds the engine's steps. §16.4
+corrects a wrong claim of §15.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -342,8 +350,11 @@ Both are owed with her hash, beside the other towing items. Also noted there, an
 towed boat with no file of her own puts no drag on the ship, and the generator may refuse `towed`
 on such a boat when her files come.
 
-**Owed with her hash, as the lead rules on §15.3** (the lead's nudge 88): her topsail cut clear
-above the lateen yard's slings.
+**Owed with her hash, as the lead rules** (nudges 88 and 89):
+- her topsail cut 3 pieds clear of the lateen yard's slings, the foot 0.9 of its own yard (§16.1);
+- the tréou's yard and the great lateen as ruled on §16.2;
+- her proof from rest by the eight points, with her wear and her tack from each, on the trunk that
+  holds the engine's steps (§16.3).
 
 ## 7. The pictures
 
@@ -971,7 +982,8 @@ The doubled deck height comes from the datums: the file's yard heights are above
 **For the engine's step.** A5 classes her topsail as a topsail, not a course, because its foot
 stands above the lateen yard (`foot > lat.height_m`). With the arithmetic mended, that holds by
 the rounding alone. On the unrounded figures the two are equal, and she would read as a course.
-The re-cut in §15.3 takes her off that edge.
+The re-cut in §15.3 takes her off that edge. *(Corrected in §16.4: this is wrong. Her topsail is a
+topsail by the tréou's yard below it, and the foot check does not decide it.)*
 
 ### 15.2 What her source gives
 
@@ -1001,7 +1013,8 @@ Every one is inside the ±15% band.
 - The cut then matches the drawing. V2 takes a loose sail's depth as its area over that foot.
   Its clews then stand 1.26 m above the slings; as filed they hang 0.76 m below them (8.09 m
   above her water, §14.2).
-- It keeps her topsail off A5's edge by a margin a seaman would see.
+- It keeps her topsail off A5's edge by a margin a seaman would see. *(Corrected in §16.4: there
+  is no such edge.)*
 
 It is built with her hash, through `tools/ships/tartane.py` and the generator:
 - her topsail's area, centre and note, and her plain sail's check;
@@ -1015,3 +1028,134 @@ yard is slung. Both are at 8.31 m above her deck datum, 0.00 m apart on the mast
 the tréou's yard lies on deck (§14), so nothing meets. Whenever the tréou is set, the two yards
 stand at one height on the mast. Its hoist rests on the same reading of Forfait p. 121 and on
 the cutter's precedent. Recorded for the lead with the depth.
+
+## 16. The lead's nudge 89: the rulings for her hash, and the preview's finding
+
+The lead's nudge 89, in the note at the end of `docs/dev/M7-WorkPackages.md` on the trunk at
+e1cbd452, which I read whole. Three items are for her hash, built when the engine's passes are in.
+Nothing is built now. This section answers what is asked of the report, and corrects §15 (§16.4).
+
+### 16.1 Her topsail: 3 pieds clear, the foot 0.9 of its own yard (ruled)
+
+The lead ruled my pick (§15.3). The lead's reasons, to stand beside mine:
+- the depth had no source, and was set to meet Forfait's area to the tenth, which proves nothing
+  of the cut;
+- a loose foot lying at the very height of the slings cannot set;
+- the foot by its own yard is the cut of a sail flown when the tréou's yard is not crossed, which
+  is most of her days;
+- 8.5% under Forfait's 216.0 m² is inside the band. It is said as a departure, with the 1-pied row
+  beside it as the cut not taken.
+
+With her hash it is declared as JUDGEMENT in her file's notes, with the head and the hoist as
+sourced (Forfait, Table II and p. 121). Her polar and truth 7-688 are measured again where they
+move, old beside new.
+
+### 16.2 The tréou's yard and the lateen's slings: what the sources give
+
+**What each source gives:**
+- **Forfait p. 121** (read in `docs/references/forfait/`): the great yard is hoisted until its
+  halyard block touches the return block at the masthead, or the sheave in the mast itself. A
+  lateen's yard, lowered on deck with its sail, leaves only a very short mast standing. The page
+  says nothing of the tréou.
+- **Lescallier p. 401:** a tartane may go with the wind aft, or with too strong a wind, by rigging
+  a square sail called the tréou. He does not say whether the lateen stays.
+- **Lescallier p. 395, the galley:** with the wind aft and strong enough, the tréou is rigged on
+  the fore mast, another mast than the main's lateen.
+- **Forfait p. 124:** the tartanes sent into the Ocean take away the great lateen and set a square
+  sail of the same area in its place.
+
+**So no source sets both on her one mast.** They point to the lead's second branch: the great
+lateen is taken in for the tréou, as her truth 7-688 already does it.
+
+**The engine keeps a taken-in lateen's yard aloft.** It takes a lateen in by brailing the sail up
+to its yard (`data/evolutions/take_in_lateen.yaml`: the yard is not lowered). So, taken in, her
+great yard still stands at the slings, at the tréou's yard's height. Lowering it on deck, as p. 121
+has a lateen's yard lowered, is engine work that no step has.
+
+**My proposal, both halves, for the lead to rule:**
+1. **Her file and her orders say the great lateen is taken in for the tréou.** Her `all sail`
+   group holds both today, and would lose the great lateen. The tréou's note says so. Whether `set
+   the treou` refuses with the great lateen set, or takes it in first, is the engine's order and
+   its words, not mine.
+2. **The tréou's yard hoists 1 pied (0.32 m) below the slings, its parrel's room** (JUDGEMENT: the
+   two yards' half-diameters, 0.13 and 0.12 m, and the parrel's trucks). Then the two yards never
+   stand at one height, as the engine keeps them. The tréou becomes 6.46 m deep instead of 6.78,
+   about 77.4 m² instead of 81.3, and truth 7-688's 4.86 kn with it set is measured again.
+
+A5 reads them so on the trunk's code. The tréou's yard is her lowest yard on the main, level 0, her
+course (nudge 39's ruling 1), whether it hangs at the slings or below them.
+
+### 16.3 The preview's finding, measured on this tree
+
+**Reproduced.** Her file at 3c584e0f is this tree's. The start is seed 7, wind N at 12 kn, from rest
+heading 292:
+- **`set plain sail`:** the watch's hands set the sails in turn: the great lateen at 131 s, the
+  topsail at 576, the mizen at 707 and the jib at 815. The great lateen luffs her to 59 degrees off.
+  Her topsail, its yard square, is taken aback at 592 s.
+- **`steer south`:** with her helm hard over she lies between 293 and 305 degrees, making
+  **sternway** of 0.5 to 1.3 kn (the preview's half a knot), her helm reversed for it.
+- **`wear ship`:** "Stand by to wear ship. Up helm; brace in the after yards.", and at 900 s
+  "Could not wear: she would not come round." Her topsail stays aback throughout. The wear braces
+  the after yards, and she has none.
+- **One difference:** here, `take in the mizen` let her pay off: she was steady on S 433 s after
+  the order, at 3.2 kn. In the preview it did not. The harness's wind is steady, and the preview game's may not have
+  been (JUDGEMENT on the cause, not measured).
+
+**The cause is her topsail, set aback with its yard square.** Each order tried after `steer south`:
+
+| Order | What she did |
+|---|---|
+| `brace sharp up on the starboard tack` | filled her topsail; she bore away to S within 120 s, 2.85 kn |
+| `trim sails` | the same; 3.25 kn |
+| easing the great lateen's sheet alone, 45.6 to 53.0 degrees | did not free her |
+| `square the yards` | changed nothing; her yards were square already |
+
+The merchant brig, from the same start with the same orders, has her yards square too. She falls
+off while making sail (241 degrees at 360 s), bears away to S in 240 s, and wears.
+
+**From rest by the eight points, today's tree** (the lead's proof's form; the course is the start
+heading where that is 67.5 degrees or more off the wind, else 67.5 off on her side):
+
+| From rest | Course | Taken in 20 minutes | Then `wear ship` | Then `tack ship` |
+|---|---|---|---|---|
+| 000 | 068 | no: topsail aback, sternway 1.4 kn | could not wear | refused: not way enough to stay |
+| 045 | 068 | no: aback, sternway 1.5 kn | could not wear | refused: not way enough |
+| 090 | 090 | no: aback, sternway 0.5 kn | could not wear | refused: not way enough |
+| 135 | 135 | yes, 4.05 kn | wore in 269 s | missed stays |
+| 180 | 180 | yes, 3.78 kn | wore in 224 s | refused: "She is not close-hauled; bring her by the wind before going about." |
+| 225 | 225 | yes, 4.05 kn | wore in 269 s | missed stays |
+| 270 | 270 | no: aback, sternway 0.5 kn | could not wear | refused: not way enough |
+| 315 | 292 | no: aback, sternway 1.5 kn | could not wear | refused: not way enough |
+
+On today's tree, plain sail and a course cannot get her under way from rest on five of the eight
+points. On the three abaft the beam she takes her course and wears. Her tack wants her by the wind
+with way on, which those five starts never give her.
+
+**A lever in her file** (tried on a scratch copy, not committed). Her `plain sail` group set in the
+order jib, topsail, great lateen, mizen, as a seaman casts her head with the headsail and the square
+sail before the lateens (JUDGEMENT):
+- from 090 and 270 she takes her course at 2.79 kn, and wears in 315 s;
+- from 000 she falls off at 1.3 kn, not aback, and wears in 357 s;
+- from 045 and 315, close-hauled courses, the topsail still sets aback.
+
+**The rest is the engine's.** No ship braces a square yard for a close-hauled course from rest on
+`set plain sail` and a course alone. The merchant brig from 000, 045 and 315 is 34 to 62 degrees off
+her course after 20 minutes at 1 to 1.7 kn, though she keeps headway and wears. So her proof runs
+on the trunk that holds the engine's steps (A1a to A1d, A5, A6), as the lead rules, with her hash
+and with the lever above for the lead to rule. I will say there what remains.
+
+### 16.4 A correction to §15
+
+§15.1 says A5 classes her topsail as a topsail because its foot stands above the lateen yard, so
+that with the arithmetic mended it holds by rounding alone. §15.3 gives "off A5's edge" as a reason
+for my pick. **Both are wrong.**
+
+I probed it on the trunk at e1cbd452, in a scratch worktree with her file copied in, nothing
+committed:
+- **Her topsail is level 1 because her tréou's yard is crossed below it on the same mast** in her
+  file. With the lateen yard raised over the topsail's foot, it stays level 1.
+- **The foot check is reached only by a yard of level 0.** That is her tréou's yard, which stays 0,
+  a course, since the lateen yard is not below it.
+
+So neither of her yards' levels turns on the foot's arithmetic. The re-cut stands on the lead's
+reasons and on the drawing's.
