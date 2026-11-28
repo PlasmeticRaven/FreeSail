@@ -461,7 +461,7 @@ class Console:
         self,
         world: World,
         compression: float = 1.0,
-        out=sys.stdout,
+        out=None,
         lockstep: bool = False,
         replay_anyway: bool = False,
         free_running: bool = False,
@@ -478,7 +478,9 @@ class Console:
         )
         self.desk: Any = None  # the agent API's stations, with --agents-port
         self.running = False
-        self.out = out
+        # resolved when a console is made, not when the module is imported: a stream
+        # taken at import may be one since closed (a test's capture, say)
+        self.out = out if out is not None else sys.stdout
         self._view = RollupView()  # the roll-up (spec M4 §20)
         self._alarm: Event | None = None  # an urgent line seen while running fast
         self.lock = threading.RLock()  # the clock thread and the prompt share the world
