@@ -150,7 +150,9 @@ Each mutant the reader named was put in by hand once and each fails its truth: a
 
 ## The cloud's runs
 
-Read through the public API (`/actions/runs/<id>/jobs` and each job's annotations). The run that proved the downloads as they now are, at `14192b3` (the downloads' own files have not changed since; the hash reported carries the trunk merged in and this report, and its own run is named in the report to the lead):
+Read through the public API (`/actions/runs/<id>/jobs` and each job's annotations). **The run of the downloads as they now are** (the reader's findings mended: the smoke test in a folder of its own, the poison in the user's site and the folder it is started from, the step that proves its teeth, the Windows zip without a folder, the interpreter stripped) is the push run of the commit that brought them, and is named, with its jobs' figures, in the report to the lead; the commits after it change no file of the downloads. The runs below are **earlier**: they ran the smoke test as it then was (the runner's own home, the poison in the `PYTHON*` folder alone, the Windows zip with its folder), so what they prove of the poison is less than the run of now proves.
+
+At `14192b3`:
 
 **Run 46079578966**, all green:
 
