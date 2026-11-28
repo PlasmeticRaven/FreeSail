@@ -1143,6 +1143,32 @@ class LateenChange:
         self.done = True
 
 
+def lateens_shifting(ship: Ship) -> set[str]:
+    """The whole lateens whose change round the mast is in hand now, by sail id: peaked up and
+    passed round in their gear, in a manoeuvre's change (`LateenChange`, held on its script as
+    `lateen_change`), in a shift by itself, or handed on by a belay (`ChangeLateenScript`);
+    not one waiting its turn, drawing where it lies, nor one left in its gear by a belay of its
+    shift by itself. Read by the served snapshot (package 90, the lead's nudge 88, item 2: each
+    yard was served only `in_the_gear` while it was shifted, as a lateen brailed up is). No
+    state is kept for it: the mark is the work in hand, so no checkpoint holds more."""
+    runner = ship.extra.get("evolutions") if isinstance(ship.extra, dict) else None
+    out: set[str] = set()
+    for inst in getattr(runner, "instances", None) or ():
+        script = inst.script
+        if inst.waiting or script is None or script.status != "running":
+            continue
+        change = getattr(script, "lateen_change", None)
+        if isinstance(change, LateenChange) and not change.done:
+            out.update(change._begun())
+        if isinstance(script, ChangeLateenScript) and script.phase == "shift":
+            ids = list(script.handed) if script.handed is not None else [script.sail_id]
+            for i in ids:
+                sl = ship.sails.get(i) if i else None
+                if sl is not None and sl.state is SailState.IN_THE_GEAR and not sl.wrecked:
+                    out.add(sl.id)
+    return out
+
+
 def innermost_head_sail(ship: Ship, standing: bool = False) -> Sail | None:
     """The head sail nearest the mast (the fore staysail, or the jib if it is alone): the
     sheet a fore-and-after hauls to windward to heave to (Luce 1884, ch. XXXIV). With

@@ -40410,3 +40410,64 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, what the client is served: the towed boat, a lateen shifting, the square foot at one datum (the lead's nudge 88, 2026-11-28)
+
+**1. The towed boat.** The ship graph's `boats` gives each boat her file tows astern: her id, her
+name, `towed: true` and `length_m` (her file's `length_ft` in metres, as the graph is: the tartane
+probe's 15-ft boat, on the 16-ft yawl's file, 4.572 m). The snapshot's `boats` gives each one's
+`in_tow`, by `keep_in_tow`'s own rule (`boats._in_tow`): in tow at sea; not away, lost or stove.
+Neither key is served for a ship whose file tows none, and no committed file tows one.
+
+Found by it, and mended: a towed boat cut adrift (or swamped) at home, never sent on an errand,
+has a `BoatState` that names no boat (`boat_id` ""), and `keep_in_tow` took none for gone. So
+she was kept in tow, `boat_in_tow` kept and her drag on the ship, a boat lost towing astern. A
+state that names none now stands for her errands' boat, as the dealings read it
+(`boats.errands_boat`, which `Dealings.boat_spec` now reads). It reaches no committed file.
+
+**2. A lateen shifting.** A whole lateen's sail on the snapshot carries `shifting: true` only
+while its change round the mast is in hand (`scripts.lateens_shifting`): peaked up and its car
+passed round, in its gear. That covers a manoeuvre's change (`LateenChange`, held on its script
+as `lateen_change`), a shift by itself, and a shift handed on by a belay (`ChangeLateenScript`).
+It is not served for a lateen waiting its turn, drawing where it lies, nor for one brailed up.
+No state is kept for it: the mark is the work in hand, so no checkpoint holds more. The xebec
+probe (seed 7, 15 kn, settled on the starboard tack heading 292.5°), each yard served from its
+first second to its last:
+
+| Case | Fore | Main | Mizen |
+|---|---|---|---|
+| `tack ship`: the change begun at +44 s ("Shift the mainsail and the foresail and the mizen") | 44 to 226 | 44 to 247 | 44 to 150 |
+| Its mizen taken in first, brailed up in its gear | 47 to 228 | 47 to 250 | never |
+| `shift the mainsail` by itself, after a tack that left the lateens | | 1 to 346 | |
+| The tack belayed at +100 s, the yards handed on | 101 to 226 | 101 to 247 | 101 to 150 |
+
+Each served span ends the second before that yard's "Shifted" line. Heading 270° and brought by
+the wind first (`keep her full and by`), the tack served it from +50 to +250 s, sampled every
+10 s (the lead's figure: +60 to +250 s). Old: no key, each yard served only `in_the_gear` while
+it was shifted, as a lateen brailed up is.
+
+**3. The square foot at one datum, the deck.** `graph._square_foot_m` is the foot above the deck:
+`2 × (centre_height_m − deck_height_m) − yard.height_m`. A sail's centre is filed above the water
+(TechnicalSpec-M0-M2.md §6.2), a yard's height above the deck. The old foot,
+`2 × centre_height_m − yard.height_m`, set the centre above the water against the yard above the
+deck and stood too high by twice her deck's height.
+
+On the tartane's file (her branch, read, not merged), her deck stands 0.54 m above the water.
+Her topsail's yard is 15.78 m above the deck and its centre 12.6 m above the water, so its foot
+stands 2 × (12.6 − 0.54) − 15.78 = 8.34 m above the deck. That is **0.03 m above her great
+lateen's yard at 8.31 m**, where the old rule had 9.42 m (1.08 m too high, twice 0.54 m). Her
+tréou's foot is 2.21 m (old 3.29 m). Her topsail is still a topsail by the rule, by 0.03 m.
+
+Today's classing is unmoved: every yard's level, the courses and the topsails, old beside new,
+are the same on the nineteen files and on the four probes as built (120 yards). Three pins of
+`tests/test_yard_level.py` move, each a tartane probe on the cutter's hull, whose deck (0.9 m)
+is not hers:
+
+- **Her file's heights and cuts (`HER_FILE`)** now carry her deck, 0.54 m. With the cutter's
+  deck and the foot by the deck, her topsail's foot would be 7.62 m, below the lateen's yard, and
+  a course. The two tests that read her file's heights (the tréou not crossed; the pole's words
+  where no yard is below) read it so.
+- **The foot at the lateen's yard's tie** (1.0, 10 and 10.25 m): the probe's deck is set at 0.5 m,
+  exact in binary, and its centres at 8.75, 13.25 and 13.375 m. Old: the cutter's deck and the
+  centres 8.25, 12.75 and 12.875 m. By the deck those old centres give feet 0.8 m lower (−0.8,
+  8.2 and 8.45 m), each a course.

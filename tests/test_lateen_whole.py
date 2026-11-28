@@ -32,6 +32,7 @@ from rig_fixtures import (
 )
 
 from freesail import units
+from freesail.api import queries
 from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
@@ -3369,3 +3370,105 @@ def test_a_lateen_whose_shift_waits_for_hands_is_told_so_not_to_shift_it(xebec_i
         "the mizen lying on the mast; she will carry them away: its shift waits its turn, the "
         "hands shifting the mainsail."
     ), [e.text for e in said]
+
+
+# ---------------------------------------------------------------------------
+# What the client is served (the lead's nudge 88, item 2): a lateen changed round its mast
+# ---------------------------------------------------------------------------
+
+
+def _served_shifting(world) -> list[str]:
+    return [sl["id"] for sl in queries.snapshot(world)["sails"] if sl.get("shifting")]
+
+
+def _shifting_spans(world, seconds: int, at: int = 0) -> dict[str, tuple[int, int]]:
+    """Each sail served `shifting`, its first and last second of it, counted from `at`."""
+    spans: dict[str, tuple[int, int]] = {}
+    for i in range(seconds):
+        world.tick()
+        for sid in _served_shifting(world):
+            first = spans.get(sid, (at + i + 1,))[0]
+            spans[sid] = (first, at + i + 1)
+    return spans
+
+
+def _shifted_at(world, n0: int, t0: int) -> dict[str, int]:
+    names = {"fore.lateen": "foresail", "main.lateen": "mainsail", "mizzen.lateen": "mizen"}
+    return {
+        sid: next(
+            e.tick - t0
+            for e in _after(world, n0)
+            if e.text == f"Shifted the {name}; it stands to leeward of the mast."
+        )
+        for sid, name in names.items()
+    }
+
+
+def test_a_lateen_shifted_in_a_tack_is_served_shifting_from_its_change_begun_until_it_is_set(
+    xebec,
+):
+    """The xebec probe tacked (seed 7, 15 kn): each yard served `shifting` on the snapshot's sail
+    from the line that begins the change (+44 s) to the second before its own "Shifted" (the
+    mizen +151 s, the foresail +227 s, the mainsail +248 s), in its gear meanwhile as before;
+    before and after, no sail is. Old: no key, each yard served only `in_the_gear` while it was
+    shifted, as a lateen brailed up is (the lead's nudge 88, item 2)."""
+    world = _from(xebec)
+    n0, t0 = len(world.log.all()), world.clock.tick
+    assert _served_shifting(world) == []
+    world.submit("tack ship")
+    spans = _shifting_spans(world, 100)
+    sails = {sl["id"]: sl for sl in queries.snapshot(world)["sails"]}
+    assert {sid: sails[sid]["state"] for sid in XEBEC_LATEENS} == dict.fromkeys(
+        XEBEC_LATEENS, "in_the_gear"
+    )
+    spans.update(
+        {sid: (spans[sid][0], b) for sid, (_, b) in _shifting_spans(world, 300, 100).items()}
+    )
+    begun = next(e.tick - t0 for e in _after(world, n0) if e.text.startswith("Shift the main"))
+    done = _shifted_at(world, n0, t0)
+    assert spans == {sid: (begun, done[sid] - 1) for sid in XEBEC_LATEENS}
+    assert spans == {
+        "fore.lateen": (44, 226),
+        "main.lateen": (44, 247),
+        "mizzen.lateen": (44, 150),
+    }
+    assert world.ship.dyn.tack == "larboard" and _served_shifting(world) == []
+
+
+def test_a_lateen_brailed_up_is_served_in_its_gear_and_never_shifting(xebec):
+    """Its mizen taken in before the tack, brailed up in its gear: never served `shifting`, through
+    the tack, while the foresail and the mainsail are from their change begun (+47 s) until each
+    is set (+229 s, +251 s)."""
+    world = _from(xebec)
+    world.submit("take in the mizen")
+    world.run(120)
+    mizen = world.ship.sails["mizzen.lateen"]
+    assert mizen.state is SailState.IN_THE_GEAR and _served_shifting(world) == []
+    world.submit("tack ship")
+    spans = _shifting_spans(world, 400)
+    assert spans == {"fore.lateen": (47, 228), "main.lateen": (47, 250)}
+    assert mizen.state is SailState.IN_THE_GEAR
+
+
+def test_a_lateen_shifted_by_itself_or_handed_on_by_a_belay_is_served_shifting_until_set(xebec):
+    """`shift the mainsail` by itself: served `shifting` from the order's next second until the
+    second before "Shifted the mainsail" (+347 s). A tack belayed at +100 s, its yards' change
+    begun and handed on (`Script.handed_on`): each still served until it is set, at the seconds
+    the tack would have set it (+151, +227, +248 s)."""
+    world = _from(xebec)
+    world.submit("tack ship and leave the lateens")
+    world.run(300)
+    n0, t0 = len(world.log.all()), world.clock.tick
+    world.submit("shift the mainsail")
+    spans = _shifting_spans(world, 600)
+    shifted = next(e.tick - t0 for e in _after(world, n0) if e.kind == "sail.dipped")
+    assert spans == {"main.lateen": (1, shifted - 1)} and shifted == 347
+    world = _from(xebec)
+    n0, t0 = len(world.log.all()), world.clock.tick
+    world.submit("tack ship")
+    world.run(100)
+    assert world.submit("belay that").kind == "work.belayed"
+    spans = _shifting_spans(world, 400, 100)
+    done = _shifted_at(world, n0, t0)
+    assert spans == {sid: (101, done[sid] - 1) for sid in XEBEC_LATEENS}
+    assert done == {"fore.lateen": 227, "main.lateen": 248, "mizzen.lateen": 151}

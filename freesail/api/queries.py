@@ -19,16 +19,19 @@ from __future__ import annotations
 
 from typing import Any
 
+from freesail import units
 from freesail.api import readings, viewer_flags, viewer_guns
 from freesail.core.world import World
 from freesail.crew import bill
 from freesail.crew.model import Crew, Station, Watch
+from freesail.evolutions.scripts import lateens_shifting
 from freesail.physics.oars import oars_of
 from freesail.physics.sails import SAIL_CLASSES
 from freesail.ship.form import stations as drawn_stations
 from freesail.ship.graph import Ship
 from freesail.ship.parts import Line, Sail, SailState, Spar, booms, sail_room
 from freesail.ship.schema import PROFILE_KEYS, STERN_KEYS, HullForm, HullProfile
+from freesail.world.boats import boats_in_tow_now, towed_boats
 
 
 def weather_block(world: World) -> dict[str, Any]:
@@ -319,6 +322,12 @@ def snapshot(world: World) -> dict[str, Any]:
             "stroke": float(oars.stroke),
             "hours": round(float(oars.hours), 2),
         }
+    if towed_boats(ship):
+        # package 90, the lead's nudge 88, item 1: each boat her file tows astern, and whether
+        # she is in tow now (`boats.keep_in_tow`'s rule); left out for a ship that tows none
+        in_tow = boats_in_tow_now(world)
+        out["boats"] = [{"id": b.id, "in_tow": b.id in in_tow} for b in towed_boats(ship)]
+    shifting = lateens_shifting(ship)
     out["sails"] = [
         {
             "id": s.id,
@@ -335,6 +344,10 @@ def snapshot(world: World) -> dict[str, Any]:
             "lug_side": _lug_side(ship, s),  # package 57: a lug drawn on its side of the mast
             # package 75: a settee's yard lowered on deck to be dipped, only while it is
             **_only_when_true(s, "yard_lowered"),
+            # package 90, the lead's nudge 88, item 2: a whole lateen's yard peaked up and its
+            # car passed round its mast, only while its change is in hand (served before only
+            # `in_the_gear`, as a lateen brailed up is)
+            **({"shifting": True} if s.id in shifting else {}),
             # package 98, step 3: a settee's sheet held over to windward, the side it holds the
             # cloth to, only while it is (the viewer drew every settee to leeward)
             **_settee_sheet_side(ship, s),
@@ -594,7 +607,24 @@ def ship_graph(ship: Ship) -> dict[str, Any]:
         "aliases": dict(ship.aliases),
         "guns": action["guns"],
         "ports": action["ports"],
+        **_towed_entry(ship),
     }
+
+
+def _towed_entry(ship: Ship) -> dict[str, Any]:
+    """`{"boats": [...]}`, each boat her file tows astern by her id and name, her `towed` key
+    and her length (package 90, the lead's nudge 88, item 1; her file's `length_ft`, in metres
+    as the graph is); nothing for a ship whose file tows none, so that her graph is as before."""
+    boats = [
+        {
+            "id": b.id,
+            "name": b.name,
+            "towed": True,
+            "length_m": units.feet_to_m(float(b.length_ft)),
+        }
+        for b in towed_boats(ship)
+    ]
+    return {"boats": boats} if boats else {}
 
 
 # ---------------------------------------------------------------------------

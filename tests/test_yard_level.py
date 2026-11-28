@@ -237,10 +237,11 @@ def _cut_moved(sail: dict, yard: dict, height_m: float) -> None:
 
 def test_a_square_yard_over_a_whole_lateen_counts_the_lateen_yard_below_it(tmp_path):
     """The tartane probe with her topsail yard on her pole main's head (its cut moved with it, its
-    foot 12.0 m) and no braced yard below it, her great lateen's yard below at 10 m: a topsail
-    (1), not a course, being set over the lateen, its foot clear above the lateen's yard. With a
-    gaff sail in the lateen's place it is the mast's lowest braced yard, a course, as the rule has
-    always read."""
+    foot 10.2 m above the deck: 12.0 m before the lead's nudge 88, item 3, the centre above the
+    water set against the yard above the deck) and no braced yard below it, her great lateen's yard
+    below at 10 m: a topsail (1), not a course, being set over the lateen, its foot clear above the
+    lateen's yard. With a gaff sail in the lateen's place it is the mast's lowest braced yard, a
+    course, as the rule has always read."""
     doc = tartane_probe_doc()
     yard = next(s for s in doc["spars"] if s["id"] == "topsail.yard")
     yard["on"] = "main.mast"
@@ -257,12 +258,17 @@ def test_a_square_yard_over_a_whole_lateen_counts_the_lateen_yard_below_it(tmp_p
 def test_a_square_sail_whose_foot_comes_below_the_lateens_yard_is_the_course(tmp_path):
     """The clause narrowed (nudge 39, ruling 1): a square sail is a topsail by the lateen's yard
     below it only where it is set over the lateen, its foot clear above that yard. The same probe,
-    its yard at 15.5 m, with the sail cut down to near the deck (its centre 8.25 m, its foot 1.0 m)
-    is the course: the mast's lowest braced yard, whose foot comes down past the lateen's yard. So
-    is a foot at the lateen's yard's own height (10 m): not clear above it. A foot at 10.25 m is
-    clear above it, a topsail. (Heights exact in binary, so the tie is a tie.)"""
-    for centre, level in ((8.25, 0), (12.75, 0), (12.875, 1)):
+    its yard at 15.5 m, with the sail cut down to near the deck (its centre 8.75 m above the
+    water, its foot 1.0 m above the deck) is the course: the mast's lowest braced yard, whose foot
+    comes down past the lateen's yard. So is a foot at the lateen's yard's own height (10 m): not
+    clear above it. A foot at 10.25 m is clear above it, a topsail. (Heights exact in binary, so
+    the tie is a tie: her deck at 0.5 m above the water.) Old, before the foot was taken at one
+    datum (the lead's nudge 88, item 3): the cutter's deck at 0.9 m, the centres 8.25, 12.75 and
+    12.875 m, the feet 1.0, 10 and 10.25 m by the centre above the water set against the yard
+    above the deck; by the deck those feet are 0.8 m lower, -0.8, 8.2 and 8.45 m, each a course."""
+    for centre, level in ((8.75, 0), (13.25, 0), (13.375, 1)):
         doc = tartane_probe_doc()
+        doc["hull"]["deck_height_m"] = 0.5
         yard = next(s for s in doc["spars"] if s["id"] == "topsail.yard")
         yard["on"], yard["height_m"] = "main.mast", 15.5
         next(s for s in doc["sails"] if s["id"] == "topsail")["centre_height_m"] = centre
@@ -280,16 +286,21 @@ def _tartane_with_her_treou(
     treou_first: bool = False,
     cuts: tuple[float, float] | None = None,
     flying: bool = False,
+    deck_m: float | None = None,
 ) -> Path:
     """The tartane probe (its rig, not her file: her file is not on this branch) with her pole
     main as Tar-D §4.1 files it, no topmast and the topsail yard on the main's own head at
     `topsail_m`, her great lateen's yard crossing the mast at `lateen_m`; with the tréou's yard
     crossed on the main at `treou_m` (the cutter's square sail and its gear, renamed), filed
     after the great lateen's yard or, `treou_first`, before it; or not crossed (`None`). Each
-    sail's cut moves with its yard (`_cut_moved`: the cutter's topsail's foot 3.6 m below its
-    yard, its square sail's 5.6 m), or `cuts` gives the topsail's and the tréou's centres; and
-    `flying`, the tréou set flying as her file sets it (its yard sent down with it, furled)."""
+    sail's cut moves with its yard (`_cut_moved`: the cutter's topsail's foot 5.4 m below its
+    yard, its square sail's 7.4 m, her deck 0.9 m above the water; 3.6 and 5.6 m before the
+    lead's nudge 88, item 3), or `cuts` gives the topsail's and the tréou's centres; `flying`,
+    the tréou set flying as her file sets it (its yard sent down with it, furled); and `deck_m`,
+    her deck's height above the water, where not the cutter's."""
     doc = tartane_probe_doc()
+    if deck_m is not None:
+        doc["hull"]["deck_height_m"] = deck_m
     gone = {"main.topmast", "main.topgallant_mast"}
     doc["spars"] = [s for s in doc["spars"] if s["id"] not in gone]
     doc["lines"] = [ln for ln in doc["lines"] if ln.get("of") not in gone or ln["id"] == "jib.stay"]
@@ -340,8 +351,12 @@ def _tartane_with_her_treou(
 
 # her file's heights and cuts (`data/ships/tartane.yaml` on her branch): the great lateen's yard
 # and the tréou's both at the main's hounds, 8.31 m, the topsail's yard at 15.78 m; the topsail's
-# centre 12.6 m (its foot 9.42 m) and the tréou's 5.8 m (its foot 3.29 m)
-HER_FILE = {"lateen_m": 8.31, "topsail_m": 15.78, "cuts": (12.6, 5.8)}
+# centre 12.6 m above the water and the tréou's 5.8 m, her deck 0.54 m above it. Their feet above
+# the deck 8.34 m and 2.21 m (the lead's nudge 88, item 3: her topsail's foot 0.03 m above the
+# great lateen's yard). Old: the deck the cutter's (0.9 m), not hers, and the feet 9.42 and 3.29 m,
+# the centre above the water set against the yard above the deck; with the cutter's deck and the
+# feet by the deck, her topsail's would be 7.62 m, below the lateen's yard, and a course.
+HER_FILE = {"lateen_m": 8.31, "topsail_m": 15.78, "cuts": (12.6, 5.8), "deck_m": 0.54}
 REEF_TACKLES = {"main.treou.reef_tackle.starboard", "main.treou.reef_tackle.larboard"}
 
 
@@ -369,13 +384,14 @@ def test_the_tartanes_topsail_is_a_topsail_whether_the_treous_yard_is_crossed_or
 ):
     """Her tréou is set flying (Tar-D decision 9, §5.1a, §15 risk 5): its yard sent up with it and
     struck with it, so in plain sail no yard stands under her topsail. Her topsail reads the same
-    both ways, a topsail (1) on the pole and handed by the pole's way: with no yard below it, by
-    the great lateen's yard below it, being set over the lateen (the clause as ruled, nudge 39
-    ruling 1); with the tréou's yard crossed, by the braced yard below it. **The tréou is her
-    course wherever its yard crosses** (ruling 1): its foot comes down past the great lateen's
-    yard toward the deck, so the clause does not reach it, below the great lateen's yard (8 m),
-    above it (13 m, its foot 7.4 m), or at one height with it as her file has them (8.31 m), in
-    either order of the file. The answer hangs on the sail's cut, not on two yards' heights."""
+    both ways, a topsail (1) on the pole and handed by the pole's way: with no yard below it, by the
+    great lateen's yard below it, being set over the lateen (the clause as ruled, nudge 39 ruling
+    1); with the tréou's yard crossed, by the braced yard below it. **The tréou is her course
+    wherever its yard crosses** (ruling 1): its foot comes down past the great lateen's yard toward
+    the deck, so the clause does not reach it, below the great lateen's yard (8 m), above it (13 m,
+    its foot 5.6 m above the deck; 7.4 m before the lead's nudge 88, item 3), or at one height with
+    it as her file has them (8.31 m), in either order of the file. The answer hangs on the sail's
+    cut, not on two yards' heights."""
     path = _tartane_with_her_treou(tmp_path, treou_m, **shape)
     ship = load_ship(path)
     assert ship.yard_level("topsail.yard") == 1

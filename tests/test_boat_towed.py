@@ -21,6 +21,7 @@ from pathlib import Path
 import pytest
 from rig_fixtures import tartane_probe_doc, write_ship
 
+from freesail.api import queries
 from freesail.api.session import make_world
 from freesail.core import replay
 from freesail.core.world import Scenario
@@ -478,6 +479,46 @@ def _at_sea(path: str):
             ship_speed_kn=5.0,
         ),
     )
+
+
+def test_her_towed_boat_is_served_with_her_length_and_whether_she_is_in_tow_now(tmp_path):
+    """What the client is served (the lead's nudge 88, item 1): the ship graph gives each boat
+    her file tows astern, her id, name, `towed` key and length (her file's 15 ft, in metres as
+    the graph is), and the snapshot whether she is in tow now, by `keep_in_tow`'s rule: in tow
+    at sea, and not once stove by a shot or lost, as her drag leaves the ship then. Old: neither
+    served a boat; she was in `ship.extra["boat_in_tow"]` alone. Her boat on deck, nothing."""
+    w = _at_sea(_probe(tmp_path))
+    boat = {"id": "boat", "name": "the boat", "towed": True, "length_m": 4.572}
+    assert queries.ship_graph(w.ship)["boats"] == [boat]
+    assert queries.snapshot(w)["boats"] == [{"id": "boat", "in_tow": True}]
+    w.submit("set plain sail")
+    w.run(60)
+    assert "boat_in_tow" in w.ship.extra
+    assert queries.snapshot(w)["boats"] == [{"id": "boat", "in_tow": True}]
+    w.ship.extra["boats_stove"] = ("boat",)
+    assert queries.snapshot(w)["boats"] == [{"id": "boat", "in_tow": False}]
+    w.run(1)
+    assert "boat_in_tow" not in w.ship.extra
+    lost = _at_sea(_probe(tmp_path))
+    assert lost.submit("cut the boat adrift").text.startswith("The boat cut adrift by order.")
+    assert queries.snapshot(lost)["boats"] == [{"id": "boat", "in_tow": False}]
+    assert queries.ship_graph(lost.ship)["boats"] == [boat]
+    on_deck = _at_sea(_probe(tmp_path, towed=False))
+    assert "boats" not in queries.ship_graph(on_deck.ship)
+    assert "boats" not in queries.snapshot(on_deck)
+
+
+@pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
+def test_no_committed_file_is_served_a_towed_boat_or_a_lateen_shifting(path):
+    """The guard of the lead's nudge 88: no committed file tows a boat or has a whole lateen, so
+    none is served `boats` on her graph or her snapshot, nor `shifting` on a sail (the proof
+    byte for byte, at rest and through a tack, a wear and a box off, is the report's)."""
+    w = _at_sea(str(path))
+    w.submit("set plain sail")
+    w.run(30)
+    snap = queries.snapshot(w)
+    assert "boats" not in queries.ship_graph(w.ship) and "boats" not in snap
+    assert not any("shifting" in sl for sl in snap["sails"])
 
 
 def test_cut_adrift_before_she_was_ever_sent_her_boat_is_in_tow_no_longer(tmp_path):

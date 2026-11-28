@@ -43,11 +43,16 @@ _YARD_LEVELS: weakref.WeakKeyDictionary[Ship, dict[str, int]] = weakref.WeakKeyD
 YARD_LEVEL_SPARS = ("mast", "topmast", "topgallant_mast", "royal_mast")
 
 
-def _square_foot_m(yard: Spar, sail: Sail) -> float:
-    """A square sail's foot as her file cuts it, at the heights her file gives: its head on its
-    yard and its centre (`centre_height_m`, the centre of its cut) midway between head and foot,
-    so the foot is the centre's height less its depth below the yard (package 90, nudge 39)."""
-    return 2.0 * sail.centre_height_m - yard.height_m
+def _square_foot_m(yard: Spar, sail: Sail, deck_height_m: float) -> float:
+    """A square sail's foot above the deck as her file cuts it: its head on its yard and its
+    centre (`centre_height_m`, the centre of its cut) midway between head and foot, so the foot
+    is the centre's height less its depth below the yard (package 90, nudge 39). One datum, the
+    deck: the yards' (`Spar.height_m`, above the deck), and so the lateen yard's it is set
+    against (`Ship._find_yard_levels`). The centre is filed above the water
+    (TechnicalSpec-M0-M2.md §6.2) and is brought to the deck by her `deck_height_m` (the lead's
+    nudge 88, item 3: the centre above the water was set against the yard above the deck, the
+    foot too high by twice her deck's height, on the tartane 1.08 m)."""
+    return 2.0 * (sail.centre_height_m - deck_height_m) - yard.height_m
 
 
 class Ship:
@@ -355,7 +360,8 @@ class Ship:
                 # and no braced yard below it on its mast; not one whose foot comes down below
                 # that yard to the deck (the tartane's tréou, her course: nudge 39, ruling 1)
                 square = self.sail_of(sp)
-                foot = _square_foot_m(sp, square) if square is not None else None
+                deck = self.hull.spec.deck_height_m
+                foot = _square_foot_m(sp, square, deck) if square is not None else None
                 for lat in self.spars.values():
                     sail = self.sail_of(lat) if lat.cls == "lateen_yard" else None
                     if (

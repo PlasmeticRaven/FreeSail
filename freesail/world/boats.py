@@ -987,6 +987,17 @@ def _in_tow(ship: Any, state: Any) -> list[tuple[Any, Any]]:
     ]
 
 
+def boats_in_tow_now(world: Any) -> set[str]:
+    """The ids of the ship's towed boats in tow now, by `keep_in_tow`'s rule, for the served
+    snapshot (package 90, the lead's nudge 88, item 1): none where her dealings keep no boat (a
+    ship alone, whose boats nothing keeps in tow)."""
+    dealings = getattr(world, "dealings", None)
+    state = getattr(dealings, "boat", None)
+    if state is None:
+        return set()
+    return {b.id for b, _ in _in_tow(world.ship, state)}
+
+
 def keep_in_tow(ship: Any, state: Any) -> None:
     """The boats towed astern on their painters (package 90, A4; a boat's `towed`), their hulls
     kept as `ship.extra["boat_in_tow"]` while each is in tow, for her drag on the ship's way
