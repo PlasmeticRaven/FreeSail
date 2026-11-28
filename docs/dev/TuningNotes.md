@@ -40509,7 +40509,7 @@ saved and read by names, 7-797).
 
 **The new truths' tier:** 7-790 (both), 7-791, 7-793 (both), 7-796, 7-797, 7-798 (the harbour's) and
 7-799 in the slow tier; 7-792, 7-794, 7-795 and the console's 7-798 (1.3 s) in the fast. Their times
-on Python 3.11: TIMES_PENDING.
+on Python 3.11.18, as pytest's durations gave them on 757f2eab (four workers): 7-797 347 s; 7-793 the day 309 s and the Havre's trader 222 s; 7-791 278 s; 7-790 the Little Road 52 s and the ship bound home 16 s; 7-798 the harbour's 21 s; 7-796 14 s; 7-799 1.6 s (run alone). The fast four are each below the fast tier's fifteenth longest (109 s) and are not named in its list.
 
 **Read by a reader other than the builder** (one, on the second build's code and truths against
 this section): no test of the trunk changed, loosened or moved slow; each figure and rule, old and
