@@ -234,7 +234,8 @@ def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit(
                 continue
             assert re.fullmatch(r"[\w.-]+/[\w.-]+@[0-9a-f]{40}", u), f"{name}: {u}"
         assert "pull_request" not in text, name
-        assert text.count("contents: write") == 1, name
+        # the downloads' publishing job; the gate's release job, and its call of the downloads
+        assert text.count("contents: write") == {"downloads.yml": 1, "release.yml": 2}[name], name
         assert "\npermissions:\n  contents: read\n" in text, name
         # nothing an outsider writes is put into a script as text: only through the environment
         for run in re.findall(r"run: \|\n((?:\s{10,}.*\n)+)", text):
@@ -244,8 +245,13 @@ def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit(
     # a release is made by a hand or by a gate, never by the words of a commit
     assert "head_commit" not in downloads and "--draft" not in downloads
     release = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
-    job = release.split("\n  release:\n", 1)[1]
-    assert "contents: write" in job
+    jobs = "\n" + release.split("\njobs:\n", 1)[1]
+    for job in ("lint", "checks"):
+        part = jobs.split(f"\n  {job}:\n", 1)[1].split("\n\n  ", 1)[0]
+        assert "permissions" not in part, job  # the workflow's reading alone
+    assert "contents: write" in jobs.split("\n  release:\n", 1)[1]
+    call = jobs.split("\n  downloads:\n", 1)[1].split("\n\n  ", 1)[0]
+    assert "contents: write" in call and "uses: ./.github/workflows/downloads.yml" in call
 
 
 def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must():

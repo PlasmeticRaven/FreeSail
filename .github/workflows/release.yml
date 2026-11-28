@@ -80,8 +80,14 @@ jobs:
       - name: Both tiers, this shard, without the pace tests
         run: python -m pytest -n auto --dist loadgroup --slow -m "not pace" -rfE -p no:cacheprovider
 
+  # Writing is given here too only because a called workflow is held to what its caller
+  # gives, read when the run is read and before any `if:`: the downloads' publishing job
+  # asks for it and never runs on a gate's call; their build and smoke jobs stay at reading
+  # by downloads.yml's own `permissions: contents: read`.
   downloads:
     name: the downloads
+    permissions:
+      contents: write
     uses: ./.github/workflows/downloads.yml
     with:
       name: gate-${{ github.event.inputs.gate || github.ref_name }}
