@@ -727,15 +727,28 @@ def test_the_treou_is_refused_with_the_way_out_where_the_lateen_cannot_be_taken_
     assert ship.sails["main.treou"].state is SailState.FURLED
 
 
-def test_all_sail_naming_both_keeps_the_great_lateen_and_does_not_set_the_treou(tmp_path):
-    """Her `all sail` lists the great lateen and the tréou, as her file has it (its groups are
-    her builder's): `make all sail` sets the great lateen, named first, and passes the tréou
-    over as one that does not stand with it, so she makes all sail under the great lateen."""
-    world = _her_treou_world(tmp_path, all_sail=True)
-    lines, both = _ordered(world, "make all sail", 900)
-    sails = world.ship.sails
-    assert (sails["main.lateen"].state, sails["main.treou"].state) == (
-        SailState.SET,
-        SailState.FURLED,
+@pytest.mark.parametrize(
+    "order, first, other",
+    [
+        ("set the mainsail and the treou", "main.lateen", "main.treou"),
+        ("set the treou and the mainsail", "main.treou", "main.lateen"),
+    ],
+)
+def test_one_order_naming_both_sets_the_first_named_and_passes_the_other_over(
+    tmp_path, order, first, other
+):
+    """One order naming the great lateen and the tréou (as a group naming both would, her
+    file's groups being her builder's): the first named is set, and the other is passed over in
+    the reply's "Not done", as one that does not stand with it; she never stands under both.
+    (`make all sail` names no tréou: its square sail's line is a cutter's `square_sail` alone,
+    `storm.listed_lines`.)"""
+    world = _her_treou_world(tmp_path)
+    reply = world.submit(order)
+    names = {"main.lateen": "the mainsail", "main.treou": "the main treou"}
+    assert reply.text.endswith(
+        f"Not done: {names[other]}: it does not stand with {names[first]} on her mast."
     )
-    assert both == 0 and (92, "sail.set", "Set the mainsail.") in lines
+    _, both = _ordered(world, "trim sails", 600)
+    sails = world.ship.sails
+    assert (sails[first].state, sails[other].state) == (SailState.SET, SailState.FURLED)
+    assert both == 0

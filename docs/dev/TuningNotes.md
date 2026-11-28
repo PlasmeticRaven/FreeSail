@@ -40491,10 +40491,11 @@ nothing loosed yet, the belay's line is said and nothing waits.
 
 The set is refused where the other cannot be taken in, the way out in the take-in's own words
 (the great yard carried away: cut away the wreck, then shift the yard for a spare). Where one
-order names both, as her file's `all sail` does, the first named stands and the other is passed
-over, so she makes all sail under the great lateen (her file's groups are her builder's). The
-great yard is not lowered on deck (Forfait p. 121, not owed): taken in, it is brailed up aloft
-as today.
+order names both (`set the mainsail and the treou`, or a group listing both: her file's groups
+are her builder's), the first named stands and the other is passed over in the reply's "Not
+done". `make all sail` names no tréou: its square sail's line is for a cutter's `square_sail`
+part alone (`storm.listed_lines`). The great yard is not lowered on deck (Forfait p. 121, not
+owed): taken in, it is brailed up aloft as today.
 
 The probe (seed 7, 15 kn from 0°, heading 292.5°, plain sail set and settled 600 s), seconds
 from the order:
@@ -40504,6 +40505,7 @@ from the order:
 | `set the treou` (set flying) | the great lateen, brailed up, at 141 | the tréou, flying, at 271 |
 | then `set the mainsail` | the tréou, sent down with its yard, at 107 | the great lateen at 154 |
 | `set the mainsail`, the crossed tréou's set given 200 s before and not yet loosed | its set belayed at 1, left furled | the great lateen at 48 |
-| `make all sail`, her `all sail` naming both | (the tréou passed over) | the great lateen at 92; the tréou left furled |
+| `set the mainsail and the treou` | (the tréou passed over: "it does not stand with the mainsail on her mast") | the great lateen |
+| `set the treou and the mainsail` | (the great lateen passed over) | the tréou |
 
 She never stood under both.
