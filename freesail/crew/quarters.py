@@ -48,6 +48,15 @@ the lower deck's from that end, its line naming the decks. A ship with no `lower
 and pickles as before. The stations by deck are the thirds of the length on each deck, unchanged:
 no period source quarters the parts of the ship by deck (Bel-D §6.4 item 3).
 
+**Three gun decks** (package 90, A9: `docs/design/Design-Ship-PurisimaConcepcion.md` §6.3, the
+*Concepción*'s; `Plan-Package90.md` §6), keyed on a `middle` deck, which no ship but a three-decker
+carries: the beat says the middle deck's line between the lower's and the upper's, as it did; the
+middle deck's crews whose gun on the engaged side is shut by the sea are robbed first with the lower
+deck's, the sea shutting her middle tier at a greater heel than her lower; and of the crews left
+open, the upper deck's and the upper works' go first, the middle deck's after them and the lower
+deck's last, the lighter metal before the heavier (the 74's reason for her lower deck's last,
+carried a deck up: judgement). A two-decker's order and words are as they were, rank for rank.
+
 **Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
 whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
 number (`gun:lower:3`, `Gun.pair_key`), read here as `gun:3` is, its number the key's last part and
@@ -100,6 +109,12 @@ FORWARD_SHARE = 1.0 / 6.0
 # The deck of the bill by deck (package 75, B7.b): the gun deck whose crews are robbed last, and
 # first of all where the sea has shut their ports (Bel-D §6.4 item 4).
 LOWER = "lower"
+# The middle gun deck of a ship of three (package 90, A9: Con-D §6.3): its crews behind ports the
+# sea has shut robbed first with the lower deck's; its open crews after the upper deck's and before
+# the lower deck's. No two-decker carries it, so nothing of theirs moves.
+MIDDLE = "middle"
+# The gun decks whose crews are counted shut by the sea, for the robbing (`_shut_crews`)
+_SHUT_DECKS = (LOWER, MIDDLE)
 # The decks in the beat's lines, from below, and their words (`schema.DECK_WORDS`; the
 # `roundhouse` is the poop: Bel-D §3.5; the words `parts.DECK_SAID`, a gun's name's since B7.d).
 _DECK_ORDER = ("lower", "middle", "upper", "quarterdeck", "forecastle", "roundhouse")
@@ -418,8 +433,9 @@ class Quarters:
     def _shut_crews(self) -> frozenset[str]:
         """The keys of the lower-deck crews whose gun on the engaged side is shut by the sea
         (package 75, B7.b: `Battery._shut`, read from `ship.extra["battery"]` as the runner
-        reads it): none with no side engaged, when either gun of a pair may yet bear, and none
-        on a ship whose crews keep no deck."""
+        reads it), and on a ship of three gun decks the middle deck's with them (package 90,
+        A9): none with no side engaged, when either gun of a pair may yet bear, and none on a
+        ship whose crews keep no deck."""
         battery = (getattr(self.ship, "extra", None) or {}).get("battery")
         shut = getattr(battery, "_shut", None)
         engaged = getattr(battery, "engaged", None)
@@ -428,7 +444,7 @@ class Quarters:
         guns = getattr(self.ship, "guns", {}) or {}
         out = set()
         for gc in self.crews.values():
-            if gc.deck != LOWER:
+            if gc.deck not in _SHUT_DECKS:
                 continue
             on_side = [g for g in gc.guns if g in guns and guns[g].side == engaged]
             if on_side and all(g in shut for g in on_side):
@@ -496,7 +512,8 @@ class Quarters:
 
     def _deck_lines(self) -> list[str]:
         """A line a deck on a ship whose broadside guns stand on two gun decks, the lower and the
-        upper (package 75, B7.b: the 74 and the 64): 'The lower deck: 14 gun crews, 182 men.'
+        upper (package 75, B7.b: the 74 and the 64): 'The lower deck: 14 gun crews, 182 men.';
+        on a ship of three the middle deck's line between them, from below (package 90, A9).
         None on a ship of one gun deck."""
         decks: dict[str, list[GunCrew]] = {}
         for gc in self.crews.values():
@@ -579,8 +596,9 @@ def _deck_rank(deck: str | None) -> int:
 
 def _decks_words(parts: list[str], crews: list[GunCrew], shut: frozenset[str]) -> str:
     """The numbered crews by deck in the order given (the robbing order's), each deck's numbers
-    in runs, the lower deck's shut ones apart: 'the lower deck, Nos. 4 to 10, their ports
-    shut, and the upper deck, Nos. 26 to 28'; the chasers and swivels (`parts`) first."""
+    in runs, the lower deck's shut ones apart (and a middle deck's: package 90, A9): 'the lower
+    deck, Nos. 4 to 10, their ports shut, and the upper deck, Nos. 26 to 28'; the chasers and
+    swivels (`parts`) first."""
     groups: list[tuple[str | None, bool, list[int]]] = []
     for gc in crews:
         n = _crew_number(gc.key)
@@ -674,9 +692,16 @@ def _rob_order(
     if _crew_number(gc.key) is None:
         return (1, 0, 0.0, key)
     # by deck (package 75, B7.b): the lower deck's crews whose port is shut first, the other
-    # decks' next, the lower deck's last; constant on a ship whose crews keep no deck
-    if gc.deck == LOWER:
-        deck = 0 if gc.key in shut else 2
+    # decks' next, the lower deck's last; constant on a ship whose crews keep no deck. On a ship
+    # of three gun decks (package 90, A9) the middle deck's shut crews go first with the lower
+    # deck's, and its open crews between the other decks' and the lower deck's; no two-decker has
+    # a middle deck, so her ranks keep their order (0, 1, then 3 where it was 2)
+    if gc.deck in _SHUT_DECKS and gc.key in shut:
+        deck = 0
+    elif gc.deck == LOWER:
+        deck = 3
+    elif gc.deck == MIDDLE:
+        deck = 2
     else:
         deck = 1
     # the end that bears least first: the after guns when the enemy is forward, else the
