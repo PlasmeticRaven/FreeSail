@@ -114,6 +114,94 @@ def test_a_far_hull_is_told_as_herself_not_as_her_files_ship():
     assert "Industry" not in words and "Harpy" not in words and "Captain Pope" not in words
 
 
+def test_every_committed_ships_class_words_read_as_her_class():
+    """Carried fault 24 (found by the Diana's builder; the lead's nudge 84). The razee, the 64 and
+    the 74 read "hMS as razeed, 1795", "hMS as built, a 64-gun ship of the Ardent class" and "hMS
+    a 74-gun ship of the Arrogant class": her name taken out of her era note's first clause left
+    the "HMS" that goes with it, whatever leading capital was made small, and a clause naming her
+    state and no class was said as her class. The smack read "a Navy's smack", the "The" of her
+    note made "a" before a possessive. Every committed ship's class words now open with an
+    article or "H.M.", hold no word made small at its head, no article before a possessive and no
+    doubled one; the four by their words (`readings.ship_class_words`). The razee's note's first
+    clause is written as the others' at her generator (the lead's nudge 85,
+    `tools/ships/indefatigable.py`): with the reading's mend alone, "an Ardent-class 64 of 1784 cut
+    down to a frigate by the Navy Office's draught of September 1794, ship-rigged"."""
+    import re
+
+    from freesail.api.readings import ship_class_words
+    from freesail.ship.loader import load_spec
+
+    said = {}
+    for path in sorted((ROOT / "data" / "ships").glob("*.yaml")):
+        spec = load_spec(path)
+        if getattr(spec, "oars", None) is not None:
+            continue  # a boat is told by her own words (`readings._boat_words`)
+        words = said[path.stem] = ship_class_words(spec, spec.name)
+        assert re.match(r"(a|an|the) |H\.M\. ", words), (path.name, words)
+        assert not re.search(r"\b[a-z]+[A-Z]", words), (path.name, words)
+        assert not re.search(r"\b(a|an) \S+'s\b", words), (path.name, words)
+        assert not re.search(r"\b(a|an|the)\s+(a|an|the)\b", words, re.IGNORECASE), words
+    assert len(said) == 14
+    assert {k: said[k] for k in ("razee-44", "sixty-four", "seventy-four", "smack")} == {
+        "razee-44": "a razee of 44 guns, cut down from a 64-gun ship of the Ardent class",
+        "sixty-four": "a 64-gun ship of the Ardent class",
+        "seventy-four": "a 74-gun ship of the Arrogant class",
+        "smack": "the Navy's smack",
+    }
+
+
+def test_a_class_opening_with_a_name_of_its_own_keeps_its_capital_and_takes_an_article():
+    """Carried fault 24, at its cause for any file: the class's first word was made small whatever
+    it was ("hMS"). Now only a leading article is; a class that opens with a word of its own keeps
+    it and is given its article ("spanish xebec ..." before)."""
+    from types import SimpleNamespace
+
+    from freesail.api.readings import ship_class_words
+
+    spec = SimpleNamespace(
+        era_notes="Spanish xebec Murciano of the Mahón station (her lines after Chapelle): ...",
+        name="Murciano",
+        rig="xebec",
+    )
+    assert ship_class_words(spec, spec.name) == "a Spanish xebec of the Mahón station"
+
+
+@pytest.mark.parametrize(
+    ("note", "name", "rig", "said"),
+    [
+        (
+            "HMS Agamemnon as fitted, 1793: the Ardent-class 64 of 1781 (Winfield): ...",
+            "Agamemnon",
+            "ship",
+            "an Ardent-class 64 of 1781, ship-rigged",
+        ),
+        ("The 18-gun brig-sloop Cruizer (1797): ...", "Cruizer", "brig", "an 18-gun brig-sloop"),
+    ],
+)
+def test_a_class_is_read_past_her_state_and_given_the_article_of_its_sound(note, name, rig, said):
+    """Carried fault 24, at its cause for any file, as no committed file has it once the razee's
+    note is written as the others' (the lead's nudge 85): a first clause of her name and state
+    and no class gives the next clause's ("hMS as razeed, 1795" was said), and a "the" made "a"
+    is "an" before a vowel's sound or eleven or eighteen."""
+    from types import SimpleNamespace
+
+    from freesail.api.readings import ship_class_words
+
+    spec = SimpleNamespace(era_notes=note, name=name, rig=rig)
+    assert ship_class_words(spec, spec.name) == said
+
+
+def test_the_navys_smack_under_a_merchants_papers_is_a_smack():
+    """Carried fault 24: the smack out of Falmouth, a merchantman, read "Culloden, a Navy's smack;
+    a merchantman of Britain", and with her class mended would read "the Navy's smack; a
+    merchantman". Her file's "the Navy's" goes, as its "H.M." does, where she is not a King's
+    ship (`readings.ship_words`)."""
+    w = _world("smack-falmouth.yaml")
+    assert R.ship_words(w).startswith(
+        "The ship: Culloden, a smack; a merchantman of Britain. She carries no guns."
+    )
+
+
 STATIONS = ("watcher", "officer", "captain", "master", "lookout", "passenger")
 
 

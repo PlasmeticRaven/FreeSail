@@ -1709,8 +1709,11 @@ def her_hull(p):
         p,
         key="razee",
         file="razee-44.yaml",
-        era_notes="HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a "
-        "frigate by the Navy Office's draught of September 1794 (ZAZ2371), her quarterdeck, "
+        # her note's first clause is her class as a reading says it (`readings.ship_class_words`;
+        # the lead's nudge 85, carried fault 24: "hMS as razeed, 1795" was said for it)
+        era_notes="HMS Indefatigable as razeed, 1795, a razee of 44 guns, cut down from a 64-gun "
+        "ship of the Ardent class: the 64 of 1784, razeed by the Navy Office's draught of "
+        "September 1794 (ZAZ2371), her quarterdeck, "
         "forecastle and their sides taken off and her lower masts shortened, rated a 44 (Winfield "
         "1793-1817 pp. 99-100; James vol. 1 p. 454, vol. 5 p. 428). Derived from the 64's file as "
         "data: her hull and lines the 64's measured on her draughts (ZAZ1407, ZAZ1280) at her "

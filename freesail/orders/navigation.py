@@ -913,13 +913,13 @@ def _against_their_masts(ship: Any, lugs: list[Any], verb: str) -> str:
 def _lies_on_the_mast(ship: Any, lateens: list[Any]) -> str:
     """'the mainsail lies on the mast; shift it when you will': a whole lateen left on the bad
     hand (package 90, A1a; Design-Package90-Engine.md §2.3 item 1, JUDGEMENT on the words)."""
-    from freesail.evolutions.scripts import names_of_sails
+    from freesail.evolutions.scripts import sails_listed
 
     one = len(lateens) == 1
-    names = names_of_sails(ship, lateens)
+    names = sails_listed(ship, lateens)  # in their order, the order taken as said (nudge 77)
     return (
         f"{names} {'lies on the mast' if one else 'lie on their masts'}; "
-        f"shift {'it' if one else 'them'} when you will"
+        f"shift {names} when you will"
     )
 
 
@@ -934,11 +934,11 @@ def _aback_against_the_mast(ship: Any, lateens: list[Any]) -> str:
     aback. Before nudge 60, "let fly its sheet, shift it or box her off", the box offered to the
     xebec, which refuses it; before nudge 53, "shift it when you will", said of yards at 1.2 to
     1.7 of their ratings."""
-    from freesail.evolutions.scripts import names_of_sails
+    from freesail.evolutions.scripts import sails_listed
     from freesail.physics.strain import pressed_reliefs
 
     one = len(lateens) == 1
-    names = names_of_sails(ship, lateens)
+    names = sails_listed(ship, lateens)  # in their order, the order taken as said (nudge 77)
     return (
         f"{names} {'is aback against the mast' if one else 'are aback against their masts'}; "
         f"{pressed_reliefs(ship, 'aback', names)}"

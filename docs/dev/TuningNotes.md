@@ -39932,6 +39932,27 @@ The branch `…/pkg-90-lateen2`, cut from `…/pkg-90` at b35aaaba (the list of 
    - **The towed boat's line at its figures:** said as the ship's way passes the boat's hull speed (not at it), not again over nine tenths of it, and again after she has fallen under nine tenths and passed it once more.
 5. **The dire step within one cause waits for package 127's rule**, as the lead asks: a dire warning said whatever lesser one came within the ten minutes, for every ship. It is not built here, and it does not hold items 1 to 4.
 
+## Package 90, the lateen hulls' list, its third pass: the boat lost by the lost road, the reliefs that wait, the bow's list as said (the lead's nudge 77, 2026-11-24)
+
+The branch `…/pkg-90-lateen3`, cut from `…/pkg-90` at 86fa56d3 (the second pass merged on the trunk at 474eff8b). The equations are read, not changed. Old is 86fa56d3.
+
+1. **A towed boat stove and cut adrift is lost by the road a boat swamped or cut adrift takes** (`world/boats.py`, `stove_in_tow`, kept each tick by her dealings after `keep_in_tow`; `lose_boat`): "The boat stove by a shot as she towed astern, and cut adrift. A new one is the yard's.", her reading "the boat lost: stove on the 10th; a new one is the yard's".
+   - Old: `send the boat ashore`, `lay out a kedge` and `go to the boat` obeyed with her; new: each refused, as of any boat lost.
+   - **The kedge refused no lost boat at all** (`LayOutKedgeScript.check`), so a boat swamped or cut adrift could lay one out on any ship: mended at the cause, "the boat is lost: ...". A committed ship's boat is lost only so, and no run of the gales or the harness loses one.
+   - `clear for action`: old "The boats are out and towing astern; the ship is clear." of a ship whose boat was lost; new, of the tartane probe (two boats, the other on the booms), "The rest of her boats are out and towing astern, the boat lost; the ship is clear.", and of a ship with no other boat "The ship is clear; the boat is lost.". Every other ship's line is as it was (that it says so of boats left on the booms is the trunk's).
+2. **A spar lost while its shift waits: the dire step, waiting for package 127's rule.** Not built here.
+3. **A relief that waits is said to wait** (`strain._shift_held`): the work given before it that holds the lateen, behind which a shift or a box ordered now waits. The tartane in 40 kn, her lateens put on the bad hand while her watch is at her trims, her main yard at 1.51: old "...: shift the mainsail or box her off."; new "...: shift the mainsail or box her off when the hands are done trimming the mainsail.". Measured, a shift given then begun 182 s on, and a box 82 s on.
+   - **Boxing off, coming to:** old, `box her off` given while a heave-to was in hand was taken, waited, and did nothing (the polacre in 40 kn, aback). New: the words do not offer it, and the order is refused, "She is heaving to; she will not box off while she comes to." (`scripts.heave_to_in_hand`, `Runner.start`, `BoxOffScript.check`; a lie a-try the same). That refusal is every ship's: a box given while she comes to was taken and did nothing on any of them.
+4. **Pins:**
+   - "its shift waits its turn" is not said while her own shift runs;
+   - the hands named are those shifting, not another shift waiting too;
+   - the stove line's `towed` key in its data;
+   - two boats towed astern, each her own drag, the one not the errands' stove leaving the other in tow and the ship's boat not lost.
+5. **The bow's line in her sails' order, said as a seaman lists three things, and the order taken as said** (`scripts.sails_listed`, by their masts from forward aft; `orders/grammar.py`, a whole lateen hull's `shift` reading a list with commas as its "and" list, a side after a comma still a side).
+   - The xebec, the wind through her bow: old "the foresail and the mizen and the mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."; new "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.".
+   - The stern's line the same, and "shift it when you will" of a lateen on its mast now names it: "shift the mizen when you will".
+   - "shift the foresail, the mainsail and the mizen" is taken as said. No hull without a whole lateen reads a comma so.
+
 ## Package 90, the Diana: her file, her tuning and the pins she moves (2026-11-20)
 
 Her builder (Plan-Package90.md §8.0 steps 2 to 5; Design-Ship-Diana.md, Dia-D). Her file, `data/ships/corvette-20.yaml`, is new, written by `tools/ships/diana.py` through the generator; every other ship file comes out byte for byte. Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `under_plain_sail`, `close_hauled_on_starboard`, `until`, `wear`, `hove_to`), on her file with each figure changed in a scratch copy.
@@ -40326,6 +40347,50 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
 
+## Package 90, the lateen hulls' list, its third pass with package 127: item 2 by 127's rule, the boats' line in 127's words (the lead's nudge 83, 2026-11-27)
+
+`…/pkg-90` merged at e87714d7 (package 127 on the trunk at 572133ac). Old is e87714d7.
+
+- **Item 2, a spar lost while its shift waits: the dire step, by package 127's rule.** A whole lateen's cause is counted by `strain.warning_due`, as every part is: one warning a part and its cause in ten minutes, and the dire one said whatever lesser one came within them (`last_dire_s`). A cause that comes again begins its dire count afresh too (`_causes_come`). At e87714d7 the cause kept its own old rule (the lead's choice at nudge 56), and 127 left it so.
+  - The xebec in 40 kn, the wind through her bow, her sheets let fly onto the bad hand, the wind then to 56 kn: her mizzen yard warned "working" at 1.05 at 613 s.
+  - Old: nothing more, and carried away at 1,080 s.
+  - New: "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; she will carry them away: shift the mizen." at 1.77 at 701 s, and carried away at 1,080 s as before. No load moves.
+  - The xebec in 50 kn on the bad hand: her main yard warned "working" at 1.28 at once, and now "bending like a whip ...; she will carry it away: shift the mainsail." as it passes 1.5.
+- **The boats' line of `clear for action`, in 127's words:** her boats griped fast on the booms, or towing astern on their painters where her file tows them. Her boat lost is not among them, and is said lost by her file's name (`action_scripts._boats_cleared_words`, 127's one function; the third pass's own, at the end of the file, removed in the merge).
+  - A ship with boats on the booms and one lost, the brig, her launch cut adrift: "The boats griped fast on the booms; the launch lost; the ship is clear.".
+  - The bilander, her one boat lost: "The long-boat lost; the ship is clear.".
+  - The tartane probe, her boat towed and stove, her punt on the booms: "The punt griped fast on the booms; the boat lost; the ship is clear.".
+- **A wait said once, routine, marked** (127's `TURN_WAIT`): the third pass's line for an order to a whole lateen waiting behind work (nudge 60's item 2) is 127's line for every order now, said once, routine and marked. The third pass's own branch is gone in the merge.
+  - The strain's "when the hands are done trimming the mainsail" is a clause of the strain's warning, under the strain's count, and not a wait note.
+  - The shift or box then ordered says its own wait by 127's road.
+
+## Package 90, after the staged third pass: the dire count's pin, and the ships' class words (carried fault 24; the lead's nudge 84, 2026-11-27)
+
+`…/pkg-90` merged at 939de7d6 (the Diana). Old is 939de7d6.
+
+- **The dire count begun afresh when a cause comes again** (`strain._causes_come`, at 801c309) is pinned: `test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes`.
+  - The case: the xebec in 50 kn, her lateens on the bad hand, the wind eight points through her bow 20 s on and back 40 s after.
+  - The main yard is warned dire "lying on the mast; she will carry it away" as it passes 1.5 again, 55 s after the wind came back.
+  - With the count kept from the cause's first time: nothing more, the yards at 1.57 to 1.60.
+  - No load moves; the line is 801c309's.
+- **The ships' class words** (`readings.ship_class_words`, the first clause of a file's era note, served in the ship reading and every station's brief). Mended at the cause for every file; **words alone**, nothing a ship does moves.
+  - **Her name is taken out with the "HMS" that goes with it.** Before, only the name went, and "HMS" was left at the head.
+  - **Only a leading article is made small.** Before, whatever capital led was made small ("hMS"). A class that opens with a word of its own keeps it and is given its article: "a Spanish xebec ..." (no committed file).
+  - **A first clause naming her and her state, and no class, is read past to her class:** the class after its comma ("HMS Indefatigable as built, a 64-gun ship ..."), or else the next clause's, after its colon ("HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a frigate ...").
+  - **"the" before a possessive is kept**, where it was made "a" ("a Navy's smack"). An "a" made from "the" before a vowel is "an".
+  - **"the Navy's" goes where she is not a King's ship, as "H.M." does** (`readings.ship_words`).
+
+  | Ship | Old | New |
+  |---|---|---|
+  | the razee | "hMS as razeed, 1795, ship-rigged" | "an Ardent-class 64 of 1784 cut down to a frigate by the Navy Office's draught of September 1794, ship-rigged" |
+  | the 64 | "hMS as built, a 64-gun ship of the Ardent class" | "a 64-gun ship of the Ardent class" |
+  | the 74 | "hMS a 74-gun ship of the Arrogant class" | "a 74-gun ship of the Arrogant class" |
+  | the smack | "a Navy's smack" | "the Navy's smack" |
+  | the smack out of Falmouth, a merchantman (`smack-falmouth`) | "The ship: Culloden, a Navy's smack; a merchantman of Britain." | "The ship: Culloden, a smack; a merchantman of Britain." |
+
+  - The other ten committed ships' class words are the same, byte for byte, and of the 49 committed scenarios' ship sentences only the smack's moves.
+  - Pinned over every committed file: `test_every_committed_ships_class_words_read_as_her_class` (an article or "H.M." at the head, no word made small at it, no article before a possessive, none doubled; the four by their words); `test_a_class_opening_with_a_name_of_its_own_keeps_its_capital_and_takes_an_article`; `test_the_navys_smack_under_a_merchants_papers_is_a_smack`. Each of the mend's eight parts undone fails one of them.
+
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
 **One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
@@ -40410,6 +40475,33 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, the third pass's box mended at the reader's finding: a box behind a failing heave-to saves her again (the lead's nudge 86, 2026-11-27)
+
+`…/pkg-90` merged at 93cf624c (package 126's second part). Old is 93cf624c.
+
+- **The finding.** A box given while a heave-to or a lie a-try was in hand waited on the trunk, began if her coming to failed, and saved her. The third pass refused it at the order ("She is heaving to; she will not box off while she comes to."), and left her aback with her helm amidships where the heave-to failed.
+- **The mend, the lead's ruling** (`runner.Runner.start`, `_start_waiting`, `_box_not_wanted`; the box script's own refusal taken out):
+  - a box given while she comes to (a heave-to or lie a-try in hand or still waiting) is taken and waits its turn, as on the trunk;
+  - it begins if her coming to fails;
+  - where she comes to, it is belayed when its turn comes, "Belayed boxing off: she is hove to." (notable), and the all hands kept up for it are piped down;
+  - where she has no head yards (the lugger), it is still refused at the order with that reason, as it can never be done.
+- **Measured** (`n86/box.py`, at sea from 270 with the wind from the north, plain sail settled 600 s; `heave to`; the wind four points onto her bow 20 s on; the box given 60 s on or when she is first said aback). 23 cases: the brig, the 36, the corvette, the hermaphrodite brig and the 74, each in 12 and 25 kn; the corvette in 30 kn with no shift, the box at 1, 60 and 300 s.
+  - **17 are the trunk's byte for byte.** In each where her heave-to failed, the box began as it failed and boxed her off as on the trunk.
+    - The brig in 12 kn: the heave-to failed at 600 s ("Could not heave to: she would not lie to on the starboard tack, the wind on the larboard bow; ..."); "Boxed her off; braced sharp up on the larboard tack, full and by." at 709 s.
+    - The corvette in 30 kn, at 1, 60 and 300 s: each boxed off as on the trunk.
+  - **6 moved, each by one line,** where she came to with the box waiting: "Could not box her off: She is hove to; fill away first, or wear." is now "Belayed boxing off: she is hove to." These are the corvette in 12 kn, the 36 in 25, the hermaphrodite brig in 12 and 25, and the 74 in 12 and 25.
+  - **None ends worse than on the trunk.**
+- **The 74 lying a-try, the box given behind it:** on the trunk it failed at 280 s and her hands were kept up. Now it is belayed at 280 s and "Piped down; the starboard watch has the deck." follows. Piped down, the watch below goes below, and what she does after may move by it (the reader's brig lying a-try in 30 kn: her spanker set 16 s sooner and her main topgallant 1 s sooner).
+- **The kedge's refusal for a lost boat** says the yard's new one as the errands' refusals do: "the launch is lost: cut adrift on the 10th; a new one is the yard's".
+- **Pins:**
+  - `test_a_box_given_while_her_heave_to_fails_begins_when_it_fails_and_boxes_her_off` (the brig);
+  - `test_on_a_committed_ship_a_box_given_while_she_comes_to_is_belayed_when_she_is_hove_to` (the 36 heaving to, the 74 lying a-try: belayed, and piped down where all hands were called), in place of the third pass's refused-at-the-order pin;
+  - `test_a_box_given_behind_a_heave_to_still_waiting_is_belayed_when_she_comes_to` (the 36 wearing, the heave-to and the box waiting behind the wear);
+  - `test_on_a_committed_ship_with_no_head_yards_a_box_given_while_she_comes_to_is_refused` (the lugger);
+  - `test_coming_to_she_is_not_offered_boxing_off_and_a_box_given_waits_its_turn` (the polacre probe), in place of the third pass's;
+  - the kedge's pin, its words.
+  - Each of the mend's four parts, undone, fails one of them.
 
 ## Package 90, the viewer: the whole lateen, the pole mast and the yard below that does not stand (2026-11-28)
 
