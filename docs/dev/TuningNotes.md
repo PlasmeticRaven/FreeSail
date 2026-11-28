@@ -40410,3 +40410,73 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, the viewer: the whole lateen, the pole mast and the yard below that does not stand (2026-11-28)
+
+`docs/design/Plan-Package90.md` §6's V1 and V2, in `client/projection.js` alone, keyed as the engine's steps A1 (a lateen with `dipping`, not cut at the mast: `scripts.is_whole_lateen`) and A6 (`Ship.on_pole`). No committed file carries a whole lateen; the smack's topsail is the one committed sail on a pole and the tartane's topsail the one square sail over a flying yard (both on her builder's branch, not on the package's). Every figure below is measured with the client's own `buildSkeleton` from the game's snapshot, old (the projection at 93cf624c) beside new. The tartane's figures are on her two files read from her branch at 3c584e0f into a scratch folder outside the tree, with `dipping: true` on her two whole lateens and her bouffette as her design gives them (Tar-D §4.2: "its side waits on the engine's step A1a"); seed 7, 12 kn, all hands. Pictures are the coordinating session's, in a live preview.
+
+### V1: the whole lateen drawn
+
+- **Its cut.** Three corners on its yard, from the file's `corners_m` (tools/ships/lateen.py's contract, the tack a short luff under the throat). The yard is drawn whole, car to penne, along the head's line: slung **a third of its length from the car** where the head crosses the yard's filed height, on its mast's raked line, a mast's half-diameter (`LUG_LEE_OF_MAST_OF_BEAM`) to the side the game serves it hanging (`lug_side`). The whole cut swings about its slings by its sheet's angle, as a lug's.
+- **Its side.** The cloth lies to the lee of the tack wherever its yard hangs (as a settee's), so on the bad hand, its yard to windward, it lies **against its mast**; held aback (A1d, served `backed`) it lies to windward, pressed on the mast.
+- **Aloft in every state.** Its yard is never lowered (Tar-D §5.4 item 7): in its gear it is brailed up under its yard aloft by the settee's rule (festoons down by `IN_GEAR_DEPTH` of its depth square to the yard, the clew in the after festoon); furled, a bundle along its head.
+- **Peaked while it is shifted.** While `change_lateen` is in hand on it (the snapshot's `evolutions_in_progress`, its subject the sail) and it is in its gear, its yard stands up its mast's raked line a mast's half-diameter abaft the mast on the middle line, its car passed round there (the lead's ruling, Willaumez's MUDER), slung where it was and raised only as far as keeps its car `ON_DECK_M` over the deck; the sail a bundle along it; its sheet not drawn (JUDGEMENT on the pose).
+- **Its sheet.** From its clew (brailed in, in its gear) to her drawn rail on the side its cloth lies on, **two metres abaft the clew**, as any single sheet of a sail with no yard below; a standing lug's is a metre (`tests/test_view_geometry.py`'s `lead_x`).
+- **With no cut** (the engine's probes): cut from its yard and its area (JUDGEMENT): the head the whole yard at the lateen yard's old tilt (`LATEEN_TILT`, 0.8 rad, the figure the viewer always gave one, now named), slung a third from the car at the yard's height, the tack at the car, the clew `LOOSE_FOOT_HEIGHT_M` over the deck as far aft as gives the triangle its area and no farther aft than the penne (the probes' areas are too large for their yards at that tilt: the xebec probe's main 129.6 m² drawn against 150).
+- **The frame** takes the yard in the file's plane and reaches its swing about its slings every way (sixteen points) at the heights of its ends and of its sail's tack and clew, and its two ends peaked up (`framePts`), for each whole lateen filed on the yard, bent or not (her bouffette).
+
+The tartane's great lateen (`main.lateen`), her start on the starboard tack, the wind 50° on her bow, sheeted 25°, old beside new (x forward, y to starboard, z above her water, metres):
+
+| State | Old: drawn as a standing lug | New: V1 |
+|---|---|---|
+| set, good hand (yard to larboard, the lee) | yard the head alone, 23.63 m, (9.77, 2.55, 4.40) to (−7.91, −5.69, 17.74); slings (3.88, −0.20, 8.85); sheet to the rail **1 m** abaft the clew, x 2.87 | yard car to penne, **24.36 m** (the file's), (9.94, 2.63, 4.27) to (−8.28, −5.86, 18.02); slings (3.87, −0.20, 8.85); the corners where they were; sheet to the lee rail **2 m** abaft, x 1.87 |
+| set, bad hand (yard to starboard, the weather) | the whole cloth swung **to windward**: peak (−7.91, +5.69, 17.74) | slings (3.87, **+0.20**, 8.85), the cloth **to leeward against the mast**: peak (−7.91, **−5.30**, 17.74) |
+| in the gear | yard and sail **on deck**, 1.14 m over her water | brailed up under its yard **aloft**, the cloth from 4.37 to 17.74 m |
+| furled | yard and sail on deck, 1.14 m | a bundle along its head aloft, 4.40 to 17.74 m |
+| shifted by itself (`change_lateen`) | as in the gear, on deck | peaked up its mast: car (3.67, 0, 1.14), penne (3.67, 0, **25.50**), abaft the mast |
+
+**The frame, for the lead (JUDGEMENT).** Held so, her fixed frame's top rises from 17.59 to **25.50 m** (her great yard's penne peaked), and the frame abeam from 30.86 × 18.80 to 31.80 × 26.72 m, ahead from 24.36 to 27.74 m wide: in every view she is drawn about 30 per cent smaller, so that the view does not rescale for the minute her yard is shifted. Left out of the frame, she is drawn at today's scale and the view zooms out while the yard stands peaked and back after, the frame's rule broken for that minute. Built the first way; the second is one line (`framePts`). Every committed file's frame is as it was (the smack's and the lugger's measured to the centimetre; every file's held by the view-geometry file's frame cases).
+
+### V2: the pole mast and the yard below that does not stand
+
+**The cause, mended at it.** `squareCut` hung a square sail's clews at the arms of the yard below it (`yardBelowId`, by the file's heights), skipping it only when the spar's own state was `sent_down`. A yard on deck with its flying sail is served `sound` (its sail says it is down; package 57's `yardOnDeck`), drawn on deck, and was still taken as the yard below. The same choice was made in three more places, each now reading one predicate, `standsBelow` (aloft, neither sent down nor on deck with its flying sail): the topsail's **sheets** (`yardBelow`), which led to that yard's arms on deck; a hoisting yard's **reefed height** over the yard below, taken from that yard's place on deck; and, new with the pole, **where a pole's yard is lowered to**. A sail over a yard that does not stand hangs from its own yard, `HEAD_SPREAD` of it broad, head and foot, as deep as its area over that breadth, as every square sail with no yard below does, and its sheets come down to her drawn rail abreast its clews. In every committed file the only square sail over a flying yard is the tartane's topsail, so no committed drawing moves by it.
+
+**The pole.** A pole's upper yards (mirroring `Ship.on_pole`, `is_pole_mast` and `yard_level` from the parts as filed, the engine's arithmetic kept so that the two agree) are drawn down while their sails are not set: onto the yard below where it stands, their slings `YARD_ON_CAP_M` over its own; where none stands, down to the hounds, the height the file gives the highest yard below on the mast of any class (A6's words, "down to the hounds"): the tartane's tréou's yard's, which is her lateen's slings' too; the polacre's mizen lateen's. Halfway while `lower_and_clew_up` is in hand (take_in_pole.yaml's and furl_pole.yaml's step, added to `STEP_HOIST`). A pole is filed as one lower mast with no topmast, and so is already drawn with no doubling (Pol-D §13): a case holds it.
+
+The tartane's topsail (`main.topsail`), her topsail yard 10.39 m on her pole main at 15.78 m over her deck, old beside new:
+
+| Her state | Old | New |
+|---|---|---|
+| her start before the wind (the topsail furled, the tréou sent down) | yard at 16.32 m; foot **90° askew** of its yard, fore and aft from x −2.12 to 9.86 m at 8.85 m | yard down to the hounds, **9.15 m**; foot square with its yard |
+| plain sail before the wind, the tréou taken in | foot **90° askew**, 11.99 m fore and aft; sheets to the arms of the yard on deck, 1.44 m over her water | foot **square with its yard**, 9.35 m broad, its clews 8.09 m over her water; sheets to her rail abreast the clews, at 2.12 m |
+| plain sail by the wind, her topsail yard braced 64° | foot **26° askew**, still fore and aft | foot square with its yard (0.0°), 9.35 m broad, clews at 8.09 m |
+| the tréou set | clews at the tréou's yard's arms, 8.85 m; square | the same, unchanged |
+| the tréou taken in again | 90° askew | square, 9.35 m, 8.09 m |
+| the topsail taken in (`take_in_pole`), the tréou on deck | yard at 16.32 m, in the gear | yard down to the hounds, 9.15 m, in the gear |
+
+Her builder's scratch figures (Report-Package90-Tartane.md §14.2: 9.35 m broad, clews 8.09 m over her water) are met to the centimetre, and her design's check, her loose foot square with its own yard (Decisions-Package90-2026-11.md, Part F row T-v), holds in each state.
+
+**The smack** (`data/ships/smack.yaml`, committed), her topsail yard's slings, metres above her water, old beside new: the plan's one expected move (§6, §10.4), here in every state her topsail is not set, her start and plain sail among them, since A6 furls it on the yard below:
+
+| Her state | Old | New |
+|---|---|---|
+| her start (furled) | 14.35 | **11.15**: on her square-sail yard, 10.85 + 0.30 |
+| plain sail (which sets no topsail) | 14.35 | **11.15** |
+| the topsail set | 14.35 | 14.35, unchanged |
+| `take in the topsail`, 30 s into `lower_and_clew_up` | 14.35 | **12.75**, halfway |
+| taken in, in the gear | 14.35 | **11.15** |
+| furled (`furl_pole`) | 14.35 | **11.15** |
+
+Her topsail's clews stay at her square-sail yard's arms (10.85 m), its sheets to them, as before; nothing else of hers moves. Her frame is as it was (24.42 × 15.65 m abeam), so her view's scale does not move.
+
+### Pins moved, old beside new
+
+None. No case of `tests/test_view_geometry.py` or `tests/test_pictures.py` was changed but one docstring's words (`test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward`: its lateen carries neither key, `dipping` nor `cut_at_mast`, and its words now say so; its name and its assertions are kept), and no threshold moved. New: V1's 24 cases and V2's 19 in `tests/test_view_geometry.py` (43, none of the base's removed or renamed).
+
+### Not built, for the lead
+
+- **V3, the towed boat**, stops: the client is served no boat. `/api/ship` (`api/queries.ship_graph`) serves no boats and `/api/state` (`api/queries.snapshot`) no boat in tow; A4 keeps her in `ship.extra["boat_in_tow"]` alone. `freesail/api/queries.py` is neither in the viewer's row of the plan's §7.1 nor named by the card for it.
+- **A manoeuvre's change of the lateens is not served**: in a tack, a wear, a fill away, a box-haul or a box off (`LateenChange`), and for the yards a belay hands on beyond the one `change_lateen` names, the snapshot serves only the manoeuvre and the sail `in_the_gear`, as it serves a lateen brailed up before the manoeuvre began. The yards being shifted are drawn brailed up under their yards aloft, not peaked. The settee's mirror, a key served only while true (`yard_lowered`'s), would let the drawing read it with one condition.
+- **Found on the way, the engine's**: `ship/graph._square_foot_m` takes a square sail's foot as twice its centre (`centre_height_m`, above the water) less its yard's height (`height_m`, above the deck), and A5's lateen rule compares it with a lateen yard's height above the deck, so it overstates the foot by twice the deck's height: 1.08 m on the tartane, whose topsail clears her lateen's yard by 0.03 m (8.34 against 8.31 m over her deck), not 1.11 m; 3.0 m on the polacre probe. It moves no classing on her file. The viewer keeps the engine's arithmetic so that the two read every pole alike.
+
+Built by the viewer's session; to be passed by an independent reader (the plan's §10.4).
