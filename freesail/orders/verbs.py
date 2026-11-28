@@ -42,7 +42,13 @@ from freesail import units
 from freesail.crew.model import number_words
 from freesail.evolutions import scripts
 from freesail.evolutions import trim as yard_trim
-from freesail.evolutions.runner import PartyTooSmall, part_name
+from freesail.evolutions.runner import (
+    TAKEN_IN_FIRST,
+    TURN_WAIT,
+    TURN_WAIT_SEVERITY,
+    PartyTooSmall,
+    part_name,
+)
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
@@ -431,12 +437,30 @@ def _sail_evolution(
             p["reefs"] = sail.reefs
         if verb == "reef" and order.modifiers.get("close"):
             p["reefs"] = sail.reef_bands - sail.reefs  # every band still out: close reefed
+        first_words = ""
+        if verb == "set":
+            try:
+                here = frozenset(st["subject"] for st in started)
+                first, first_words = _taken_in_first(ship, sail, vocab, skip, group, here)
+            except OrderError as e:
+                failed.append(str(e))
+                failed_ids.append(sail.id)
+                continue
+            if first:
+                p[TAKEN_IN_FIRST] = first
         try:
-            texts.append(unsaid(runner, runner.start(ship, evo, sail.id, p)))
+            line = runner.start(ship, evo, sail.id, p, say_wait=not first_words)
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, sail.id), e))
             failed_ids.append(sail.id)
             continue
+        if first_words:
+            # its wait said in its own words, at the order and once: what is taken in first and
+            # why (the runner's "will follow" line names the work and not the why)
+            mark = {TURN_WAIT: True}
+            ship.note(TURN_WAIT_SEVERITY, "evolution.waiting", first_words, sail.id, mark)
+            line = ""
+        texts.append(unsaid(runner, line))
         started.append({"evolution": evo, "subject": sail.id, "params": p})
     _settle_call(ship, call, bool(started))
 
@@ -547,6 +571,72 @@ def _countermand_said(
         return "work.belayed", words + not_done, data
     ship.note("notable", "work.belayed", words, None, {"belayed": belayed})
     return "evolution.started", not_done.strip(), data
+
+
+def _taken_in_first(
+    ship: Ship,
+    sail: Sail,
+    vocab: Vocabulary,
+    skip: frozenset[str] = frozenset(),
+    group: str | None = None,
+    here: frozenset[str] = frozenset(),
+) -> tuple[list[str], str]:
+    """The sails that do not stand on her mast with the sail to be set and are standing, or being
+    set, now (`scripts.stands_apart`: the tartane's tréou and her great lateen, Forfait 1788
+    p. 124; the lead's nudge 90): each taken in first, by its own take-in order, its setting
+    countermanded where it is going up, and the set to wait behind it (`TAKEN_IN_FIRST`). Returns
+    their ids and the set's one wait line, said at the order ("The mainsail taken in first, for
+    the tréou does not stand with it on her mast; the tréou is set when it is in."). Refused,
+    with the way out, where one cannot be taken in;
+    and where the same order sets it, by an earlier line of its group (`skip`) or as an earlier
+    sail of its own (`here`): the first named stands, so that `all sail` keeps the great lateen
+    and does not set the tréou, however her file's groups list them (her builder's)."""
+    from freesail.orders.grammar import parse
+
+    runner = ship.extra.get("evolutions")
+    sets = set(vocab.evolutions.get("set", {}).values())
+    going_up = {i.subject_id for i in getattr(runner, "instances", None) or () if i.evo.id in sets}
+    others = [
+        sl
+        for sl in scripts.stands_apart(ship, sail)
+        if sl.state in scripts.STANDING_STATES or sl.id in going_up
+    ]
+    if not others:
+        return [], ""
+    name = f"the {part_name(ship, sail.id)}"  # as the runner's lines name it
+    ids: list[str] = []
+    said: list[str] = []
+    for other in others:
+        theirs = f"the {part_name(ship, other.id)}"
+        if (group is not None and other.id in skip) or other.id in here:
+            raise OrderError(f"{name}: it does not stand with {theirs} on her mast")
+        try:
+            kind, text, data = _sail_evolution(
+                ship, parse(ship, f"take in {other.id}", vocab), vocab
+            )
+        except OrderError as e:
+            # the way out is the take-in's own refusal's (a wreck cut away, the spar shifted)
+            why = str(e).rstrip(".")
+            why = why[:1].lower() + why[1:] if why.startswith(("The ", "A ")) else why
+            raise OrderError(
+                f"{name} does not stand with {theirs} on her mast, and {theirs} cannot be taken "
+                f"in: {why}; then set {name}"
+            ) from None
+        if kind == "work.belayed":
+            # its setting belayed before any of it was loosed: nothing to take in, the belay its
+            # whole work, said as its own line, and nothing to wait for
+            ship.note("notable", "work.belayed", text, other.id, {"belayed": data["belayed"]})
+            continue
+        ids.append(other.id)
+        said.append(theirs)
+    if not said:
+        return [], ""
+    first = errors.join_names(said, "and")
+    it, is_in = ("it", "it is") if len(said) == 1 else ("them", "they are")
+    return ids, (
+        f"{first[0].upper()}{first[1:]} taken in first, for {name} does not stand with {it} on "
+        f"her mast; {name} is set when {is_in} in."
+    )
 
 
 def _countermand_the_set(

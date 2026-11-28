@@ -40471,3 +40471,39 @@ is not hers:
   exact in binary, and its centres at 8.75, 13.25 and 13.375 m. Old: the cutter's deck and the
   centres 8.25, 12.75 and 12.875 m. By the deck those old centres give feet 0.8 m lower (−0.8,
   8.2 and 8.45 m), each a course.
+
+**4. The tréou and the great lateen do not stand together on her one mast (the lead's nudge
+90; Forfait 1788 p. 124).** `scripts.stands_apart` names the sails that cannot stand with one
+on her mast. These are a lateen not cut at the mast, the yard-level rule's lateen (her file's
+great lateen carries no `dipping`), and a square sail on the same mast whose foot, at the one
+datum, comes down past that lateen's yard. Each is of the other. On her file (her branch, read)
+the tréou stands apart from the great lateen and the bouffette, both on the great yard, and her
+topsail stands with all. On the tréou probe at her file's heights, cuts and deck, it is the tréou
+and the great lateen. No sail of a committed file, nor of the four probes as built, stands apart
+from any.
+
+`set` of one takes the other in first, by its own take-in order (`orders.verbs._taken_in_first`).
+Its setting is countermanded where it is going up, and the set waits behind it (the runner's
+`TAKEN_IN_FIRST`, held as the set's). One line at the order says so in place of the runner's
+"will follow" line: "The mainsail taken in first, for the main treou does not stand with it on
+her mast; the main treou is set when it is in." Where the setting belayed was the whole of it,
+nothing loosed yet, the belay's line is said and nothing waits.
+
+The set is refused where the other cannot be taken in, the way out in the take-in's own words
+(the great yard carried away: cut away the wreck, then shift the yard for a spare). Where one
+order names both, as her file's `all sail` does, the first named stands and the other is passed
+over, so she makes all sail under the great lateen (her file's groups are her builder's). The
+great yard is not lowered on deck (Forfait p. 121, not owed): taken in, it is brailed up aloft
+as today.
+
+The probe (seed 7, 15 kn from 0°, heading 292.5°, plain sail set and settled 600 s), seconds
+from the order:
+
+| Order | Taken in first | Then set |
+|---|---|---|
+| `set the treou` (set flying) | the great lateen, brailed up, at 141 | the tréou, flying, at 271 |
+| then `set the mainsail` | the tréou, sent down with its yard, at 107 | the great lateen at 154 |
+| `set the mainsail`, the crossed tréou's set given 200 s before and not yet loosed | its set belayed at 1, left furled | the great lateen at 48 |
+| `make all sail`, her `all sail` naming both | (the tréou passed over) | the great lateen at 92; the tréou left furled |
+
+She never stood under both.

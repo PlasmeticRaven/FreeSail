@@ -276,6 +276,9 @@ TURN_WAIT_SEVERITY = "routine"
 # out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
 # for all at once" said twice with a turn-wait between is routine the second time, as before.
 TURN_WAIT = "turn_wait"
+# The sails a set waits to see taken in first, by id, in its params: those that do not stand on
+# her mast with the sail it sets (`scripts.stands_apart`; the lead's nudge 90).
+TAKEN_IN_FIRST = "taken_in_first"
 # The groups of the orders being given whose wait for their turn is said already, by (the order,
 # the group), with the works they wait behind and the note that says it (`Runner._group_turn_wait`);
 # in the runner's `__dict__` from the order to the next tick only.
@@ -1093,6 +1096,9 @@ class Runner:
 
     def _holds(self, ship: Ship, inst: Instance) -> set[str]:
         held = {inst.subject_id}
+        # a sail set after one that does not stand with it is taken in (`orders.verbs`, the
+        # lead's nudge 90): it holds that sail too, so that it waits behind its taking-in
+        held |= set(inst.params.get(TAKEN_IN_FIRST) or ())
         if inst.script is not None:
             held |= inst.script.holds()
             if not getattr(inst.script, "holds_subject", True):

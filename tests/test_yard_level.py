@@ -570,3 +570,172 @@ def test_the_smacks_lie_a_try_is_refused_furled_in_her_topsails_words_and_set_sh
     assert not [x for k, x in lines if k in ("evolution.failed", "order.rejected")], lines
     assert ("ship.hove_to", "Lying a-try under the topsail and the foresail, helm a-lee.") in lines
     assert world.ship.sails["topsail"].is_set
+
+
+# ---------------------------------------------------------------------------
+# The tréou and the great lateen do not stand together on her one mast (the lead's nudge 90;
+# Forfait 1788 p. 124): setting the one takes the other in first
+# ---------------------------------------------------------------------------
+
+STANDING = ("set", "loosed", "sheeted")
+
+
+def _her_treou_world(tmp_path, flying: bool = True, all_sail: bool = False):
+    """The tartane probe at her file's heights, cuts and deck, the tréou crossed at the main's
+    hounds (`flying`: set flying, as her file sets it, else the cutter's square sail crossed);
+    `all_sail`, the tréou in her `all sail` as her file lists it. Seed 7, 15 kn from 0°."""
+    path = _tartane_with_her_treou(tmp_path, 8.31, flying=flying, **HER_FILE)
+    if all_sail:
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        doc["groups"]["all sail"].append("main.treou")
+        path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    return make_world(7, str(path), scenario)
+
+
+def _ordered(world, order: str, seconds: int) -> tuple[list[tuple[int, str, str]], int]:
+    """The order's lines of the two sails' work (the plain sail's others left out), by the seconds
+    from it, and the seconds she stood under both at once."""
+    n0, t0 = len(world.log.all()), world.clock.tick
+    world.submit(order)
+    both = 0
+    sails = world.ship.sails
+    for _ in range(seconds):
+        world.tick()
+        if all(sails[s].state.value in STANDING for s in ("main.lateen", "main.treou")):
+            both += 1
+    kinds = ("evolution.waiting", "sail.taken_in", "sail.set", "work.belayed")
+    lines = [
+        (e.tick - t0, e.kind, e.text)
+        for e in world.log.all()[n0:]
+        if e.kind in kinds and ("main treou" in e.text or "mainsail" in e.text)
+    ]
+    return lines, both
+
+
+@pytest.mark.parametrize("flying", [True, False], ids=["set-flying", "crossed"])
+def test_her_treou_and_her_great_lateen_stand_apart_and_no_sail_of_todays_files_does(
+    tmp_path, flying
+):
+    """`scripts.stands_apart`: the tréou, her main's course (its foot 2.21 m above the deck,
+    below the great lateen's yard at 8.31 m), and the great lateen, each of the other; her
+    topsail, its foot clear above that yard, and her mizen stand with both. No sail of a
+    committed file, nor of the four probes as built, stands apart from any, so no order of
+    today's ships is touched by the rule."""
+    ship = load_ship(_tartane_with_her_treou(tmp_path, 8.31, flying=flying, **HER_FILE))
+    apart = {sid: [s.id for s in scripts.stands_apart(ship, sl)] for sid, sl in ship.sails.items()}
+    assert {sid: ids for sid, ids in apart.items() if ids} == {
+        "main.lateen": ["main.treou"],
+        "main.treou": ["main.lateen"],
+    }
+    from rig_fixtures import three_decker_probe_doc, xebec_probe_doc
+
+    probes = [tartane_probe_doc, polacre_probe_doc, xebec_probe_doc, three_decker_probe_doc]
+    ships = [load_ship(p) for p in SHIP_FILES]
+    ships += [load_ship(write_ship(d(), tmp_path, d.__name__)) for d in probes]
+    assert len(ships) == 23
+    assert not [
+        (s.name, sl.id) for s in ships for sl in s.sails.values() if scripts.stands_apart(s, sl)
+    ]
+
+
+def test_set_the_treou_with_her_great_lateen_set_takes_the_lateen_in_first(tmp_path):
+    """Her plain sail set and settled 600 s: `set the treou` takes the great lateen in first,
+    brailed up aloft as it is taken in today (the great yard is not lowered on deck: not owed,
+    Forfait p. 121), and says so at the order, the tréou's set waiting behind it; then sets the
+    tréou, flying. Then `set the mainsail` takes the tréou in first, sent down with its yard,
+    and sets the great lateen. She never stands under both. Old: each set as ordered, the other
+    left standing, both set together on her one mast."""
+    world = _her_treou_world(tmp_path)
+    world.submit("set plain sail")
+    world.run(600)
+    lines, both = _ordered(world, "set the treou", 400)
+    assert lines == [
+        (
+            1,
+            "evolution.waiting",
+            "The mainsail taken in first, for the main treou does not stand with it on her mast; "
+            "the main treou is set when it is in.",
+        ),
+        (141, "sail.taken_in", "Took in the mainsail; brailed up to its yard."),
+        (271, "sail.set", "Set the main treou, flying."),
+    ]
+    assert both == 0
+    lines, both = _ordered(world, "set the mainsail", 300)
+    assert lines == [
+        (
+            1,
+            "evolution.waiting",
+            "The main treou taken in first, for the mainsail does not stand with it on her mast; "
+            "the mainsail is set when it is in.",
+        ),
+        (107, "sail.taken_in", "Took in the main treou; sent down on deck with its yard."),
+        (154, "sail.set", "Set the mainsail."),
+    ]
+    assert both == 0
+    sails = world.ship.sails
+    assert (sails["main.lateen"].state, sails["main.treou"].state) == (
+        SailState.SET,
+        SailState.FURLED,
+    )
+
+
+def test_a_treou_going_up_is_belayed_by_set_the_mainsail_and_nothing_waits(tmp_path):
+    """The tréou crossed, its set given and its hands still aloft to loose it 200 s on:
+    `set the mainsail` countermands it (`_countermand_the_set`), the tréou left furled and said
+    so, and nothing to take in, the great lateen set at once."""
+    world = _her_treou_world(tmp_path, flying=False)
+    world.submit("set plain sail")
+    world.run(600)
+    _ordered(world, "set the treou", 200)
+    assert world.ship.sails["main.treou"].state is SailState.FURLED
+    lines, both = _ordered(world, "set the mainsail", 300)
+    assert lines == [
+        (1, "work.belayed", "Belayed setting the main treou; the main treou left furled."),
+        (48, "sail.set", "Set the mainsail."),
+    ]
+    assert both == 0
+
+
+def test_the_treou_is_refused_with_the_way_out_where_the_lateen_cannot_be_taken_in(tmp_path):
+    """Her great lateen's yard carried away, the sail gone with it and hanging: it cannot be
+    taken in, so `set the treou` is refused, naming the way out in the take-in's own words; the
+    lateen is not touched."""
+    from freesail.physics import strain as ST
+
+    world = _her_treou_world(tmp_path)
+    world.submit("set plain sail")
+    world.run(600)
+    ship = world.ship
+    ST._wreck_spar(ship, ST.strain_state(ship), ship.spars["main.lateen_yard"], 2.0)
+    world.run(5)
+    reply = world.submit("set the treou")
+    assert reply.kind == "order.rejected"
+    assert reply.text == (
+        "Order not carried out ('set the treou'): The main treou does not stand with the "
+        "mainsail on her mast, and the mainsail cannot be taken in: the main lateen went with "
+        "the main lateen yard when it carried away; cut away the wreck, then shift the main "
+        "lateen yard for a spare; then set the main treou."
+    )
+    assert ship.sails["main.treou"].state is SailState.FURLED
+
+
+def test_all_sail_naming_both_keeps_the_great_lateen_and_does_not_set_the_treou(tmp_path):
+    """Her `all sail` lists the great lateen and the tréou, as her file has it (its groups are
+    her builder's): `make all sail` sets the great lateen, named first, and passes the tréou
+    over as one that does not stand with it, so she makes all sail under the great lateen."""
+    world = _her_treou_world(tmp_path, all_sail=True)
+    lines, both = _ordered(world, "make all sail", 900)
+    sails = world.ship.sails
+    assert (sails["main.lateen"].state, sails["main.treou"].state) == (
+        SailState.SET,
+        SailState.FURLED,
+    )
+    assert both == 0 and (92, "sail.set", "Set the mainsail.") in lines

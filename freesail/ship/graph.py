@@ -214,6 +214,15 @@ class Ship:
             chain = self._chain_memo[key]
         return chain[-1] if chain else None
 
+    def square_foot_m(self, sail: str | Sail) -> float | None:
+        """A square sail's foot above the deck as her file cuts it (`_square_foot_m`), or None
+        for a sail on no yard."""
+        sl = self._sail(sail)
+        yard = self.yard_of(sl)
+        if yard is None:
+            return None
+        return _square_foot_m(yard, sl, self.hull.spec.deck_height_m)
+
     def under_bowsprit(self, part: str | Part) -> bool:
         """A yard crossed under the bowsprit or the jib-boom (the spritsail yard, the
         sprit-topsail yard: Steel 1794 vol. I pp. 196-197; Lavery I27-I30), or the square

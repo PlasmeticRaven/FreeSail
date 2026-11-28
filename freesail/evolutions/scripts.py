@@ -409,6 +409,38 @@ def is_whole_lateen(sail: Sail) -> bool:
     return sail.cls == "lateen" and bool(sail.dipping) and not sail.cut_at_mast
 
 
+# A sail standing: set or going up, drawing or about to (`stands_apart`'s); one in its gear, furled,
+# unbent or blown out stands not.
+STANDING_STATES = (SailState.SET, SailState.LOOSED, SailState.SHEETED, SailState.GOOSE_WINGED)
+
+
+def stands_apart(ship: Ship, sail: Sail) -> list[Sail]:
+    """The sails that cannot stand on her mast with this one (the lead's nudge 90; Forfait 1788
+    p. 124, the tartane's tréou and her great lateen): a lateen not cut at the mast and a square
+    sail on the same mast whose foot comes down past the lateen's yard, so that the yard stands
+    in its canvas. That square sail is the mast's course by the rule of yard levels, whose
+    lateens these are (`Ship._find_yard_levels`: her file's great lateen carries no `dipping`);
+    one whose foot is clear above the yard (her topsail) stands with it. Each of the other; []
+    on a ship with no such lateen, as is every committed file."""
+
+    def great(sl: Sail) -> bool:
+        return sl.cls == "lateen" and not sl.cut_at_mast
+
+    def apart(lateen: Sail, square: Sail) -> bool:
+        yard, sq_yard = ship.yard_of(lateen), ship.yard_of(square)
+        if yard is None or sq_yard is None or ship.mast_of(yard) is not ship.mast_of(sq_yard):
+            return False
+        foot = ship.square_foot_m(square)
+        return foot is not None and foot <= yard.height_m
+
+    if great(sail):
+        squares = [sl for sl in ship.sails.values() if sl.cls == "square"]
+        return [sl for sl in squares if apart(sail, sl)]
+    if sail.cls == "square":
+        return [sl for sl in ship.sails.values() if great(sl) and apart(sl, sail)]
+    return []
+
+
 def whole_lateens(ship: Ship) -> list[Sail]:
     """The whole lateens set (`is_whole_lateen`), by the ship's order: what a manoeuvre may shift
     round its mast, the stern and bow watches read against its mast, and a heave-to finds no
