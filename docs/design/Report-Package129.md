@@ -158,14 +158,25 @@ The trunk was merged at 93cf624c (nineteen ship files, the corvette Diana; packa
 
 The trunk was merged again at 9c6a5c3e (documents only since 93cf624c: the work packages, the carried list, the ships' nudge, the proposal); no conflict.
 
+The trunk was merged a third time at b122b23e, as merge ed173ca0. It was not documents only: package 90's A9 (`freesail/crew/quarters.py`, `freesail/orders/gunnery.py`, `tests/test_three_decks.py`) and its viewer (`client/projection.js`, `tests/test_view_geometry.py`), with their reports and pictures. One conflict, in `docs/dev/TuningNotes.md`, where both sides had added a section at the end: both kept whole, package 90's viewer first, then this package's. No code conflicted; no file of this package was touched by it. The tiers were run again on the merged hash.
+
 ## The second build: the lead's list of c22aa834
 
 The first build was read by an independent reader and the lead and not passed, on six things; each was taken up here.
 
 1. **A ship bound home to the port she weighed from never anchored there** (a regression of the first build). The first build left out every anchorage of the port in `_departing`, which is never cleared at sea, so a passage home to it lost its own anchorage. Mended at its cause: the one left out is the anchorage she lies at as she weighs, the first leg of the track out, when she is within its reach (`_weighed_from`). The reader's probe (a smack 12 nm off Falmouth, Plymouth and Dover, departing it, running home, 18 h): the trunk in port at all three; the first build `done` 1.7 nm off Falmouth and 0.1 nm off Dover, "on passage"; this build in port at all three, at the same hours as the trunk. smack-falmouth's fishermen: above. Pinned, 7-790's smack.
 2. **The trader sailed and never arrived.** Two causes, both mended (above, the ports' table): the destination's anchorage laid where the track out held the only one; in port by the world's rule. `Planner.legs_for` is untouched: its check would have moved the crewed captain's plans too, so the mend is in `brains.py`. The riding cases' cause, and the crewed captain's form of the fault, are told above.
-3. **7-799 on Python 3.11.** A path pickles as its words whole on 3.13 and as its parts on 3.11; the truth now holds the place by its words on either (`Path(*words)`). The tiers were run on Python 3.11 (below, and in the build's report).
+3. **7-799 on Python 3.11.** A path pickles as its words whole on 3.13 and as its parts on 3.11; the truth now holds the place by its words on either (`Path(*words)`). The tiers were run on Python 3.11 (below).
 4. **7-793 could not tell health from a slow loop.** Restated (above). The weigh's wait doubles to a day (`AT_ANCHOR_MOST_S`, JUDGEMENT), pinned by 7-791.
 5. **The console's road.** The console's `serve_agents` keeps the place as words as the server does; a truth of 7-798 in `tests/test_console.py` hosts the agents with a place given as a path, saves, reads the names (no path), and loads by the checkpoint.
 6. **The reader's "within".** It named the last classes pushed before a path, not the objects holding it. Now the reader keeps the loader's stack by each opcode's own account (`pickletools`), and "within" is the objects on the stack whose state is given them after the name (their BUILD later), outermost first, an object made by the game's `replay._new` told by its class. A name fetched again from the memo is told as its own place, where the first build told a class only where it was first named: a second path in the same checkpoint was missed. A planted scenario path is told within `World < Hull < World < Scenario` (the world's façade), a planted `consent_records_dir` within `World`. Its words are the strings it is called with: a path's words on either Python.
 
+## The tiers
+
+On ed173ca0 (this package at 82d04503 with the trunk at b122b23e merged), on Python 3.11.18, four workers, `__pycache__` cleared before each run:
+
+- The fast tier, whole: 9322 passed, 1 xfailed (1 h 12 min).
+- The slow tier (`--slow -m "slow and not pace"`), every file a change of this package can reach, in three runs: the first 32 files 84 passed (12 min); the next 33 294 passed, 8 xfailed (1 h 35 min); the last 30 56 passed, 2 xfailed (18 min). The files are named one by one in the build's report.
+- `tests/test_api_door.py`: 19 passed.
+
+Before the third merge the same tiers passed on 757f2eab (fast 9201 passed, 1 xfailed; the slow runs all passed). The trunk's two new test files are not reached by this package and were run in the fast tier only. The commit that adds this section changes this report alone.
