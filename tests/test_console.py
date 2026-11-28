@@ -81,3 +81,45 @@ def test_the_console_prints_the_followed_hulls_log_after_follow():
     con.handle_line("tick 1")
     assert con.handle_line("set the royals")  # the observer's refusal, printed as before
     assert "No ship followed" in out.getvalue()[mark:]
+
+
+def test_truth_7_798_the_console_keeps_the_records_place_as_words_and_its_save_a_checkpoint(
+    tmp_path,
+):
+    """Truth 7-798's third road (package 129; the lead's mutant of c22aa834): the console
+    hosting the agents with a records place given (`serve_agents`, as `--consent-records`
+    gives it, a path object from a caller) keeps the place in the world as words, which a
+    checkpoint may hold; its save is read by names without loading (no path, nothing not
+    admitted) and loads by its checkpoint, the game as it was."""
+    import socket
+    import sys
+    from pathlib import Path
+
+    from freesail.ui.server import prepare_game, server_parser
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    import checkpoint_holders as H
+
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+    con, _out = make_console()
+    records = tmp_path / "consent"
+    server = con.serve_agents(port, records_dir=records, saves_dir=str(tmp_path / "saves"))
+    try:
+        place = con.world.consent_records_dir
+        assert isinstance(place, str) and Path(place) == records
+        con.handle_line("steer 45")
+        con.handle_line("tick 120")
+        save = tmp_path / "s.json"
+        con.handle_line(f"save {save}")
+        body = H.pickle_of(save.with_suffix(".checkpoint"))
+        assert not [h.line() for h in H.holders(body) if h.module.startswith("pathlib")]
+        assert not [h.line() for h in H.not_admitted(body)]
+        loaded = prepare_game(server_parser().parse_args(["--load", str(save)]), say=print)
+        assert loaded.load_report.how == "checkpoint", loaded.load_report.words
+        assert loaded.clock.tick == con.world.clock.tick
+        assert loaded.log.digest() == con.world.log.digest()
+        assert loaded.consent_records_dir == place
+    finally:
+        server.should_exit = True

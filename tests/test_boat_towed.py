@@ -429,12 +429,8 @@ def test_a_boat_towed_too_fast_is_said_at_her_hull_speed_and_again_only_under_ni
     assert notes[0][1] == "boat.towed_too_fast"
 
 
-def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_path):
-    """Nudge 76, item 3: a boat towed astern was "stove on the booms by a shot" and stayed in
-    tow. Stove where she tows (`combat.hits._deck_hit`, its draw the boats' as before: here a
-    shot amidships and the boats' share drawn), she fills and her painter is cut: in tow no
-    longer, her drag gone, and her reading says so. The probe as filed, her boat on deck, is
-    stove on the booms as before."""
+def _stove(w) -> None:
+    """A shot amidships on her deck, the boats' share drawn (`combat.hits._deck_hit`)."""
     from types import SimpleNamespace
 
     from freesail.combat import hits
@@ -443,23 +439,148 @@ def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_
         def random(self):
             return 0.0
 
-    said = {}
+    keeper = SimpleNamespace(minute=[])
+    hits._deck_hit(
+        w.ship, keeper, None, None, None, 0.0, "starboard", 1.0, False, _Draw(), w.clock.tick
+    )
+
+
+def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_path):
+    """Nudges 76 and 77, item 3 and item 1: a boat towed astern was "stove on the booms by a
+    shot" and stayed in tow; then, cut adrift, she was still sent ashore, laid out the kedge and
+    was gone to. Stove where she tows (`combat.hits._deck_hit`, its draw the boats' as before),
+    she fills and her painter is cut, and she is lost by the road a boat swamped or cut adrift
+    takes (`boats.stove_in_tow`, `lose_boat`): in tow no longer, used by nobody, and said so.
+    The hit's data carries `towed`. The probe as filed, her boat on deck, is stove on the booms
+    as before, and not lost."""
+    said, data = {}, {}
     for towed in (True, False):
         w = at_anchor_in(CARRICK_ROAD, ship=_probe(tmp_path, towed=towed))
         assert ("boat_in_tow" in w.ship.extra) is towed
         n0 = len(w.log.all())
-        keeper = SimpleNamespace(minute=[])
-        hits._deck_hit(
-            w.ship, keeper, None, None, None, 0.0, "starboard", 1.0, False, _Draw(), w.clock.tick
-        )
+        _stove(w)
         w.run(2)
-        said[towed] = [e.text for e in w.log.all()[n0:] if e.kind == "boat.stove"]
+        stove = [e for e in w.log.all()[n0:] if e.kind == "boat.stove"]
+        said[towed] = [e.text for e in stove]
+        data[towed] = stove[0].data
         assert "boat_in_tow" not in w.ship.extra
+        assert bool(w.dealings.boat.lost) is towed
         if towed:
-            assert w.readings.words("boat") == "the boat stove by a shot and cut adrift"
+            lost = [e.text for e in w.log.all()[n0:] if e.kind == "boat.lost"]
+            assert lost == [
+                "The boat stove by a shot as she towed astern, and cut adrift. A new one is the "
+                "yard's."
+            ]
+            assert w.readings.words("boat").startswith("the boat lost: stove on the ")
+            for order in ("send the boat ashore", "lay out a kedge", "go to the boat"):
+                assert w.submit(order).kind == "order.rejected", order
     assert said == {
         True: [
             "The boat is stove by a shot as she tows astern; she fills, and her painter is cut."
         ],
         False: ["The boat is stove on the booms by a shot."],
     }
+    assert data == {True: {"boat": "boat", "towed": True}, False: {"boat": "boat"}}
+
+
+def test_clearing_for_action_her_boat_lost_says_no_boat_out(tmp_path):
+    """Nudge 77, item 1: `clear for action` said "The boats are out and towing astern" of a ship
+    whose boat was stove and cut adrift. Her boat lost, the line says so (the tartane probe
+    carries two, the other on the booms), in package 127's words of where her boats are."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+    )
+    said = {}
+    for stove in (True, False):
+        w = make_world(7, _probe(tmp_path), sc)
+        w.submit("set plain sail")
+        w.run(600)
+        if stove:
+            _stove(w)
+            w.run(2)
+        n0 = len(w.log.all())
+        assert w.submit("clear for action").kind == "order.accepted"
+        w.run(900)
+        said[stove] = [e.text for e in w.log.all()[n0:] if "the ship is clear" in e.text.lower()]
+    assert said == {
+        True: ["The punt griped fast on the booms; the boat lost; the ship is clear."],
+        False: [
+            "The punt griped fast on the booms; the boat towing astern on her painter; the ship "
+            "is clear."
+        ],
+    }  # in package 127's words (the boats where they are); before it, "The rest of her boats
+    # are out and towing astern, the boat lost; ..." and "The boats are out and towing astern;
+    # ..." (nudge 83)
+
+
+def test_of_two_boats_towed_each_is_in_tow_and_one_stove_leaves_the_other(tmp_path):
+    """Nudge 77, item 4: two boats towed astern, each her own hull's drag on the ship; the one
+    that is not the errands' boat stove by a shot leaves the tow, and the other stays in it, the
+    ship's boat not lost."""
+    import copy
+
+    doc = tartane_probe_doc()
+    doc["boats"][0]["towed"] = True
+    second = copy.deepcopy(doc["boats"][0])
+    second["id"] = "boat2"
+    second["name"] = "the jolly boat"
+    doc["boats"].append(second)
+    w = at_anchor_in(CARRICK_ROAD, ship=str(write_ship(doc, tmp_path, "tartane-two")))
+    assert len(w.ship.extra["boat_in_tow"]) == 2
+    w.ship.extra.setdefault("boats_stove", []).append("boat2")
+    w.run(2)
+    assert len(w.ship.extra["boat_in_tow"]) == 1
+    assert not w.dealings.boat.lost
+    assert w.readings.words("boat") == "the boat towing astern on her painter"
+
+
+# ---------------------------------------------------------------------------
+# The third pass's changes on ships in the game (the lead's nudge 79): declared and pinned
+# ---------------------------------------------------------------------------
+
+
+def test_on_a_committed_ship_a_lost_boat_lays_out_no_kedge(tmp_path):
+    """Nudge 79, the declaration: on every committed ship with a boat, `lay out a kedge` with her
+    boat lost was taken, and the boat cut adrift hoisted out and laid it out (the frigate's launch:
+    "Hoist out the launch; the kedge and a hawser into her.", the kedge let go 775 s on). Now it
+    is refused at the order, as a lost boat is sent on no errand, in the errands' words: "...: the
+    launch is lost: cut adrift on the 10th; a new one is the yard's" (the lead's reader at nudge
+    86; the third pass's ended "cut adrift on the 10th")."""
+    w = at_anchor_in(CARRICK_ROAD)
+    assert w.submit("cut the boat adrift").kind != "order.rejected"
+    w.run(1)
+    r = w.submit("lay out a kedge")
+    assert r.kind == "order.rejected"
+    assert r.text.startswith("Order not carried out ('lay out a kedge'): the launch is lost: ")
+    assert r.text.endswith("; a new one is the yard's"), r.text
+
+
+def test_on_a_committed_ship_clearing_for_action_with_her_boat_lost(tmp_path):
+    """Nudge 79, the declaration: `clear for action` said "The boats are out and towing astern;
+    the ship is clear." with her boat cut adrift. Now the boat lost is said, by her name, beside
+    package 127's "griped fast on the booms" of the rest."""
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+    )
+    w = make_world(7, "data/ships/brig.yaml", sc)
+    w.submit("set plain sail")
+    w.run(600)
+    w.submit("cut the boat adrift")
+    w.run(1)
+    n0 = len(w.log.all())
+    w.submit("clear for action")
+    w.run(1200)
+    said = [e.text for e in w.log.all()[n0:] if "the ship is clear" in e.text.lower()]
+    assert said == ["The boats griped fast on the booms; the launch lost; the ship is clear."]
+    # in package 127's words; before it, "The rest of her boats are out and towing astern, the
+    # launch lost; the ship is clear." (nudge 83)

@@ -84,6 +84,13 @@ __all__ = [
 
 CHARTS_DIR = Path(__file__).resolve().parents[2] / "data" / "charts"
 
+# The tiles a level keeps loaded, the least lately read let go first (`Level.tile`). JUDGEMENT,
+# measured: a far trader's passage from the Havre to Dover laid by the planner reads 33 tiles
+# of one level and 31 of another; with 16 kept, every laying loaded them all again (37
+# loads), with 64 none. A tile is about a megabyte, so a level holds some 64 MB at
+# most. What is kept changes no answer: a tile is the same read from the cache or the disk.
+TILE_CACHE = 64
+
 # The grounding check's short-circuit (spec M5 §11; C §5.5): a tile whose shoalest
 # sounding is deeper than the draught plus the highest tide plus a margin needs nothing
 # more. The highest tide of these waters is Brest's spring range of about seven metres
@@ -659,7 +666,7 @@ class Level:
         unit_m: float,
         folder: Path,
         names: set[str],
-        cache_size: int = 16,
+        cache_size: int = TILE_CACHE,
         paths: dict[str, Path] | None = None,
         use: str = "",
         beside: dict[str, list[Path]] | None = None,
@@ -703,6 +710,11 @@ class Level:
         key = (south_sec, west_sec)
         t = self._cache.get(key)
         if t is not None:
+            if self._order[-1] != key:
+                # the least lately read is the one let go (a passage laid over the chart reads
+                # its tiles again and again, the first among them)
+                self._order.remove(key)
+                self._order.append(key)
             return t
         name = f"{south_sec}_{west_sec}"
         path = self.paths.get(name)

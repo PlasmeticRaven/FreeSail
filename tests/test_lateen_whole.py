@@ -281,8 +281,10 @@ def test_the_stern_watch_says_a_lateen_left_on_its_mast_by_a_gybe(xebec):
     world.run(240)
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_stern"]
     assert [e.text for e in said] == [
-        "The wind has come across the stern to the larboard quarter: the foresail and the mizen "
-        "and the mainsail lie on their masts; shift them when you will."
+        "The wind has come across the stern to the larboard quarter: the foresail, the mainsail "
+        "and the mizen lie on their masts; shift the foresail, the mainsail and the mizen when "
+        "you will."  # was "the foresail and the mizen and the mainsail ...; shift them when you
+        # will.": the sails in their order, the order as she takes it (nudge 77, item 5)
     ]
     assert said[0].data["lateens"] == ["fore.lateen", "mizzen.lateen", "main.lateen"]
 
@@ -302,9 +304,10 @@ def test_the_bow_watch_says_a_lateen_left_on_its_mast_by_a_shift_of_wind_through
     world.run(240)
     said = [e for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert [e.text for e in said] == [
-        "The wind has come round ahead to the larboard bow: the foresail and the mizen and the "
-        "mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."
-    ]  # was "...; shift them.", which she refused as worded (nudge 76, item 2)
+        "The wind has come round ahead to the larboard bow: the foresail, the mainsail and the "
+        "mizen are aback against their masts; shift the foresail, the mainsail and the mizen."
+    ]  # was "...; shift them.", which she refused as worded (nudge 76, item 2), then "the
+    # foresail and the mizen and the mainsail ...": in their order, a seaman's list (nudge 77)
 
 
 def test_the_bow_watch_says_a_luggers_lugs_left_on_their_masts_at_the_same_cause():
@@ -2899,7 +2902,7 @@ def test_the_bows_line_names_what_eases_a_lateen_aback_and_says_when_you_will_on
     (line,) = [e.text for e in _after(world, n0) if e.kind == "sail.across_the_bow"]
     assert line == (
         "The wind has come round ahead to the larboard bow: the mainsail is aback against the "
-        "mast; shift the mainsail; and the mizen lies on the mast; shift it when you will."
+        "mast; shift the mainsail; and the mizen lies on the mast; shift the mizen when you will."
     )  # was "...; let fly its sheet, shift it or box her off; and ..." (nudge 60, item 3), then
     # "...; shift it; and ...", which she refused as worded (nudge 76, item 2)
 
@@ -3200,8 +3203,9 @@ def test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning
     """Nudges 60 and 76, item 3 and item 1: on the bad hand the words name its yard shifted, which
     eases it at once, and nothing that does not (the dire line names only what eases at once).
     The xebec in 50 kn, her lateens put on the bad hand, her main yard warned at once at 1.28,
-    "... the mainsail lying on the mast: shift the mainsail.", and at 1.57 30 s on (within the
-    cause, the ten minutes' rule, the lead's choice at nudge 56): shifted, under half within a
+    "... the mainsail lying on the mast: shift the mainsail.", and dire as it passes 1.5 within
+    the same cause (package 127's rule, nudge 77, item 2; before, unsaid till the ten minutes
+    were out, the lead's choice at nudge 56), at 1.57 30 s on: shifted, under half within a
     minute (measured: a second). Taken in, it eases nothing for two minutes, held at 1.57 to 1.60
     (measured: under half 169 s on), so it is not named; before nudge 76, "shift it or take it
     in.". Not named either, the sheet let fly, which raises it (this case: 1.57 to 1.71)."""
@@ -3209,9 +3213,12 @@ def test_on_the_bad_hand_a_lateen_is_eased_at_once_only_by_the_order_its_warning
     n0 = len(world.log.all())
     _on_the_bad_hand(world)
     world.run(30)
-    (said,) = _warned(_after(world, n0), "main.lateen_yard")
-    assert said.text.endswith("the mainsail lying on the mast: shift the mainsail."), said.text
-    assert ("take" in said.text) is False
+    said = _warned(_after(world, n0), "main.lateen_yard")
+    assert said[0].text.endswith("the mainsail lying on the mast: shift the mainsail.")
+    assert said[-1].text.endswith(
+        "the mainsail lying on the mast; she will carry it away: shift the mainsail."
+    ), [e.text for e in said]
+    assert not any("take" in e.text for e in said)
     at_order = _pressing(world, "main.lateen")
     assert at_order > strain.CARRY_AWAY_RATIO, at_order
     assert world.submit(order).kind == "order.accepted"
@@ -3369,3 +3376,268 @@ def test_a_lateen_whose_shift_waits_for_hands_is_told_so_not_to_shift_it(xebec_i
         "the mizen lying on the mast; she will carry them away: its shift waits its turn, the "
         "hands shifting the mainsail."
     ), [e.text for e in said]
+
+
+# ---------------------------------------------------------------------------
+# The lateen hulls' list, its third pass (the lead's nudge 77)
+# ---------------------------------------------------------------------------
+
+
+def _runner_of(*shifts):
+    """A runner of shift instances for `strain._shift_waiting`: (sail id, waiting) each."""
+    from types import SimpleNamespace
+
+    evo = SimpleNamespace(id="change_lateen")
+    return SimpleNamespace(
+        instances=[SimpleNamespace(evo=evo, subject_id=s, waiting=w) for s, w in shifts]
+    )
+
+
+def test_waits_its_turn_is_said_only_while_her_own_shift_waits_and_names_the_hands_shifting(
+    xebec_file,
+):
+    """Nudge 77, item 4: "its shift waits its turn" is not said while her own shift runs, and
+    the hands named are those shifting, not another shift waiting too."""
+    ship = load_ship(xebec_file)
+    ship.extra["evolutions"] = _runner_of(("mizzen.lateen", False))
+    assert strain._shift_waiting(ship, "mizzen.lateen") is None  # her own shift runs
+    ship.extra["evolutions"] = _runner_of(
+        ("main.lateen", False), ("fore.lateen", True), ("mizzen.lateen", True)
+    )
+    assert strain._shift_waiting(ship, "mizzen.lateen") == (
+        "its shift waits its turn, the hands shifting the mainsail"
+    )
+    ship.extra["evolutions"] = _runner_of(("fore.lateen", True), ("mizzen.lateen", True))
+    assert strain._shift_waiting(ship, "mizzen.lateen") == "its shift waits its turn"
+
+
+def test_a_relief_that_waits_behind_work_on_its_sail_is_said_to_wait(tmp_path_factory):
+    """Nudge 77, item 3: a relief named was not at once. The tartane in 40 kn, her lateens put
+    on the bad hand while her watch is still at her trims: her main yard warned at 1.51,
+    "... shift the mainsail or box her off when the hands are done trimming the mainsail.";
+    measured, a shift given then begun 182 s on and a box 82 s on, behind the trim."""
+    world = _from(_rated_and_settled(tartane_probe_doc(), tmp_path_factory, 40.0, 600))
+    n0 = len(world.log.all())
+    _on_the_bad_hand(world)
+    world.run(160)
+    said = [e.text for e in _warned(_after(world, n0), "main.lateen_yard")]
+    assert any(
+        s.endswith(
+            "shift the mainsail or box her off when the hands are done trimming the mainsail."
+        )
+        for s in said
+    ), said
+
+
+def test_coming_to_she_is_not_offered_boxing_off_and_a_box_given_waits_its_turn(polacre_in_40):
+    """Nudge 77, item 3: `box her off` was offered while a heave-to was in hand. Coming to, the
+    words offer only the shift (`scripts.heave_to_in_hand`). A box given then is taken and waits
+    behind the heave-to, as on the trunk, to begin if it fails (the lead's ruling at nudge 86;
+    the third pass refused it at the order, "She is heaving to; she will not box off while she
+    comes to.", which was not true of a heave-to failing)."""
+    world = _from(polacre_in_40)
+    ship = world.ship
+    _shift_the_wind(world, -8.0)
+    world.run(5)
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen or box her off"
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(2)
+    assert scripts.heave_to_in_hand(ship)
+    assert strain.pressed_reliefs(ship, "aback", "the mizen") == "shift the mizen"
+    n0 = len(world.log.all())
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(2)
+    assert "'Box off' will follow 'heave to', which the hands are still at." in [
+        e.text for e in _after(world, n0)
+    ]
+
+
+def test_the_bows_list_in_her_sails_order_is_taken_as_said(xebec):
+    """Nudge 77, item 5: the bow's line names her sails from forward aft as a seaman lists three
+    things (`scripts.sails_listed`), and the order it gives is taken as said: "shift the
+    foresail, the mainsail and the mizen", where a list with commas was refused. A side after a
+    comma is the grammar's side as before."""
+    world = _from(xebec)
+    lateens = [world.ship.sails[i] for i in ("mizzen.lateen", "main.lateen", "fore.lateen")]
+    assert scripts.sails_listed(world.ship, lateens) == "the foresail, the mainsail and the mizen"
+    assert scripts.sails_listed(world.ship, lateens[:2]) == "the mainsail and the mizen"
+    _on_the_bad_hand(world)
+    world.run(5)
+    r = world.submit("shift the foresail, the mainsail and the mizen")
+    assert r.kind == "order.accepted", r.text
+    assert r.text == "Order: shift the foresail, the mainsail and the mizen."
+
+
+def _at_sea(path: str, knots: float = 15.0):
+    sc = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=knots,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=270.0,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, path, sc)
+    world.submit("set plain sail")
+    world.run(600)
+    return world
+
+
+@pytest.mark.parametrize(
+    ("path", "first", "said"),
+    [
+        ("data/ships/frigate-36.yaml", "heave to", ["Belayed boxing off: she is hove to."]),
+        (
+            "data/ships/seventy-four.yaml",
+            "lie a-try",
+            [
+                "Belayed boxing off: she is hove to.",
+                "Piped down; the starboard watch has the deck.",
+            ],
+        ),
+    ],
+)
+def test_on_a_committed_ship_a_box_given_while_she_comes_to_is_belayed_when_she_is_hove_to(
+    path, first, said
+):
+    """Nudges 79 and 86: on the trunk, `box her off` given while she comes to was taken, waited,
+    and failed once she was hove to ("Could not box her off: She is hove to; fill away first, or
+    wear.", the frigate 172 s on, the 74 lying a-try 280 s on, her hands kept up). The third pass
+    refused it at the order; by the lead's ruling at nudge 86 it is taken and waits as before,
+    and, she hove to, it is belayed then and said so, and all hands up for it are piped down (the
+    74's lie a-try called them; the frigate's heave-to called none)."""
+    world = _at_sea(path)
+    n0 = len(world.log.all())
+    assert world.submit(first).kind == "order.accepted"
+    world.run(1)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(400)
+    ends = ("work.belayed", "crew.piped_down", "evolution.failed", "ship.boxed_off")
+    assert [e.text for e in _after(world, n0) if e.kind in ends] == said
+
+
+def test_on_a_committed_ship_with_no_head_yards_a_box_given_while_she_comes_to_is_refused():
+    """Nudge 79, the declaration: the lugger's box given while she comes to was taken, waited, and
+    failed 82 s on, "Could not box her off: She has no head yards to brace abox.". It can never be
+    done, and is refused at the order with that reason (kept at the lead's ruling of nudge 86)."""
+    world = _at_sea("data/ships/lugger.yaml")
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(1)
+    r = world.submit("box her off")
+    assert r.kind == "order.rejected" and r.text.endswith("She has no head yards to brace abox.")
+
+
+def test_a_box_given_behind_a_heave_to_still_waiting_is_belayed_when_she_comes_to():
+    """The lead's ruling at nudge 86: a box given while a heave-to or lie a-try is in hand or
+    still waiting waits behind it, to begin if it fails. The frigate wearing, `heave to` and the
+    box given behind the wear, each waiting: worn 379 s on, hove to 566 s on, and the box belayed
+    then and said so, all hands piped down. On the trunk: "Could not box her off: She is hove to;
+    fill away first, or wear.", the hands kept up."""
+    world = _at_sea("data/ships/frigate-36.yaml")
+    n0 = len(world.log.all())
+    for order in ("wear ship", "heave to", "box her off"):
+        assert world.submit(order).kind == "order.accepted", order
+        world.run(1)
+    world.run(700)
+    ends = ("work.belayed", "crew.piped_down", "evolution.failed", "ship.boxed_off")
+    assert [e.text for e in _after(world, n0) if e.kind in ends] == [
+        "Belayed boxing off: she is hove to.",
+        "Piped down; the starboard watch has the deck.",
+    ]
+
+
+def test_a_box_given_while_her_heave_to_fails_begins_when_it_fails_and_boxes_her_off():
+    """The lead's nudge 86, the reader's finding: a box given while a heave-to was failing saved
+    her on the trunk, and the third pass refused it ("She is heaving to; she will not box off
+    while she comes to."), leaving her aback with her helm amidships. The brig in 12 kn under
+    plain sail, `heave to`, the wind four points onto her bow 20 s on, the box given 60 s on:
+    taken and waiting, her heave-to failed 600 s on ("Could not heave to: she would not lie to on
+    the starboard tack, ..."), the box begun at once, and "Boxed her off; braced sharp up on the
+    larboard tack, full and by." 709 s on, as on the trunk, line for line."""
+    world = _at_sea("data/ships/brig.yaml", 12.0)
+    n0 = len(world.log.all())
+    assert world.submit("heave to").kind == "order.accepted"
+    world.run(20)
+    _shift_the_wind(world, -4.0)
+    world.run(40)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(700)
+    after = _after(world, n0)
+    failed = [e for e in after if e.kind == "evolution.failed"]
+    boxed = [e for e in after if e.kind == "ship.boxed_off"]
+    assert [e.text[:15] for e in failed] == ["Could not heave"], [e.text for e in failed]
+    assert boxed and boxed[0].tick > failed[0].tick, [e.text for e in after]
+
+
+def test_a_box_behind_a_lie_a_try_that_fails_its_own_check_is_still_carried_out():
+    """Nudge 79, the declaration: a heave-to or lie a-try given and still waiting to begin is not
+    `heave_to_in_hand`, for it may fail its own check, and a box behind it is wanted then. The
+    merchant brig, her main topsail not yet set: `lie a-try` taken, waiting behind her sail, and
+    failed 114 s on ("Could not bring her to: The main topsail is not set; ..."); the box behind
+    it carried out, "Boxed her off; braced sharp up on the starboard tack, full and by.", as
+    before."""
+    world = _at_sea("data/ships/merchant-brig.yaml")
+    n0 = len(world.log.all())
+    assert world.submit("lie a-try").kind == "order.accepted"
+    world.run(1)
+    assert world.submit("box her off").kind == "order.accepted"
+    world.run(300)
+    kinds = [e.kind for e in _after(world, n0)]
+    assert "ship.boxed_off" in kinds and "evolution.failed" in kinds
+
+
+def test_within_one_cause_a_yard_risen_to_dire_is_warned_before_it_goes(xebec_in_40):
+    """Nudge 77, item 2, by package 127's rule (`strain.warning_due`): a lateen's yard warned
+    "working" in its cause and risen past 1.5 within the ten minutes was not warned again, and
+    carried away (the lead's reader: the xebec's main yard, 334 s after its shift's order,
+    warned before the order alone). The xebec in 40 kn, the wind through her bow, her sheets let
+    fly onto the bad hand (the mizzen yard warned "working" at 1.05), the wind then to 56 kn:
+    warned "bending like whips ... she will carry them away" at 1.77 as it rises past 1.5, before
+    its loss (measured in the like run of `n60l/seq.py`: warned 88 s after "working", lost 467 s
+    after it). Before, the loss with no second line."""
+    world = _from(xebec_in_40)
+    _shift_the_wind(world, -8.0)
+    world.run(10)
+    for mast in ("fore", "main", "mizzen"):
+        world.submit(f"let fly the {mast} lateen sheet")
+        world.run(1)
+    n0 = len(world.log.all())
+    world.run(87)
+    world.wind.follow(world.wind.base_direction, units.knots_to_ms(56.0))
+    world.scenario.wind_speed_kn = 56.0
+    world.run(600)
+    after = _after(world, n0)
+    said = _warned(after, "mizzen.lateen_yard")
+    gone = [
+        e.tick for e in after if e.kind == "spar.carried_away" and e.subject == "mizzen.lateen_yard"
+    ]
+    dire = [e for e in said if e.data["ratio"] > strain.CARRY_AWAY_RATIO]
+    assert dire and "lying on the mast; she will carry them away" in dire[0].text, [
+        e.text for e in said
+    ]
+    assert not gone or dire[0].tick < gone[0]
+
+
+def test_a_cause_given_way_and_come_again_is_warned_dire_again_within_the_ten_minutes(xebec_in_50):
+    """The lead's nudge 84, on nudge 83's open line: a whole lateen's cause that gives way to
+    another and comes again begins its dire count afresh, as its lesser one does
+    (`strain._causes_come`, package 127's `last_dire_s`). The xebec in 50 kn, her lateens put on
+    the bad hand, each yard warned dire "lying on the mast" at once; the wind eight points through
+    her bow 20 s on, each warned dire "aback against the mast"; the wind back 40 s after, the bad
+    hand come again: each warned "working ... lying on the mast", then dire again as it passes 1.5
+    (measured in the like run of `n83/seqsev.py`: at 1.51, 55 s after the wind came back). With
+    the dire count kept from the cause's first time, nothing more to the run's end, the yards at
+    1.57 to 1.60."""
+    world = _from(xebec_in_50)
+    _on_the_bad_hand(world)
+    world.run(20)
+    _shift_the_wind(world, -8.0)
+    world.run(40)
+    n0 = len(world.log.all())
+    _shift_the_wind(world, 8.0)
+    world.run(240)
+    said = _warned(_after(world, n0), "main.lateen_yard")
+    dire = [e for e in said if e.data["ratio"] > strain.CARRY_AWAY_RATIO]
+    assert dire and "lying on the mast; she will carry it away" in dire[0].text, [
+        e.text for e in said
+    ]

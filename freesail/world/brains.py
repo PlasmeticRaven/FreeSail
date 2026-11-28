@@ -49,6 +49,7 @@ from freesail.world.ships import PLAYER_ID
 
 __all__ = [
     "AT_ANCHOR_LEAST_S",
+    "AT_ANCHOR_MOST_S",
     "FAR_DETAIL_STATES",
     "HAIL_REACH_M",
     "IN_PORT_WAIT_S",
@@ -71,11 +72,20 @@ __all__ = [
 # only what she does. Her business in port is a wait (`IN_PORT_WAIT_S`: a tide and a day's
 # dealing, judgement; the small economy is 43b's), her anchorage in shelter is kept until
 # the weather clears by day and `AT_ANCHOR_LEAST_S` has passed (judgement: an hour, so that
-# a clearing of a minute does not weigh her). The player's ship is a sail to her under the
+# a clearing of a minute does not weigh her), and a weigh that leaves her at anchor is tried
+# again only when as long again has passed. The player's ship is a sail to her under the
 # id `PLAYER_ID`, her colours taken as shown (a King's ship wears them; a merchantman
 # shows them when asked, and nothing of the player's models his colours yet).
 IN_PORT_WAIT_S = 12 * 3600
 AT_ANCHOR_LEAST_S = 3600
+# The tick of her last weigh from an anchorage, in her captain's business (`FarCaptain._work`),
+# and how many weighs in a row have left her riding where she lay (`WEIGH_TRIES`). Each such
+# weigh doubles the wait before the next, from `AT_ANCHOR_LEAST_S` to `AT_ANCHOR_MOST_S`
+# (JUDGEMENT: a day; a master who cannot get away waits on a change of wind or tide, and is
+# not asked every hour for ever: an hour, two, four, eight, sixteen, then a day).
+WEIGHED = "weighed"
+WEIGH_TRIES = "weigh_tries"
+AT_ANCHOR_MOST_S = 24 * 3600
 # The states the far-detail body resolves without a brain (spec M6 §4; package 40): on
 # passage is her plan, hove to is no way. A vessel with a brain resolves every state.
 FAR_DETAIL_STATES: tuple[str, ...] = ("on passage", "hove to for weather", "in company")
@@ -139,6 +149,14 @@ def perceive_vessel(world: Any, vessel: Any, brain: Any = None) -> Perception:
             p.reach_nm = float(getattr(best[0], "reach_nm", IN_PORT_NM))
             if p.anchor_down and best[1] <= p.reach_nm:
                 p.in_port = best[0].id
+        if p.anchor_down and not p.in_port and hasattr(ports, "in_port_at"):
+            # the world's own rule (`Ports.in_port_at`): within the port's reach of its roads,
+            # its anchorage or its mooring. A ship come to at the Havre's Little Road (three
+            # miles inside the Great Road), at Torbay's or at Poole's anchorage is in port, and
+            # does her business there, where she had ridden at it still "on passage"
+            lying = ports.in_port_at(here)
+            if lying is not None:
+                p.in_port = lying.id
     spoken = brain.spoken_ids if brain is not None else set()
     glass_for = brain._stranger if brain is not None else None
     p.strangers = world.vessels.strangers_of(world, vessel, spoken, glass_for)
@@ -515,12 +533,39 @@ class FarCaptain(Judgement):
         except ValueError as e:
             self.vessel.warning = f"cannot lay the plan for {self.intent.words}: {e}"
             legs = []
+        if self._departing:
+            legs = self._weighed_from(legs)
         plan = _plan_of_legs(legs)
         self.vessel.plan = plan
         self.vessel.cycle = False
         self.vessel.saved_plan = None
         self.vessel.tack = 0.0
         self.planned = True
+
+    def _weighed_from(self, legs: list[Leg]) -> list[Leg]:
+        """The legs out of the port she weighs from. Every port's track to sea begins at its
+        anchorage (the Havre's at the Little Road, beyond the port's reach of its Great
+        Road): where she lies at it, it is where she is, not a mark to anchor at, and it is
+        left out, it alone (a passage laid later, home to that port, anchors her there).
+        Where it was the only anchorage of the legs, the destination's is laid at their end,
+        as the planner lays it when the tracks give none (`Planner.legs_for`), so that she
+        comes to in the port she is bound for and does not end her voyage off it."""
+        first = legs[0] if legs else None
+        if first is None or first.kind != "anchorage" or first.port != self._departing:
+            return legs
+        _, off = bearing_and_distance(self.vessel.position, first.position)
+        if off / units.NAUTICAL_MILE > first.reached_nm:
+            return legs
+        out = legs[1:]
+        if any(leg.kind == "anchorage" for leg in out):
+            return out
+        intent = self.intent
+        if intent is None or intent.kind in ("station", "fish"):
+            return out
+        port = Planner(self.world)._port(intent.destination)
+        if port is not None:
+            out.append(Leg(port.anchorage.name, port.anchorage.position, "anchorage", 0.5, port.id))
+        return out
 
     def _station_mark(self) -> Position | None:
         if not self._stationed():
@@ -662,10 +707,19 @@ class FarCaptain(Judgement):
             # detour keeps the chase leg of the mark it entered with, as it did
             self._take_mark(p)
         elif state == "at anchor":
-            since = self._state_entered or 0
+            # the hour at anchor counted from her coming to it, or from a weigh that left her
+            # riding there still (a plan that anchors her where she lies is not laid again
+            # every minute of the day)
+            entered = self._state_entered or 0
+            weighed = int(self._business.get(WEIGHED, 0))
+            # the weighs that left her riding here, counted afresh when she comes to anew
+            tries = int(self._business.get(WEIGH_TRIES, 0)) if weighed >= entered else 0
+            wait = min(AT_ANCHOR_LEAST_S * 2**tries, AT_ANCHOR_MOST_S)
             clear = p.visibility not in ("a mile", "a cable")
-            if clear and p.daylight == "day" and p.tick - since >= AT_ANCHOR_LEAST_S:
-                self._weigh()
+            if clear and p.daylight == "day" and p.tick - max(entered, weighed) >= wait:
+                if self._weigh():
+                    self._business[WEIGHED] = p.tick
+                    self._business[WEIGH_TRIES] = tries + 1
         elif state == "in port":
             self._in_port(p)
 
@@ -799,18 +853,21 @@ class FarCaptain(Judgement):
         if other_id != players_id(self.world) and hasattr(vessels, "spoke"):
             vessels.spoke(self.vessel, other_id)
 
-    def _weigh(self) -> None:
-        """Under way again from an anchorage: the plan taken up (`under way` fires next)."""
+    def _weigh(self) -> bool:
+        """Under way again from an anchorage: the plan taken up (`under way` fires next).
+        Returns whether her passage was laid afresh for it (no plan saved to take up)."""
         v = self.vessel
         if v.saved_plan is not None:
             v.plan = list(v.saved_plan)
             v.saved_plan = None
         else:
             v.plan = []
-        if not v.plan:
+        laid = not v.plan
+        if laid:
             self.planned = False
             self._plan()
         v.tack = 0.0
+        return laid
 
     def _in_port(self, p: Perception) -> None:
         """The business in port: the voyage's end (a passage, a letter or a run home

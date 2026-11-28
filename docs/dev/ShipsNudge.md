@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 05:50 UTC (THE VIEWER'S HASH IS NOT PASSED though the drawing is sound: outline moves not declared (the sprit topsails off 60 degrees, ringtails and storm staysails once bent), three pins that cannot fail, the foot's sag spike on a ringtail, the launch's lug; one small list, one hash). Nudge number: 93.
+Latest note: 2026-11-28, 15:30 UTC (THE VIEWER'S THREE RULES ARE AT MY GATE, staged, a cloud run and a reader on them; yes, show the owner the fore braces of the 74, the 64 and the razee with the three-decker). Nudge number: 101.
