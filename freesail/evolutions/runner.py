@@ -276,6 +276,10 @@ TURN_WAIT_SEVERITY = "routine"
 # out of its memory of a recurring kind's last words (`World.record`), so that "not hands enough
 # for all at once" said twice with a turn-wait between is routine the second time, as before.
 TURN_WAIT = "turn_wait"
+# Her coming to: the work a box given while it is in hand or waiting waits behind (`Runner.start`),
+# and the mark such a box carries (`Runner._box_not_wanted`; the lead's ruling at nudge 86).
+COMING_TO = ("heave_to", "lie_a_try")
+BOX_BEHIND_COMING_TO = "box_behind_coming_to"
 # The groups of the orders being given whose wait for their turn is said already, by (the order,
 # the group), with the works they wait behind and the note that says it (`Runner._group_turn_wait`);
 # in the runner's `__dict__` from the order to the next tick only.
@@ -492,6 +496,17 @@ class Runner:
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
+        if evo.id == "box_off" and any(i.evo.id in COMING_TO for i in self.instances):
+            # given while she comes to: it waits its turn as before, and begins if her heave-to or
+            # lie a-try fails, which it saves her from as it did; where she comes to, it is
+            # belayed then, said so, and the hands piped down (`_box_not_wanted`; the lead's
+            # ruling at nudge 86, where the third pass refused it at the order, nudge 77, item 3).
+            # Where she has no head yards it can never be done: refused at the order with that
+            from freesail.evolutions.scripts import head_and_after_yards
+
+            if not head_and_after_yards(ship)[0]:
+                raise OrderError("She has no head yards to brace abox.")
+            inst.params[BOX_BEHIND_COMING_TO] = True
         blockers = [
             other
             for other in self.instances
@@ -1344,7 +1359,9 @@ class Runner:
                 continue
             reason = self._failing_condition(ship, inst, inst.evo.preconditions + inst.evo.requires)
             if reason is not None:
-                if inst.done_already:
+                if inst.params.get(BOX_BEHIND_COMING_TO) and "hove_to" in ship.extra:
+                    self._box_not_wanted(ship, inst)
+                elif inst.done_already:
                     self._done_already(ship, inst, reason)
                 elif inst.evo.on_refused is not None:
                     self._refused(ship, inst, reason)
@@ -1495,6 +1512,19 @@ class Runner:
         key = inst.params.get("log_group")
         if key:
             self._group_done(ship, inst, key)
+        self._after_all_hands(ship, inst)
+
+    def _box_not_wanted(self, ship: Ship, inst: Instance) -> None:
+        """A box given while she came to, its turn come with her hove to (the lead's ruling at
+        nudge 86): belayed, and said so in the belay's words, where it began and failed ("Could
+        not box her off: She is hove to; fill away first, or wear."), with all hands kept up for
+        it to the end. Waiting, it kept the hands up when her heave-to or lie a-try ended (all
+        hands work waiting its turn counts, `_after_all_hands`); belayed, its call ends, and they
+        are piped down as that end would have piped them."""
+        belayed = self.belay(ship, [inst])
+        words = f"Belayed {self._doing(inst)}: she is hove to."
+        ship.note("notable", "work.belayed", words, inst.subject_id, {"belayed": belayed})
+        inst.held_up = inst.held_up or self._want(inst).all_hands
         self._after_all_hands(ship, inst)
 
     def _done_already(self, ship: Ship, inst: Instance, reason: str) -> None:

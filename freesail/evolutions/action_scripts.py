@@ -146,11 +146,16 @@ def _boats_cleared_words(ship: Ship) -> str:
     astern on their painters where her file tows them (a boat's `towed`), and the ship clear.
     No boat is hoisted out by clearing for action, and none was: the line said "The boats are
     out and towing astern" of every ship, her boats on the booms all the while, where a shot
-    may stave them (`combat.hits`). A ship with no boats is clear."""
+    may stave them (`combat.hits`). A ship with no boats is clear. Her boat lost (swamped, cut
+    adrift, or stove by a shot as she towed: package 90, the lead's nudges 77 and 80) is said
+    lost by her file's name, and not griped fast nor towing."""
     spec = getattr(ship, "spec", None)
     if getattr(spec, "oars", None) is not None:
         return "The boat is clear."  # a boat's own clearing: she carries no boats of her own
     boats = list(getattr(spec, "boats", None) or [])
+    lost = _lost_boat(ship)
+    if lost is not None:
+        boats = [b for b in boats if b.id != lost.id]
     towed = [b for b in boats if getattr(b, "towed", False)]
     booms = [b for b in boats if not getattr(b, "towed", False)]
     said: list[str] = []
@@ -166,10 +171,25 @@ def _boats_cleared_words(ship: Ship) -> str:
             if len(towed) == 1
             else "the boats towing astern on their painters"
         )
+    if lost is not None:
+        said.append(f"{lost.name} lost")
     if not said:
         return "The ship is clear."
     head = "; ".join(said)
     return f"{head[:1].upper()}{head[1:]}; the ship is clear."
+
+
+def _lost_boat(ship: Ship) -> Any:
+    """Her boat lost, her file's entry for it, or None (package 90, the lead's nudge 77, item 1:
+    the ship's `BoatState.lost`, through the World her standing runtime holds)."""
+    from freesail.evolutions.scripts import _world_of
+
+    if not isinstance(getattr(ship, "extra", None), dict):
+        return None  # a ship alone, with no World about her (truth 7-786's)
+    dealings = getattr(_world_of(ship), "dealings", None)
+    if dealings is None or not dealings.boat.lost:
+        return None
+    return dealings.boat_spec()
 
 
 def _crews_present_share(ship: Ship) -> float:
