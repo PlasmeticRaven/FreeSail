@@ -76,3 +76,180 @@ tartane, whose topsail clears her lateen's yard by 0.03 m, not 1.11 m. It moves 
 files. The viewer keeps the engine's arithmetic so that the two read every pole alike.
 
 I carry on with the tiers on one hash for V1 and V2, and write them here when they are done.
+
+## 2026-11-28: the hash for V1 and V2, with V1's mend: 20aca5e
+
+**The reported hash is 20aca5e**, tiered whole on that exact hash (below). It is V1 and V2 as one
+hash, without V3, on the lead's terms of nudge 88. It carries the package's branch merged three
+times, each docs only, at 6c29d1d, ef5a9dd and a027600. The commits:
+
+| Commit | What |
+|---|---|
+| e0cba7d | V1: the whole lateen drawn as its own |
+| 24d239a | V2: the pole mast, and a yard below that does not stand |
+| 427ca81 | the notes: V1 and V2 measured old beside new |
+| 0000168 | this report: V1 and V2 built, V3 stopped, the questions |
+| c28eeee | merge of `claude/pkg-90` at 6c29d1d (docs only) |
+| 450108d | the notes: the owner's fixed frame, its figures on the page, the lead's rulings of nudge 88 |
+| 1c27d37 | merge of `claude/pkg-90` at ef5a9dd (docs only) |
+| fe22edd | V1's mend: each edge of a sail bellied by its own length (the owner's note T-v2) |
+| 20aca5e | merge of `claude/pkg-90` at a027600 (docs only) |
+
+Every commit's author is as the cloud gives it. My commits changed only `client/projection.js`,
+`tests/test_view_geometry.py`, `docs/dev/TuningNotes.md` and this report; the merges bring the
+package's docs alone. The figures,
+old beside new, are in the notes' section "Package 90, the viewer".
+
+### V1: the whole lateen (`client/projection.js`)
+
+- **Keyed** as A1a keys it: `wholeLateen`, a lateen with `dipping`, not cut at the mast. No
+  committed file carries one.
+- **Its cut and yard** (`lateenCorners`, `lateenCut`):
+  - three corners on its yard, from the file's cut;
+  - the yard drawn whole from car to penne, slung a third of its length from the car where the
+    head crosses the yard's filed height, on the mast's raked line;
+  - a mast's half-diameter to the side the game serves it hanging (`lug_side`);
+  - the whole cut swung about its slings by its sheet.
+- **Its cloth**: to the lee of the tack on either hand, so against its mast on the bad hand; to
+  windward when served `backed` (A1d).
+- **Its placement** (`placeSpars`'s whole-lateen branch, before the lug's): aloft in every state.
+  - Brailed up under its yard in its gear; a bundle along its head furled.
+  - Peaked up its mast's raked line, abaft the mast, while `change_lateen` is in hand on it
+    (`shifting`).
+- **Its sheet**: to her rail on the side its cloth lies on, two metres abaft its clew.
+- **Filed with no cut** (the probes): cut from its yard and its area.
+- **The frame**: reaches its swing every way at its heights, and its yard peaked (`framePts`).
+- **On her great lateen, old beside new:**
+  - before, the yard was drawn as the head alone (23.63 m), it lay on deck in the gear and
+    furled, and on the bad hand its cloth swung to windward;
+  - now the yard is the file's 24.36 m, aloft in every state, and on the bad hand the cloth lies
+    to leeward against the mast.
+
+### V2: the pole mast, and the yard below that does not stand
+
+- **The cause, mended where it lives** (`standsBelow`): a yard below is taken only where it
+  stands, aloft, neither sent down nor on deck with its flying sail. It is read in the four places
+  that choose a yard below:
+  - the clews, `squareCut`;
+  - the sheets, `yardBelow`;
+  - a hoisting yard's reefed height;
+  - where a pole's yard is lowered to.
+- **The pole** (`poleYard`, mirroring `Ship.on_pole` with the engine's arithmetic): its upper
+  yards drawn down onto the yard below, or to the hounds, while their sails are not set; halfway
+  in `lower_and_clew_up`. A pole is drawn with no doubling.
+- **The tartane's topsail**: its loose foot is square with its own yard in her report's three
+  §14.2 states. It is 9.35 m broad, its clews 8.09 m over her water, as her builder measured in
+  scratch. Before, it was 90° askew before the wind and 26° by the wind braced 64; with the tréou
+  set, unchanged.
+- **The smack's topsail yard** lies on her square-sail yard, 11.15 m over her water against 14.35
+  m, whenever her topsail is not set, her start and plain sail among them; halfway, 12.75 m, in the
+  lowering. This is the plan's one expected move (§6, §10.4), measured; her frame and scale are
+  unmoved.
+
+### V1's mend: each edge's belly by its own length (the owner's note T-v2, at the live look)
+
+- **The cause.** A sail's belly was reckoned once for the whole sail and laid on every curved edge
+  whatever its length. The whole lateen's 0.30 m luff at its car took the sail's whole belly and
+  stood out a thin tongue: 2.56 m off its chord on her great lateen, 1.65 m on her mizen.
+- **Mended where the belly is laid** (`edgeControl`), in the four-cornered sails' path
+  (`quadSail`: square, gaff, lug, settee, lateen), the jib's and the goose-winged. No edge bellies
+  more than `BELLY` of its own length; an edge as long as the length the belly is reckoned by is
+  drawn as before. Her luffs now stand 0.04 m off their chords.
+- **The same cause elsewhere**, found by measuring every committed file with every sail set. The
+  outlines of sails on **15 of the 19 committed files move**, declared old beside new in the notes'
+  table. The largest are:
+  - the bilander's settee luff, 1.35 m off a 1.81 m luff, the same tongue as the lateen's, now
+    0.22 m;
+  - her jib's leech, 1.22 to 0.66 m;
+  - the hermaphrodite brig's main topmast staysail, 1.16 to 0.67 m;
+  - the 64's, the razee's and the 74's main staysails, about 0.4 m less;
+  - the boats' lug luffs, about 0.15 m less;
+  - the lugger's mizen lug's foot, 1.02 to 0.85 m.
+- **What does not move:** the rest are a few centimetres. The cutter, the smack and the two
+  schooners do not move. On every file no corner, spar, line, frame or view's bounds moves,
+  measured at eight facings and four heels. **These moves lie outside the card's named moves.**
+  They are built in this hash at the coordinating session's word ("mend it at its cause, in the
+  hash you send now") and are declared for the lead's reading.
+
+### The frame: the owner's choice
+
+The owner chose **(a), the fixed frame**, at a live look on 2026-11-28
+(Decisions-Package90-2026-11.md Part F, row T-f). The frame holds every state's figures, the peaked
+yard among them; the reason put to them was that by her default practice she shifts at every tack
+and wear. Measured on the page (`shipview.js`'s box, abeam): 35.80 × 25.27 m before, 36.89 × 33.54 m
+now. So where the page's width sets her scale she is drawn 3 per cent smaller, and where its height
+does, about 25 per cent. The coordinating session's preview with the peak left out showed her scale
+unchanged because its view was set by its width, which the swing, not the peak, moves. Leaving the
+peak out is `framePts` alone, which takes the height back to 19.23 m. No committed file's frame
+moves.
+
+### Pins moved, old beside new
+
+**None.** One docstring's words changed, with its name and assertions kept:
+`test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward` takes a lateen with
+neither key. No threshold of `tests/test_pictures.py` moved, and that file is untouched.
+
+**New cases: 71 in `tests/test_view_geometry.py`.** V1 has 24, V2 19 and the edge's belly 28;
+none of the base's cases was removed or renamed (collected both ways). Run on the code before
+them:
+- V1's and V2's 43, on 93cf624c's projection: 32 fail and 11 pass. The 11 hold what was drawn so
+  before: the unswung cut, the aback side, four of the frame's six facings, the pole as one stick,
+  the topsail set aloft, and the clews to a yard below that stands.
+- The belly's 28, on V2's: 17 fail and 11 pass, the 11 being files with no short edge drawn
+  whole.
+
+### Taken as judgement
+
+- The peaked pose: the yard up the mast's raked line, a mast's half-diameter abaft it, slung
+  where it was, raised only to keep its car `ON_DECK_M` over the deck.
+- The whole lateen's sheet two metres abaft its clew, as any single sheet.
+- The cut made for a whole lateen filed with none: `LATEEN_TILT`, the clew a loose foot's height
+  over the deck by its area.
+- A pole's yard lowered `YARD_ON_CAP_M` over the yard below, or over the hounds: the filed height
+  of the highest yard below on its mast, of any class.
+- Halfway in `lower_and_clew_up`.
+- The edge's cap at `BELLY` of its own length.
+
+### V3 and V4
+
+On the lead's ruling (nudge 88), V3 waits for the engine's served step. That step serves each towed
+boat (`towed`, her length, whether she is in tow now) and a whole lateen's change inside a
+manoeuvre, a key served only while it is in hand. The viewer then draws both in the hash with V3
+and V4, after that step and A9. Until then a manoeuvre's lateens being shifted are drawn brailed
+under their yards aloft. The engine's `_square_foot_m` is mended in the same step, and the viewer
+follows its arithmetic.
+
+### The tests on 20aca5e
+
+Every run is on the exact hash, with `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist
+loadgroup"`.
+
+- **The fast tier, whole, compared test by test with the base's** (93cf624c; junit both ways):
+  - on 20aca5e, 9,269 cases: 9,260 passed, 8 skipped, 1 xfailed;
+  - on the base, 9,198 cases: 9,189 passed, 8 skipped, 1 xfailed.
+  - No case changed its outcome and none is gone. The 71 new cases are the view geometry's, and
+    all pass.
+- **The slow tier of the files the steps reach, with `--slow`**: 1,327 cases, all passed.
+  - `tests/test_view_geometry.py` whole: 1,174 cases, none of them slow.
+  - `tests/test_pictures.py` whole, 2, and `tests/test_flag_drawings.py` whole, 27: none of them
+    slow.
+  - `tests/test_browser_probe.py`: the 12 browser plans, every one. They are a-letter, action,
+    ashore, asleep, boat-and-visitor, deck-and-below, dressed, prisoner, seated-officer, seated,
+    signals and under-way.
+  - `tests/test_harbour.py` whole, 50, with its 3 slow among them: the maker's save in the
+    player's place, the API door started from the harbour, and the four scenarios' round trip in
+    the browser.
+  - `tests/test_server.py` whole, 61, with its 2 slow: the frigate's snapshot through state
+    changes, and the clock eased on station.
+  - No harbour or browser test failed in these runs. No loader was patched.
+- **The merged base's practice tests**: `tests/test_practice.py` on a027600, in a detached
+  worktree, 25 passed. It is the one test that reads the docs the merges changed, and it has no slow
+  case.
+- **The file rules**:
+  - ruff clean on the whole tree;
+  - no Python line over 100 characters;
+  - `git diff 93cf624c..20aca5e | tr -cd '\r' | wc -c` is 0;
+  - the view geometry's ids collected on the base and on this hash: 1,103 against 1,174, 71 added,
+    none removed or renamed.
+
+That is the hash. I stop here and wait for the lead's word; nothing more is pushed until it comes.
