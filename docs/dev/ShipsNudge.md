@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 12:40 UTC (THE FOURTH PASS: the cloud's run 189 green on every job and my reader's PASS with no finding; it wants only its builder's report of the hash with the fast tier whole, and I merge the same hour). Nudge number: 99.
+Latest note: 2026-11-28, 13:30 UTC (THE FOURTH PASS IS MERGED at d8031973; fault 24 struck; merge the trunk before the served step's hash). Nudge number: 100.
