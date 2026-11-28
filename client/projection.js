@@ -104,7 +104,9 @@
   var HOISTED_STATES = { set: 1, goose_winged: 1, blown_out: 1, wrecked: 1 };
   // the steps of the square sail's evolutions that move its yard (data/evolutions/*_square.yaml):
   // hoisting or settling the halyards, halfway; reefing or shaking out, down on the cap
-  var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0 };
+  // and a pole's upper yard let go and lowered onto the yard below as its sail is clewed up there
+  // (package 90, V2: take_in_pole.yaml's and furl_pole.yaml's step), halfway
+  var STEP_HOIST = { hoist: 0.5, settle_halyards: 0.5, clew_down: 0.5, reef: 0, shake_out: 0, lower_and_clew_up: 0.5 };
   // Package 57 (the owner's notes 4 and 5 of the Éclair's first cruise; the lead's finding
   // of 18:29). A square yard is slung before its mast, the sail hanging before the yard, so
   // that from ahead the sail hides the mast and from astern the mast hides the sail: the
@@ -779,6 +781,72 @@
     function onCap(spec) {
       return spec.class === "yard" && sparState(spec.id) === "sent_down" && (sparSpecs[spec.parent] || {}).class === "topmast";
     }
+    /** Package 90 (V2; A6; docs/design/Design-Ship-Polacre.md §5.1, §13): the yards above the
+     *  lowest on a pole mast, the mast and topmast in one stick, read from the parts as filed as
+     *  the engine reads them (`Ship.on_pole`, `Ship.is_pole_mast`, `Ship.yard_level`): a yard on a
+     *  lower mast with no topmast stepped on it, above another yard on that mast by the file's
+     *  heights and order, or with no yard below it set over a lateen yard on the mast, its sail's
+     *  foot above that yard (the engine's own arithmetic, `_square_foot_m`). The smack's topsail
+     *  yard is the one committed. A pole is drawn as the one spar it is filed, with no doubling. */
+    var poleYard = {};
+    (function () {
+      var yards = graph.spars.filter(function (s) {
+        return s.class === "yard";
+      });
+      var levels = ["mast", "topmast", "topgallant_mast", "royal_mast"];
+      yards.forEach(function (y, order) {
+        var root = sparSpecs[chainTop(y)];
+        var mast = sparSpecs[y.parent];
+        if (!root || !mast || mast.class !== "mast" || mast.parent) return;
+        var stepped = graph.spars.some(function (s) {
+          return s.parent === mast.id && s.class === "topmast";
+        });
+        if (stepped) return;
+        var level = Math.max(levels.indexOf(mast.class), 0);
+        yards.forEach(function (o, i) {
+          var oh = o.height_m || 0, yh = y.height_m || 0;
+          if (o.parent === y.parent && (oh < yh || (oh === yh && i < order))) level += 1;
+        });
+        if (level === 0) {
+          var sq = squareSailOn(y.id);
+          var foot = sq ? 2 * (sq.centre_height_m || 0) - (y.height_m || 0) : null;
+          graph.spars.forEach(function (lat) {
+            if (level || foot === null || lat.class !== "lateen_yard" || chainTop(lat) !== root.id) return;
+            var ls = (sailsBySpar[lat.id] || []).filter(function (s) {
+              return (s.roles || {}).yard === lat.id;
+            })[0];
+            var lh = lat.height_m || 0;
+            if (ls && ls.class === "lateen" && !ls.cut_at_mast && lh < (y.height_m || 0) && foot > lh) level = 1;
+          });
+        }
+        if (level > 0) poleYard[y.id] = true;
+      });
+    })();
+    /** Whether the yard below stands to take a sail's clews or a yard lowered onto it: aloft, not
+     *  sent down nor on deck with its flying sail (package 90, V2: the tartane's tréou's yard in
+     *  her plain sail, served `sound` and drawn on deck, `yardOnDeck`). A yard below that does not
+     *  stand is no yard below: the sail over it hangs from its own yard, loose-footed along it,
+     *  as every square sail with no yard below does, and its sheets come down to the side. */
+    function standsBelow(B) {
+      return !!(B && B.arm && !sentDown(B) && !B.onDeck);
+    }
+    /** Where a pole's upper yard is lowered to (package 90, V2; A6's `take_in_pole`, "amener en
+     *  paquet", Lescallier 1791 p. 371): onto the yard below where that stands (`resolve`d), its
+     *  slings a little above that yard's (YARD_ON_CAP_M); where none stands, down to the hounds,
+     *  at the height the file gives the highest yard below it on its mast, of any class (the
+     *  tartane's tréou's, swayed up to the hounds, and her lateen's slings; the polacre's mizen
+     *  lateen's), as the engine's words say ("down to the hounds"). */
+    function poleLowered(spec, resolve) {
+      var belowId = yardBelowId[spec.id];
+      var B = belowId ? resolve(belowId) : null;
+      if (standsBelow(B)) return B.centre[2] + YARD_ON_CAP_M;
+      var hounds = null;
+      graph.spars.forEach(function (s) {
+        if (s === spec || s.parent !== spec.parent || !YARD_CLASSES[s.class]) return;
+        if ((s.height_m || 0) < (spec.height_m || 0) && (hounds === null || s.height_m > hounds)) hounds = s.height_m || 0;
+      });
+      return deck + (hounds === null ? spec.height_m || 0 : hounds) + YARD_ON_CAP_M;
+    }
     /** How far up a hoisting yard is: 1 at its hoist, 0 lowered, a half while the halyards
      *  are worked (STEP_HOIST). */
     function hoistFraction(spec) {
@@ -997,15 +1065,22 @@
           // what the reefs take out above the yard below
           var z = deck + H;
           r.hoist = 1;
-          if (where && parent && parent.parent && (onCap(spec) || hoists(spec))) {
-            var lowered = parent.parent.head[2] + YARD_ON_CAP_M;
+          // package 90 (V2; A6): a pole's upper yard is lowered as a topmast's is, onto the yard
+          // below or down to the hounds (`poleLowered`) while its sail is not set; a pole yard with
+          // no square sail bent stands where it is filed
+          var pole = !!(where && parent && poleYard[id] && squareSailOn(id));
+          if (poleYard[id]) r.onPole = true;
+          if (where && parent && ((parent.parent && (onCap(spec) || hoists(spec))) || pole)) {
+            var lowered = pole ? poleLowered(spec, resolve) : parent.parent.head[2] + YARD_ON_CAP_M;
             var hoisted = z;
             var sailOn = squareSailOn(id);
             var belowId = yardBelowId[id];
             var bare = bareFoot(spec);
             if (sailOn && !onCap(spec)) {
               var rf = reefFraction(sailOn, sailDyn(sailOn));
-              if (belowId) {
+              // the yard below where it stands (package 90, V2: not one on deck with its flying
+              // sail, which the sail's reefs are not taken out above)
+              if (belowId && standsBelow(resolve(belowId))) {
                 var below = resolve(belowId);
                 var gap = z - (deck + (sparSpecs[belowId].height_m || 0));
                 hoisted = below.centre[2] + gap * rf;
@@ -1530,7 +1605,8 @@
       var belowId = yardBelowId[Y.id];
       var B = belowId ? spars[belowId] : null;
       var gap = belowId ? (Y.spec.height_m || 0) - (sparSpecs[belowId].height_m || 0) : 0;
-      if (B && B.arm && !sentDown(B) && gap > 0.5) {
+      // package 90 (V2): only a yard below that stands takes the clews (`standsBelow`)
+      if (standsBelow(B) && gap > 0.5) {
         var along = underBowsprit(Y.spec) ? len(sub(Y.centre, B.centre)) : gap;
         var foot = CLEW_SPREAD * B.half * 2;
         var head = Math.min(Math.max((2 * spec.area_m2) / along - foot, 0.5 * L), L);
@@ -1947,7 +2023,7 @@
     function yardBelow(Y) {
       var id = yardBelowId[Y.id];
       var B = id ? spars[id] : null;
-      return B && B.arm && !sentDown(B) ? B : null;
+      return standsBelow(B) ? B : null; // package 90 (V2): not one on deck with its flying sail
     }
 
     graph.lines.forEach(function (ln) {
