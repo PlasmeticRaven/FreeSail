@@ -37,8 +37,9 @@ SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
 # marines and her flag party: Design-Ship-Bellerophon.md §6.3, §17.0), held in tests/
 # test_bellerophon.py (old: every file on the shelf)
 # the files whose bills carry the marines: the 74's since her step 4, the 64's and the razee's since
-# the lead's answer of 2026-11-10 at 19:30 (B1's module)
-KEYED_FILES = ("seventy-four.yaml", "sixty-four.yaml", "razee-44.yaml")
+# the lead's answer of 2026-11-10 at 19:30 (B1's module); the Concepción's since her landing, her
+# 225 soldiers kept in their division, and no flag party (package 90, Con-D §6.3; old: the three)
+KEYED_FILES = ("seventy-four.yaml", "sixty-four.yaml", "razee-44.yaml", "three-decker.yaml")
 KEYLESS_FILES = [p for p in SHIP_FILES if p.name not in KEYED_FILES]
 # the pickled states' keys before the stage, in their order
 BILL_STATE = ["trimmers", "helm", "powder", "priority", "small_arms", "boarders", "filling"]
@@ -149,10 +150,13 @@ def test_a_bills_marines_below_nought_or_beyond_her_marines_are_refused_in_words
 # -- a fit's own marines (package 75, B1: the lead's ruling (4) of 2026-11-13) ----------------
 
 RAZEE = ROOT / "data" / "ships" / "razee-44.yaml"
-# the files whose fits give their own marines, and the figure each fit gives
+# the files whose fits give their own marines, and the figure each fit gives; the Concepción's 1809
+# fit since her landing, 197 of her 225 soldiers in their division (package 90, Con-D §6.3; old: the
+# 64's and the razee's)
 FIT_MARINES = {
     "sixty-four.yaml": {"ardent class 1794": 68},
     "razee-44.yaml": {"as razeed 1795": 38},
+    "three-decker.yaml": {"concepcion 1809": 197},
 }
 # a fit's pickled state's keys before B1's key, in their order
 FIT_STATE = [

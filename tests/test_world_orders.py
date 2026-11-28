@@ -95,10 +95,12 @@ def test_each_channel_is_carried_out_in_words_and_a_bad_one_refused_in_words():
     for text, words in (
         ("port nowhere: closed to France", "no port of the world"),
         # package 75 (Design-Ship-Bellerophon.md §8.2): "a ship of the line" names the 74's
-        # description now (old: 'ship: a ship of the line "Victory" ...' refused); the Victory
-        # was a first rate, which names none
+        # description now (old: 'ship: a ship of the line "Victory" ...' refused); package 90
+        # (Design-Ship-PurisimaConcepcion.md §8.2): "a first rate" names the three-decker's since
+        # her landing (old: 'ship: a first rate "Victory" ...' refused, this example); a bomb
+        # vessel names none
         (
-            'ship: a first rate "Victory" of Britain at the Iroise, bound for Brest',
+            'ship: a bomb vessel "Thunder" of Britain at the Iroise, bound for Brest',
             "no description",
         ),
         ('ship "Nobody": running home to Brest', "No ship named"),

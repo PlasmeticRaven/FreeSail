@@ -525,7 +525,7 @@ STEEL_HEADSAILS = {
     }.items()
 }
 # The staysails between the masts in the same column: its row in words, its figures (the cloths at
-# the head and the foot, the bunt and the after leech in yards) x 1.15, and Steel's area by his
+# the head and the foot, the bunt and the after leech in yards) x 1.15, and Steel's area by Steel's
 # rule for the canvas x 1.32, with the 74's band (Bel-D §4.4).
 AREA_SCALE = RIG_SCALE * RIG_SCALE
 STEEL_BETWEEN = {
@@ -660,13 +660,15 @@ HULL_NOTES = {
     "gm_m": "JUDGEMENT: the 74's 1.36 m (the Bombay Castle's, Steel 1805 p. 141) raised for a "
     "broad ship (James vol. 1 pp. 29-30: Spain built her ships broader than any other nation's, "
     "for safety), to be tuned against the 74's heel (Con-D §2).",
-    "clr_x_m": "Tuned with her rig whole against her helm and her tack (Con-D §9), in the 74's "
-    "forms of truths 6 and 17 (her design's start, 5.7 m, the 74's lead over her length): 6.3 m, "
-    "the most weather helm that holds truth 17's form getting under way by a margin, as the 74's "
-    "4.8 was chosen; at 7.0 and over she is taken aback from rest. Her helm then near the 74's: "
-    "0.53 deg of weather helm on the beam (the 74's 0.39), 0.70 of lee helm six points off "
-    "(0.97). Measured, old beside new, in docs/dev/TuningNotes.md, 'Package 90, the Purísima "
-    "Concepción'.",
+    "clr_x_m": "6.3 m, a tuned figure and not her plan's (the lead's nudge 97): tuned with her rig "
+    "whole against her helm and her tack (Con-D §9), in the 74's forms of truths 6 and 17. At her "
+    "design's start, 5.7 m, the 74's lead over her length, her helm stood under the 74's: 0.13 "
+    "deg of weather helm on the beam against the 74's 0.39, 1.46 of lee helm six points off "
+    "against 0.97, and at 35 deg of rudder she stayed quicker than the 74. 6.3 m is the most "
+    "weather helm that holds truth 17's form getting under way by a margin, as the 74's 4.8 was "
+    "chosen; at 7.0 and over she is taken aback from rest. Her helm at 6.3: 0.53 deg of weather "
+    "helm on the beam (the 74's 0.39), 0.70 of lee helm six points off (0.97). Measured, old "
+    "beside new, in docs/dev/TuningNotes.md, 'Package 90, the Purísima Concepción'.",
     "lateral_area_m2": "About 473.5 m2 to K and the knee's fore edge, the rudder left out, by the "
     "drawn hulls' method, D29 (b), reckoned to her line as traced (the lead's rulings 2 and 5; "
     "Pages §5.6, §12.1: 475.2 m2 to the straight fit, measured, less the strip between the two "
@@ -679,14 +681,15 @@ HULL_NOTES = {
     "(Pages §5.3); 6.06 m by her note's upper line beside it. The same deck as the 74's 3.16 m and "
     "the 64's 3.22 m by its place, the highest continuous deck, at the waist: the datum of every "
     "spar height and every sail's corners.",
-    "rudder": "PB-039's rudder, accepted as measured (the lead's ruling 5; Pages §5.6, +-5%): 13.3 "
-    "m2 below her line, a span of 8.29 m to its sole on K, 1.03 m broad at the line and 1.88 m at "
-    "the heel; 3 deg/s the 74's (judgement). Its greatest angle 25 deg, the 74's 35 brought in so "
-    "that she stays no quicker than the 74 from truth 10's three headings (her brief; Con-D §9), "
-    "JUDGEMENT, tuned: at 35 deg she stayed in 210 to 223 s against the 74's 237 to 258, at 25 in "
-    "258 to 293; at 22 she misses stays from 295 deg. The engine's tack does not slow with a "
-    "ship's size (Con-D §19), which is the cause; her band against Luce's five to ten minutes is "
-    "the lead's (docs/dev/TuningNotes.md).",
+    "rudder": "PB-039's rudder, its area and span accepted as measured (the lead's ruling 5; "
+    "Pages §5.6, +-5%): 13.3 m2 below her line, a span of 8.29 m to its sole on K, 1.03 m broad "
+    "at the line and 1.88 m at the heel; 3 deg/s the 74's (judgement). Its greatest angle, 25 "
+    "deg, is a tuned figure and not her plan's (the lead's nudge 97): at the 74's 35 she stayed "
+    "from truth 10's three headings in 210 to 223 s, quicker than the 74's 237 to 258, against "
+    "her brief's 'no quicker than the 74's' (Con-D §9); at 25 she stays in 258 to 293, each "
+    "slower than the 74's; at 22 she misses stays from 295 deg, and at 23 in 12 kn. Plainly: her "
+    "tack is quicker than Luce's five to ten minutes, the engine's tack not slowing with a ship's "
+    "size (Con-D §19; the carried fault 30), and is accepted as she is (the lead's nudge 97).",
 }
 
 # ---------------------------------------------------------------------------
@@ -2271,9 +2274,9 @@ CWT = {
     ("carronade", 24): period.ADYE_CARRONADE_CWT[24],
 }
 # The men to a pair (Con-D §5.3): Falconer's for the long guns "when the ship is well manned"
-# (1780, QUARTERS: `period.FALCONER_CREW`), the 36 fourteen between his thirteen for a 32 and
-# fifteen for a 42 and the 8 his 9's six (judgement); an obús Douglas's four for a carronade
-# (1829, art. 136).
+# (1780, QUARTERS: `period.FALCONER_CREW`), the 36 fourteen between Falconer's thirteen for a 32
+# and fifteen for a 42 and the 8 Falconer's 9's six (judgement); an obús Douglas's four for a
+# carronade (1829, art. 136).
 CREW = {
     ("long", 36): 14,
     ("long", 24): period.FALCONER_CREW[24],

@@ -172,6 +172,7 @@ NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2: the Prince 
 BILANDER = "data/ships/bilander.yaml"  # package 75, B4: the bilander
 SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7: the Bellerophon
 DIANA = "data/ships/corvette-20.yaml"  # package 90: the corvette Diana
+CONCEPCION = "data/ships/three-decker.yaml"  # package 90: the three-decker Concepción
 # The files whose driver is Steel's boomsail on a lateen cut at the mast, her boom named by the cut
 # (Ext §17): the 64's since her stage B, and the 74's (package 75, B7)
 LATEEN_DRIVEN = {SIXTY_FOUR, SEVENTY_FOUR}
@@ -1316,7 +1317,10 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # on her rail at her stem, 3.59 m above her water at x +17.31, under her stem head's 5.09 (the
 # lower of the two), her end 8.43 m, 32.13 degrees where her file has her steeved 21.5 from her
 # stem head's top (Dia-D §4.2): the root 1.50 m under that top steeves the drawn spar 10.6 degrees
-# more (for the lead, with `TACK_UP_HER_STAY`).
+# more (for the lead, with `TACK_UP_HER_STAY`). The *Concepción*'s measured at her landing
+# (package 90): her heel on her stem head, 7.68 m above her water at x +31.05, under her rail's
+# 9.63 there, her end 10.6 m over her deck's height, 31.40 degrees, as the 74's spar x 1.15 (old:
+# no row).
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1332,6 +1336,7 @@ BOWSPRIT_DRAWN = {
     BILANDER: (1.270, 28.99),
     SEVENTY_FOUR: (1.235, 31.76),
     DIANA: (2.014, 32.13),
+    CONCEPCION: (1.177, 31.40),
 }
 # The three whose files' ends give no rise from the stem head (the viewer step for the rig's lines,
 # the lead's ruling of 2026-10-31: "rooted at the sheet's height"), metres above her water-line: the
@@ -2099,8 +2104,10 @@ def test_each_gallery_and_band_of_lights_lies_at_its_place(tmp_path, path):
         cut = cut or z_top != zh
         bands.append((max(zl, stern["knuckle_z_m"]), z_top, n, hb))
     # the razee's roundhouse in (B1, 2026-10-29): nothing cut on her two; the frigate's foot is,
-    # and the 74's lower tier's (B7)
-    assert cut == (path in (FRIGATE, SEVENTY_FOUR))
+    # and the 74's lower tier's (B7); and the *Concepción*'s lower two of her three, filed from x
+    # -32.1, at their feet to her stern's line, x -31.29 at 4.95 m and -32.00 at 7.54 (package 90,
+    # measured at her landing; old: the frigate's and the 74's)
+    assert cut == (path in (FRIGATE, SEVENTY_FOUR, CONCEPCION))
     got = run_js(
         tmp_path,
         {"hull": hull},
@@ -2597,7 +2604,9 @@ def test_wales_and_bands_are_drawn_only_on_the_outside_of_the_side(tmp_path, pat
 # quarterdeck's highest port's middle 0.30 m under her rail, her forecastle's and her poop's places
 # 0.31 m over it (measured at her step 4, B7); the *Diana*'s none drawn, her one tier holding her
 # eleven ports cut in the side and the 1817 fit's place over the rail, its middle 0.28 m over it
-# (measured at her landing, package 90: `BAND_UNDRAWN`, a recorded departure)
+# (measured at her landing, package 90: `BAND_UNDRAWN`, a recorded departure); the *Concepción*'s
+# five, her three gun decks' tiers and her quarterdeck's and forecastle's ports cut in her side,
+# none for her poop's places over the rail (measured at her landing, package 90; old: no row)
 TIERS_IN_THE_SIDE = {
     SIXTY_FOUR: {"lower", "upper", "quarterdeck"},
     RAZEE: {"upper", "quarterdeck", "forecastle"},
@@ -2613,6 +2622,7 @@ TIERS_IN_THE_SIDE = {
     BILANDER: {"upper"},
     SEVENTY_FOUR: {"lower", "upper", "quarterdeck"},
     DIANA: set(),  # BAND_UNDRAWN
+    CONCEPCION: {"lower", "middle", "upper", "quarterdeck", "forecastle"},
 }
 
 
@@ -2643,7 +2653,9 @@ def test_each_tier_of_ports_cut_in_the_side_is_drawn_as_a_band(tmp_path, path, b
 # alone (no wale filed), 0.001 m (measured at her landing, B2); the bilander's, her wale's after end
 # at x -10.0 where her round counter turns in, 0.103 m (measured at her review, 2026-11-08, her wale
 # hung 33 px under the drawn rail; 0.250 at her landing, B4, the band 0.17 m lower); the 74's, her
-# main wale's after end at x -13.35, 0.089 m (measured at her step 4, B7)
+# main wale's after end at x -13.35, 0.089 m (measured at her step 4, B7); the *Concepción*'s, her
+# lower tier's band at its after end, x -28.77, beside the closure to her stern, 0.273 m (measured
+# at her landing, package 90, before the viewer's mend of that closure; old: no row)
 CHORD_OFF_THE_SIDE_M = {
     FRIGATE: 0.613,
     RAZEE: 0.109,
@@ -2658,6 +2670,7 @@ CHORD_OFF_THE_SIDE_M = {
     NEUFCHATEL: 0.001,
     BILANDER: 0.103,
     SEVENTY_FOUR: 0.089,
+    CONCEPCION: 9.999,
     DIANA: 0.004,
 }
 BANDS = """
@@ -2886,6 +2899,8 @@ def test_where_a_deck_ends_over_another_a_bulkhead_closes_the_space_between(
         "frigate-36": {("quarterdeck", "fore"), ("forecastle", "aft")},
         "bilander": {("quarterdeck", "fore")},
         "seventy-four": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
+        # package 90, the Concepción's, as the 74's (measured at her landing; old: no row)
+        "three-decker": {("roundhouse", "fore"), ("quarterdeck", "fore"), ("forecastle", "aft")},
     }.get(Path(path).stem, set())
     at = {(f["deck"], "aft" if f["pts"][0][0] == decks[f["deck"]][0][0] else "fore") for f in got}
     assert at == ends and len(got) == len(ends)
@@ -4537,8 +4552,9 @@ BOOM_SAIL = {
 }
 # The files with no boom, so no gaff sail on one: the lugger's lugs, and the bilander's settee on
 # her main and her square sails and staysails (package 75, B4), each sheeted to the rail, a block
-# or the yard below
-NO_BOOM = {LUGGER, BILANDER}
+# or the yard below; and the *Concepción*'s, her mizen course on its lateen yard set boomless, her
+# file filing no driver (package 90, Con-D §4; old: the lugger and the bilander)
+NO_BOOM = {LUGGER, BILANDER, CONCEPCION}
 # Across those states the frame itself is one on every file but the smack's: the top of it there
 # is her gaff's peak as that stands sheeted, 0.09 m higher at 85 degrees heeled 0.3 rad. A gaff's,
 # and no boom's, and as before her lines: recorded.
@@ -6041,6 +6057,12 @@ LINES_ON_THE_RAIL[BILANDER] = both_sides(
     "jib.sheet",
 )
 LINES_ON_THE_RAIL[DIANA] = LINES_ON_THE_RAIL[FRIGATE]
+# the *Concepción*'s as the 74's, her rig the 74's x 1.15 (package 90; old: no row). Measured at her
+# landing, her mizzen yards' six braces end on her own mizzen mast, 24.1 to 27.3 m up, and not on
+# her rail: her masts stand upright (Pages §5.7), so `mastAftOf` finds her mizzen 0.5 m and more
+# abaft her mizzen yards. The viewer's to mend (the lead's nudge 97); her row is the drawing as the
+# 74's rule gives it.
+LINES_ON_THE_RAIL[CONCEPCION] = LINES_ON_THE_RAIL[SEVENTY_FOUR]
 # a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
 LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
 # The sails each file hanks to a stay led to the stem, and cuts by the viewer's rule: the 64's and
@@ -6060,6 +6082,7 @@ STEM_TACKED = {
     BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
     SEVENTY_FOUR: set(),  # cut from her file's corners, as the 64's (package 75, B7)
     DIANA: {"fore.storm_staysail"},
+    CONCEPCION: set(),  # cut from her file's corners, as the 74's (package 90; old: no row)
 }
 # A recorded departure (package 75, B2, for the lead): how far a head sail's tack on a stay to the
 # stem stands off the top of her side, where it is more than 5 cm. The *Neufchatel*'s stem head,

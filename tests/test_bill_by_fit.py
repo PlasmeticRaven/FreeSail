@@ -28,7 +28,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SIXTY_FOUR = ROOT / "data" / "ships" / "sixty-four.yaml"
 RAZEE = ROOT / "data" / "ships" / "razee-44.yaml"
 SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
-# the fits that tell off their own trimmers (the lead's ruling 13), by file
+# the fits that tell off their own trimmers (the lead's ruling 13), by file; the Concepción's 1809
+# fit since her landing, its six-and-two obuses taking 28 of her soldiers first (package 90, Con-D
+# §6.3; old: the razee's 'as razeed 1795' alone)
 FIT_TRIMMERS = {
     "razee-44.yaml": {
         "as razeed 1795": {
@@ -37,6 +39,15 @@ FIT_TRIMMERS = {
             "main_top": 14,
             "mizzen_top": 7,
             "afterguard": 9,
+        }
+    },
+    "three-decker.yaml": {
+        "concepcion 1809": {
+            "forecastle": 2,
+            "fore_top": 3,
+            "main_top": 4,
+            "mizzen_top": 2,
+            "afterguard": 2,
         }
     },
 }

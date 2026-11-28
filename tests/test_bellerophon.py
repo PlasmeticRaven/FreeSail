@@ -875,8 +875,12 @@ def test_her_description_names_her_file_and_ranks_her_a_ship_of_the_line():
         "a French ship of the line",
     ):
         assert S.description_key(words) == "seventy-four", words
-    for words in ("a two-decker", "a third rate", "a first rate"):
+    # words of another rate name none of hers; "a first rate" names the Concepción's description
+    # since her landing (package 90, Con-D §8.2; old: "a first rate" among these, None), so a
+    # second rate stands in its place
+    for words in ("a two-decker", "a third rate", "a second rate"):
         assert S.description_key(words) is None, words
+    assert S.description_key("a first rate") == "three-decker"
     d = S.description("seventy-four")
     assert d["file"] == SEVENTY_FOUR and d["rig"] == "a ship of the line"  # old: "a ship"
     assert C.size_of_words(f"{d['rig']}, lying to") == C.LINE_OF_BATTLE_RANK  # old: 3
@@ -2683,15 +2687,17 @@ def test_the_numbering_key_is_read_left_out_of_the_pickle_unset_and_refused_in_w
         _numbered("on across", upper)
 
 
-# The two two-deckers numbered by deck (B7.d; the lead's answer (3): both together); every other
+# The two two-deckers numbered by deck (B7.d; the lead's answer (3): both together), and the
+# Concepción's three decks since her landing (package 90, Con-D §5.5; old: the two); every other
 # armed file, the razee among them, numbered on across her decks as before
-NUMBERED_BY_DECK = (SEVENTY_FOUR, SIXTY_FOUR)
+NUMBERED_BY_DECK = (SEVENTY_FOUR, SIXTY_FOUR, "data/ships/three-decker.yaml")
 
 
 def test_only_the_two_deckers_carry_the_numbering_key_and_every_other_gun_is_as_it_was():
     """B7.d (§12.5: "every pair key, gun name and order of the eight unchanged (no file carries the
     key)"): the 74's and the 64's armaments give `numbering: by deck` and every gun of their fits
-    is numbered by deck, pickled so; no other file gives it, so every other armament reads None and
+    is numbered by deck, pickled so, and the Concepción's since her landing (package 90; old: the
+    two); no other file gives it, so every other armament reads None and
     pickles as before it, and every gun of every fit of theirs is false, in no gun's pickled
     state, its name and its crew's key the forms they had (`No. 3 starboard gun`, `gun:3`; a
     chaser's `gun:<its id>`). `Gun.by_deck` is a plain class default, no field; a gun pickled

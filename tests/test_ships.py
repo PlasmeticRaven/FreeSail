@@ -103,9 +103,12 @@ def test_the_descriptions_name_the_four_files_and_the_brigs_two_come_from_her_fi
     assert S.description_key("brig-sloop") == "brig-sloop"
     # package 75 (Design-Ship-Bellerophon.md §8.2; Build-Ships.md §16.1): "a ship of the line"
     # names the 74's description (old: `description_key("a ship of the line") is None`); the
-    # refusal kept by words that name no file still, a first rate, which the game lacks
+    # refusal kept by words that name no file still, a bomb vessel, which the game lacks. Package 90
+    # (Design-Ship-PurisimaConcepcion.md §8.2): "a first rate" names the three-decker's description
+    # since her landing (old: `description_key("a first rate") is None`, this refusal's example)
     assert S.description_key("a ship of the line") == "seventy-four"
-    assert S.description_key("a first rate") is None
+    assert S.description_key("a bomb vessel") is None
+    assert S.description_key("a first rate") == "three-decker"
     own = S.file_descriptions(BRIG)
     assert set(own) == {"brig-sloop", "merchant brig"}  # one file, two descriptions' words
     assert S.description("merchant brig")["what"] == own["merchant brig"]["what"]
@@ -203,9 +206,11 @@ def test_a_goal_makes_a_plan_and_a_goal_the_captain_does_not_know_is_refused_in_
     with pytest.raises(ValueError, match="knows no such place"):
         put(w, "cutter", 0.0, 3.0, "bound for Valparaiso")
     # package 75 (Design-Ship-Bellerophon.md §8.2): "ship of the line" is the 74's description
-    # now (old: `put(w, "ship of the line", ...)` refused); a first rate names none
+    # now (old: `put(w, "ship of the line", ...)` refused); a bomb vessel names none. Package 90:
+    # "first rate" names the three-decker's description since her landing (Con-D §8.2; old: `put(w,
+    # "first rate", ...)` refused, this refusal's example)
     with pytest.raises(ValueError, match="no description"):
-        put(w, "first rate", 0.0, 3.0, "bound for Brest")
+        put(w, "bomb vessel", 0.0, 3.0, "bound for Brest")
     # two brigs of one file are not one brig: the sailing factor is drawn once each
     other = put(w, "merchant brig", 100.0, 7.0, "trading Falmouth to the Lizard")
     assert S.SAILING_FACTOR_MIN <= trade.sailing_factor <= 1.0

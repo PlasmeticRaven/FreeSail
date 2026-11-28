@@ -517,6 +517,57 @@ def test_truth_7_736_three_gun_decks_at_quarters():
     )
 
 
+def test_truth_7_736_b_a_tack_at_quarters_robs_her_upper_works_and_upper_deck_and_no_lower():
+    """Con-D §14, truth b, its tack at quarters (the lead's nudge 97, item 7), in the frigate's
+    7-136 form: close-hauled on the starboard tack from 292.5 deg in 15 kn, seed 7. Cleared, she
+    tacks in 276 s. At quarters, her guns run out, under `sail before guns` the tack's watch of 398
+    is worked first by the 240 of hers idle at quarters, her 15 trimmers and her 225 soldiers in
+    their division (her helm, powder, carpenter's crew and surgeon's mates keeping their stations),
+    and the bill lends the other 158 by A9's order: the upper deck's crews, Nos. 2
+    to 16, the quarterdeck's and the forecastle's, the lighter metal first, and none of her middle
+    or her lower deck's, which keep their guns served; she tacks in 276 s. Under `guns before sail`
+    nothing is lent, the tack goes short, 240 of 398 (said), and she tacks in 452 s. In a player's
+    words: to work her at quarters she robs her guns, her upper deck's first."""
+    from tests.test_known_truths import _guns_ready, close_hauled_on_starboard, until
+
+    def tack(at_quarters: bool, priority: str = "sail before guns"):
+        w = close_hauled_on_starboard(HER, heading=292.5)
+        if at_quarters:
+            _guns_ready(w)
+            w.run(40)
+            w.submit("run out the guns")
+            assert w.submit(priority).kind == "guns.priority"
+            w.run(120)
+        t0 = w.clock.tick
+        w.submit("tack ship")
+        runner = w.ship.extra["evolutions"]
+        inst = next(i for i in runner.instances if i.evo.id == "tack")
+        factor = runner._crew_factor(inst, False)
+        done, seconds = until(w, ("ship.tacked", "ship.missed_stays"), 1200)
+        assert [e.kind for e in done] == ["ship.tacked"], (priority, [e.text for e in done])
+        robbed = [e for e in w.log if e.tick > t0 and e.kind == "quarters.robbed"]
+        short = [e for e in w.log if e.tick > t0 and e.kind == "evolution.short_handed"]
+        return seconds, robbed, short, factor
+
+    cleared, none_robbed, _, _ = tack(False)
+    assert not none_robbed and cleared == 276
+    sail_first, robbed, short, factor = tack(True)
+    assert [r.data["hands"] for r in robbed] == [158], [r.text for r in robbed]
+    assert robbed[0].text == (
+        "Tacking ship at quarters: 158 hands taken from the upper deck, Nos. 2 to 16, the "
+        "quarterdeck, Nos. 1 to 6, and the forecastle, Nos. 1 to 3; the guns go on short-handed."
+    )
+    assert "middle deck" not in robbed[0].text and "lower deck" not in robbed[0].text
+    assert not short and factor == pytest.approx(1.0, abs=1e-3)
+    assert sail_first == 276
+    guns_first, robbed2, short2, factor2 = tack(True, "guns before sail")
+    assert not robbed2
+    assert [(s.data["hands_got"], s.data["hands_wanted"]) for s in short2] == [(240, 398)]
+    assert short2[0].text == "Only 240 hands to tack ship; there are no more on deck."
+    assert factor2 == pytest.approx(398 / 240, abs=1e-3)
+    assert guns_first == 452
+
+
 def test_truth_7_737_her_lower_ports_shut_at_the_heel_her_plan_gives():
     """Con-D §14, truth c, in the 74's 7-195 form: her midship lower port, No. 8 at x +0.18, 1.89 m
     over her water at a half-breadth of 8.07 m, dips at 13.2 deg (13.3 on L0, Pages §5.2; ruling
