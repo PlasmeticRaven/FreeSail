@@ -463,3 +463,34 @@ def test_a_boat_towed_astern_stove_by_a_shot_is_cut_adrift_not_on_the_booms(tmp_
         ],
         False: ["The boat is stove on the booms by a shot."],
     }
+
+
+def _at_sea(path: str):
+    return make_world(
+        7,
+        path,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=15.0,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=270.0,
+            ship_speed_kn=5.0,
+        ),
+    )
+
+
+def test_cut_adrift_before_she_was_ever_sent_her_boat_is_in_tow_no_longer(tmp_path):
+    """Found by the lead's nudge 88, item 1 (whether she is in tow now): her boat cut adrift (or
+    swamped) at home, never sent on an errand, her `BoatState` names no boat, and `keep_in_tow`
+    took none for gone. She was kept in tow, `boat_in_tow` kept and her drag on the ship, a boat
+    lost towing astern. Now the state that names none stands for her errands' boat, as the
+    dealings read it (`boats.errands_boat`): in tow no longer, her drag gone with her."""
+    w = _at_sea(_probe(tmp_path))
+    w.submit("set plain sail")
+    w.run(60)
+    assert "boat_in_tow" in w.ship.extra and w.dealings.boat.boat_id == ""
+    w.submit("cut the boat adrift")
+    w.run(1)
+    assert w.dealings.boat.lost == "cut adrift" and w.dealings.boat.boat_id == ""
+    assert "boat_in_tow" not in w.ship.extra

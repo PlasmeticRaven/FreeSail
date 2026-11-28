@@ -951,6 +951,42 @@ TOWED_TOO_FAST_WORDS = (
 )
 
 
+def towed_boats(ship: Any) -> list[Any]:
+    """The boats her file tows astern on their painters (a boat's `towed`), in her file's order;
+    [] for a ship whose file tows none."""
+    boats = getattr(getattr(ship, "spec", None), "boats", None) or []
+    return [b for b in boats if getattr(b, "towed", False)]
+
+
+def errands_boat(ship: Any) -> Any:
+    """The boat her errands send, and the one her `BoatState` stands for where it names none: the
+    largest she carries (the launch or the long-boat; judgement: the errands here are cargo and
+    water), or None for a ship with no boat (`Dealings.boat_spec`)."""
+    boats = getattr(getattr(ship, "spec", None), "boats", None) or []
+    return max(boats, key=lambda b: (b.tons, b.length_ft)) if boats else None
+
+
+def _in_tow(ship: Any, state: Any) -> list[tuple[Any, Any]]:
+    """Each towed boat in tow now with her hull (`keep_in_tow`'s): not the boat away or lost
+    (`state`, the ship's `BoatState`: hers by id, or the errands' boat where it names none, as a
+    boat lost at home does), nor one stove by a shot, nor one with no file of her own to be a hull
+    by. (The lead's nudge 88, item 1, found by it: cut adrift or swamped before she was ever sent,
+    her state names no boat, and she was kept in tow, her drag on the ship.)"""
+    gone = None
+    if state.away or state.lost:
+        boat = errands_boat(ship) if not state.boat_id else None
+        gone = str(state.boat_id) if state.boat_id else (boat.id if boat is not None else None)
+    # a boat towed astern stove by a shot is cut adrift (`combat.hits`; the lead's nudge 76,
+    # item 3): in tow no longer
+    extra = getattr(ship, "extra", None)
+    stove = set(extra.get("boats_stove") or ()) if isinstance(extra, dict) else set()
+    return [
+        (b, h)
+        for b in towed_boats(ship)
+        if b.id != gone and b.id not in stove and (h := _towed_hull(b)) is not None
+    ]
+
+
 def keep_in_tow(ship: Any, state: Any) -> None:
     """The boats towed astern on their painters (package 90, A4; a boat's `towed`), their hulls
     kept as `ship.extra["boat_in_tow"]` while each is in tow, for her drag on the ship's way
@@ -958,20 +994,10 @@ def keep_in_tow(ship: Any, state: Any) -> None:
     hull, towing ahead) or lost (`state`, the ship's `BoatState`), nor one with no file of her
     own to be a hull by. The key is gone when none is in tow; a ship whose file tows no boat is
     never given it. Kept every tick by her dealings."""
-    boats = getattr(getattr(ship, "spec", None), "boats", None) or []
-    towed = [b for b in boats if getattr(b, "towed", False)]
     extra = getattr(ship, "extra", None)
-    if not towed or not isinstance(extra, dict):
+    if not towed_boats(ship) or not isinstance(extra, dict):
         return
-    gone = str(state.boat_id) if (state.away or state.lost) else None
-    # a boat towed astern stove by a shot is cut adrift (`combat.hits`; the lead's nudge 76,
-    # item 3): in tow no longer
-    stove = set(extra.get("boats_stove") or ())
-    in_tow = [
-        (b, h)
-        for b in towed
-        if b.id != gone and b.id not in stove and (h := _towed_hull(b)) is not None
-    ]
+    in_tow = _in_tow(ship, state)
     if in_tow:
         extra["boat_in_tow"] = tuple(h for _, h in in_tow)
     else:

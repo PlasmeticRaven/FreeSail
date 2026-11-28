@@ -2732,10 +2732,10 @@ class Dealings:
     # -- the boat ---------------------------------------------------------------------------
 
     def boat_spec(self) -> Any:
-        """The boat sent on an errand: the largest the ship carries (the launch or the
-        long-boat; judgement: the errands here are cargo and water)."""
-        boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
-        return max(boats, key=lambda b: (b.tons, b.length_ft)) if boats else None
+        """The boat sent on an errand: the largest the ship carries (`boats.errands_boat`)."""
+        from freesail.world.boats import errands_boat
+
+        return errands_boat(self.world.ship)
 
     def _tows_a_boat(self) -> bool:
         """Whether her file tows a boat astern (package 90, A4; a boat's `towed`)."""
