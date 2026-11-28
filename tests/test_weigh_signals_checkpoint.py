@@ -230,6 +230,16 @@ def test_truth_7_791_a_weigh_that_leaves_her_at_anchor_waits_longer_each_time(mo
     w.run(B.AT_ANCHOR_MOST_S + 12 * 3600)
     assert len(weighs) == 1, weighs
     assert B.AT_ANCHOR_MOST_S <= weighs[0] - set_at <= B.AT_ANCHOR_MOST_S + 12 * 3600, weighs
+    # come to anew (her anchor let go again after a passage), the count begins afresh: the
+    # hour, not the day, before she is asked
+    brain._business[B.WEIGH_TRIES] = 20
+    brain._business[B.WEIGHED] = int(w.clock.tick) - 60
+    del weighs[:]
+    brain._enter("at anchor")
+    came_to = int(w.clock.tick)
+    w.run(2 * 3600)
+    assert len(weighs) == 1, (weighs, w.clock.ship_time)
+    assert B.AT_ANCHOR_LEAST_S <= weighs[0] - came_to <= B.AT_ANCHOR_LEAST_S + 120, weighs
 
 
 def test_truth_7_792_a_passage_laid_again_reads_its_tiles_from_the_cache_and_lays_the_same(
