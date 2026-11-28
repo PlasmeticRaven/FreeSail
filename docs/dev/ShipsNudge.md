@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 13:30 UTC (THE FOURTH PASS IS MERGED at d8031973; fault 24 struck; merge the trunk before the served step's hash). Nudge number: 100.
+Latest note: 2026-11-28, 15:30 UTC (THE VIEWER'S THREE RULES ARE AT MY GATE, staged, a cloud run and a reader on them; yes, show the owner the fore braces of the 74, the 64 and the razee with the three-decker). Nudge number: 101.
