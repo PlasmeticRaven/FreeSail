@@ -71,6 +71,14 @@ PENDING = "storm_canvas_pending"
 # (`world.captains`); a jib taken in or blown out is forgotten (`forget_kept_jibs`).
 KEPT = "jibs_kept"
 
+# A kept jib seen through on a ship whose captain gives no judgements of his own (the lead's
+# ruling on the reader's finding of 2026-11-28): the order `shorten sail` left it on her, so
+# the order's hands take it in before it goes, at its strain's second line or its first dire
+# line (`physics.strain`, read), whichever comes first. The first line is the player's warning,
+# the order named in it. Where each kept jib's lines are counted (`see_kept_jibs_through`).
+HANDS_TAKE_IN_LINE = 2
+SEEN = "jibs_kept_seen"
+
 STORM_VERBS = frozenset({"set the storm staysails"})
 
 # `shorten sail`'s line that sets them (`shorten_sail_lines`).
@@ -529,11 +537,68 @@ def kept_jibs(ship: Ship) -> list[Sail]:
 
 
 def keep_jibs(ship: Ship, kept: list[Sail]) -> None:
-    """Mark the jibs this `shorten sail` left on her (`KEPT`)."""
+    """Mark the jibs this `shorten sail` left on her (`KEPT`), each with its strain's lines as
+    they stand now (`SEEN`), so that only the lines said after it are counted."""
     if kept:
         marks = ship.extra.setdefault(KEPT, {})
+        seen = ship.extra.setdefault(SEEN, {})
         for sl in kept:
             marks[sl.id] = True
+            seen[sl.id] = {**_strain_lines(ship, sl.id), "lines": 0}
+
+
+def _strain_lines(ship: Ship, sid: str) -> dict[str, float | None]:
+    """When the sail's strain was last said, and last said dire (`physics.strain`, read)."""
+    from freesail.physics.strain import strain_state
+
+    st = strain_state(ship)
+    dire = st.__dict__.get("last_dire_s") or {}
+    return {"at": st.last_warning_s.get(sid), "dire": dire.get(sid)}
+
+
+def see_kept_jibs_through(ship: Ship) -> None:
+    """Once a tick, from the world, on a ship whose captain gives no judgements of his own (a
+    player's ship, or one with a model at his station): a jib `shorten sail` left on her is
+    taken in by the hands at its strain's `HANDS_TAKE_IN_LINE` line since it was kept, or at
+    its first dire line, before it goes, and the log says so. A jib set again by the player's
+    own order is his, and is not kept (`forget_kept_jibs`)."""
+    marks = ship.extra.get(KEPT)
+    seen = ship.extra.get(SEEN)
+    if not isinstance(marks, dict) or not isinstance(seen, dict):
+        return
+    vocab: Vocabulary | None = None
+    for sid in list(marks):
+        sail = ship.sails.get(sid)
+        rec = seen.get(sid)
+        if sail is None or not sail.is_set or not isinstance(rec, dict):
+            continue
+        now = _strain_lines(ship, sid)
+        dire = now["dire"] is not None and now["dire"] != rec.get("dire")
+        if now["at"] is not None and now["at"] != rec.get("at"):
+            rec["lines"] = int(rec.get("lines", 0)) + 1
+        rec.update(now)
+        if not dire and rec["lines"] < HANDS_TAKE_IN_LINE:
+            continue
+        vocab = vocab or load_vocabulary()
+        name = _name(ship, sail)
+        try:
+            _run(ship, f"take in the {name}", vocab)
+        except OrderError as e:
+            rec["lines"] = HANDS_TAKE_IN_LINE - 1  # tried again at its next line
+            ship.note(
+                "notable",
+                "sail.kept_jib",
+                f"The {name} is at its limit and is not taken in: {str(e).rstrip('.')}.",
+                sid,
+            )
+            continue
+        seen.pop(sid, None)
+        ship.note(
+            "notable",
+            "sail.kept_jib",
+            f"Taking in the {name} before it goes: she will gripe without it.",
+            sid,
+        )
 
 
 def forget_kept_jibs(ship: Ship) -> None:
@@ -542,13 +607,18 @@ def forget_kept_jibs(ship: Ship) -> None:
     marks = ship.extra.get(KEPT)
     if not isinstance(marks, dict):
         ship.extra.pop(KEPT, None)
+        ship.extra.pop(SEEN, None)
         return
+    seen = ship.extra.get(SEEN)
     for sid in list(marks):
         sail = ship.sails.get(sid)
         if sail is None or not sail.is_set:
             marks.pop(sid)
+            if isinstance(seen, dict):
+                seen.pop(sid, None)
     if not marks:
         ship.extra.pop(KEPT, None)
+        ship.extra.pop(SEEN, None)
 
 
 def replaced_by_storm_canvas(ship: Ship) -> set[str]:

@@ -823,9 +823,11 @@ def test_truth_7_664_shortened_in_25_knots_her_jib_is_left_on_her_and_she_stays(
 
 
 # 25 knots shortened and her jib then taken in (`take in the jib`, the order the shortening's
-# line names), as measured: from 290 she keeps her way and stays; from 292.5 and 295 she gripes
-# past what her rudder holds, comes up toward the wind with her way going, and misses stays or the
-# tack is refused for want of way. Her angle off the wind and her way in their bands. Old (with the
+# line names), as measured: from 290 she keeps her way (71 degrees off at 7.5 kn) and stays; from
+# 292.5 she lies 62 degrees off at 4.9 kn, her helm at 18 degrees, and misses stays, her way
+# lost before her head comes to the wind; from 295 she gripes up to 39 degrees off, her helm at 22
+# degrees, with a knot of way, and the tack is refused for want of way. Her angle off
+# the wind and her way in their bands. Old (with the
 # jib taken in by `shorten sail` itself, before package 125's D): 290 off 65 to 75 at 6 to 9 kn,
 # stayed 235 s; 292.5 and 295 off 30 to 62 at under 2.5 kn, not about.
 NOT_ABOUT = ("evolution.failed", "ship.missed_stays")  # refused for want of way, or missed
@@ -839,11 +841,14 @@ SHORTENED_25 = {
 @pytest.mark.parametrize("heading", sorted(SHORTENED_25))
 def test_truth_7_664_shortened_in_25_knots_she_gripes_without_her_jib(heading):
     """Truth E's shortened row, 25 knots, the jib taken in (the lead's nudge 70; package 125):
-    **without her jib in a fresh breeze she gripes.** Shortened by the game's own order, which
-    leaves the jib on her, and the jib then taken in by `take in the jib`: her weather helm past
-    what her small rudder holds, she comes up toward the wind with her way going, and will not go
-    about. Stayed 1 of 3, from 290, where her way held. Her rudder, traced from her plan and the
-    least of any ship's, is the cause (with the frigate-36's ratio she holds her course)."""
+    **without her jib in a fresh breeze she does not go about.** Shortened by the game's own
+    order, which leaves the jib on her, and the jib then taken in by `take in the jib`: her
+    weather helm grows past what her small rudder holds well (18 and 22 degrees measured). From
+    292.5 she lies 62 degrees off at 4.9 kn and misses stays, her way gone before her head
+    comes to the wind; from 295 she gripes up to 39 degrees off with a knot of way and the tack
+    is refused for want of way. Stayed 1 of 3, from 290, where her way held. Her rudder, traced
+    from her plan and the least of any ship's, is the cause (with the frigate-36's ratio she
+    holds her course)."""
     from tests.test_known_truths import knots, off_wind, run, until
 
     band = SHORTENED_25[heading]

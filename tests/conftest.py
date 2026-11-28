@@ -127,6 +127,17 @@ SLOW_TESTS: frozenset[str] = frozenset(
                 "razee-44-28.0-11",
             )
         ),
+        # package 125 (D, the lead's ruling of 2026-11-28): the same hour on a player's ship,
+        # the kept jib taken in by the hands (a minute or two a case)
+        *(
+            f"test_captains.py::test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_before_it_goes[{c}]"
+            for c in (
+                "brig-30.0-11",
+                "brig-35.0-7",
+                "hermaphrodite-brig-30.0-11",
+                "razee-44-28.0-11",
+            )
+        ),
         # package 125 (truth 7-762): the fleet's tacks shortened by the game's own order, the
         # shortening run to its end before the helm goes down (6 to 8 s a case)
         *(

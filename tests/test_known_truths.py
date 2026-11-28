@@ -24220,6 +24220,20 @@ def test_truth_7_763_a_ship_known_slack_in_stays_hauls_with_the_wind_ahead_any_o
     assert slack["off"] <= 1.5 or slack["through"], slack
 
 
+def test_truth_7_763c_a_ship_slack_in_stays_with_two_fifths_of_her_way_hauls_at_the_point():
+    """Package 125 (truth 7-763, the reader's mutant M02 on b5ddfa6a): the two-fifths figure
+    (`HAUL_WAY_FRACTION`) pinned for a ship that is slack in stays. **Slack in stays, she still
+    hauls at the point while she keeps two fifths of her way and more; only with her way gone
+    under that is the haul held for the wind ahead.** The frigate in 15 knots, the habit set on
+    her in memory, keeps 0.53 of her way at the point and hauls there, her head 8 to 11.25
+    degrees off, as without it; a figure of one (all her way) holds her haul for the wind
+    ahead and fails here, and one of none hauls the hermaphrodite brig at the point and fails
+    truth 7-763."""
+    slack = _haul_moment("frigate-36", 15.0, 292.5, slack=True)
+    assert 0.4 <= slack["share"] < 1.0, slack
+    assert 8.0 <= slack["off"] <= 11.25 and not slack["through"], slack
+
+
 def test_truth_7_763b_a_ship_known_slack_in_stays_is_said_so_in_the_ship():
     """Package 125 (truth 7-763, the lead's ruling on rule A, item 4): her people know the habit,
     and the reading `the ship` says it in one line after her class: "She is slack in stays: when
