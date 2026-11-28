@@ -404,3 +404,75 @@ loadgroup"`.
     added (18 since 20aca5e), none removed or renamed.
 
 That is the hash. I stop here and wait for the lead's word; nothing more is pushed until it comes.
+
+## 2026-11-28: V4 built on A9, held for the hash with V3
+
+The coordinating session's word (nudge 94): A9 is in `claude/pkg-90` at 157f870d, so V4 may be
+built; its hash goes with V3, after the engine's served step (the towed boat, and the lateen's
+change in a manoeuvre: nudge 88). So **this is a finished step, not a hash for the gate.**
+
+| Commit | What |
+|---|---|
+| 93f9565 | merge of `claude/pkg-90` at 157f870d (A9 with the *Concepción*'s report, nudge 94) |
+| 367e123 | V4: a port named by its deck as the log names it |
+
+V4 changes only `client/projection.js`, `tests/test_view_geometry.py` and the notes' subsection "V4:
+a port's words by the log's "-deck" form", where the measures are in full. Every commit's author is
+as the cloud gives it.
+
+### V4: what it says, and where
+
+- **The cause.** The viewer said "-deck" of the upper deck alone, and every other deck by its bare
+  word (`portFigures`). The log says the lower, the middle and the upper deck with "-deck"
+  (`freesail/combat/ports.py`, `_DECKS_SAID_SO`): "The lee lower-deck ports are shut". So the 74
+  and the 64 said "a lower port", and a three-decker would say "a middle port".
+- **The mend**, where a port's words are made: `DECKS_SAID_SO`, the log's list, in the exported
+  `constants`. A port on one of its decks is said "<deck>-deck port"; every other deck by its own
+  word, as before. No other place in the client names a deck.
+- **A test holds the viewer's list to the log's**, since one is JavaScript and the other Python.
+
+### Measured, old beside new
+
+Every port's and lid's words, on every committed file and on the three-decker probe, her guns
+secured, run out, and shut by the sea: 1,710 figures. **Words alone move**, and every figure's
+deck, side, place, part and state is the same.
+
+- **The 74's lower-deck ports** (28 figures) and **the 64's** (26): "a lower port" becomes "a
+  lower-deck port" in each of its four forms ("its lid shut", "open", "'s lid, hauled up", "shut,
+  the sea at its sill").
+- **The probe's middle-deck ports**: "a middle port" becomes "a middle-deck port"; her lower-deck
+  ports move as the 74's.
+- **Nothing else moves:** "an upper-deck port", "a quarterdeck port", the razee's "a forecastle
+  port", and the empty ports, on every file.
+
+### Tests
+
+- **New: 18 cases**, each made to fail with its rule taken out:
+  - the viewer's list is the log's, 1;
+  - every port on the 14 files with a hull profile, 14;
+  - the 74's and the 64's lower-deck ports, 2;
+  - the probe's middle-deck ports, 1.
+
+  With the old rule put back, 5 fail. With the quarterdeck added to the list, 7.
+- **Pins moved: none**, of the base's or of this package's. There are now 107 cases in the package,
+  none of the base's removed or renamed.
+- **Run on this tree**, with `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist
+  loadgroup" --slow`, all passed:
+  - 1,564 cases: every test that runs the client, and the three decks' and the lee ports' tests,
+    which say the log's words. The client's are the view geometry whole (1,210), the view action,
+    the boats' and the flags' drawings, the map view, the pictures, and the 12 browser plans;
+  - the viewer's known truths, 7-437 to 7-444: 20 cases;
+  - the harbour whole and the server whole, with their slow cases: 111;
+  - the practice tests: 25.
+- **No harbour or browser test failed.**
+- **The file rules:** ruff check and ruff format clean on the whole tree, no Python line over 100
+  characters, and no CR byte.
+- **Not yet run: the whole fast tier** and its comparison with a base on the merged tree. Those
+  go with the hash, once V3 is built.
+
+### Held
+
+- **V3, and the lateen's change in a manoeuvre,** wait for the engine's served step (nudge 88).
+- **If the reader's report on 856dbcc brings a list,** it comes before anything more here.
+
+I stop here and wait for the coordinating session's word.
