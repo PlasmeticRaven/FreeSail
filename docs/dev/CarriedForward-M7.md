@@ -114,6 +114,8 @@ Each was told to him when it was made and is in the records of its package. **On
 - Package 126's part two was merged over its reader's "not pass" on one finding: the cutter, in a steady gale from the start, is brought to nineteen minutes later than the trunk's, having first taken in the light topsail the trunk's cutter lay under and lost; she ends hove to with her sail whole where the trunk's ends sailing on.
 - A ship with no spare of the spar she has lost sails on without it until a yard refits her: the *Renard*'s captain clears the wreck, says there is no spare topgallant mast aboard, and keeps her one spare topmast for the loss of her topmast. **The owner, 27 November: "I am OK with leaving it (as recommended)".** **The owner, later the same day: "the work of a spar being converted to another that it could act as should come with the addition of the carpenter station"**: it is written into package 87's line of the proposal and its row.
 
+- Readers at the gate: **the owner, 28 November: "You may read multiple packages at once, as the Opus usage for simply reading and reviewing is reasonable."** Several readers at once, each on Opus; the one-at-a-time rule of the 26th is lifted.
+
 ## 8. Waiting on a decision of the owner's
 
 - (Settled 24 November: the line between milestone 8's two gates, and the crew's morale and skill; the proposal's decision 79.)
