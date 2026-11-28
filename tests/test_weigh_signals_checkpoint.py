@@ -2,21 +2,25 @@
 truths 7-790 to 7-793, 7-795 and 7-796 (7-794 and 7-798 in `test_harbour.py`, 7-797 and 7-799 in
 `test_checkpoint.py`).
 
-Three faults of the game as it was, two found by the owner in his own play (his notes 6 and
-10 of 27 November), each reproduced first and pinned here as the game now has it.
+Three faults of the game as it was, two found by the owner in their own play (their notes 6
+and 10 of 27 November), each reproduced first and pinned here as the game now has it; and the
+lead's findings on the first build of the package (c22aa834).
 
-- 7-790: a trader the business draws lying at the Havre's Little Road (three miles from the
-  Great Road, beyond the port's reach of it, so `at anchor` and not `in port`) sails for Dover:
-  her course out by the port's track to sea no longer begins with an anchor where she lies.
-  OLD: she weighed every minute of the day, laid her whole passage afresh, found its first
-  leg was to anchor in the Little Road, and lay there; the next minute the same.
-- 7-791: a weigh that leaves her riding at her anchor still is not tried again until the hour
-  at anchor has passed once more. OLD: every minute of the day.
+- 7-790 (slow): a trader the business draws lying at the Havre's Little Road (three miles from
+  the Great Road) is in port by the world's own rule (`Ports.in_port_at`: within the port's
+  reach of its anchorage) and sails for Dover: her course out leaves out the anchorage she
+  lies at, and ends at Dover's. OLD: she weighed every minute of the day, laid her whole
+  passage afresh, found its first leg was to anchor in the Little Road, and lay there; the
+  next minute the same. And a smack bound home to the port she weighed from comes to in it.
+  OLD (c22aa834): every anchorage of that port was left out, and she ended her voyage off it.
+- 7-791 (slow): a weigh that leaves her riding at her anchor still doubles the wait before
+  the next, from an hour to a day. OLD: every minute of daylight; c22aa834, every hour.
 - 7-792: a passage laid twice over the chart loads no tile the second time, and lays the
   same legs as before. OLD: the level kept sixteen tiles, the first in let go first, and every
   laying of the Havre's passage loaded all its tiles again.
 - 7-793 (slow): a day of the owner's sea off Dover with the business on: no far vessel lays
-  her passage more than three times in any hour.
+  her passage more than three times in any hour, nor, lying in one place, in the day; and the
+  Havre's trader comes to in Dover and sells her cargo.
 - 7-795: the private table is a King's ship's by her papers as by her captain's place; a
   privateer's or a merchantman's papers give none; `private_signals` says last.
 - 7-796: a game of the first action saved with the player a prisoner aboard the Renard loads
@@ -24,7 +28,8 @@ Three faults of the game as it was, two found by the owner in his own play (his 
   with the Renard's hull's seed and journal, and was "not this save's".
 
 7-794 is the harbour's King's ship in `tests/test_harbour.py`; 7-797 the sweep of the shipped
-scenarios' checkpoints in `tests/test_checkpoint.py`.
+scenarios' checkpoints in `tests/test_checkpoint.py`; 7-798 the records' place kept as words, by
+the harbour's road (`tests/test_harbour.py`) and the console's (`tests/test_console.py`).
 """
 
 from __future__ import annotations
@@ -216,6 +221,15 @@ def test_truth_7_791_a_weigh_that_leaves_her_at_anchor_waits_longer_each_time(mo
     assert all(b >= a for a, b in zip(gaps, gaps[1:], strict=False)), gaps
     assert all(g <= B.AT_ANCHOR_MOST_S + 12 * 3600 for g in gaps), gaps
     assert int(brain._business[B.WEIGH_TRIES]) == len(weighs), brain._business
+    # the bound: after twenty weighs that left her riding, she is still asked within a day of
+    # the last, by daylight, and once
+    set_at = int(w.clock.tick)
+    brain._business[B.WEIGH_TRIES] = 20
+    brain._business[B.WEIGHED] = set_at
+    del weighs[:]
+    w.run(B.AT_ANCHOR_MOST_S + 12 * 3600)
+    assert len(weighs) == 1, weighs
+    assert B.AT_ANCHOR_MOST_S <= weighs[0] - set_at <= B.AT_ANCHOR_MOST_S + 12 * 3600, weighs
 
 
 def test_truth_7_792_a_passage_laid_again_reads_its_tiles_from_the_cache_and_lays_the_same(
@@ -295,10 +309,32 @@ def _owners_sea(tmp_path: Path):
 # and when a chase or a gale is over; three in an hour is more than any of them asks. Measured
 # over the day (package 129): at most two in any hour; OLD, the Havre's trader sixty.
 LAYINGS_AN_HOUR_MOST = 3
+# JUDGEMENT: lying in one place (her anchor down), a far captain lays his passage when his
+# business in port is done, or when he weighs from an anchorage and the wait before the next
+# weigh doubles (`brains.AT_ANCHOR_MOST_S`); three in a day is more than either asks. Measured
+# over the owner's day: at most two; OLD (c22aa834), a ship who could not get away, one an
+# hour of daylight for ever.
+LAYINGS_LYING_A_DAY_MOST = 3
+# JUDGEMENT, measured: the Havre's trader, the Little Road to Dover some 110 miles with the wind
+# in the west, comes to in Dover at 37 hours (package 129); the bound allows the tide's turn.
+DOVER_WITHIN_H = 42
 
 
 def test_truth_7_793_a_day_of_the_owners_sea_lays_no_passage_again_and_again(monkeypatch, tmp_path):
+    """The owner's sea a day (`_owners_sea`): no far vessel lays her passage more than three
+    times in any hour, nor, lying in one place with her anchor down, more than three times
+    in the day."""
     laid = _count_layings(monkeypatch)
+    lying: Counter = Counter()
+    plan = B.FarCaptain._plan
+
+    def told(self):
+        here = self.vessel.plan[:1]
+        if here and here[0][0] == "anchor":
+            lying[str(self.vessel.id)] += 1
+        return plan(self)
+
+    monkeypatch.setattr(B.FarCaptain, "_plan", told)
     w = _owners_sea(tmp_path)
     by_hour: Counter = Counter()
     for hour in range(24):
@@ -306,20 +342,68 @@ def test_truth_7_793_a_day_of_the_owners_sea_lays_no_passage_again_and_again(mon
         w.run(3600)
         for vid, n in laid.items():
             by_hour[(vid, hour)] = n - before.get(vid, 0)
+    assert laid, "no far vessel laid a passage"
     worst = max(by_hour.values(), default=0)
     assert worst <= LAYINGS_AN_HOUR_MOST, sorted(by_hour.items(), key=lambda kv: -kv[1])[:5]
-    # the Havre's brandy trader of his sea sails, and is not lying in the Little Road
-    havre = [
-        v
-        for v in w.vessels.vessels
-        if v.brain is not None
-        and v.brain.intent is not None
-        and v.brain.intent.kind == "trade"
-        and v.brain.intent.origin == "le-havre"
-    ]
-    assert havre, [getattr(v.brain, "intent", None) for v in w.vessels.vessels]
-    for v in havre:
-        assert "on passage" in [s for _t, s in v.brain.history], (v.id, v.brain.history)
+    assert max(lying.values(), default=0) <= LAYINGS_LYING_A_DAY_MOST, lying.most_common(5)
+
+
+def test_truth_7_793_the_havres_trader_comes_to_in_dover_and_sells_her_cargo():
+    """What the owner would see of his sea's trader: drawn lying at the Havre's Little Road
+    with a cargo for Dover, she sails, comes to in Dover within `DOVER_WITHIN_H` hours,
+    sells her cargo there, buys a return cargo and sails again. The player's ship is in mid
+    Channel, out of the near detail's reach of her (the game's own captain sails a ship
+    within two miles of the player's, `ships.NEAR_DETAIL_NM`). OLD: the trunk, she lay at
+    the Little Road; c22aa834, she reached Dover and ended her voyage off it, `done` at sea,
+    nothing sold."""
+    from freesail.world.ships import vessel_from_spec
+
+    sc = Scenario(
+        start_time=datetime(1805, 6, 12, 6, 0),
+        wind_from_deg=270.0,
+        wind_speed_kn=12.0,
+        gustiness=0.0,
+        variability=0.0,
+        position={"lat_deg": 50.25, "lon_deg": -0.6},
+        region="channel-east",
+        ports=["le-havre", "dover"],
+    )
+    w = make_world(1805, "data/ships/brig.yaml", sc)
+    port, dover = w.dealings.ports["le-havre"], w.dealings.ports["dover"]
+    spec = {
+        "id": "trader",
+        "description": "brig",
+        "name": "Speedwell",
+        "nation": "britain",
+        "position": port.anchorage.position.to_dict(),
+        "goal": "trading the Havre to Dover",
+        "intent": "trade 20 tons of wine from the Havre to Dover",
+        "departing": port.id,
+    }
+    v = vessel_from_spec(w, spec, w.vessels.serial + 1)
+    w.vessels.serial += 1
+    w.vessels.add(v)
+    v.saved_plan = None
+    v.plan = [("anchor", port.id)]
+    brain = v.brain
+    brain._departing = port.id
+    brain.state = None
+    brain.planned = True
+    brain._business["drawn_in_port_s"] = 3 * 3600.0
+    brain._state_entered = None
+    in_dover = None
+    for hour in range(1, DOVER_WITHIN_H + 13):
+        w.run(3600)
+        here = bearing_and_distance(dover.anchorage.position, v.position)[1]
+        if in_dover is None and brain.state == "in port" and here < 2 * units.NAUTICAL_MILE:
+            in_dover = hour
+        if any("sold at" in words for _t, words in getattr(v, "story", ()) or ()):
+            break
+    assert in_dover is not None and in_dover <= DOVER_WITHIN_H, (in_dover, brain.history)
+    assert v.detail == "far"
+    sold = [words for _t, words in v.story if "sold at" in words]
+    assert sold[0].startswith("20 tons of wine sold at Dover"), v.story
+    assert brain.intent.origin == "dover" and not v.done, brain.intent
 
 
 def _papers(**papers):
