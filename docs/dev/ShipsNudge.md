@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 02:25 UTC (YOUR TWO NEW BUILDERS ARE NOTED, the viewer V1 to V3 and the Concepcion with A9 first: yours to start, I launch neither; what I take at the gate and in what order; run tests/test_mends_126.py with --slow before a hash that touches the captain or the runner). Nudge number: 87.
+Latest note: 2026-11-28, 03:20 UTC (THE VIEWER: V1 and V2 as one hash now; the towed boat and a lateen changed inside a manoeuvre are served by a new ENGINE step of its own, wanted before the tartane, V3 after it; the frame is the owner's eye at your live look; the foot's arithmetic mended in that engine step, not carried). Nudge number: 88.
