@@ -40209,27 +40209,6 @@ Words alone; no figure of her sailing moved and no pin of another ship's.
 - **"a Spanish ship sloop", old beside new:** old, no description (the tail "ship sloop" in no row, hers holding "a ship sloop" alone, where the brig-sloop's hold both forms); new, "corvette", by the bare row "ship sloop" beside it. "a ship-sloop", "a Spanish ship-sloop" and "a French corvette" resolved before and do now.
 - **Truth E's docstring and her design note** carry the lead's reader's measure, said and not pinned: put about before her sail is set and her way is on her (600 s after `set plain sail`, in the game's default gusts, 2 to 3.5 kn of way) she stayed in none of nine in 12 and 15 kn, where settled she stays in 11 of 12.
 
-## Package 90, the lateen hulls' list, its third pass: the boat lost by the lost road, the reliefs that wait, the bow's list as said (the lead's nudge 77, 2026-11-24)
-
-The branch `…/pkg-90-lateen3`, cut from `…/pkg-90` at 86fa56d3 (the second pass merged on the trunk at 474eff8b). The equations are read, not changed. Old is 86fa56d3.
-
-1. **A towed boat stove and cut adrift is lost by the road a boat swamped or cut adrift takes** (`world/boats.py`, `stove_in_tow`, kept each tick by her dealings after `keep_in_tow`; `lose_boat`): "The boat stove by a shot as she towed astern, and cut adrift. A new one is the yard's.", her reading "the boat lost: stove on the 10th; a new one is the yard's".
-   - Old: `send the boat ashore`, `lay out a kedge` and `go to the boat` obeyed with her; new: each refused, as of any boat lost.
-   - **The kedge refused no lost boat at all** (`LayOutKedgeScript.check`), so a boat swamped or cut adrift could lay one out on any ship: mended at the cause, "the boat is lost: ...". A committed ship's boat is lost only so, and no run of the gales or the harness loses one.
-   - `clear for action`: old "The boats are out and towing astern; the ship is clear." of a ship whose boat was lost; new, of the tartane probe (two boats, the other on the booms), "The rest of her boats are out and towing astern, the boat lost; the ship is clear.", and of a ship with no other boat "The ship is clear; the boat is lost.". Every other ship's line is as it was (that it says so of boats left on the booms is the trunk's).
-2. **A spar lost while its shift waits: the dire step, waiting for package 127's rule.** Not built here.
-3. **A relief that waits is said to wait** (`strain._shift_held`): the work given before it that holds the lateen, behind which a shift or a box ordered now waits. The tartane in 40 kn, her lateens put on the bad hand while her watch is at her trims, her main yard at 1.51: old "...: shift the mainsail or box her off."; new "...: shift the mainsail or box her off when the hands are done trimming the mainsail.". Measured, a shift given then begun 182 s on, and a box 82 s on.
-   - **Boxing off, coming to:** old, `box her off` given while a heave-to was in hand was taken, waited, and did nothing (the polacre in 40 kn, aback). New: the words do not offer it, and the order is refused, "She is heaving to; she will not box off while she comes to." (`scripts.heave_to_in_hand`, `Runner.start`, `BoxOffScript.check`; a lie a-try the same). That refusal is every ship's: a box given while she comes to was taken and did nothing on any of them.
-4. **Pins:**
-   - "its shift waits its turn" is not said while her own shift runs;
-   - the hands named are those shifting, not another shift waiting too;
-   - the stove line's `towed` key in its data;
-   - two boats towed astern, each her own drag, the one not the errands' stove leaving the other in tow and the ship's boat not lost.
-5. **The bow's line in her sails' order, said as a seaman lists three things, and the order taken as said** (`scripts.sails_listed`, by their masts from forward aft; `orders/grammar.py`, a whole lateen hull's `shift` reading a list with commas as its "and" list, a side after a comma still a side).
-   - The xebec, the wind through her bow: old "the foresail and the mizen and the mainsail are aback against their masts; shift the foresail and the mizen and the mainsail."; new "the foresail, the mainsail and the mizen are aback against their masts; shift the foresail, the mainsail and the mizen.".
-   - The stern's line the same, and "shift it when you will" of a lateen on its mast now names it: "shift the mizen when you will".
-   - "shift the foresail, the mainsail and the mizen" is taken as said. No hull without a whole lateen reads a comma so.
-
 ## Package 127: words and waits on today's ships (2026-11-24)
 
 Eight faults of what the log said, or failed to say, on ships already in the game (`docs/dev/CarriedForward-M7.md`, section 4, items 1, 3, 4, 5, 7, 8, 9 and 13). Six are mended in words and item 4 in what she does, at the lead's ruling (`docs/design/Report-Package127.md`); item 5 is not pursued, and the cutter's going astern after filling away is carried forward. No figure of load, strain or damage, no physics and no ship's file moves. New truths 7-780 to 7-787, in `tests/test_words_and_waits.py`.
@@ -40347,6 +40326,139 @@ lines, every fog alike: "A fog is settling in." (notable), "The fog is thickenin
 (notable), "The fog is thinning." 30 min on (routine), "The fog lifted." an hour on (routine). The
 sky's own lines ("The sky thick.", "The sky hazy.") as the sight passes a mile.
 
+## Package 125, the moment of the haul, a failed tack's words, and the jib she cannot be held without (2026-11-24; the captain's topgallants taken out 2026-11-27)
+
+The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: docs/design/Report-Package125.md. Measured at seed 7 by the truths' own helpers (the wind from the north, no gusts), every committed ship that tacks, from 290, 292.5 and 295 degrees in 8, 12, 15, 20 and 25 knots, plain and shortened by the game's own `shorten sail`.
+
+**The figures, each JUDGEMENT on the measure.**
+- `scripts.HAUL_WAY_FRACTION` 0.4 (new). "Mainsail haul" a point on the bow while she keeps two fifths of her way at "helm's a-lee"; under it, with the wind ahead. At the point every committed square-rigger keeps 0.48 to 0.58; the hermaphrodite brig 0.21 to 0.33; the light corvette of the ships' package 0.25 to 0.37 (0.37 at 8 kn, 0.30 to 0.36 at 12, 0.29 to 0.35 at 15, 0.28 to 0.33 at 20, 0.25 to 0.30 at 25). The lead's test of a lower figure: 0.33 loses her 20-kn tack from 290 (she hauls at the point there with 0.33); 0.35 keeps her 20 and 25 kn and moves no committed ship, but her 12-kn tacks from 292.5 and 295 are still 319 and 331 s against the trunk's 187 and 184. No figure keeps all three of the lead's terms, so 0.4.
+- `scripts.WIND_AHEAD_RAD` half a degree (new): Luce's "with the wind ahead"; a quarter point and half a point were measured for her, 13 of 15 either way and no better on the whole.
+- `storm.HELM_IN_HAND_SHARE` 0.25 (new). A jib loaded to its 0.75 is left set where she would want more than a quarter of her rudder's travel without it, while under its whole rating. At the order in 25 kn the frigate and the corvette would each want 9.5 to 12 degrees; with the jib in the frigate gripes to 11 to 20 and recovers, the corvette to 21 to 25 and does not. A third of the travel (11.7) would keep it from 295 alone.
+- The captain's answer to a straining topgallant yard (E) was built at 28375be and taken out on the lead's list of 2026-11-27: no figure of it stands.
+
+**Pins moved, old beside new.**
+- `tests/test_evolutions.py::test_a_tack_ended_by_the_steady_timeout_names_the_tack_she_lies_on`, replaced by three tests in its place:
+  - `..._on_her_old_tack_is_a_missed_stay`: the stub frigate fallen back and held on her old tack. Old "Tacked; braced up on the starboard tack, heading NE by N (35°)."; new "Missed stays: she came through the wind and fell back on her old tack. Up helm; square the yards." (urgent), then "Squared the yards; she fell off on the starboard tack, to try again or to wear."
+  - `..._with_her_head_in_the_wind_is_in_irons` (new case): "Missed stays: she lies in irons, her head in the wind."
+  - `..._on_the_new_tack_names_where_she_lies`: the old naming kept for a tack that has come round, held 100 degrees off on the new tack: "Tacked; braced up on the larboard tack, heading S by W (190°)."; its tick count (the timeout's 300 s and one) as the old test had it.
+  - Why: a tack fallen back on her old tack had not come round (the brig in 20 kn was logged "Tacked" lying 110 to 149 degrees off on her old tack).
+- `tests/test_captain_trials.py::test_with_ushant_under_her_lee_she_is_not_left_hove_to_onto_it`: moved by E at 28375be, and back to the trunk's figures with E taken out. The file is the trunk's (f2821c7), package 127's re-measured figures unmoved.
+  - What E did there, for the rule when it is carried: states `(26760, on passage) ... (67200, keeping station)` against the trunk's `(30780, on passage) ... (51540, beating)`; 1561 -> 1940 lines; within 2.4 miles of the land at 28,200 s in 42 kn.
+  - The cause: the report's §6.
+- No other pin moved. Before the build, the 46 test files that tack or shorten (5,485 fast-tier tests) passed under each rule alone (the report's §7). No captain trial's pin moves on this hash.
+
+**What moves in the fleet (the truths 7-760 to 7-762 tables).**
+- The hermaphrodite brig by the haul: plain 8 kn 411/405/397 -> 300/296/291 s; 12 kn 267/266/263 -> 198/198/196; 15 kn 192/189/193 -> 194/186/184; 20 kn 176/170/170 -> 186/184/183; 25 kn 165/163/162 -> 171/169/167; shortened 20 kn 138/150/149 -> 186/185/183; shortened 25 kn 162/160/159 -> 167/166/164.
+- The brig in 20 kn, by the words: plain from 292.5 and 295 and shortened from 290 and 292.5, "Tacked" at 456 to 460 s -> "Missed stays: she came through the wind and fell back on her old tack."
+- The jib kept in 25 kn shortened: the frigate 309/205/231 -> 233/252/265 s; the razee from 295, 486 -> 261.
+- Both schooners by the haul, by one or two seconds: plain 20 kn from 290, 233 -> 235 s; plain 25 kn 157/156/157 -> 156/155/156.
+- The merchant brig with her sail set, 20 kn from 290: "Tacked; braced up on the starboard tack, heading SW by W (232°)." at 461 s, lying 130 degrees off on her old tack -> "Missed stays: she came through the wind and fell back on her old tack."
+- Every cell, old (f2821c7) beside new: the report's §10.
+
+**Read by:** a reader other than the builder, on the stronger tier, a subagent of this session (2026-11-24).
+- The moved evolution pins: passed.
+- Truths 7-760 to 7-769: each fails with its mend taken out, and each passes with it. Of them, 7-768 and 7-769 were E's, and are taken out with it.
+- Its three points, mended:
+  - 7-766's storm-staysail assertion checked nothing; it now asserts "storm staysail" is not in the reply.
+  - The old-tack pin's tick count is exact (301 and the squaring's 51).
+  - The in-irons pin has the whole line, the urgency and the fell-off.
+- The moved trial pin was measured after that reading. It is gone with E. The lead's reader read the hash 28375be and found the lee-shore trial's cause, and the merchant brig's and the schooners' cells undeclared; all three are declared in the report.
+
+**The lead's second list of 2026-11-27 (the read of a8b2c3e).** The trunk at f09fe283 is merged (package 126's part one; TuningNotes kept both sections). Measured with the reader's harness and default gusts; old is f09fe283. Every figure is in the report's §11.
+- **No new figure.** `HELM_IN_HAND_SHARE`, `HAUL_WAY_FRACTION` and `WIND_AHEAD_RAD` stand.
+  - A in a gust: no reading of "slack in stays" was found that tells the corvette from the 74 and the 64 checked in 25 to 30 kn. Twelve cells change undeclared on a8b2c3e; they are declared in the report's §11 and left for the lead to rule.
+- **Built (D):**
+  - A jib `shorten sail` leaves on her is marked (`storm.KEPT`, in `ship.extra`, forgotten once a tick when it is no longer set, `storm.forget_kept_jibs` from the runner). The next `shorten sail` takes it in, loaded or not.
+  - The reply adds "It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'."
+  - Its strain line (words only, in `physics/strain.py`; no load, ratio or rate read differently) ends ": take in the jib." and is said alone.
+  - The captain's `_head_sails_straining` takes a kept jib in at either of its strain lines in any wind.
+  - A jib the storm canvas will take in or shift is not kept, and its own take-in line stands (`storm.shortening_plan`, `storm.replaced_by_storm_canvas`).
+- **Pins moved, old beside new:** one, this package's own truth 7-766. Its reply assertion was "The jib is left on her: she gripes, and her helm will not hold her without it." in the text; it is now that line, then "It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'.", then the order's "Not done:".
+- **New pins:**
+  - truths 7-767b, 7-768 (the schooner abeam in 40 kn) and 7-769 (the bilander's jib, which kills the `HELM_IN_HAND_SHARE = 0` mutant). The numbers 7-768 and 7-769 were E's, which was never merged.
+  - `tests/test_evolutions.py::test_a_tack_ended_within_two_points_of_the_wind_either_side_is_in_irons` (the in-irons bound).
+  - `tests/test_captains.py::test_a_jib_kept_at_its_limit_is_taken_in_at_its_first_strain_whatever_the_wind`.
+  - `..._taken_in_by_the_captain_before_it_goes`, four hours in rising wind, in the slow tier.
+- **What moves:**
+  - the tack matrix: 90 of 1,512 cells, no tack lost (787 against 780);
+  - D's 7 cells in 260 of `dprobe.py`, all close-hauled (none abeam);
+  - the reader's passages and the lee-shore trial: identical; four beats by A and C.
+- **Carried, not mended:** the box-off's end line names the tack she was on when it began. A box-off that wears her round, as `keep her full and by`'s does for the cutter and the schooners in 20 to 30 kn, says "braced sharp up on the starboard tack" while she lies on the larboard tack. The tack after it is true (the report's §11, item 6).
+
+**The lead's ruling on rule A (2026-11-27): the haul with the wind ahead is a habit of the ship, said in her file.** The report's §12.
+- **Built:** `ship.slack_in_stays` (schema; false by default; true or false, else refused). `TackScript._time_to_haul` reads `HAUL_WAY_FRACTION` and `WIND_AHEAD_RAD` only for a ship with it; every other ship is hauled at the point, as on the trunk. The reading `the ship` says the habit in one line where it is set. No ship file sets it, and no figure moved.
+- **What moves:** nothing of today's eighteen by A. The tack matrix differs from the trunk in 25 cells, C's 12 and D's 13 (786 made against 780, the six D's). The seat's comparison against bd4fa9e4: 9,168 items and 1,350 answers, none differing.
+- **Pins moved, old beside new** (the hermaphrodite brig hauled at the point again: her bands from her trunk seconds, less and more thirty, to the ten):
+  - truth 7-761, plain: 8 kn (260, 330) -> (360, 450); 12 kn (160, 230) -> (230, 300); 20 kn (150, 220) -> (140, 210); 25 kn (130, 210) -> (130, 200); 15 kn stands at (150, 230).
+  - truth 7-762, shortened: 20 kn (150, 220) -> (100, 180); 25 kn (130, 200) -> (120, 200).
+  - truth 7-763: was "the hermaphrodite brig (no habit) hauls with the wind ahead"; it now hauls at the point as her file has her (8 to 11.25 degrees off), and with the habit set in memory, with the wind ahead. Renamed `..._a_ship_known_slack_in_stays_hauls_with_the_wind_ahead_any_other_at_the_point`.
+  - truths 7-760 and 7-761: their docstrings only.
+- **New pins:** truth 7-763b (the line in `the ship`); `tests/test_ship_loader.py::test_slack_in_stays_is_a_habit_her_file_may_give_false_by_default_and_refused_else`. The mutants "every ship slack" and "no ship slack" each fail 7-763, in the fast tier.
+- **For whoever sets the key:** the report's §12 gives the trade by this package's measure (the corvette 7 to 13 of 15; the 74 and the 64 one to four minutes slower in five cells had it been every ship's).
+- **Truth numbers:** the truths 7-768 and 7-769 are D's (the storm canvas's jib, and the bilander's jib). Rule E's truths of those numbers (the captain and a straining topgallant yard) never joined the trunk; E was taken out of this package before its first merge, and nothing anywhere carries them.
+
+**The corvette joins (the Diana, `corvette-20`, trunk 939de7d6): the corvette's pins moved by D.** Measured at seed 7 on the trunk and on this package's tree; the report's §13.
+- **What moves of hers:** `tests/test_diana.py`, fast and slow, 59 tests: three fail on the merge, truth E's `..._shortened_in_25_knots_she_gripes_without_her_jib` at 290, 292.5 and 295, each at its first assertion (the jib taken in by `shorten sail`): D leaves it on her. Nothing of hers moves by A (her key is unset) or by C. Her plain-sail tacks, her 20-knot shortened tacks, her wear, her helm (truth D), her speed, her stiffness and her lee port are as they were.
+- **What she now does, shortened by the game's own order** (her test's own settle):
+  - 20 kn: her jib is left on her, as before (0.49 of its rating; helm 0.5 to 2.0 degrees); she stays 3 of 3, 186 to 193 s. Unmoved.
+  - 25 kn: her jib is now left on her ("The jib is left on her: she gripes, and her helm will not hold her without it." and "It is carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'."). It carries 0.75 of its rating; she holds her course 65 to 70 degrees off at 6.9 to 8.1 kn with 0.4 to 2.0 degrees of helm; and she stays 3 of 3 in 203 to 208 s, the jib set throughout. On the trunk she stayed 1 of 3.
+  - In the fleet's settle (truth 7-762): 25 kn 184, 187 and 189 s against the trunk's 216 s from 290 alone (a miss from 292.5, no end in 900 s from 295); 20 kn 175 to 182 s on both trees.
+- **Her jib taken in, then set again:**
+  - With `take in the jib` after the shortening, she gripes as her truth had it. From 290 she stays (233 s; old 235). From 292.5 she misses stays (62.4 degrees off at 4.9 kn, her helm 18 degrees). From 295 the tack is refused for want of way (39.3 off at 1.0 kn, her helm 22 degrees).
+  - `set the jib` is then obeyed. She bears away and stays 3 of 3, 184 to 187 s, with the jib at 0.67 to 0.70 of its rating.
+  - A second `shorten sail` takes the kept jib in as well. From 290 and 292.5 she then stays (231 s); from 295 she is refused (52.6 off at 1.4 kn). Not pinned.
+- **Pins moved, old beside new** (her test file only; her ship file, her generator, her design note and her report untouched):
+  - `test_truth_7_664_shortened_in_25_knots_she_gripes_without_her_jib`. Old: "in a fresh breeze, shortened by the game's own order, she wants her jib. `shorten sail` takes it in there ... and with it in she gripes ... Stayed 1 of 3, from 290", with the jib taken in by the shortening and the bands 290 off 65 to 75 at 6 to 9 kn, stays; 292.5 and 295 off 30 to 62 at 0 to 2.5 kn, not about. New: "without her jib in a fresh breeze she gripes", with the jib taken in by `take in the jib` after the shortening and the bands 290 off 65 to 75 at 6 to 9 kn, stays; 292.5 off 55 to 66 at 3 to 6 kn, not about; 295 off 30 to 50 at 0 to 2.5 kn, not about. Stayed 1 of 3, as before.
+  - `test_truth_7_664_shortened_in_25_knots_with_her_jib_set_again_she_stays`. Old: "After the game's own shortening has taken it in, `set the jib` is taken". It passed on the merge only because `set the jib` was refused ("The jib is already set."). New: the jib is taken in by `take in the jib` and asserted in before `set the jib`. Measured 184 to 187 s (old 184 to 189) with the jib at 0.67 to 0.70 of its rating (old 0.68 to 0.78). Her band of 180 to 330 s stands.
+  - New: `test_truth_7_664_shortened_in_25_knots_her_jib_is_left_on_her_and_she_stays`. It pins the words of the reply, the jib set at 0.70 to under 1.0 of its rating, 62 to 72 degrees off at 6 to 9 kn, her helm within 5 degrees, and 3 of 3 stays in her band. It fails with D off (the mutant `HELM_IN_HAND_SHARE = 99`).
+- **Her rows in the fleet's tables** (truths 7-761 and 7-762; bands from the measured seconds less and more thirty, to the ten; the trunk's count from 939de7d6):
+  - plain: 8 kn from 290 (320, 390), 1; 12 kn (150, 220), 3; 15 kn (200, 270), 3; 20 and 25 kn none, 0;
+  - shortened: 20 kn (140, 220), 3; 25 kn (150, 220), trunk 1.
+  - Her 7-762 cases are in `SLOW_TESTS`.
+- **Read by:** her pins were pinned by her builder (package 90, the ships' session). The moved ones have been read by no reader of this package's.
+
+**The reader's read of b5ddfa6a (2026-11-28): a kept jib on a player's ship; the two-fifths figure; her words.** The report's §14.
+- **The finding:** on a player's ship (no captain's intent) nothing took the kept jib in. Its line was said every ten minutes, it stood all hour at up to 1.73 of its rating, and the brig's in 35 kn at seed 7 blew out at 1596 s, where the trunk's `shorten sail` had it in.
+- **Built:** `storm.see_kept_jibs_through`, from the world's tick on a ship whose captain does not command. The hands take a kept jib in at its strain's first dire line since it was kept (loaded past `CARRY_AWAY_RATIO`, where it may go). The log says "Taking in the jib before it goes: she will gripe without it." Its lesser lines stay the player's warning. A jib he sets again himself is his own. Under a captain who commands, the hands leave it to him.
+- **The moment measured, two ways:**
+  - At the second strain line (1b6a90a1): the kept jib came in during the tack matrix's long shortening, and the corvette lost her three tacks shortened in 30 kn at seed 11 (refused, where b5ddfa6a made them in 190 to 195 s). Not kept.
+  - At the first dire line (6c298df8): no tack lost.
+- **The hour in rising wind** (ten ships, 25, 30 and 35 kn, seeds 7 and 11, plus the razee in 28 kn and the brig from 290: 62 cells; the wind rising 12 kn over the hour; a player's ship):
+  - jibs blown out: trunk 11, b5ddfa6a 12, now 11; kept jibs blown out: 0, 1, 0;
+  - the jib is kept in 8 cells. The hands take it in in 4: the brig in 35 kn at 1073 s, the hermaphrodite brig in 35 kn at 2159 s, the 36 in 25 kn at 3560 s, the razee in 28 kn at 173 s. In the other 4 it stands under its dire line all hour (the brig and the hermaphrodite brig in 30 kn at 1.19 and 1.2; the two schooners at 1.03), its line said, and none blows out;
+  - the 11 jibs lost on every tree are ones `shorten sail` did not keep, and they are alike on all three.
+- **The tack matrix** (1,596 cells with the default gusts):
+  - against b5ddfa6a, 2 cells move, both D's: the razee shortened in 30 kn at seed 11, from 290 missed stays then refused now, and from 295 refused on both, in other words. No tack lost or gained;
+  - against the trunk e3d50aac, 28 cells move: C 16, D 12 (the brig 4, the hermaphrodite brig 3, the razee 3 by tmxrule, and the corvette 3), A 0. Made 838 against 829, refused 609 against 613, 9 gained, none lost.
+- **The two-fifths figure (the reader's M02, `HAUL_WAY_FRACTION` = 1.0, lived):** new truth 7-763c. The frigate in 15 kn with the habit set in memory keeps 0.53 of her way at the point and hauls there, 8 to 11.25 degrees off. M02 now fails it and no other test.
+- **Her words (`tests/test_diana.py`, the gripe truth):**
+  - Old: "she gripes past what her rudder holds, comes up toward the wind with her way going".
+  - New: from 292.5 she lies 62 degrees off at 4.9 kn, her helm at 18 degrees, and misses stays; from 295 she gripes up to 39 degrees off with a knot of way and is refused.
+  - Her bands are unchanged.
+- **New pins:**
+  - `tests/test_captains.py::test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_its_dire_line` (fast). It fails with the take-in off.
+  - `..._on_a_players_ship_is_taken_in_before_it_goes`, the four hours of `KEPT_JIB_HOURS` as a player's ship, in the slow tier: taken in where it comes to its dire line, standing under it with its line said where it does not.
+
+**Truth 7-779b, the spar carried away on passage (the lead's item of 2026-11-28, 02:15).** Its brig cell in 20-38 kn failed (`assert set() == {3}`): the brig at seed 3 had come inside the rule, where `PASSAGE_DECLARED` had her outside.
+- **Why it was not seen:** `tests/test_mends_126.py` was not among the 55 files of my slow tier, so the truth was not run on this branch after rule D went in. It fails on the lead's machine too.
+- **Measured:** every `PASSAGE_CELLS` cell at every seed (140), the three passages on the trunk e3d50aac and on this tree. Two cell-seeds moved, and no other figure.
+- **Old beside new** (way made good in nm, minutes astern, times aback, brought to in s):
+
+  | cell-seed | passage | trunk | this tree |
+  |---|---|---|---|
+  | brig 20-38, seed 3 | the trunk's captain | 2.70, 44, 6, 6274 | the same |
+  | | the wreck cleared at once | 14.19, 2, 1, 6223 | the same |
+  | | this tree's | 10.61, 18, 4, 6963 (outside: brought to late) | 7.61, 17, 5, 6096 (inside) |
+  | frigate 20-38, seed 3 | the trunk's captain | 12.34, 17, 5, 5293 | 12.56, 17, 5, 5291 |
+  | | the wreck cleared at once | 22.60, 0, 0, 5442 | the same |
+  | | this tree's | 13.29, 24, 2, 5838 (outside: astern, brought to late) | 15.77, 12, 1, 5945 (outside: brought to late) |
+
+- **The cause:** rule D's kept jib at the captain's `shorten sail`. With `HELM_IN_HAND_SHARE` at 99 (no jib kept) both return exactly to the trunk's figures. With the hands' take-in off they keep the new ones.
+- **`PASSAGE_DECLARED`:**
+  - the brig's seed 3 is taken out. She is now no worse than the trunk's captain on every count: brought to 178 s before him, 4.9 nm more made good, 27 fewer minutes astern, one fewer time aback. A good move. Her way is 3.0 nm less than this tree's captain made before rule D;
+  - the frigate's seed 3 stays outside (brought to 654 s after the trunk's captain, where it was 545). Its words give the new figures: 15.77 nm against 12.56, 12 minutes astern against 17.
+- **The slow tier from now on** takes `tests/test_mends_126.py`, `tests/test_captains.py` and `tests/test_known_truths.py` whole.
+
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
 **One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
@@ -40431,20 +40543,3 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
-
-## Package 90, the lateen hulls' list, its third pass with package 127: item 2 by 127's rule, the boats' line in 127's words (the lead's nudge 83, 2026-11-27)
-
-`…/pkg-90` merged at e87714d7 (package 127 on the trunk at 572133ac). Old is e87714d7.
-
-- **Item 2, a spar lost while its shift waits: the dire step, by package 127's rule.** A whole lateen's cause is counted by `strain.warning_due`, as every part is: one warning a part and its cause in ten minutes, and the dire one said whatever lesser one came within them (`last_dire_s`). A cause that comes again begins its dire count afresh too (`_causes_come`). At e87714d7 the cause kept its own old rule (the lead's choice at nudge 56), and 127 left it so.
-  - The xebec in 40 kn, the wind through her bow, her sheets let fly onto the bad hand, the wind then to 56 kn: her mizzen yard warned "working" at 1.05 at 613 s.
-  - Old: nothing more, and carried away at 1,080 s.
-  - New: "The mizzen mast and lateen yard bending like whips, the mizen lying on the mast; she will carry them away: shift the mizen." at 1.77 at 701 s, and carried away at 1,080 s as before. No load moves.
-  - The xebec in 50 kn on the bad hand: her main yard warned "working" at 1.28 at once, and now "bending like a whip ...; she will carry it away: shift the mainsail." as it passes 1.5.
-- **The boats' line of `clear for action`, in 127's words:** her boats griped fast on the booms, or towing astern on their painters where her file tows them. Her boat lost is not among them, and is said lost by her file's name (`action_scripts._boats_cleared_words`, 127's one function; the third pass's own, at the end of the file, removed in the merge).
-  - A ship with boats on the booms and one lost, the brig, her launch cut adrift: "The boats griped fast on the booms; the launch lost; the ship is clear.".
-  - The bilander, her one boat lost: "The long-boat lost; the ship is clear.".
-  - The tartane probe, her boat towed and stove, her punt on the booms: "The punt griped fast on the booms; the boat lost; the ship is clear.".
-- **A wait said once, routine, marked** (127's `TURN_WAIT`): the third pass's line for an order to a whole lateen waiting behind work (nudge 60's item 2) is 127's line for every order now, said once, routine and marked. The third pass's own branch is gone in the merge.
-  - The strain's "when the hands are done trimming the mainsail" is a clause of the strain's warning, under the strain's count, and not a wait note.
-  - The shift or box then ordered says its own wait by 127's road.

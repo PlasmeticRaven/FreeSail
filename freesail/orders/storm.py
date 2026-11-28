@@ -27,6 +27,7 @@ staysails were in the sail room and nothing set them.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from freesail import units
@@ -52,10 +53,37 @@ STORM_CANVAS_KN = 40.0
 # 1.3 squared, 1.7 times, and still short of blowing it out.
 HEAD_SAIL_IN_RATIO = 0.75
 
+# A jib loaded to its `HEAD_SAIL_IN_RATIO` is left set by `shorten sail` where she would want
+# more than this share of her rudder's travel without it (package 125, D; `loaded_jibs`).
+# JUDGEMENT, its ground the measure (docs/design/Report-Package125.md §5): in 25 knots close-hauled
+# the frigate and a light corvette would each want about ten degrees of helm of their 35 without
+# the jib as it is ordered in; with it in, the frigate gripes to 11 to 20 degrees and recovers,
+# the corvette to 21 to 25 and comes up into the wind and lies there. A quarter of the travel
+# keeps it for both; the helmsman wants the rest in hand for the gusts and the sea.
+HELM_IN_HAND_SHARE = 0.25
+
 # Where the storm staysails being bent are kept until they can be set (`keep_storm_canvas`).
 PENDING = "storm_canvas_pending"
 
+# Where the jibs `shorten sail` left on her for her helm are kept (package 125, D): set while
+# each stays set, so that the next `shorten sail` takes it in, its strain's line names the
+# order that does (`physics.strain`), and the captain takes it in at its first strain
+# (`world.captains`); a jib taken in or blown out is forgotten (`forget_kept_jibs`).
+KEPT = "jibs_kept"
+
+# A kept jib seen through on a ship whose captain gives no judgements of his own (the lead's
+# ruling on the reader's finding of 2026-11-28): the order `shorten sail` left it on her, so
+# the order's hands take it in before it goes, at its strain's first dire line since it was kept
+# (`physics.strain`, read: loaded past `CARRY_AWAY_RATIO`, where it may go). Its lesser lines
+# are the player's warning, the order named in them. Taken in at its second line instead, it
+# came in during a long shortening and cost the corvette her three tacks in 30 knots (the
+# report's §14). Where each kept jib's dire line is watched (`see_kept_jibs_through`).
+SEEN = "jibs_kept_seen"
+
 STORM_VERBS = frozenset({"set the storm staysails"})
+
+# `shorten sail`'s line that sets them (`shorten_sail_lines`).
+STORM_LINE = "set the storm staysails"
 
 
 def storm_staysails(ship: Ship) -> list[Sail]:
@@ -380,27 +408,36 @@ def bowsprit_sail_lines(ship: Ship) -> list[str]:
 def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
     """What `shorten sail` adds to its list (see the module's head): each jib loaded to
     `HEAD_SAIL_IN_RATIO` of its rating or more, outermost first; and over the storm line
-    `set the storm staysails`, when she carries any that are not set."""
-    lines: list[str] = []
-    jibs = [ship.sails[sid] for sid in ship.groups.get("jibs") or [] if sid in ship.sails]
-    for sail in sorted(jibs, key=lambda sl: -sl.x_m):
-        if not sail.is_set:
-            continue
-        rating = sail.effective_cloth_rating_kn
-        if rating > 0.0 and sail.load_kn / rating >= HEAD_SAIL_IN_RATIO:
-            lines.append(f"take in the {_name(ship, sail)}")
-    lines += _after_sail_lines(ship)
+    `set the storm staysails`, when she carries any that are not set (`shortening_plan`)."""
+    return shortening_plan(ship, true_wind_kn)[0]
+
+
+def shortening_plan(ship: Ship, true_wind_kn: float | None) -> tuple[list[str], list[Sail]]:
+    """`shorten_sail_lines`' lines, and the jibs they leave on her (package 125, D): the
+    loaded jibs her helm cannot do without (`loaded_jibs`), less any the storm canvas takes in
+    or shifts as it is set (`replaced_by_storm_canvas`), which are taken in by their own line
+    as before; a jib the last `shorten sail` left on her is taken in, loaded or not."""
+    taken, kept = loaded_jibs(ship)
+    held = {sl.id for sl in taken}
+    taken += [sl for sl in kept_jibs(ship) if sl.id not in held]
+
+    def jib_lines(jibs: list[Sail]) -> list[str]:
+        return [f"take in the {_name(ship, sl)}" for sl in sorted(jibs, key=lambda sl: -sl.x_m)]
+
+    after = _after_sail_lines(ship)
     over_the_line = true_wind_kn is not None and true_wind_kn >= STORM_CANVAS_KN
     # package 57: the staysail she lies to under (Steel's main staysail, the file's
     # `lying-to staysails`) taken in over the storm line or loaded as a jib is, the storm
     # staysails standing for it in a whole gale (Luce 1884, ch. XXIX: "lying to under
     # close-reefed main topsail, fore storm staysail"); Steel has it "preferable when it
     # blows strong enough for that sail to support the rolling of the ship"
+    lying: list[str] = []
     for sail in lying_to_staysails(ship):
         rating = sail.effective_cloth_rating_kn
         loaded = rating > 0.0 and sail.load_kn / rating >= HEAD_SAIL_IN_RATIO
         if sail.is_set and (over_the_line or loaded):
-            lines.append(f"take in the {_name(ship, sail)}")
+            lying.append(f"take in the {_name(ship, sail)}")
+    before = jib_lines(taken) + after + lying
     storms = storm_staysails(ship)
     stormy = {sl.id for sl in storms}
     # the head sails the foremost storm staysail replaces, loaded to their ratings: the
@@ -416,11 +453,185 @@ def shorten_sail_lines(ship: Ship, true_wind_kn: float | None) -> list[str]:
         sl.effective_cloth_rating_kn > 0.0
         and sl.load_kn / sl.effective_cloth_rating_kn >= HEAD_SAIL_IN_RATIO
         for sl in heads
-        if f"take in the {_name(ship, sl)}" not in lines
+        if f"take in the {_name(ship, sl)}" not in before and sl not in kept
     )
-    if (over_the_line or strained) and any(not sl.is_set for sl in storms):
-        lines.append("set the storm staysails")
-    return lines
+    storm_line = (over_the_line or strained) and any(not sl.is_set for sl in storms)
+    if storm_line and kept:
+        stormed = replaced_by_storm_canvas(ship)
+        taken += [sl for sl in kept if sl.id in stormed]
+        kept = [sl for sl in kept if sl.id not in stormed]
+    lines = jib_lines(taken) + after + lying + ([STORM_LINE] if storm_line else [])
+    return lines, kept
+
+
+def loaded_jibs(ship: Ship) -> tuple[list[Sail], list[Sail]]:
+    """The jibs loaded to `HEAD_SAIL_IN_RATIO` of their ratings, outermost first, split into
+    those `shorten sail` takes in and those it leaves set because she cannot be held without
+    them (package 125, D): a jib is kept where, taken in with those before it, she would want
+    more than `HELM_IN_HAND_SHARE` of her rudder's travel to hold her (`helm_without`), and
+    only while it is under its whole rating; one over its rating is taken in as before, and so
+    is one an earlier `shorten sail` left on her (`KEPT`): it is kept once, at its limit. A kept
+    jib is not a "strained" head sail for the storm staysails, which would take it in in their
+    place. The player's own `take in the jib` is an order of its own and is obeyed as ever."""
+    taken: list[Sail] = []
+    kept: list[Sail] = []
+    before = ship.extra.get(KEPT) or {}
+    jibs = [ship.sails[sid] for sid in ship.groups.get("jibs") or [] if sid in ship.sails]
+    for sail in sorted(jibs, key=lambda sl: -sl.x_m):
+        if not sail.is_set:
+            continue
+        rating = sail.effective_cloth_rating_kn
+        if rating <= 0.0 or sail.load_kn / rating < HEAD_SAIL_IN_RATIO:
+            continue
+        if sail.id in before:
+            taken.append(sail)
+            continue
+        stop = ship.hull.spec.rudder.max_angle_deg
+        wanted = math.degrees(helm_without(ship, taken + [sail]))
+        if sail.load_kn / rating < 1.0 and wanted > HELM_IN_HAND_SHARE * stop:
+            kept.append(sail)
+        else:
+            taken.append(sail)
+    return taken, kept
+
+
+def helm_without(ship: Ship, sails: list[Sail]) -> float:
+    """The weather helm (radians, positive to bring her head up) she would carry with these
+    sails taken in: her helm as she carries it now (`dyn.weather_helm`), and the yaw moment the
+    sails give her about her centre of lateral resistance taken over by her rudder at the way
+    she has now (`physics.hull.rudder_forces`, read; its moment goes with the rudder's angle).
+    The deck's reading of it: what her helm is holding now, and what it would have to hold."""
+    from freesail.physics import hull as hp
+
+    hull, d = ship.hull, ship.dyn
+    per_rad = hp.rudder_forces(hull, d.u, 1.0)[1] - hp.rudder_forces(hull, d.u, 0.0)[1]
+    if abs(per_rad) < 1e-9:
+        return math.pi  # no way on her: the helm holds nothing
+    moment = sum(sl.side_force_kn * 1000.0 * (sl.x_m - hull.spec.clr_x_m) for sl in sails)
+    to_windward = -1.0 if d.apparent_wind_angle >= 0 else 1.0  # as `weather_helm_reading`
+    return d.weather_helm + to_windward * moment / per_rad
+
+
+def kept_jibs_words(ship: Ship, kept: list[Sail]) -> str:
+    """`shorten sail`'s words for the jibs it leaves set (package 125, D), in the deck's words:
+    "The jib is left on her: she gripes, and her helm will not hold her without it. It is
+    carried at its limit: the next 'shorten sail' takes it in, or 'take in the jib'." """
+    if not kept:
+        return ""
+    one = len(kept) == 1
+    names = errors.join_names([f"the {_name(ship, sl)}" for sl in kept], "and")
+    verb = "is" if one else "are"
+    it = "it" if one else "them"
+    said = f"{names[0].upper()}{names[1:]} {verb} left on her"
+    orders = errors.join_names([f"'take in the {_name(ship, sl)}'" for sl in kept], "or")
+    limit = "It is carried at its limit" if one else "They are carried at their limit"
+    return (
+        f"{said}: she gripes, and her helm will not hold her without {it}. "
+        f"{limit}: the next 'shorten sail' takes {it} in, or {orders}."
+    )
+
+
+def kept_jibs(ship: Ship) -> list[Sail]:
+    """The jibs an earlier `shorten sail` left on her (`KEPT`) that are set still."""
+    kept = ship.extra.get(KEPT) or {}
+    return [ship.sails[sid] for sid in kept if sid in ship.sails and ship.sails[sid].is_set]
+
+
+def keep_jibs(ship: Ship, kept: list[Sail]) -> None:
+    """Mark the jibs this `shorten sail` left on her (`KEPT`), each with its strain's lines as
+    they stand now (`SEEN`), so that only the lines said after it are counted."""
+    if kept:
+        marks = ship.extra.setdefault(KEPT, {})
+        seen = ship.extra.setdefault(SEEN, {})
+        for sl in kept:
+            marks[sl.id] = True
+            seen[sl.id] = _strain_lines(ship, sl.id)
+
+
+def _strain_lines(ship: Ship, sid: str) -> dict[str, float | None]:
+    """When the sail's strain was last said, and last said dire (`physics.strain`, read)."""
+    from freesail.physics.strain import strain_state
+
+    st = strain_state(ship)
+    dire = st.__dict__.get("last_dire_s") or {}
+    return {"at": st.last_warning_s.get(sid), "dire": dire.get(sid)}
+
+
+def see_kept_jibs_through(ship: Ship) -> None:
+    """Once a tick, from the world, on a ship whose captain gives no judgements of his own (a
+    player's ship, or one with a model at his station): a jib `shorten sail` left on her is
+    taken in by the hands at its strain's first dire line since it was kept, before it goes, and
+    the log says so. A jib set again by the player's own order is his, and is not kept
+    (`forget_kept_jibs`)."""
+    marks = ship.extra.get(KEPT)
+    seen = ship.extra.get(SEEN)
+    if not isinstance(marks, dict) or not isinstance(seen, dict):
+        return
+    vocab: Vocabulary | None = None
+    for sid in list(marks):
+        sail = ship.sails.get(sid)
+        rec = seen.get(sid)
+        if sail is None or not sail.is_set or not isinstance(rec, dict):
+            continue
+        dire = _strain_lines(ship, sid)["dire"]
+        if dire is None or dire == rec.get("dire"):
+            continue
+        rec["dire"] = dire
+        vocab = vocab or load_vocabulary()
+        name = _name(ship, sail)
+        try:
+            _run(ship, f"take in the {name}", vocab)
+        except OrderError as e:
+            ship.note(
+                "notable",
+                "sail.kept_jib",
+                f"The {name} is at its limit and is not taken in: {str(e).rstrip('.')}.",
+                sid,
+            )
+            continue
+        seen.pop(sid, None)
+        ship.note(
+            "notable",
+            "sail.kept_jib",
+            f"Taking in the {name} before it goes: she will gripe without it.",
+            sid,
+        )
+
+
+def forget_kept_jibs(ship: Ship) -> None:
+    """Once a tick, from the runner: a kept jib no longer set (taken in, blown out, carried
+    away with its stay) is forgotten, so that it is kept afresh if it is set again."""
+    marks = ship.extra.get(KEPT)
+    if not isinstance(marks, dict):
+        ship.extra.pop(KEPT, None)
+        ship.extra.pop(SEEN, None)
+        return
+    seen = ship.extra.get(SEEN)
+    for sid in list(marks):
+        sail = ship.sails.get(sid)
+        if sail is None or not sail.is_set:
+            marks.pop(sid)
+            if isinstance(seen, dict):
+                seen.pop(sid, None)
+    if not marks:
+        ship.extra.pop(KEPT, None)
+        ship.extra.pop(SEEN, None)
+
+
+def replaced_by_storm_canvas(ship: Ship) -> set[str]:
+    """The sails `set the storm staysails` would take in or shift, said before it is run: for
+    each storm staysail not set, the sail bent in its place (`_in_its_place`, the
+    fore-and-after's jib shifted for her storm jib) and what it replaces as it is set
+    (`_replaced`). A jib among them is not left on her (package 125, D; `shortening_plan`)."""
+    out: set[str] = set()
+    for i, storm in enumerate(storm_staysails(ship)):
+        if storm.is_set:
+            continue
+        rival = _in_its_place(ship, storm)
+        if rival is not None and storm.state is SailState.UNBENT:
+            out.add(rival.id)
+        out.update(sl.id for sl in _replaced(ship, storm, i == 0))
+    return out
 
 
 def _after_sail_lines(ship: Ship) -> list[str]:

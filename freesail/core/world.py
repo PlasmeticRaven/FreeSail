@@ -2537,6 +2537,14 @@ class World:
         if self.tide is not None and self.clock.ship_time.second == 0:
             # the tide once a minute (spec M5 §16), before the ship feels the stream
             self._tick_tide()
+        if "jibs_kept" in getattr(self.ship, "extra", ()):
+            # a jib `shorten sail` left on her, seen through by the hands on a ship whose
+            # captain gives no judgements of his own (package 125, D; `orders.storm`)
+            captain = getattr(self, "captain", None)
+            if captain is None or not captain.commands:
+                from freesail.orders.storm import see_kept_jibs_through
+
+                see_kept_jibs_through(self.ship)
         for note in self.ship.step(1.0, self.wind):
             if len(note) == 3:
                 self.record(*note)

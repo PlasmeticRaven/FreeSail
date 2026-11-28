@@ -106,7 +106,6 @@ from freesail.evolutions.scripts import (
     SCRIPTS,
     Script,
     _world_of,
-    heave_to_in_hand,
     helm_lost,
     helm_words,
     keep_full_and_by,
@@ -493,15 +492,6 @@ class Runner:
             except hands.CrewRequestError as e:
                 raise OrderError(f"{evolution_id}: {e}") from None
             self._check_party(ship, inst)
-        if evo.id == "box_off" and heave_to_in_hand(ship):
-            # coming to, she does not box off: taken behind the heave-to, it waited and failed
-            # once she was hove to (package 90, the lead's nudge 77, item 3); refused at the
-            # order, with the reason it would have failed for where she has no head yards
-            from freesail.evolutions.scripts import head_and_after_yards
-
-            if not head_and_after_yards(ship)[0]:
-                raise OrderError("She has no head yards to brace abox.")
-            raise OrderError("She is heaving to; she will not box off while she comes to.")
         blockers = [
             other
             for other in self.instances
@@ -646,6 +636,11 @@ class Runner:
             from freesail.orders.storm import keep_storm_canvas
 
             keep_storm_canvas(ship)
+        if "jibs_kept" in ship.extra:
+            # a jib `shorten sail` left on her, forgotten once it is in (package 125, D)
+            from freesail.orders.storm import forget_kept_jibs
+
+            forget_kept_jibs(ship)
         if "course_pending" in ship.extra:
             # a course across the wind held for want of way, given when she has it (37m)
             from freesail.orders.navigation import keep_course_pending

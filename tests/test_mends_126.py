@@ -1281,14 +1281,9 @@ PASSAGE_DECLARED: dict[tuple[str, str, int], str] = {
     ),
     ("frigate-36", "20-38", 3): (
         "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
-        "before the rise: given `lie a-try` at the trunk's tick, she lies a-try 545 s after it; "
-        "13.29 nm against 12.34"
-    ),
-    ("brig", "20-38", 3): (
-        "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22) "
-        "just before the rise: given `lie a-try` at the trunk's tick, she comes round through "
-        "the wind as she is brought up and lies a-try 689 s after it; 10.61 nm against 2.70, 18 "
-        "minutes astern against 44"
+        "before the rise, her jib kept on her at `shorten sail` (package 125's rule D): given "
+        "`lie a-try` at the trunk's tick, she lies a-try 654 s after it; 15.77 nm against "
+        "12.56, 12 minutes astern against 17"
     ),
     ("seventy-four", "25", 7): (
         "the wreck's sails lowered to the deck, its windage gone (the carried list, fault 22): "

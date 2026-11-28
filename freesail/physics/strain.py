@@ -436,13 +436,12 @@ def _warn(
     key = part.id if pressed is None else f"{pressed[0]}:{part.id}"
     dire = ratio > CARRY_AWAY_RATIO
     if pressed is not None:
-        # a whole lateen's cause counted by package 127's rule, as every part is (`warning_due`):
-        # one a part and its cause in ten minutes, and the dire one said whatever lesser one came
-        # within them (package 90, the lead's nudge 77, item 2: the xebec's main yard carried
-        # away 334 s after its shift's order, warned before the order alone); its plain strain
-        # counted as said with it. No committed ship's part is pressed so
-        if not warning_due(st, key, dire):
+        # a whole lateen's cause keeps its own rule, one a part and its cause in ten minutes
+        # whatever it is (the lead's choice at nudge 56); no committed ship's part is pressed so
+        last = st.last_warning_s.get(key)
+        if last is not None and st.elapsed_s - last < WARNING_INTERVAL_S:
             return
+        st.last_warning_s[key] = st.elapsed_s
         st.last_warning_s[part.id] = st.elapsed_s
     elif not warning_due(st, key, dire):
         return
@@ -482,6 +481,11 @@ def _warn(
             many = "stretched drum-tight; they will not stand much more."
         else:
             one = many = "straining at the bolt-ropes."
+        kept = ship.extra.get("jibs_kept") if isinstance(ship.extra, dict) else None
+        if isinstance(kept, dict) and part.id in kept:
+            # a jib `shorten sail` left on her for her helm (package 125, D; `orders.storm`):
+            # its line names the order that eases it, and is said alone
+            one, many = one[:-1] + f": take in the {_name(ship, part.id, False)}.", None
     warning = _Warning(part, ratio, one, many)
     if out is None:
         _log_warnings(ship, [warning])
@@ -496,11 +500,9 @@ def _causes_come(st: StrainState, pressed: dict[str, tuple[str, str, float]]) ->
     let fly, on the bad hand and warned, and aback and on the bad hand again within the ten
     minutes, was silent the second time, at 1.59 of its rating, till its yard carried away."""
     last = getattr(st, "pressed_by", None) or {}
-    dire = _last_dire_s(st)
     for part_id, mark in pressed.items():
         if last.get(part_id) != mark[0]:
             st.last_warning_s.pop(f"{mark[0]}:{part_id}", None)
-            dire.pop(f"{mark[0]}:{part_id}", None)  # and its dire one, by package 127's count
     st.pressed_by = {part_id: mark[0] for part_id, mark in pressed.items()}
 
 
@@ -523,32 +525,11 @@ def pressed_reliefs(ship: Ship, cause: str, names: str) -> str:
     as worded ("There is no such part as the them")."""
     shift = f"shift {names}"
     if cause == "aback":
-        from freesail.evolutions.scripts import head_and_after_yards, heave_to_in_hand
+        from freesail.evolutions.scripts import head_and_after_yards
 
-        # not hove to, nor coming to: a box given then is refused (the lead's nudge 77, item 3)
-        if (
-            head_and_after_yards(ship)[0]
-            and "hove_to" not in ship.extra
-            and not heave_to_in_hand(ship)
-        ):
+        if head_and_after_yards(ship)[0] and "hove_to" not in ship.extra:
             return f"{shift} or box her off"
     return shift
-
-
-def _shift_held(ship: Ship, sail_id: str) -> str | None:
-    """'trimming the mainsail': the work given before it that holds this lateen (its trim, its
-    take-in), behind which a shift ordered now waits (package 90, the lead's nudge 77, item 3:
-    the tartane's shift waited three minutes behind her trims, told only to shift it); None
-    where nothing holds it but a shift of its own."""
-    runner = ship.extra.get("evolutions") if isinstance(ship.extra, dict) else None
-    held = [
-        i
-        for i in getattr(runner, "instances", []) or []
-        if i.subject_id == sail_id and i.evo.id != "change_lateen"
-    ]
-    if not held:
-        return None
-    return " and ".join(runner._doing(i) for i in held)
 
 
 def _shift_waiting(ship: Ship, sail_id: str) -> str | None:
@@ -579,12 +560,6 @@ def _pressed_words(ship: Ship, pressed: tuple[str, str, float], dire: bool) -> t
     cause, sail_id = pressed[0], pressed[1]
     sail = _name(ship, sail_id, False)
     ease = _shift_waiting(ship, sail_id) or pressed_reliefs(ship, cause, f"the {sail}")
-    held = None if ease.startswith("its shift") else _shift_held(ship, sail_id)
-    if held:
-        # the reliefs, but not at once: a shift and a box both wait behind the work holding the
-        # sail (the tartane's trims: her shift begun 182 s and her box 82 s after the order),
-        # said so, with what they wait behind
-        ease = f"{ease} when the hands are done {held}"
     if cause == "aback":
         how = f"the {sail} aback against the mast"
     else:
