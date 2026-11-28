@@ -446,33 +446,3 @@ def test_every_text_file_is_kept_with_lf_endings_by_the_attributes():
                 if "fixtures" in p.parts:
                     continue
                 assert b"\r\n" not in p.read_bytes(), p
-
-
-def test_slack_in_stays_is_a_habit_her_file_may_give_false_by_default_and_refused_else():
-    """Package 125, the lead's ruling on rule A (2026-11-27): `ship.slack_in_stays` in a ship's
-    file says her people know her slack in stays (`TackScript._time_to_haul` hauls her after
-    yards with the wind ahead when her way is gone). Absent, she is not; true or false only,
-    anything else refused in words; and no ship of the eighteen sets it."""
-    import glob
-    import pickle
-
-    assert ship_from_dict(copy.deepcopy(MINIMAL)).spec.slack_in_stays is False
-    slack = copy.deepcopy(MINIMAL)
-    slack["ship"]["slack_in_stays"] = True
-    assert ship_from_dict(slack).spec.slack_in_stays is True
-    for wrong in ("yes", 1, None):
-        bad = copy.deepcopy(MINIMAL)
-        bad["ship"]["slack_in_stays"] = wrong
-        with pytest.raises(ShipFileError) as e:
-            ship_from_dict(bad)
-        assert str(e.value) == (
-            f"<memory>: 'ship.slack_in_stays' is {wrong!r}, which is not true or false."
-        )
-    # a ship without the habit is pickled as before it (the checkpoint's bytes unmoved)
-    spec = ship_from_dict(copy.deepcopy(MINIMAL)).spec
-    assert "slack_in_stays" not in spec.__getstate__()
-    assert pickle.loads(pickle.dumps(spec)).slack_in_stays is False
-    assert "slack_in_stays" in ship_from_dict(slack).spec.__getstate__()
-    paths = sorted(glob.glob("data/ships/*.yaml"))
-    assert len(paths) == 18
-    assert not [p for p in paths if load_ship(p).spec.slack_in_stays]

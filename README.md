@@ -6,7 +6,9 @@ Status: the last gate passed is m5c, on 8 October 2026 (`docs/gates/gate-m5c.md`
 
 ## Running it
 
-Requires Python 3.11 or newer.
+**Without Python** (Windows 10 and 11, 64-bit; macOS 12 and later, Apple silicon or Intel; package 130): download `FreeSail-NAME-windows.zip` or `FreeSail-NAME-mac.zip` from a release (each gate's, or a `preview-NAME` pre-release), unpack it anywhere, and open `FreeSail` in it (`FreeSail.cmd` on Windows, `FreeSail.command` on the Mac). It carries its own Python and everything the game needs, and its `START HERE.txt` says the three steps, the one-time warning each system gives and how to pass it, how to stop, and where the saves and settings are kept (outside the folder, so a newer download keeps them). A model at a station is optional, and needs a key of your own (below). The downloads are built and proven on Windows and both kinds of Mac by `.github/workflows/downloads.yml` (`tools/bundle.py`; `docs/design/Report-Package130.md`).
+
+With Python: requires Python 3.11 or newer.
 
 ```
 py -m pip install -e ".[dev,server,agents]"     # once (python3 in place of py off Windows)

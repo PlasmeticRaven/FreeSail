@@ -1,0 +1,38 @@
+FreeSail, for Windows (10 and 11, 64-bit)                      download {{NAME}}
+=============================================================================
+
+STARTING
+  1. Unpack the zip: right-click it, choose "Extract All...", then "Extract".
+     Any folder you like will do (Downloads, the Desktop, Documents).
+  2. In the folder it makes, double-click FreeSail (a "Windows Command Script").
+  3. The first time only, Windows warns you that it does not know who made it:
+       "Windows protected your PC": click "More info", then "Run anyway".
+       or "The publisher could not be verified. Are you sure you want to run
+       this software?": click "Run".
+
+WHAT YOU WILL SEE
+  A black window: the game's server, with a few lines saying it has started.
+  Keep it open while you play. In a few seconds your web browser opens the
+  harbour (http://localhost:8000/harbour; open that address yourself if it
+  does not). Begin with "A first passage": it starts the game and its lesson.
+
+STOPPING
+  Close the black window, or press Ctrl+C in it (and Y if it asks
+  "Terminate batch job (Y/N)?"). Save first with the order "save NAME" if you
+  want to come back to the same moment.
+
+YOUR SAVES AND SETTINGS
+  They are kept outside this folder, in %APPDATA%\FreeSail
+  (paste that into the address bar of a File Explorer window to see them):
+  the saves in its "saves" folder, the settings in settings.yaml.
+  So for a newer download, unpack it beside this one and delete this folder:
+  your saves and settings stay where they are.
+
+A MODEL AT A STATION
+  Optional, and needs a key of your own; see the README (game\README.md).
+
+IF SOMETHING GOES WRONG
+  Tell the person who sent you this download what you did and what the black
+  window said (a photo of it will do); or, with a GitHub account, open an
+  issue at https://github.com/PlasmeticRaven/FreeSail/issues
+  This is download {{NAME}}, built from {{COMMIT}}.

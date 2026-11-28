@@ -1,0 +1,226 @@
+name: downloads
+
+# The downloads for a machine without Python (package 130; docs/design/Report-Package130.md):
+# one zip for Windows and one for the Mac, assembled by tools/bundle.py from the commit, and
+# each proven by tools/bundle_smoke.py on the system it is for, against the built zip itself:
+# Windows, a Mac with Apple silicon and a Mac with Intel.
+#
+# It runs in three ways:
+#
+# 1. "Run workflow" in the Actions tab, on any branch, with a name typed (e.g. for-james):
+#    builds both, smoke-tests them, and publishes them as the pre-release `preview-NAME`
+#    (replacing an earlier one of that name), for handing to friends between gates.
+# 2. Called by the gate's release (.github/workflows/release.yml), which attaches both
+#    downloads beside the project's zip once their smoke tests have passed.
+# 3. A push that changes the downloads' own files (the paths below): builds and smoke-tests
+#    them (and when pyproject.toml, whose dependencies the locks follow, changes), so that
+#    the macOS runners run when a download has changed and not on every push.
+#    A push whose head commit's message has a line of its own `[preview name]` (the name in
+#    small letters, figures, dots and dashes) also publishes, as a DRAFT
+#    (not public): a builder's proof of the publishing, not a build for players.
+#
+# Every action is pinned by its commit (the tag it was in the comment beside it); every
+# third-party file a download carries is pinned by version and sha256 in tools/bundle.py
+# and tools/bundle/locks/. No pull request runs this workflow, so no code of one ever runs
+# with the repository's token; the token can write only in the publishing job.
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "The downloads' name: letters, figures, dots and dashes (e.g. for-james)"
+        required: true
+  workflow_call:
+    inputs:
+      name:
+        description: "The downloads' name (the gate's release passes gate-NAME)"
+        required: true
+        type: string
+      called:
+        description: "Set by the call alone (a called workflow sees its caller's event)"
+        type: boolean
+        default: true
+  push:
+    paths:
+      - "tools/bundle.py"
+      - "tools/bundle/**"
+      - "tools/bundle_smoke.py"
+      - ".github/workflows/downloads.yml"
+      # the truths of what the downloads ship (7-800 to 7-806)
+      - "tests/test_downloads.py"
+      # the dependencies the lock files are resolved from
+      - "pyproject.toml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build both downloads
+    runs-on: ubuntu-24.04
+    outputs:
+      name: ${{ steps.name.outputs.name }}
+      publish: ${{ steps.name.outputs.publish }}
+      draft: ${{ steps.name.outputs.draft }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11.14"
+      - name: The downloads' name
+        id: name
+        env:
+          GIVEN: ${{ inputs.name }}
+          CALLED: ${{ inputs.called }}
+          EVENT: ${{ github.event_name }}
+          MESSAGE: ${{ github.event.head_commit.message }}
+          SHA: ${{ github.sha }}
+        run: |
+          publish=false
+          draft=false
+          if [ "$CALLED" = "true" ]; then
+            name="${GIVEN/gates\//}"           # the gate's release: gate-gates/m7 -> gate-m7
+          elif [ "$EVENT" = "workflow_dispatch" ]; then
+            name="preview-$GIVEN"; publish=true
+          elif [[ "$MESSAGE" =~ (^|$'\n')\[preview\ ([a-z0-9][a-z0-9.-]*)\]($'\n'|$) ]]; then
+            name="preview-${BASH_REMATCH[2]}"; publish=true; draft=true  # a builder's proof
+          else
+            name="trial-${SHA:0:12}"
+          fi
+          if ! [[ "$name" =~ ^[A-Za-z0-9][A-Za-z0-9.-]*$ ]]; then
+            echo "::error title=downloads::the name given is not letters, figures, dots and dashes"
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "draft=$draft" >> "$GITHUB_OUTPUT"
+          echo "::notice title=downloads::building FreeSail-$name (publish: $publish)"
+      - name: Build the Windows download
+        env:
+          NAME: ${{ steps.name.outputs.name }}
+        run: python tools/bundle.py windows --name "$NAME" --out dist --cache "$RUNNER_TEMP/pins"
+      - name: Build the Mac download
+        env:
+          NAME: ${{ steps.name.outputs.name }}
+        run: python tools/bundle.py mac --name "$NAME" --out dist --cache "$RUNNER_TEMP/pins"
+      - name: Build both again, and compare
+        env:
+          NAME: ${{ steps.name.outputs.name }}
+        run: |
+          python tools/bundle.py windows --name "$NAME" --out again --cache "$RUNNER_TEMP/pins"
+          python tools/bundle.py mac --name "$NAME" --out again --cache "$RUNNER_TEMP/pins"
+          {
+            echo "### The downloads"
+            echo
+            echo "| download | size | sha256 | built twice |"
+            echo "|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          for z in dist/*.zip; do
+            a=$(sha256sum "$z" | cut -d' ' -f1)
+            b=$(sha256sum "again/$(basename "$z")" | cut -d' ' -f1)
+            mb=$(( $(stat -c %s "$z") / 1048576 ))
+            same=$([ "$a" = "$b" ] && echo "the same bytes" || echo "DIFFERENT")
+            echo "| $(basename "$z") | $mb MB | \`$a\` | $same |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$a" = "$b" ]; then
+              echo "::notice title=$(basename "$z")::$mb MB, sha256 $a; built twice, the same bytes"
+            else
+              echo "::error title=$(basename "$z")::built twice, two different zips ($a, $b)"
+              exit 1
+            fi
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: download-windows
+          path: dist/FreeSail-*-windows.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: download-mac
+          path: dist/FreeSail-*-mac.zip
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+
+  smoke:
+    name: smoke test on ${{ matrix.label }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Windows
+            runner: windows-2025
+            download: download-windows
+          - label: a Mac with Apple silicon
+            runner: macos-15
+            download: download-mac
+          - label: a Mac with Intel
+            runner: macos-15-intel
+            download: download-mac
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: tools/bundle_smoke.py
+          sparse-checkout-cone-mode: false
+      # the harness's own Python, which the game must never see (the smoke test hides it):
+      # 3.11.9, the last 3.11 built for Windows and the Mac
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11.9"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: ${{ matrix.download }}
+          path: downloaded
+      - name: The smoke test
+        shell: bash
+        env:
+          PYTHONUTF8: "1"
+          LABEL: ${{ matrix.label }}
+        run: python tools/bundle_smoke.py downloaded/FreeSail-*.zip --title "smoke test on $LABEL"
+
+  publish:
+    name: publish the pre-release
+    needs: [build, smoke]
+    if: needs.build.outputs.publish == 'true'
+    runs-on: ubuntu-24.04
+    # two runs of one name (a typed run and a pushed one) publish one after the other
+    concurrency:
+      group: publish-${{ needs.build.outputs.name }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: download-*
+          merge-multiple: true
+          path: dist
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NAME: ${{ needs.build.outputs.name }}
+          DRAFT: ${{ needs.build.outputs.draft }}
+          SHA: ${{ github.sha }}
+          REF: ${{ github.ref_name }}
+        run: |
+          case "$NAME" in preview-*) ;; *) echo "::error::not a preview: $NAME"; exit 1 ;; esac
+          gh release delete "$NAME" --cleanup-tag --yes 2>/dev/null || true
+          # a tag of the name left without its release would hold the new one to an old commit
+          gh api -X DELETE "repos/$GH_REPO/git/refs/tags/$NAME" 2>/dev/null || true
+          if [ "$DRAFT" = "true" ]; then
+            kind=(--draft)
+            notes="A builder's proof of the downloads' publishing, from the branch $REF at ${SHA:0:12}: not a build for players."
+          else
+            kind=(--prerelease)
+            notes="FreeSail's downloads for Windows and the Mac, from the branch $REF at ${SHA:0:12}: a preview between gates, not a gate. Unpack the zip for your computer and read START HERE.txt in it."
+          fi
+          gh release create "$NAME" dist/*.zip "${kind[@]}" --target "$SHA" \
+            --title "FreeSail $NAME (a preview)" --notes "$notes"
+          echo "::notice title=published::$NAME (${kind[0]#--}), from $REF at ${SHA:0:12}"

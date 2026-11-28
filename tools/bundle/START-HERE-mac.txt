@@ -1,0 +1,46 @@
+FreeSail, for the Mac (macOS 12 and later, Apple silicon or Intel)   download {{NAME}}
+=====================================================================================
+
+STARTING
+  1. Unpack the zip: double-click it (your browser may already have done so).
+     Move the folder it makes wherever you like.
+  2. In that folder, Control-click (or right-click) FreeSail.command, choose
+     "Open", and in the box that says "macOS cannot verify the developer of
+     "FreeSail.command". Are you sure you want to open it?", click "Open".
+       On macOS 15 (Sequoia) or later the box says instead "FreeSail.command"
+       Not Opened: click "Done", open System Settings, Privacy & Security,
+       scroll down to ""FreeSail.command" was blocked to protect your Mac",
+       click "Open Anyway", give your password, and "Open Anyway" again.
+     This is asked the first time only. If the Mac asks whether Terminal may
+     access files in your Downloads (or Desktop, or Documents) folder, click OK.
+  3. A Terminal window opens with the game's server in it, and in a few seconds
+     your web browser opens the harbour. Later, double-clicking FreeSail.command
+     is enough.
+
+WHAT YOU WILL SEE
+  The Terminal window: the game's server, with a few lines saying it has
+  started. Keep it open while you play. The harbour is at
+  http://localhost:8000/harbour (open that address yourself if the browser
+  does not). Begin with "A first passage": it starts the game and its lesson.
+
+STOPPING
+  Press Control-C in the Terminal window, or close it. Save first with the
+  order "save NAME" if you want to come back to the same moment.
+
+YOUR SAVES AND SETTINGS
+  They are kept outside this folder, in your Library:
+  ~/Library/Application Support/FreeSail (in the Finder: Go, Go to Folder...,
+  and paste that), the saves in its "saves" folder, the settings in
+  settings.yaml. So for a newer download, unpack it, and move this folder to
+  the Bin (the Trash): your saves and settings stay where they are.
+
+A MODEL AT A STATION
+  Optional, and needs a key of your own; see the README (game/README.md).
+
+IF SOMETHING GOES WRONG
+  This Mac download was built and started by a Mac in the cloud (Apple silicon
+  and Intel), and has not yet been tried by a person: please say how it went.
+  Tell the person who sent you this download what you did and what the
+  Terminal window said (a screenshot will do: Shift-Command-4); or, with a
+  GitHub account, open an issue at https://github.com/PlasmeticRaven/FreeSail/issues
+  This is download {{NAME}}, built from {{COMMIT}}.

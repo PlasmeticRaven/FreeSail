@@ -605,20 +605,6 @@ SETTEE_WORE_WORDS = (
 # yard of 15-17 m against her 10.3 m (judgement; Ext §5.5, E16).
 SETTEE_DIP_S = 120.0
 
-# The tack's "mainsail haul" a point on the bow while she keeps this share of the way she had at
-# "helm's a-lee"; under it, with the wind ahead (`TackScript._time_to_haul`). Read only for a ship
-# whose file says she is slack in stays (`ShipSpec.slack_in_stays`; the lead's ruling of
-# 2026-11-27); every other ship is hauled at the point.
-# JUDGEMENT, its ground the fleet's measure at the point (docs/design/Report-Package125.md §2):
-# every committed square-rigger keeps 0.48 to 0.58 of her way there and comes round; the light
-# corvette measured for the ships' package keeps 0.25 to 0.37, and hauled at the point her swung
-# after yards turn her back in a fresh breeze. Two fifths stands between them; 0.33 and 0.35 were
-# measured and do not serve (the report's §2.3).
-HAUL_WAY_FRACTION = 0.4
-# "With the wind ahead": her head within half a degree of the true wind, JUDGEMENT (the probe's
-# reading of Luce's words; a quarter and half a point were measured and gave no better).
-WIND_AHEAD_RAD = math.radians(0.5)
-
 
 class SetteeChange:
     """A settee changed round its mast in a manoeuvre (package 75; Ext §5.5-§5.6): its yard
@@ -2031,11 +2017,10 @@ class TackScript(Script):
 
     Helm's a-lee: the helm is ordered to a heading twelve points round, through the
     wind, the head sheets let fly and the spanker (or a fore-and-after's main) sheet
-    hauled aft, which brings her up. When her head is within a point of the wind (or, when
-    her file says she is slack in stays and her way is gone, with the wind ahead:
-    `_time_to_haul`, package 125), "mainsail haul": the after yards swing to the new tack, over
-    ``brace_s``, or over the short ``light_after_swing_s`` when they are a schooner's light
-    main yards (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
+    hauled aft, which brings her up. When her head is within a point of the wind,
+    "mainsail haul": the after yards swing to the new tack, over ``brace_s``, or over the
+    short ``light_after_swing_s`` when they are a schooner's light main yards
+    (`_after_swing_s`); the word is "main-topsail haul" when her main course is not set
     (Luce 1884 p. 417; `_haul_words`). When her head has passed through the wind and the
     after yards are round, "let go and haul": the head yards follow, the head sheets are
     drawn on the new tack and the helm is ordered to the new close-hauled course; with her
@@ -2464,7 +2449,7 @@ class TackScript(Script):
                 self._miss_stays("she hung in stays and would not come round")
                 return
         if self.phase == "helm_down":
-            if self._time_to_haul(rel) or self.through:
+            if abs(rel) <= POINT or self.through:
                 self.phase = "mainsail_haul"
                 # "The lee braces and the bowlines are let go, and the yards swung
                 # around briskly by the weather braces" (Luce 1884, ch. XXIV, 'Tacking');
@@ -2630,20 +2615,6 @@ class TackScript(Script):
                     # before it is a tack, as before
                     self._miss_stays("she fell off on the old tack")
                     return
-                if not steady and not has_whole_lateen(self.ship):
-                    # package 125, C: a tack that ends by the timeout with her fallen back on
-                    # her old tack, or lying with her head in the wind, has not come round, and
-                    # is not said to have (the brig in twenty knots came through the wind,
-                    # gathered sternway and fell back through it on to her old tack, and was
-                    # logged "Tacked; braced up on the starboard tack"). Read at the end, as the
-                    # whole lateen's is above, so that a tack that comes round before it is a
-                    # tack; a missed stay's words, severity and recovery
-                    if self.sign * rel > 2 * POINT:
-                        self._miss_stays("she came through the wind and fell back on her old tack")
-                        return
-                    if abs(rel) <= 2 * POINT:
-                        self._miss_stays("she lies in irons, her head in the wind")
-                        return
                 if not (self.steer is not None and self.steer.given):
                     # the end's line says how she lies, on a hull with a whole lateen (nudge 48)
                     lies = self._how_she_lies_words(wind, ch)
@@ -2831,31 +2802,6 @@ class TackScript(Script):
         frigate lost a hundred and fifty metres to leeward with them so (package 32e)."""
         full_and_by = full_and_by_apparent(self.ship, wind, self.speed_at_helm)
         draw_sheets(self.ship, self.heads + self.booms + self.shifted, new_lee, full_and_by)
-
-    def _time_to_haul(self, rel: float) -> bool:
-        """The moment of "mainsail haul", by how she is coming round (Luce 1884, ch. XXIV,
-        'Tacking', p. 417: the after yards are hauled "with the wind ahead or a point on the
-        bow"). A ship that comes round smartly, keeping `HAUL_WAY_FRACTION` of the way she had
-        at "helm's a-lee", has the after yards hauled with her head a point off the wind, as
-        before; one that is slack in stays, her way gone below it, has them hauled with the
-        wind ahead (within `WIND_AHEAD_RAD`), so that the swung yards do not take what swing
-        she has left and turn her back. What the deck reads: her way through the water now and
-        at the helm's a-lee, and where the wind is. Her passing through the wind hauls them in
-        any case (the caller's `self.through`).
-
-        The second moment is a habit of the ship, said in her file (`ShipSpec.slack_in_stays`;
-        the lead's ruling of 2026-11-27): her people know her slack in stays. A ship without it
-        is hauled at the point whatever her way, as before package 125; none of the eighteen
-        sets it."""
-        off = abs(rel)
-        if off > POINT:
-            return False
-        spec = getattr(self.ship, "spec", None)
-        if not getattr(spec, "slack_in_stays", False):
-            return True
-        if self.ship.dyn.speed >= HAUL_WAY_FRACTION * self.speed_at_helm:
-            return True
-        return off <= WIND_AHEAD_RAD
 
     def _hang(self) -> None:
         """Her way is gone within a point of the wind: she hangs in stays, and the

@@ -424,12 +424,7 @@ def _group_evolution(
         # square sail's line only where she has one (`storm.listed_lines`)
         lines = storm.listed_lines(ship, lines)
         lines = storm.bowsprit_sail_lines(ship) + storm.flying_topsail_lines(ship) + lines
-        # package 125, D: a jib left on her because her helm will not hold her without it,
-        # said in the reply (and so in the log's line of the order)
-        added, kept = storm.shortening_plan(ship, storm.true_wind_kn(ship))
-        lines += added
-    else:
-        kept = []
+        lines += storm.shorten_sail_lines(ship, storm.true_wind_kn(ship))
     for line in lines:
         try:
             sub = parse(ship, line, vocab)
@@ -462,15 +457,6 @@ def _group_evolution(
     # a line's words the runner said itself are none here (`verbs.unsaid`)
     text = f"{order.verb[0].upper()}{order.verb[1:]}: " + " ".join(t for t in texts if t)
     text = text.rstrip()
-    if kept:
-        # package 125, D: a sail this order took in or shifts is never said left on her
-        # (the storm canvas's own are taken in by their line: `storm.shortening_plan`)
-        from freesail.orders import storm
-
-        kept = [sl for sl in kept if sl.id not in ordered]
-        storm.keep_jibs(ship, kept)
-        if kept:
-            text += " " + storm.kept_jibs_words(ship, kept)
     if failed:
         text += " Not done: " + errors.sentence_list(failed) + "."
     data = {
