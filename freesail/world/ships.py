@@ -297,6 +297,17 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a ship",
         "what": "a corvette, flush-decked, eleven ports a side",
     },
+    # package 90 (docs/design/Design-Ship-PurisimaConcepcion.md §8): the three-decker Purísima
+    # Concepción, the Spanish first rate of 112 as rebuilt. The tops make out a three-decker at her
+    # rig's distance, her size and her three tiers being what a lookout tells first of her (the
+    # lead's ruling 17 of 2026-11-12 for a ship of the line; JUDGEMENT on the distance, as the
+    # 74's), her class a rank above the line (`captains._SIZE_WORDS`); the glass her three tiers of
+    # sixteen ports a side as rebuilt
+    "three-decker": {
+        "file": "data/ships/three-decker.yaml",
+        "rig": "a three-decker",
+        "what": "a three-decker, sixteen ports a tier",
+    },
 }
 # Her rig's word (`DESCRIPTIONS`' `rig`, a vessel's `kind`) is what the tops make out of her at the
 # rig's distance, and for a two-decker that is her class, "a ship of the line" (the lead's ruling 17
@@ -305,7 +316,7 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
 # how she is rigged read `rigged` (the whole-change review of 80e703c7, sources-1 and gundeck-3: the
 # made-out word served the hail's answer, "His Majesty's ship of the line Bellerophon", and the
 # glass's "her sails aback" for a two-decker lying to, where both read as a ship's before it).
-RIGGED_AS = {"a ship of the line": "a ship"}
+RIGGED_AS = {"a ship of the line": "a ship", "a three-decker": "a ship"}
 
 
 def rigged(kind: str) -> str:
@@ -401,6 +412,19 @@ _DESCRIPTION_WORDS = {
     "ship-sloop": "corvette",
     "a ship sloop": "corvette",
     "ship sloop": "corvette",
+    # package 90 (Design-Ship-PurisimaConcepcion.md §8.2): the three-decker's words, a first
+    # rate's and a hundred-and-twelve's; "a ship of the line" stays the 74's
+    "a three-decker": "three-decker",
+    "three-decker": "three-decker",
+    "a three decker": "three-decker",
+    "three decker": "three-decker",
+    "a first rate": "three-decker",
+    "first rate": "three-decker",
+    "a first-rate": "three-decker",
+    "first-rate": "three-decker",
+    "a hundred-and-twelve": "three-decker",
+    "a 112": "three-decker",
+    "a ship of the line of three decks": "three-decker",
 }
 
 

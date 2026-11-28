@@ -50,6 +50,7 @@ RAZEE = "data/ships/razee-44.yaml"
 NEUFCHATEL = "data/ships/hermaphrodite-brig.yaml"  # package 75, B2
 SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7
 DIANA = "data/ships/corvette-20.yaml"  # package 90, her builder
+CONCEPCION = "data/ships/three-decker.yaml"  # package 90, her builder
 LAUNCH = "data/ships/boat-launch-31.yaml"
 # A real checkpoint of a cutter with her guns cast loose, written by the commit before package
 # 75's stage 0 (c5140483): her guns hold no deck and her hull no profile, her sills 1.5 m. A
@@ -1652,6 +1653,11 @@ LOWEST_LEE_PORT = (
     # 1.72 m, half-breadth 4.46 m; Pages §5.7), shut at 18.50 degrees of heel alone, ports 5, 7
     # and 4 within the next degree (her truth 7-665, tests/test_diana.py). Old: no row, nine files
     (DIANA, "carronadas de a 30 1810", "upper", 18.50, 4),
+    # package 90, the Concepción's builder: her midship lower port, No. 8 from forward (sill 1.89
+    # m over her water, half-breadth 8.07 m; Pages §5.2), shut at 11.33 degrees of heel alone,
+    # five more of her lee lower tier within the next degree (her truth 7-737,
+    # tests/test_concepcion.py). Old: no row, ten files
+    (CONCEPCION, "concepcion 1797", "lower", 11.33, 6),
 )
 # The razee's three decks with guns in them, as lines of the truth (§15, "Not truths, said";
 # Indf §3.4): her main battery the 64's lower deck raised by her rise, and the two above it.

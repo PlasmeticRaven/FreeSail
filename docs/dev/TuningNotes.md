@@ -40410,3 +40410,54 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, the Purísima Concepción: A9, her file, her tuning and the pins she moves (2026-11-28)
+
+Her builder (Plan-Package90.md §6 row A9, §8.0 steps 2 to 5, §8.5; Design-Ship-PurisimaConcepcion.md, Con-D). Measured on the cloud's container, seed 7, the wind from the north, no gusts, by the truths' own helpers (`tests/test_known_truths.py`: `close_hauled_on_starboard`, `until`, `under_plain_sail`, `reading`; the 74's `_truth_17_form`), on her file with each figure changed in a scratch copy.
+
+**A9 (three gun decks) moves no pin.** It is keyed on broadside guns on a `middle` deck, which no file but hers carries. `crew/quarters.py`'s `_rob_order` ranks a two-decker's lower deck 3 where it was 2 (the ranks 0, 1 and 3 keep the old order crew for crew: `tests/test_three_decks.py` holds it against the old function at four heels on the 74 and the 64). Proved besides, before and after, on all nineteen committed files at 93cf624c and at A9: their beat to quarters, their robbing order and words at five heels, the gunnery words of 26 phrases and nine fire orders, and a passage at quarters with a tack, every line the same.
+
+**Her two tuned figures, old beside new** (Con-D §2 and §9: her helm's lead and her rudder tuned "to a tack no quicker than the 74's and inside Luce's five to ten minutes"; her brief):
+
+| figure | old (her design's start) | new | why |
+|---|---|---|---|
+| `clr_x_m` | 5.7 (the 74's lead over her length) | **6.3** | the most weather helm that keeps truth 17's form getting under way by a margin, as the 74's 4.8 was chosen: 62.9 deg off at the nearest, settled in 391 s (the 74's 59.6 and 451); her helm then near the 74's (below); at 7.0 m and over she is taken aback from rest |
+| `rudder.max_angle_deg` | 35 (the 74's) | **25** | at 35 she stays from truth 10's three headings in 210, 206 and 223 s against the 74's 237, 243 and 258; at 25 in 258, 276 and 293, each slower than the 74's; at 22 and 20 she misses stays from 295 deg, and at 23 in 12 kn (JUDGEMENT, tuned; the 74's rate, 3 deg/s, kept) |
+
+Her helm in truth 6's and 17's forms, 15 kn, against the 74's as filed (weather helm positive, degrees): on the beam +0.13 at 5.7, +0.33 at 6.0, **+0.53 at 6.3**, +0.73 at 6.6, +0.98 at 7.0 (the 74's +0.39); six points off −1.46, −1.08, **−0.70**, −0.34, +0.15 (−0.97); seven points −0.20, +0.05, **+0.30**, +0.55, +0.87 (+0.16); ten points +0.57, +0.69, **+0.82**, +0.94, +1.10 (+0.79); headsails in +1.84, +2.03, **+2.23**, +2.42, +2.67 (+2.32); her mizen course in −0.83, −0.62, **−0.41**, −0.20, +0.07 (−0.83). Truth 17's form, nearest the wind and settled: 64.4 deg and 351 s, 63.0 and 363, **62.9 and 391**, 62.3 and 421; aback at 7.0, 7.5, 7.7 and 8.0.
+
+The sweep, tacks from 290, 292.5 and 295 deg (s), her rudder's rate 3 deg/s unless said:
+
+| `clr_x_m` | angle | tacks (s) |
+|---|---|---|
+| 5.7 | 35 | 210, 206, 223 |
+| 4.0 | 35 | 204, 204, 214 |
+| 7.0 | 35 | 230, 229, 257 (aback getting under way) |
+| 7.5 | 35 | 294, 296, 321 (aback) |
+| 7.7 | 35 | 304, 306, 335 (aback) |
+| 8.0 | 35 | 319, 323, 364 (aback) |
+| 5.7 | 35, at 2.0 and 1.5 deg/s | 214, 208, 225; 217, 212, 229 |
+| 5.7 | 30 | 219, 231, 249 |
+| 5.7 | 25 | 252, 268, 282 |
+| 5.7 | 22 | 285, 299, missed stays |
+| 5.7 | 20 | 310, 322, missed stays |
+| 6.0 | 25 | 254, 271, 287 |
+| **6.3** | **25** | **258, 276, 293** |
+| 6.3 | 23 | 278, 297, 308 (misses stays in 12 kn) |
+| 6.6 | 25 | 262, 281, 305 |
+
+Across the winds from 292.5 deg at 6.3 and 25 (the 74 beside): 8 kn missed stays at 2.7 kn in (the 74 the same, at 2.6), 12 kn 349 s (220), 15 kn 276 (243), 20 kn 266 (312), 25 kn 280 (265); her wear 503 s (499); hove to under 1.31 kn, 55.3 to 63.6 deg off (1.18 kn, 56.5 to 63.4). **Luce's five to ten minutes is not reached** by any setting that keeps her from being taken aback getting under way: the band is the lead's. The cause is the engine's: its tack does not slow with a ship's size or mass (Con-D §9, §19), and her rudder, 13.3 m2 against the 74's 9.82, turns her quicker; her mass, 4,440 t, does not slow her, as Con-D §9 measured on 4,200 and 5,167 t.
+
+**Her GM is her design's 1.5 m (JUDGEMENT), not moved:** close-hauled in 15 kn she heels 3.1 deg against the 74's 3.6, her design's "no more than the 74" (Con-D §2).
+
+**Her bill by fit** (Con-D §6.3; the 64's and the razee's road): her default fit's bill leaves her 15 trimmers (her 571 seamen less 552 at one side's guns and four at the wheel; the 74's share of her seamen would be 75) and keeps her 225 soldiers in their division. The 1809 fit takes its own `marines` (197, its six-and-two 48-pounder and six 24-pounder obuses taking 28 soldiers first) and `trimmers` (13). Before it, measured: in 1809 four crews stood unmanned (the upper deck's Nos. 15 and 16, the middle deck's No. 16 and the poop's No. 3) and her obuses had no soldier.
+
+**The pins her file moves, each a guard that counts the ship files or the description rows, old beside new:**
+- `tests/test_schooner_mast.py`: the guard reads twenty files (old nineteen), its name with it.
+- `tests/test_profile.py`, `MODULE_FILES`: `ships.concepcion` writes `three-decker.yaml` (old: none, a stub); `tests/test_probes_90.py`, `FILLED`: `("diana", "concepcion")` (old: the Diana's alone).
+- `tests/test_magazine.py`: the foreign calibres, her long 36 and her 48-pounder obús beside the Diana's three (old: the three).
+- `tests/test_neufchatel.py`: her row of `ROLE_BY_INTENT`, a King's ship's at every intent's kind as the 74's, and her file's first role (old: no row).
+- `tests/test_diana.py`, the doubled-article guard over every file: twenty files (old nineteen).
+- `tests/test_lee_ports.py`, truth 7-190's table by file: her row, her midship lower port shut at 11.33 deg with six of her lee lower tier within the next degree, the same a roll sooner; and truth 7-190's count of armed files, eleven (old ten).
+- `tests/test_known_truths.py`, truth 7-700: her muster after package 119's rule, 398 and 398 at both seeds (old: the Diana's alone made after it).
+No figure of another ship moved: each table's other rows read as before.

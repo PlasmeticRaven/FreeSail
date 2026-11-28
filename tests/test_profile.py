@@ -510,7 +510,7 @@ MODULE_FILES = {
     "ships.polacre": [],
     "ships.xebec": [],
     "ships.diana": ["corvette-20.yaml"],  # package 90, her builder (old: [], a stub)
-    "ships.concepcion": [],
+    "ships.concepcion": ["three-decker.yaml"],  # package 90, her builder (old: [], a stub)
 }
 
 
@@ -521,7 +521,8 @@ def test_the_hook_runs_the_nine_ships_modules_after_the_eight_each_writing_its_o
     and the 74; then package 90's five, the tartane, the polacre, the xebec, the Diana and the
     Concepción) after `gen_ships` is made the running script; each build adds its own files and
     no other (§4.1), a stub none. (Old: the four modules; the name said four.) Since the Diana's
-    builder, her module writes `corvette-20.yaml` (old: none, a stub)."""
+    builder, her module writes `corvette-20.yaml` (old: none, a stub); since the Concepción's,
+    hers writes `three-decker.yaml` (old: none, a stub)."""
     out = tmp_path / "ships"
     run = subprocess.run(
         [sys.executable, "-c", HOOK_PROBE, str(ROOT / "tools" / "gen_ships.py"), str(out)],

@@ -11274,10 +11274,11 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
     `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
     digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
     14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
-    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18, the 74's lower deck's 10.35 and the
-    Diana's 18.50 degrees (±0.05; hers since package 90's file). With no roll, no port of that deck
-    shut half a degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1,
-    6, 6, 3, 6 and 4 of the deck's lee ports; with a
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18, the 74's lower deck's 10.35, the
+    Diana's 18.50 and the Concepción's lower deck's 11.33 degrees (±0.05; the Diana's since
+    package 90's file, the Concepción's since hers). With no roll, no port of that deck shut half
+    a degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3,
+    6, 4 and 6 of the deck's lee ports; with a
     roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
     amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
     port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
@@ -11355,8 +11356,9 @@ def test_truth_7_190_covers_every_armed_file():
     carries none, so that a ship file added or rearmed is not passed by in silence. Today the
     ten: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
     razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), the 74 (package 75,
-    B7; old: eight files), and the Diana (package 90, her builder; old: nine files); the
-    bilander's guns are her armed fit's, not her default (unarmed). Drafted in
+    B7; old: eight files), the Diana (package 90, her builder; old: nine files) and the
+    Concepción (package 90, her builder; old: ten files); the bilander's guns are her armed fit's,
+    not her default (unarmed). Drafted in
     `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
     from freesail.combat import ports
     from freesail.ship.loader import load_ship
@@ -11368,7 +11370,7 @@ def test_truth_7_190_covers_every_armed_file():
         if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
     }
     assert armed == {row[0] for row in LOWEST_LEE_PORT}
-    assert len(armed) == 10  # old: 9, before the Diana's file (package 90)
+    assert len(armed) == 11  # old: 10, before the Concepción's file; 9 before the Diana's
 
 
 def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside():
@@ -22812,7 +22814,7 @@ _MUSTERED_BEFORE_119 = {
 # their watches at seed 7, starboard and larboard, held by truth 7-700 beside the eighteen. The
 # Diana's (package 90, her builder): 71 and 70, her odd main top, mizzen top and afterguard
 # watched by turns. Old: none.
-_MUSTERED_AFTER_119 = {"corvette-20.yaml": (71, 70)}
+_MUSTERED_AFTER_119 = {"corvette-20.yaml": (71, 70), "three-decker.yaml": (398, 398)}
 
 
 def _mustered(path, seed=7):
@@ -22847,7 +22849,8 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
     were: no other one had more than one odd station. And every file made after the rule
     (`_MUSTERED_AFTER_119`), the Diana's 141 seamen and soldiers 71 and 70 (package 90; old: the
-    eighteen files alone, every file of the tree)."""
+    eighteen files alone, every file of the tree), and the Concepción's 796, 398 and 398 (package
+    90; old: the Diana's alone)."""
     import glob
 
     from freesail.crew.model import Watch

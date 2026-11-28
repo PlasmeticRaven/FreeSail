@@ -554,12 +554,13 @@ def test_her_reading_names_her_once_and_her_class_with_one_article():
 
 
 def test_no_committed_ships_reading_holds_a_doubled_article():
-    """Every committed file's class words, as the ship reading serves them (the lead's nudge 78)."""
+    """Every committed file's class words, as the ship reading serves them (the lead's nudge 78).
+    Old: nineteen files; twenty since the Concepción's (package 90, her builder)."""
     from freesail.api.readings import ship_class_words
 
     doubled = re.compile(r"\b(a|an|the)\s+(a|an|the)\b", re.IGNORECASE)
     files = sorted((ROOT / "data" / "ships").glob("*.yaml"))
-    assert len(files) == 19
+    assert len(files) == 20
     for path in files:
         spec = load_spec(path)
         words = ship_class_words(spec, spec.name)

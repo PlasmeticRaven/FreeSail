@@ -182,8 +182,9 @@ def test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_
     them; every charge of the ships after them is `parts.charge_lb`'s for its kind and calibre,
     the table's where Table No. 29 names the gun (the bilander's swivel 2 oz) and its kind's share
     where it names none (the Diana's guns as her navy named them, decision 9: her 30-pounder
-    carronade 2 lb 8 oz, her Danish long 8 2 lb 11 oz, her obús of 3 4 oz), and every gun the
-    table names still gets the table's own figure. The Indefatigable's two files come out the
+    carronade 2 lb 8 oz, her Danish long 8 2 lb 11 oz, her obús of 3 4 oz; and the Concepción's,
+    package 90, her long 36 and her obús of 48 carried as a carronade), and every gun the table
+    names still gets the table's own figure. The Indefatigable's two files come out the
     same either way, to the ounce (Indf §5.4). Old (before the Diana's file, package 90; the
     lead's ruling of nudge 32): every charge of the ships after the eight was the table's, which
     named all their guns."""
@@ -210,7 +211,14 @@ def test_the_eight_files_keep_their_charges_as_filed_and_the_new_ships_take_the_
     for (kind, pounder), lb in CHARGE_TABLE_LB.items():
         assert charge_lb(kind, pounder) == lb, (kind, pounder)
     foreign = {k[2] for k in new if k[2] not in CHARGE_TABLE_LB}
-    assert foreign == {("carronade", 30.0), ("long", 8.0), ("carronade", 3.0)}
+    # old (before the Concepción's file): the Diana's three alone
+    assert foreign == {
+        ("carronade", 30.0),
+        ("long", 8.0),
+        ("carronade", 3.0),
+        ("long", 36.0),
+        ("carronade", 48.0),
+    }
     assert new[("corvette-20", "carronadas de a 30 1810", ("carronade", 30.0))] == 2.5
     assert eight[("frigate-36", "amazon class 1795", ("carronade", 32.0))] == 2 + 11 / 16
     assert eight[("privateer-schooner", "long tom", SWIVEL)] == 0.25
