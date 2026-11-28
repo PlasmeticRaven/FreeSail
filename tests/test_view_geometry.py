@@ -106,6 +106,7 @@ fields the projection reads always run.
 
 from __future__ import annotations
 
+import copy
 import json
 import math
 import random
@@ -2371,8 +2372,7 @@ FOOT_SORTED = """
       };
       views.forEach(([name, facing, heel]) => {
         const proj = P.makeProjector(facing, heel);
-        const depth = f => (f.sortAt ? proj(f.sortAt).depth
-          : f.pts.reduce((s, p) => s + proj(p).depth, 0) / f.pts.length) + (f.sortBias || 0);
+        const depth = f => P.sortDepth(f, proj);  // the depth the painter sorts it at
         const near = Math.sin(facing) > 0 ? 'starboard' : 'larboard';
         const far = near === 'starboard' ? 'larboard' : 'starboard';
         const strips = side => hull.filter(f => f.part === 'side' && f.side === side && reach(f))
@@ -2668,10 +2668,19 @@ BANDS = """
       const n = f.pts.length;
       const y = p => Math.abs(p[1]);
       let off = 0;
+      const steps = [];
       // along each of the polygon's two ends, between its corners there
       for (let i = 0; i < n; i++) {
         const a = f.pts[i], b = f.pts[(i + 1) % n];
         if (Math.abs(a[0] - b[0]) > 1e-9) continue;
+        // package 90 (nudge 97): two corners at one height are a step of the end, with no height
+        // between them to follow: the side's just under the lower and just over the upper
+        if (Math.abs(a[2] - b[2]) <= 1e-9) {
+          const [lo, hi] = a[2] < b[2] ? [a, b] : [b, a];
+          steps.push({x: a[0], z: lo[2], lo: y(lo), hi: y(hi),
+                      under: H.hbAt(a[0], lo[2] - 1e-6), over: H.hbAt(a[0], hi[2] + 1e-6)});
+          continue;
+        }
         for (let k = 1; k < 8; k++) {
           const t = k / 8, z = a[2] + (b[2] - a[2]) * t;
           off = Math.max(off, Math.abs(H.hbAt(a[0], z) - (y(a) + (y(b) - y(a)) * t)));
@@ -2689,7 +2698,7 @@ BANDS = """
         }
       });
       return {part: f.part, side: f.side, pts: f.pts, outward: f.outward, off: off, chord: chord,
-              hb: f.pts.map(p => H.hbAt(p[0], p[2]))};
+              steps: steps, hb: f.pts.map(p => H.hbAt(p[0], p[2]))};
     });
 """
 
@@ -2712,6 +2721,15 @@ def unit(n: list) -> list[float]:
     return [c / size for c in n]
 
 
+def _the_steps_are_the_sides(steps: list[dict]) -> None:
+    """Each step of a band's end is one of the side's: its lower corner the side just under it, its
+    upper the side just over it, and the two more than a centimetre apart."""
+    for st in steps:
+        assert st["lo"] == pytest.approx(st["under"], abs=1e-4), st
+        assert st["hi"] == pytest.approx(st["over"], abs=1e-4), st
+        assert abs(st["hi"] - st["lo"]) > 0.01, st
+
+
 @needs_node
 @pytest.mark.parametrize("path", PROFILED)
 def test_a_band_follows_the_drawn_side_between_its_two_heights(tmp_path, path):
@@ -2720,7 +2738,9 @@ def test_a_band_follows_the_drawn_side_between_its_two_heights(tmp_path, path):
     the side and the side within 2 mm between them (straight in x and z between stations, a hair
     off that beside a closure). Old beside new, the straight chord's worst off the side:
     `CHORD_OFF_THE_SIDE_M`, the frigate's 0.613 m at x -21.88 to 2 mm. The polygons run to 25
-    points."""
+    points. Package 90 (nudge 97): where the side itself steps (a closure's line running level,
+    a counter's knuckle), an end steps with it, two corners at one height, the side's just under
+    the lower and just over the upper; no committed file's band or wale steps (measured)."""
     hull = graph_of(path)["hull"]
     got = run_js(tmp_path, {"hull": hull}, BANDS)
     assert got
@@ -2731,6 +2751,7 @@ def test_a_band_follows_the_drawn_side_between_its_two_heights(tmp_path, path):
         for p, hb in zip(f["pts"], f["hb"], strict=True):
             assert sign * p[1] == pytest.approx(hb, abs=1e-9)
         assert f["off"] <= 0.002, (f["part"], f["pts"][0])
+        _the_steps_are_the_sides(f["steps"])
         worst_chord = max(worst_chord, abs(f["chord"]))
     assert worst_chord == pytest.approx(CHORD_OFF_THE_SIDE_M[path], abs=0.002)
     # its ends share its stations: every served point of a station within a band's heights at that
@@ -8402,3 +8423,101 @@ def test_a_three_deckers_middle_ports_are_middle_deck_ports(tmp_path):
     for deck in ("lower", "middle"):
         assert said[deck] == {f"a {deck}-deck port" + s for s in PORT_STATES}
     assert said["upper"] == {"an upper-deck port" + s for s in PORT_STATES}
+
+
+# ---------------------------------------------------------------------------
+# Package 90 (nudge 97; the Concepción's report at 3d073ee5, §B.7 item 1): two of the viewer's
+# drawing rules met by the Purísima Concepción's file, her data found sound by her builder. A lower
+# mast's foot was sorted behind the deck strip it stands on, and a band's end stood off the side
+# beside a closure. Her file is on her builder's branch, so each rule is proved here on a committed
+# file changed in memory as hers stands.
+# ---------------------------------------------------------------------------
+
+# the frigate's stations and upper deck's points dropped between these, from her main mast's foot
+LONG_STRIP_FROM_M, LONG_STRIP_TO_M = -1.98, 3.0
+FOOT_CLEAR_M = 0.01  # the client's: a foot sorts this much nearer than each strip it stands on
+
+
+def _frigate_with_a_long_strip_under_her_main_mast() -> dict:
+    """The frigate's graph with her stations and her upper deck's points dropped from her main
+    mast's foot (x -1.99) to 3 m forward of it: the strip of her upper deck under the mast runs
+    from x -2.07 to 3.25, 5.32 m, its middle 2.6 m forward of the mast (the Concepción's, 1.76 m
+    between her ports' stations, her main mast 0.08 m forward of one)."""
+    graph = copy.deepcopy(graph_of(FRIGATE))
+    hull = graph["hull"]
+    kept = [s for s in hull["stations"] if not LONG_STRIP_FROM_M < s[0][0] < LONG_STRIP_TO_M]
+    hull["stations"] = kept
+    upper = hull["profile"]["decks_m"]["upper"]
+    upper[:] = [p for p in upper if not LONG_STRIP_FROM_M < p[0] < LONG_STRIP_TO_M]
+    return graph
+
+
+FOOT_X = """
+    const sk = P.buildSkeleton(d.graph, null);
+    return sk.figures.find(f => f.kind === 'spar' && f.piece === 'foot' && f.id === d.id).pts[0][0];
+"""
+
+
+@needs_node
+@pytest.mark.parametrize("meet", [False, True])
+def test_a_lower_masts_foot_is_sorted_before_its_deck_however_far_along_its_strip_it_stands(
+    tmp_path, meet
+):
+    """A lower mast's foot sorts FOOT_CLEAR_M nearer than each deck strip it stands on, or nearer
+    (`onDecks`, `sortDepth`), in every view of `test_a_lower_masts_foot_is_sorted_behind_the_near_
+    side`, and still behind the near side. Old beside new, on the frigate with a long strip under
+    her main mast: seen on the bow the strip sorted 1.233 m nearer than her foot, and was drawn over
+    it; now 0.010 m farther. The other six views as they were, 0.328 to 2.355 m. (The Concepción's
+    main mast on the quarter: 0.066 m nearer, now 0.010 m farther.) With `meet`, a point of her
+    upper deck at her foot's x on its own line, so that she stands where two strips meet, the short
+    one abaft and the long one forward, before both (the bilander's fore mast stands so)."""
+    graph = _frigate_with_a_long_strip_under_her_main_mast()
+    if meet:
+        x = run_js(tmp_path, {"graph": graph, "id": "main.mast"}, FOOT_X)
+        upper = graph["hull"]["profile"]["decks_m"]["upper"]
+        upper.append([x, interp([(p[0], p[1]) for p in upper], x)])
+        upper.sort(key=lambda p: p[0])
+    got = run_js(tmp_path, {"graph": graph}, FOOT_SORTED)
+    main = [g for g in got if g["id"] == "main.mast"]
+    assert len(main) == 7
+    for g in main:
+        assert g["decks"] and min(g["decks"]) > g["foot"] + 1e-3, g["view"]
+        assert max(g["near"]) < g["foot"] - 1e-3, g["view"]
+    (bow,) = [g for g in main if g["view"] == "on the bow"]
+    assert min(bow["decks"]) - bow["foot"] == pytest.approx(FOOT_CLEAR_M, abs=1e-6)
+
+
+def _seventy_four_with_a_port_in_her_closure() -> dict:
+    """The 74's hull with a lower-deck port added aft of her aftmost, at x -23.50, its sill at
+    1.95 m (her tier's sill line 1.97 m at her aftmost): its band's after end, half a port aft of
+    it at x -24.02, stands aft of her aftmost station (x -23.77) in the closure to her stern,
+    across her knuckle's height, 2.10 m, where her stern's line runs level from her post out to her
+    counter's edge (the Concepción's lower tier's after end at x -28.775, across her knuckle at
+    2.82 m)."""
+    hull = copy.deepcopy(graph_of(SEVENTY_FOUR)["hull"])
+    lower = hull["profile"]["ports_m"]["lower"]
+    lower.insert(0, [-23.50, 1.95, lower[0][2]])
+    return hull
+
+
+@needs_node
+def test_a_bands_end_steps_with_the_side_where_the_side_steps(tmp_path):
+    """Beside a closure the side runs at each height to the stern's line, and where that line runs
+    level (a counter's knuckle) the side steps: just under it toward the post, just over it toward
+    the counter's edge. A band's end there takes a corner wherever the side at its x bends off the
+    straight between two others, and steps with it (`onTheSide`). Old beside new, on the 74 with a
+    port in her closure: her band's after end stood 0.465 m off her side between its corners; now
+    within 2 mm of it, its step at her knuckle the side's own, 4.196 m under and 4.727 m over."""
+    got = run_js(tmp_path, {"hull": _seventy_four_with_a_port_in_her_closure()}, BANDS)
+    for f in got:
+        sign = 1.0 if f["side"] == "starboard" else -1.0
+        for p, hb in zip(f["pts"], f["hb"], strict=True):
+            assert sign * p[1] == pytest.approx(hb, abs=1e-9)
+        assert f["off"] <= 0.002, (f["part"], f["pts"][0])
+        _the_steps_are_the_sides(f["steps"])
+    steps = [st for f in got for st in f["steps"]]
+    assert len(steps) == 2  # her band's after end, a side each
+    for st in steps:
+        assert st["x"] == pytest.approx(-24.02, abs=1e-9)
+        assert st["z"] == pytest.approx(2.10, abs=1e-6)
+        assert (st["lo"], st["hi"]) == pytest.approx((4.1955, 4.7272), abs=1e-4)
