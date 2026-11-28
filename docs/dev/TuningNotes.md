@@ -40641,18 +40641,34 @@ The reader's measure of 20aca5e found the drawing sound (the skeleton old agains
 
 `docs/design/Plan-Package90.md` §6's V4 (Eng §6.2 and §13 item 3), built once A9 was in `claude/pkg-90` (157f870d, merged into this branch). **The cause:** the viewer said "-deck" of the upper deck alone (`portFigures`: `port.deck === "upper" ? "upper-deck" : port.deck`) and every other deck by its bare word, where the log says the lower, the middle and the upper deck with "-deck" and every other deck by its own word (`freesail/combat/ports.py`, `_DECKS_SAID_SO`: "The lee lower-deck ports are shut", "The lee quarterdeck ports are shut"). **Mended where a port's words are made:** `DECKS_SAID_SO` (in the exported `constants`) is the log's list, and a port on one of its decks is said "<deck>-deck port", every other deck's by its own word as before. No other place in the client names a deck (read: `.deck` grepped in `client/projection.js` and `client/shipview.js`). The log's list is the engine's Python and the viewer's is JavaScript, so a test holds the two the same.
 
-**Measured, old (the projection at 856dbcc) beside new:** every port's and lid's words on every committed file and on the three-decker probe (`three_decker_probe`, the engine note's 74 with a third gun deck, not the *Concepción*'s file), her guns secured, run out, and run in shut by the sea. 1,710 figures: every figure's deck, side, place, part and state the same, and words alone move:
+**Measured, old (the projection at 856dbcc) beside new:** every port's and lid's words on every committed file and on the three-decker probe (`three_decker_probe`, the engine note's 74 with a third gun deck, not the *Concepción*'s file), her guns secured, run out, and run in shut by the sea. 1,710 figures: every figure's deck, side, place, part and state the same, and words alone move, on 440 of them (the 74's 112, the 64's 104, the probe's 224), each word as measured:
 
-| File | Deck | Figures, each state | Old | New |
-|---|---|---|---|---|
-| the 74 | lower | 28 (14 ports a side) | "a lower port, its lid shut", "a lower port, open", "a lower port's lid, hauled up", "a lower port, shut, the sea at its sill" | "a lower-deck port" in each |
-| the 64 | lower | 26 (13 a side) | the same four | the same four |
-| the three-decker probe | lower | 28 | the same four | the same four |
-| the three-decker probe | middle | 28 | "a middle port" in each | "a middle-deck port" in each |
+| File | Old | New | Figures |
+|---|---|---|---|
+| the 74 | "a lower port, its lid shut" | "a lower-deck port, its lid shut" | 28 (14 lower-deck ports a side), her guns secured: a lid shut over each port |
+| the 74 | "a lower port, open" | "a lower-deck port, open" | 28 (14 lower-deck ports a side), her guns run out: each port open |
+| the 74 | "a lower port's lid, hauled up" | "a lower-deck port's lid, hauled up" | 28 (14 lower-deck ports a side), her guns run out: each port's lid |
+| the 74 | "a lower port, shut, the sea at its sill" | "a lower-deck port, shut, the sea at its sill" | 28 (14 lower-deck ports a side), her guns run in and shut by the sea |
+| the 64 | "a lower port, its lid shut" | "a lower-deck port, its lid shut" | 26 (13 lower-deck ports a side), her guns secured: a lid shut over each port |
+| the 64 | "a lower port, open" | "a lower-deck port, open" | 26 (13 lower-deck ports a side), her guns run out: each port open |
+| the 64 | "a lower port's lid, hauled up" | "a lower-deck port's lid, hauled up" | 26 (13 lower-deck ports a side), her guns run out: each port's lid |
+| the 64 | "a lower port, shut, the sea at its sill" | "a lower-deck port, shut, the sea at its sill" | 26 (13 lower-deck ports a side), her guns run in and shut by the sea |
+| the three-decker probe | "a lower port, its lid shut" | "a lower-deck port, its lid shut" | 28 (14 lower-deck ports a side), her guns secured: a lid shut over each port |
+| the three-decker probe | "a lower port, open" | "a lower-deck port, open" | 28 (14 lower-deck ports a side), her guns run out: each port open |
+| the three-decker probe | "a lower port's lid, hauled up" | "a lower-deck port's lid, hauled up" | 28 (14 lower-deck ports a side), her guns run out: each port's lid |
+| the three-decker probe | "a lower port, shut, the sea at its sill" | "a lower-deck port, shut, the sea at its sill" | 28 (14 lower-deck ports a side), her guns run in and shut by the sea |
+| the three-decker probe | "a middle port, its lid shut" | "a middle-deck port, its lid shut" | 28 (14 middle-deck ports a side), her guns secured: a lid shut over each port |
+| the three-decker probe | "a middle port, open" | "a middle-deck port, open" | 28 (14 middle-deck ports a side), her guns run out: each port open |
+| the three-decker probe | "a middle port's lid, hauled up" | "a middle-deck port's lid, hauled up" | 28 (14 middle-deck ports a side), her guns run out: each port's lid |
+| the three-decker probe | "a middle port, shut, the sea at its sill" | "a middle-deck port, shut, the sea at its sill" | 28 (14 middle-deck ports a side), her guns run in and shut by the sea |
 
 Every other deck says what it said: "an upper-deck port" on every file with ports, "a quarterdeck port" on the frigate, the razee, the 64, the 74 and the probe, the razee's "a forecastle port", and "an empty upper-deck port" and the 64's "an empty quarterdeck port". No committed file has an empty lower-deck port; the rule's case would reach one. The primer's chapter 22 and `docs/design/Design-ViewerAction.md` quote "an upper-deck port", unchanged.
 
 New, 18 cases: `test_the_viewer_says_with_deck_the_decks_the_log_says_so` (the viewer's list is the log's), `test_every_port_is_named_by_its_deck_as_the_log_names_it` (the rule on the 14 files with a hull profile, in each state, "an empty" port among them), `test_the_74s_and_the_64s_lower_ports_are_lower_deck_ports` (2: the move, its old words in the docstring) and `test_a_three_deckers_middle_ports_are_middle_deck_ports` (the probe). Each was run against the code with its rule taken out: the old rule put back, 5 fail (the 74's and the 64's in both cases, and the probe's); the quarterdeck added to the list, 7 (the list's, and the four files with a quarterdeck port, the 74 and the 64 in both cases).
+
+### Nudge 95: a long foot's sag pinned on a ship file (2026-11-28)
+
+The lead's reader passed 856dbcc and found that a foot at least as long as the sail's depth, which sags FOOT_SAG of the depth as before nudge 93, was pinned by the unit case alone (`test_a_foot_sags_no_more_than_its_own_length_allows`). New: `test_a_course_whose_foot_is_longer_than_its_depth_sags_by_its_depth` (4: square and braced to her limit, 64 degrees, on either tack), on the frigate's main course set: her clews straight under her head, her cloth upright and its belly level, so her foot's control stands straight under its chord's middle by the sag alone. Measured: her depth 10.197 m (her file's area over her head), her foot 21.870 m, the sag 1.224 m, 2 FOOT_SAG of the depth, the same before and after nudge 93's mend. It fails with the sag by the foot alone, by the greater of the two, not twice over, or none (all four cases each); the old rule, by the depth alone, passes it, as a long foot's sag is the old rule's, and the ringtails' and the unit case fail that one.
 
 ### Pins moved, old beside new
 
@@ -40660,7 +40676,7 @@ None of the base's. No case of `tests/test_view_geometry.py` or `tests/test_pict
 
 Nudge 93, this package's own cases: `test_no_set_sail_of_any_file_bellies_an_edge_past_its_own_length` is made stricter (old: every bent sail set, braced to the limits, at 60 degrees, the sails drawn whole alone, an edge's offset across; new: item 2 (c) above), its name and its 19 files kept. `test_the_frame_holds_the_whole_lateen_across_states`'s views and assertions are moved unchanged into two helpers it shares with the new frame case (`_great_lateen_in_the_frame`, `_the_frame_holds_the_great_lateen`). `lateen_by_the_wind` takes a document rigged from the probe. New: 18 (the frame over short masts 4, the low-slung lift 2, the ringtails 5, the foot's sag 1, the cut on a lens 1, the boats' luffs 5): 89 in this package, none of the base's removed or renamed.
 
-V4: none of the base's or this package's moved. New: 18, above: 107 in this package, none of the base's removed or renamed.
+V4: none of the base's or this package's moved. New: 18, above. Nudge 95: none moved; new: 4, the course's foot, above. That makes 111 in this package, none of the base's removed or renamed.
 
 ### Not built, for the lead
 

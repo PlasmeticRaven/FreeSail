@@ -8274,6 +8274,39 @@ def test_a_foot_sags_no_more_than_its_own_length_allows():
     assert none == pytest.approx([0.0, 0.0, 0.0])
 
 
+@needs_node
+@pytest.mark.parametrize("tack", ["larboard", "starboard"])
+@pytest.mark.parametrize("braced", [False, True])
+def test_a_course_whose_foot_is_longer_than_its_depth_sags_by_its_depth(tmp_path, tack, braced):
+    """`footSag` on a ship file: a foot at least as long as the sail's depth sags FOOT_SAG of the
+    depth, as every foot did before nudge 93, and not of its own length. The frigate's main course
+    set, square and braced to her limit, on either tack: her clews straight under her head, her
+    cloth upright and its belly level, so her foot's control stands straight under its chord's
+    middle by the sag alone. Measured: her depth 10.197 m (her file's area over her head), her foot
+    21.870 m, the sag 2 FOOT_SAG of the depth, 1.224 m."""
+    ship = make_ship(FRIGATE)
+    ship.sails["main.course"].state = SailState.SET
+    yard = ship.spars["main.yard"]
+    if braced:
+        yard.brace_angle = (1 if tack == "larboard" else -1) * yard.brace_limit
+    data = ship_state(ship, awa=(1 if tack == "starboard" else -1) * math.radians(60), tack=tack)
+    body = """
+      const f = P.buildSkeleton(d.graph, d.snap).figures
+        .filter(f => f.kind === 'sail' && f.id === 'main.course');
+      return f.map(f => ({corners: f.corners, path: f.path}));
+    """
+    (fig,) = run_js(tmp_path, data, body)
+    a, _b, c, d = fig["corners"]
+    depth, foot = math.dist(d, a), math.dist(c, d)
+    control = fig["path"][3][0]
+    middle = [(p + q) / 2 for p, q in zip(c, d, strict=True)]
+    assert depth == pytest.approx(10.197, abs=1e-3) and foot == pytest.approx(21.870, abs=1e-3)
+    assert c[2] == pytest.approx(d[2], abs=1e-9)  # the foot level, its chord's middle at its height
+    assert math.hypot(a[0] - d[0], a[1] - d[1]) == pytest.approx(0.0, abs=1e-9)  # clew under head
+    assert control[2] - middle[2] == pytest.approx(-2 * FOOT_SAG_SHARE * depth, abs=1e-9)
+    assert control[2] - middle[2] == pytest.approx(-1.224, abs=1e-3)
+
+
 # ---------------------------------------------------------------------------
 # Package 90, V4 (docs/design/Plan-Package90.md §6; Design-Package90-Engine.md §6.2 and §13 item
 # 3): a port's words by the log's "-deck" form. The viewer said "-deck" of the upper deck alone and
