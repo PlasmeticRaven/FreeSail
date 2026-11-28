@@ -3223,3 +3223,98 @@ Git merged `freesail/evolutions/scripts.py`, `world/boats.py` and `world/dealing
 **The base of every comparison is 8a27d9b1.** Its code, data, tools, client and tests are 4e32dece's to the byte; only its docs differ. So the base's fast tier is 4e32dece's, whole, from the fourth pass's report (9,340 tests).
 
 **Running now on e2ae515:** the fast tier whole, then `tests/test_mends_126.py --slow`, then the slow tier whole with the reach tracer on the served step's own lines. The proofs run old (4e32dece's tree) beside new: the graph and the snapshot, the yards' levels, every sail's `set`, the nineteen in gales, A2's harness and the declaration. **The hash is reported when the fast tier and the proofs are in**, with the reader's question of nudge 99 answered.
+
+## The served step's hash (nudges 88, 90 and 100): 7a9ce75, on `…/pkg-90` at 8a27d9b1, its fault found by its tier mended; tiered whole against 8a27d9b1 (2026-11-28, 16:00 UTC)
+
+**The hash to send: 7a9ce75** on **`…/pkg-90-served`**, pushed. **The commit after it touches this report alone.** It is two commits on the served step as the last builder pushed it (ba7d1cb), with this report's section of 13:55 (5c32e6b) between them:
+- **e2ae515**, the merge of `…/pkg-90` at **8a27d9b1** (the trunk at 00706af7, the fourth pass merged at d8031973), set out in that section;
+- **7a9ce75**, the one mend its fast tier found (below).
+
+**What it holds**, the last builder's work, its code unchanged by me:
+- **162bb5f**: a towed boat cut adrift at home is in tow no longer. Her `BoatState` named no boat, so `keep_in_tow` kept her in tow, her drag on the ship. A state that names none now stands for her errands' boat (`boats.errands_boat`).
+- **f977ad6**: what the client is served (nudge 88).
+  - The ship graph's `boats` gives each boat her file tows astern, with her id, name, `towed` and length; the snapshot's `boats` gives each one's `in_tow`.
+  - A whole lateen's sail on the snapshot carries `shifting: true` only while its change round the mast is in hand (`scripts.lateens_shifting`).
+  - `ship/graph._square_foot_m` is taken at one datum, the deck.
+- **764cf7c** and **abcb50a**: the tréou and the great lateen never stand together (nudge 90). Each `set` takes the other sail in first and says so (`scripts.stands_apart`, `orders.verbs._taken_in_first`); the pin of one order naming both is made true.
+- **db499555**: `…/pkg-90` merged at a174cca2 (the trunk at 962c5569).
+- **ba7d1cb**: `…/pkg-90` merged again at **8a95cb6**, the preview's README alone. Git merged it with no conflict and nothing was resolved by hand. ba7d1cb's code is db499555's.
+
+**Old, everywhere below, is 8a27d9b1**, the package's tip. Its code, data, tools, client and tests are 4e32dece's to the byte, so its runs are 4e32dece's: the fast tier whole of the fourth pass's report, and the proofs run on 4e32dece's tree.
+
+### The fault its tier found, mended: a sail order refused by a runner of the old form
+
+**The served step as pushed was never tiered.** On the merged tree, its fast tier's first shard failed two tests, and the served step as the last builder left it (ba7d1cb) fails the same two:
+- `tests/test_complete.py::test_every_suggestion_is_understood_by_the_parser`;
+- `tests/test_crew_orders.py::test_close_reef_after_one_reef_takes_the_rest`.
+
+Both say "FakeRunner.start() got an unexpected keyword argument 'say_wait'", at `orders/verbs.py`'s sail-evolution call.
+
+**The cause:** the tréou's road (764cf7c) passed `say_wait` to `runner.start` on every sail order, though only an order taking a sail in first says its wait in its own words. Every runner of the old form refused every sail order: `start(ship, evolution, subject, params)`, as the six fakes of the tests are. **With the mend undone**, the seven files that use such fakes fail **198 tests**: `tests/test_orders.py` 148, `tests/test_primer.py` 48 (the primer's order blocks among them), `tests/test_complete.py` 1 and `tests/test_crew_orders.py` 1.
+
+**The mend, at the cause** (`orders/verbs.py`, my row's): `say_wait` is passed only where a sail is taken in first. Every other sail order begins its work by the call it always made. **With the game's runner, nothing moves:** `say_wait` defaults to True, and `not first_words` was True wherever nothing is taken in first. Looked for elsewhere: it is the step's one new argument on a call every ship's orders make. Its other new calls (`_taken_in_first`, `lateens_shifting`) read the runner by `getattr` with a default. The six fakes are in files outside my row and are not touched. With the mend, those seven files and the step's own three pass: 2,369.
+
+### The proofs on 7a9ce75, old (4e32dece's tree, 8a27d9b1's code) beside new: today's nineteen files served the same
+
+**The graph and the snapshot** (nudge 88's proof; the script rebuilt, `served/proof.py` in the session's scratch). Each committed file is settled once: seed 7, 15 kn from the north, steady, her head 292.5 degrees at 5 kn, plain sail trimmed every two minutes after five, 900 s.
+- At rest: her graph (`queries.ship_graph`) and her snapshot (`queries.snapshot`).
+- Then from a copy of that world, each of `tack ship`, `wear ship` and `box her off`, 600 s: her snapshot every 5 s and her graph every 60 s.
+- Each reading is kept whole as a digest of its JSON.
+
+**All nineteen files byte for byte, old beside new: 7,448 readings.** The readings are live, each snapshot unlike the last (the bilander's 360 through her three manoeuvres all differ). No committed file tows a boat or carries a whole lateen, so neither key is served.
+
+**What the step's other lines reach, on today's ships, old beside new:**
+- **Every yard's level** (`Ship.yard_level`, which `_square_foot_m` now feeds at one datum): 103 yards of the nineteen files, every level the same.
+- **No sail of a committed file stands apart from another** (`scripts.stands_apart`).
+- **Every sail set by its own order, and `make all sail`** (the `set` road, `orders.verbs._taken_in_first`). Each file at sea under plain sail, settled 600 s; from a copy, `set the <sail>` for each sail of hers not set (300 s), and `make all sail` (600 s). **275 runs, byte for byte**, in every reply, line and trace row. That is 256 sails (121 taken, 135 refused in the same words both sides) and the 19 `make all sail`.
+- **The nineteen in gales:** 380 runs, the two files byte for byte (the rebuilt `n55/gales.py`, as in the fourth pass's section).
+- **A2's harness:** 285 runs, the two files byte for byte (the rebuilt `a2/harness_v2.py`).
+- **The declaration's 266 cases** (the rebuilt `n77/declare.py`, as in the fourth pass's section), and what a seat is served (every file's class words and ship reading, the 49 scenarios' readings and the 113 evolutions' texts): **byte for byte**. The served step moves none of the fourth pass's cases.
+
+**Before the merge** the same proofs were run on ba7d1cb against a174cca2: the graph and snapshot, the levels, the sets, the gales and A2's harness. Each was byte for byte as well.
+
+### The fast tier whole, on 7a9ce75 and on 8a27d9b1, test by test
+
+From the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, in eight shards with their own junits, each under 25 minutes. The base's is 4e32dece's run (its code 8a27d9b1's, to the byte), from the fourth pass's report.
+
+| | 7a9ce75 | 8a27d9b1 (4e32dece's run) |
+|---|---|---|
+| **Fast tier whole** | 9,371: 9,362 passed, 8 skipped, 1 xfailed, **0 failed** (72 min 12 s, the shards' sum) | 9,340: 9,331 passed, 8 skipped, 1 xfailed, 0 failed |
+
+- **Every test of the base is there with the same outcome; none is gone.** The 198 tests that the fault failed are among them, each passing as at the base.
+- **31 new, all passed**, the served step's own:
+  - `tests/test_boat_towed.py` 21: the towed boat served with her length and whether she is in tow; cut adrift before she was ever sent, in tow no longer; and the guard over every committed file, 19, that none is served a towed boat or a lateen shifting.
+  - `tests/test_yard_level.py` 7: the tréou and the great lateen standing apart, and no sail of today's files doing so (two cases: the tréou set flying, and crossed); `set the treou` taking the lateen in first; a tréou going up belayed by `set the mainsail`; the way out where the lateen cannot be taken in; and one order naming both (two cases).
+  - `tests/test_lateen_whole.py` 3: a lateen served shifting through a tack, never shifting when brailed up, and served by itself or handed on by a belay.
+- The 8 skipped and the 1 xfailed are the same cases both sides. No harbour or browser test failed.
+- **The guard set of §10.2, every case the same outcome both sides:** the byte test and the golden classing table 95, `test_probes_90` 90, the settee's 75, the going-about set 261 and `test_grammar_book` 9.
+
+### `tests/test_mends_126.py --slow` on 7a9ce75 (the lead's nudge 87: the step touches the runner)
+
+**45 passed** (26 min 39 s). Truth 7-779-b's 29 cases passed (its 28 cells and the trunk's stand-in), **so its 19 declared exceptions hold exactly**.
+
+### Checked on 7a9ce75
+
+- `ruff check` and `ruff format --check` clean, with ruff 0.15.8 (429 files formatted).
+- No carriage return in the diff from 8a27d9b1.
+- No line over 100 characters in its 10 Python files.
+- `python tools/gen_ships.py <scratch>`: 19 of 19 byte for byte.
+
+**The merge with the fourth pass** is e2ae515, and its lines resolved by hand are set out in this report's section of 13:55 above. The trial merge I made earlier, in scratch and not pushed, found the same four files.
+
+### The reader's question at nudge 99: a whole lateen's warning offers no box while she comes to, though a box given then is taken and waits
+
+**Yes, as meant.** It is the fourth pass's (e2a7f62), now on the trunk and in this tree by the merge; the served step adds nothing to it. The warning's reliefs are what eases the yard at once (`strain.pressed_reliefs`). While she comes to, the shift does that and the box does not. A box given then waits behind her heave-to, by nudge 86's ruling: it begins only if the heave-to fails, and is belayed where she comes to. Naming it as a relief would send the player to an order that does nothing for the yard until then. Measured on the polacre probe, as the pin builds her (`test_coming_to_she_is_not_offered_boxing_off_and_a_box_given_waits_its_turn`): in 40 kn, the wind eight points through her bow, `heave to`, then the order given 2 s later, 600 s, on 4e32dec.
+- **`shift the mizen`** begins at once: "Only 58 hands to the mizen; the rest are heaving to." at +1 s, and "Shifted the mizen; it stands to leeward of the mast." at +301 s.
+- **`box her off`** waits: "'Box off' will follow 'heave to', which the hands are still at." at +1 s. Her heave-to fails at +598 s ("Could not heave to: she would not lie to on the larboard tack; the helm amidships."), and the box begins at that second ("Box her off! Stand by the head braces.").
+- With neither order, the heave-to fails at the same second.
+
+So the box is still her way out where the heave-to fails, as on the trunk, and the warning names only what acts now. **If the lead would have the warning say the box too**, as a relief once her coming to fails, that is one clause of `pressed_reliefs` in a later hash. It is not built here.
+
+### The slow tier
+
+**The slow tier whole runs now:** first on 7a9ce75, with the reach tracer on the served step's own engaged lines, then on 4e32dece (the base's code). It observes and changes nothing. The engaged lines are where a towed boat or a lateen shifting is served, where a sail stands apart or is taken in first, and where the foot is set against a lateen's yard. The 4e32dece run is the fourth pass's slow tier too, run now that its gate is passed, with the tracer on its own lines. Their results follow in a section of their own, with the slow files each change reaches, named file by file.
+
+**For the coordinating session:** **the hash to send is 7a9ce75** on **`…/pkg-90-served`**, reported with its fast tier whole: outcome changed 0, gone 0, the 31 new passed. `test_mends_126 --slow` passed, and every proof is byte for byte its base's.
+- **One code change from the step as the last builder pushed it**, its own commit: the sail order's call mended at its cause in `orders/verbs.py`. Unmended, it failed 198 fast tests in files outside my row; nothing moves with the game's runner.
+- **The reader's question of nudge 99 is answered above:** as meant, measured.
