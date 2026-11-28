@@ -43,15 +43,18 @@ def port_taken_words(host: str, port: int) -> str | None:
     import socket
 
     family = socket.AF_INET6 if ":" in host else socket.AF_INET
-    probe = socket.socket(family, socket.SOCK_STREAM)
+    probe = None
     try:
+        # inside the try: a family the machine lacks (`--host ::1` without IPv6) is no word
+        probe = socket.socket(family, socket.SOCK_STREAM)
         if sys.platform != "win32":
             # as the server binds: a port left only in TIME_WAIT is free, one listened on
             # is not (on Windows the option would let a second socket take a port in use)
             probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         probe.bind((host, port))
-    except OSError as e:
-        if e.errno not in (errno.EADDRINUSE, getattr(errno, "WSAEADDRINUSE", -1), 10048):
+    except Exception as e:  # noqa: BLE001 - only the port being taken has a word
+        taken = (errno.EADDRINUSE, getattr(errno, "WSAEADDRINUSE", -1), 10048)
+        if not isinstance(e, OSError) or e.errno not in taken:
             return None
         return (
             f"FreeSail seems to be running already (or another program has port {port}): "
@@ -59,7 +62,24 @@ def port_taken_words(host: str, port: int) -> str | None:
             "browser. To run a second one, start it with --port and another number."
         )
     finally:
-        probe.close()
+        if probe is not None:
+            probe.close()
+    return None
+
+
+def consent_records_place(places: dict, settings_file: Path, root: Path = ROOT) -> str | None:
+    """Where this run keeps a seated model's consent records (package 130): the place the
+    settings name; else, from a download (its mark in the game's folder), `consent/` beside
+    the settings file in use (`--settings`, `FREESAIL_SETTINGS` or the player's own), as the
+    saves are; else None, the game's own `docs/agents/consent/` (`consent.RECORDS_DIR`), as
+    ever from a checkout."""
+    given = places.get("consent_records")
+    if given:
+        return given
+    from freesail.agents import consent
+
+    if (Path(root) / consent.DOWNLOAD_MARK).is_file():
+        return str(consent.default_records_dir(root, settings_file))
     return None
 
 
@@ -98,7 +118,7 @@ def main(argv: list[str] | None = None) -> int:
         crewed_cap=crewed.get("cap"),
         crewed_range=crewed.get("range_nm"),
         saves=str(settings_mod.place(settings, "saves", path)),
-        consent_records=places.get("consent_records") or None,
+        consent_records=consent_records_place(places, path),
     )
     args = ap.parse_args(argv)
     for name in PATH_FLAGS:
