@@ -3043,3 +3043,23 @@ The full report comes when they end, under its own heading.
 **Then the served step** (nudges 88 and 90), its own hash on `…/pkg-90-served`. It is built (162bb5f, f977ad6, 764cf7c, abcb50a): the towed boat served, the lateen's change in a manoeuvre served, `_square_foot_m` at one datum, and the tréou and the great lateen taking each other in. Its proof on 6c29d1d: today's nineteen files' graph and snapshot are byte for byte the same through rest, a tack, a wear and a box off, 6,916 readings. It will be merged with `…/pkg-90` and tiered after this.
 
 **Found since, on e2a7f62 and not carried in it:** a towed boat cut adrift at home is kept in tow, her drag on the ship. It is A4's fault, it reaches no committed file, and it is mended in the served step (162bb5f).
+
+## The engine track taken over (2026-11-28, 10:25 UTC): both branches read in and checked; what runs now
+
+**A new builder has the engine track**, on a fresh machine, the owner's start of 2026-11-28. The last machine ran out; everything of it was pushed. Lost with it: its unfinished test runs, and its scratch scripts outside the tree (A2's harness, the eighteen-in-gales run, `n77/declare.py`). **The three scripts are rebuilt from this report's own descriptions**, as faithfully as I can, and each result below says it is from the rebuilt script.
+
+**Both branches checked:**
+- **`…/pkg-90-lateen3`** at **050f8114** (this report alone), its parent **4e32dece**: the fourth pass, the hash to send. Its parents are e2a7f62 and a174cca2.
+- **`…/pkg-90-served`** at **db499555**, the served step merged with `…/pkg-90` at a174cca2.
+- **`…/pkg-90`** is at **8a95cb6**, one commit past a174cca2: the preview's README alone. **It is not merged into the fourth pass**, so the hash tiered stays the hash sent. It is merged into the served step when that step comes.
+
+**The coordinating session's news of nudge 96 is received:** the fourth pass is staged on the trunk at 962c5569, and the cloud's run 189 is on it. Nothing in this section moves 4e32dece's code.
+
+**Running now, in this order** (each in its own worktree of its exact hash, in shards with their own junits, results written to files as they go):
+1. **The fast tier whole** on 4e32dece and on a174cca2, compared test by test.
+2. **`tests/test_mends_126.py --slow`** on 4e32dece (truth 7-779-b and its declared exceptions).
+3. **The three rebuilt proofs, old a174cca2 beside new 4e32dece:** the nineteen committed files in gales, A2's harness, and the declaration's cases (nudge 79's four, and nudge 86's failing heave-to with the corvette among the files).
+4. **The slow tier whole** on both, and the slow files the change can reach, named file by file.
+5. **The checks:** ruff and `ruff format --check` (ruff 0.15.8, the project's pin), LF only, no Python line over 100 characters, `python tools/gen_ships.py <scratch>` 19 of 19.
+
+**Then** the full report of 4e32dece under its own heading, and after it the served step to its own hash.
