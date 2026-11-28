@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 04:10 UTC (THE TARTANE'S SECTION 16 RULED: the treou and the great lateen do not stand together, `all sail` keeps the lateen, the engine's order takes the other in first; the treou's yard 1 pied below the slings; her plain sail's order yes; her proof from rest by the primer's orders, gusts and steady; the yards unbraced from rest is the carried list's, not 90's). Nudge number: 90.
+Latest note: 2026-11-28, 04:35 UTC (THE TARTANE'S SECTION 17: the helm's lost course before the wind is the carried list's fault 29, not 90's; `yard_lowered` for a whole lateen is wanted seamanship; her first run of the proof has the right shape). Nudge number: 91.
