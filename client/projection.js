@@ -361,6 +361,82 @@
     ];
   }
 
+  /** Package 90 (nudge 93, the launch's lug): cut a closed path ([[P], [C, P] or [P], ...]) by the
+   *  plane x = x0 as `splitAtX` cuts a polygon, keeping its curves: [the part forward of it, the
+   *  part abaft it], each a path ending where it began, its cut a straight edge. Each quadratic
+   *  edge is split where it crosses the plane (de Casteljau) and its pieces kept, curved, on their
+   *  sides. The cut was made on the outline sampled at CURVE_SAMPLES points an edge, so a sail cut
+   *  at its mast drew each curved edge as six straight ones cornered between them: seen from the
+   *  quarter, a lug's luff lying along its mast showed its corners against it as a kink. */
+  function splitPathAtX(path, x0) {
+    var edges = []; // [from, control or null, to], each wholly on one side of the plane
+    function onPlane(p) {
+      return [x0, p[1], p[2]];
+    }
+    function line(p, q) {
+      if ((p[0] - x0) * (q[0] - x0) < 0) {
+        var m = onPlane(lerp(p, q, (x0 - p[0]) / (q[0] - p[0])));
+        edges.push([p, null, m], [m, null, q]);
+      } else edges.push([p, null, q]);
+    }
+    function curve(p, c, q) {
+      // x(t) = p + 2t(c - p) + t^2 (p - 2c + q) = x0, for 0 < t < 1
+      var A = p[0] - 2 * c[0] + q[0], B = 2 * (c[0] - p[0]), C = p[0] - x0;
+      var ts = [];
+      if (Math.abs(A) < 1e-12) {
+        if (Math.abs(B) > 1e-12) ts.push(-C / B);
+      } else if (B * B - 4 * A * C > 0) {
+        var r = Math.sqrt(B * B - 4 * A * C);
+        ts.push((-B - r) / (2 * A), (-B + r) / (2 * A));
+      }
+      ts = ts
+        .filter(function (t) {
+          return t > 1e-9 && t < 1 - 1e-9;
+        })
+        .sort(function (a, b) {
+          return a - b;
+        });
+      var from = p, ctrl = c, done = 0;
+      ts.forEach(function (t) {
+        var u = (t - done) / (1 - done); // along what is left of the edge
+        var a = lerp(from, ctrl, u), b = lerp(ctrl, q, u), m = onPlane(lerp(a, b, u));
+        edges.push([from, a, m]);
+        from = m;
+        ctrl = b;
+        done = t;
+      });
+      edges.push([from, ctrl, q]);
+    }
+    var prev = path[0][0];
+    for (var i = 1; i < path.length; i++) {
+      var seg = path[i], to = seg[seg.length - 1];
+      if (seg.length === 2) curve(prev, seg[0], to);
+      else line(prev, to);
+      prev = to;
+    }
+    if (len(sub(prev, path[0][0])) > 1e-9) line(prev, path[0][0]);
+    function part(keep) {
+      var out = [], pen = null;
+      edges.forEach(function (e) {
+        var mid = e[1] ? add(mul(add(e[0], e[2]), 0.25), mul(e[1], 0.5)) : lerp(e[0], e[2], 0.5);
+        if (!keep(mid[0])) return;
+        if (pen === null || len(sub(pen, e[0])) > 1e-9) out.push([e[0]]); // along the cut
+        out.push(e[1] ? [e[1], e[2]] : [e[2]]);
+        pen = e[2];
+      });
+      if (out.length && len(sub(pen, out[0][0])) > 1e-9) out.push([out[0][0]]); // back along the cut
+      return out;
+    }
+    return [
+      part(function (x) {
+        return x >= x0;
+      }),
+      part(function (x) {
+        return x < x0;
+      }),
+    ];
+  }
+
   /** Package 90 (the owner's note T-v2 of 2026-11-28, "a pinched section" at a lateen's forward
    *  end): the control point of one edge of a sail, from `p` to `q`, bellied by `belly`, the
    *  sail's own belly (BELLY of `ref`, the length it is reckoned by, twice over: a quadratic peaks
@@ -372,6 +448,16 @@
     var L = len(sub(q, p));
     var k = ref > L ? L / ref : 1;
     return add(lerp(p, q, 0.5), mul(belly, k));
+  }
+
+  /** Package 90 (nudge 93): the sag of a drawing sail's foot from C to D, straight down, by the
+   *  rule the belly is laid by (`edgeControl`): FOOT_SAG of the sail's depth, twice over, but
+   *  never more than FOOT_SAG of the foot's own length. A ringtail's foot has no length, its clew
+   *  and tack at one point; by the depth alone it hung a spike straight down from its clew once the
+   *  foot's belly was laid by its own length, 0.80 m on the corvette's to 1.12 m on the
+   *  schooners'. */
+  function footSag(C, D, depth) {
+    return v(0, 0, -2 * FOOT_SAG * Math.min(depth, len(sub(D, C))));
   }
 
   /**
@@ -1466,9 +1552,8 @@
       var ref = Math.min(depth, width);
       var belly = [0, 0, 0];
       if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * ref);
-      var sag = mul(v(0, 0, -1), 2 * FOOT_SAG * depth);
       var midBC = edgeControl(B, C, belly, ref);
-      var midCD = add(edgeControl(C, D, belly, ref), DRAWING[dyn.state] ? sag : [0, 0, 0]);
+      var midCD = add(edgeControl(C, D, belly, ref), DRAWING[dyn.state] ? footSag(C, D, depth) : [0, 0, 0]);
       var midDA = edgeControl(D, A, belly, ref);
       return [[A], [lerp(A, B, 0.5), B], [midBC, C], [midCD, D], [midDA, A]];
     }
@@ -1580,16 +1665,20 @@
         var mx = m.xAt ? m.xAt(fig.centre[2]) : m.x;
         if (mx <= minX + 0.3 || mx >= maxX - 0.3) continue;
         var halves = splitAtX(pts, mx);
+        // package 90 (nudge 93): each piece drawn with its curves (`splitPathAtX`); its centre,
+        // which places it along the view axis, and its share of the view's bounds from its
+        // outline sampled, as before (a curve's control stands off it, past the frame on the
+        // yawl's lug seen from ahead heeled, which would rescale the view while the lug is set)
+        var parts = splitPathAtX(fig.path, mx);
         var out = [];
         halves.forEach(function (poly, k) {
-          if (poly.length < 3) return;
+          if (poly.length < 3 || parts[k].length < 2) return;
           var piece = {};
           Object.keys(fig).forEach(function (key) {
             piece[key] = fig[key];
           });
-          piece.path = poly.map(function (p) {
-            return [p];
-          });
+          piece.path = parts[k];
+          piece.sampled = poly; // its outline sampled, which holds its share of the view (`project`)
           piece.centre = centroid(poly);
           piece.piece = k === 0 ? "forward" : "abaft";
           piece.mast = m.id;
@@ -1858,7 +1947,7 @@
         // (the lead's ruling of 2026-10-30): no sag below it, and furled it lies on the boom. By
         // the rule for the rest the foot hung 0.62 m under the boom and the bundle 0.35 m, through
         // her taffrail (the razee, measured)
-        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = add(fig.path[3][0], v(0, 0, 2 * FOOT_SAG * luff));
+        if (cutG && DRAWING[dyn.state]) fig.path[3][0] = sub(fig.path[3][0], footSag(clew, tackPt, luff));
         if (dyn.state === "furled") {
           var bundleT = 0.3 + 0.02 * (Bm ? Bm.spec.length_m || 0 : 0);
           fig.path = cutG
@@ -3944,7 +4033,9 @@
         g.pts = f.pts.map(proj);
         all = g.pts;
       }
-      all.forEach(note);
+      // package 90 (nudge 93): a sail cut at its mast holds its share of the bounds by its outline
+      // sampled, as it did when it was drawn so (`piecesAtMast`)
+      (f.sampled ? f.sampled.map(proj) : all).forEach(note);
       // package 75 (B5.6): a figure on one face of the hull (a stern light, a wale or a band on
       // the outside of the side, a deck's top, a side of the head) is seen only from that face's
       // side, and not edge on (within rounding: dead astern, sin(pi) leaves a hair)
@@ -4994,6 +5085,8 @@
     gooseWingTriangle: gooseWingTriangle,
     flattenPath: flattenPath,
     splitAtX: splitAtX,
+    splitPathAtX: splitPathAtX,
+    footSag: footSag,
     edgeControl: edgeControl,
     sortFigures: sortFigures,
     actionFigures: actionFigures,

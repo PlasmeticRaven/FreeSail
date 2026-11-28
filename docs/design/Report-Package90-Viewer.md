@@ -253,3 +253,154 @@ loadgroup"`.
     none removed or renamed.
 
 That is the hash. I stop here and wait for the lead's word; nothing more is pushed until it comes.
+
+## 2026-11-28: nudge 93's list, built; the hash: 856dbcc
+
+**The reported hash is 856dbcc**, tiered whole on that exact hash (below): 20aca5e (V1, V2 and V1's
+mend) with the reader's list of nudge 93 built on it. The commits since 20aca5e:
+
+| Commit | What |
+|---|---|
+| b9a2162 | this report: the hash 20aca5e and its tests |
+| 3fc7b19 | nudge 93: the cut keeps its curves; a foot sags by its own length; three pins bite |
+| 9aeeaa9 | the notes: nudge 93's list, every outline move declared old beside new |
+| 856dbcc | merge of `claude/pkg-90` at 55d2dda (docs only: the owner's T-v3 and its pictures) |
+
+Every commit's author is as the cloud gives it. My commits changed only `client/projection.js`,
+`tests/test_view_geometry.py`, `docs/dev/TuningNotes.md` and this report. The measures in full,
+the table of every moved edge among them, are in the notes' subsection "The reader's list of
+nudge 93".
+
+### 1. Every outline move, declared
+
+- **Measured again** with every sail a file can bend bent and set, the unbent as filed among them.
+  Her yards are braced to their limits and square, on either tack, with the wind at 40, 60, 90 and
+  135 degrees. Each edge's bulge is given three ways: before the mend (V2), at 20aca5e, and now.
+- **The table has 78 rows**, a pair of studding sails taking one. Each row is marked by what moves
+  it: the belly, the mend of 20aca5e; or the sag, item 3.
+- **The sprit topsails.** The reader's "leech and foot" are its two leeches: 0.99 to 0.89 m on the
+  64 and 1.10 to 1.00 m on the 74. Its foot does not move.
+- **Now declared too:**
+  - the ringtails on the five files with one;
+  - the storm staysails of the razee, the 64 and the 74.
+- **The schooners, as it is.** At 20aca5e they moved by their ringtails alone (1.14 to 1.12 m).
+  In this hash they move also:
+  - by the foot's sag: their ringtails to none, their fore sails' loose feet, their studding
+    sails' feet;
+  - by the cut's curves, 0.04 m.
+
+  Of the 19 files only the cutter does not move. The smack moves only by the cut's curves (her
+  jib, 0.02 m).
+- **Nothing else moves.** I measured V2 beside this hash on every file in 18 states, at eight
+  facings and four heels:
+  - no corner, spar, mast, yard, line, hull point or frame point moves;
+  - no view's bounds moves;
+  - no point is NaN.
+
+  A cut sail's centre, which places its pieces along the view axis, moves with its sampled
+  outline: by the sag alone, up to 0.14 m on the lugger's lugs.
+
+### 2. The three pins, made to bite
+
+Each fails with its rule taken out:
+- **(a) The frame holding the peaked yard.** A new case on the tartane probe with her main struck
+  to a pole (`_main_a_pole`; the jibs go with the topmast their stay was set up to). Her main's
+  head is 17.0 m over her water. The frame's top is the peaked penne, 21.52 m. With the peak left
+  out of the frame it falls to 17.0 m, and all four facings fail.
+- **(b) The car lifted clear of the deck.** A new case with the probe's great yard slung at 5 m.
+  Peaked where it was slung, its car would stand under the deck; it is raised to `ON_DECK_M` over
+  the deck, no higher. With the lift taken out, both tacks fail. On the probe as rigged the car
+  stood 4.69 m up.
+- **(c) The every-ship guard.** It now takes:
+  - every sail a file can bend, and the sails cut at their masts in their pieces;
+  - both bracings, either tack and four winds;
+  - besides the belly across, an up-or-down bound.
+
+  With a four-cornered sail's leech uncapped, it fails on the 64 and the 74, by their sprit
+  topsails at the winds other than 60.
+- **The other mutants**, run on the new pins and the belly's, the sag's and the cut's cases:
+  - the luff uncapped: 17 fail;
+  - the foot uncapped: 8;
+  - the jib's leech uncapped: 9;
+  - the sag by the depth again: 11;
+  - the cut made on the sampled outline: 5.
+
+### 3. The foot's sag by its own length (`footSag`)
+
+- **The cause.** A foot sagged FOOT_SAG of the sail's depth whatever its length. A ringtail's foot
+  has no length, so with its belly capped (20aca5e) it hung a spike straight down from its clew:
+  0.80 m on the corvette's to 1.12 m on the schooners'.
+- **The mend.** Like the belly's: never more than FOOT_SAG of the foot's own length. A foot at
+  least as long as the depth sags as before. The boomed spanker takes back exactly the sag it is
+  given.
+- **The moves.** The table's sag rows: the ringtails, the studding sails' feet, the lugs' feet and
+  the schooners' fore sails' feet. The largest is the lugger's main lug's sag, 1.23 to 0.62 m.
+
+### 4. The launch's lug: the cut at the mast, not the cap
+
+- **The cause.** Its luff stands wholly forward of the mast (0.23 to 0.73 m). A sail cut at its
+  mast was cut on its outline sampled at six points an edge and drawn as straight pieces. Seen from
+  the quarter, the luff's corners turned 6 to 9 degrees each (8 to 13 before the mend). The cap
+  made the luff lie along the mast, where those corners show against its straight line.
+- **The mend** (`splitPathAtX`). Each curved edge is split at the mast and kept a curve. The luff
+  is one curve again.
+- **The bounds.** A curve's control point stands off it. On the yawl's lug, seen from ahead heeled
+  0.3 rad, one stood 0.013 m past the frame, which would have rescaled her view while the lug is
+  set. So a piece holds its share of the bounds, and its place along the view axis, by its sampled
+  outline, as before. No bound moves.
+- **The cut's own move** is at most 0.05 m (the hermaphrodite brig's jib).
+- **The staysail pin** `test_a_staysail_that_crosses_a_mast_is_drawn_in_two_parts` holds
+  unchanged: its straight edge is now the cut.
+
+### Pins moved, old beside new
+
+- **None of the base's.** No threshold moved, and `tests/test_pictures.py` is untouched.
+- **This package's own cases:**
+  - the every-ship guard is made stricter, as (c) above, with its name and its 19 files kept;
+  - the frame case's views and assertions are moved unchanged into two helpers it shares with
+    (a);
+  - `lateen_by_the_wind` takes a rigged document.
+- **New: 18 cases**: the frame over short masts 4, the low-slung lift 2, the ringtails 5, the
+  foot's sag 1, the cut on a lens 1, the boats' luffs 5. That makes 89 in the package, none of the
+  base's removed or renamed (collected both ways: 1,103 against 1,192).
+
+### Taken as judgement
+
+- A cut piece's share of the bounds and its centre come from its sampled outline, as before, while
+  it is drawn with its curves.
+- The guard's up-or-down bound is BELLY and FOOT_SAG of the edge, because a tilted cloth's belly
+  has an upright part.
+- The probes for (a) and (b): her main struck to a pole, with the jibs; and her great yard slung at
+  5 m.
+
+### The tests on 856dbcc
+
+Every run is on the exact hash, with `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist
+loadgroup"`.
+
+- **The fast tier, whole, compared test by test with the base's** (93cf624c; junit both ways):
+  - on 856dbcc, 9,287 cases: 9,278 passed, 8 skipped, 1 xfailed;
+  - on the base, 9,198 cases: 9,189 passed, 8 skipped, 1 xfailed.
+  - No case changed its outcome and none is gone. The 89 new cases are the view geometry's, and
+    all pass.
+- **The slow tier of the files the steps reach, with `--slow`**: 1,345 cases, all passed.
+  - `tests/test_view_geometry.py` whole: 1,192 cases, none of them slow.
+  - `tests/test_pictures.py` whole, 2, and `tests/test_flag_drawings.py` whole, 27: none of them
+    slow.
+  - `tests/test_browser_probe.py`, 13: the 12 browser plans, every one, and the plans' own case.
+    The plans are a-letter, action, ashore, asleep, boat-and-visitor, deck-and-below, dressed,
+    prisoner, seated-officer, seated, signals and under-way.
+  - `tests/test_harbour.py` whole, 50, with its 3 slow among them.
+  - `tests/test_server.py` whole, 61, with its 2 slow.
+  - No harbour or browser test failed in these runs. No loader was patched.
+- **The merged base's practice tests**: `tests/test_practice.py`, 25 passed. They ran on 55d2dda
+  alone, and again in the fast tier on 856dbcc. It is the one test file that reads the docs the
+  merge changed.
+- **The file rules**:
+  - `ruff check .` and `ruff format --check .` clean on the whole tree;
+  - no Python line over 100 characters;
+  - `git diff 93cf624c..856dbcc | tr -cd '\r' | wc -c` is 0;
+  - the view geometry's ids collected on the base and on this hash: 1,103 against 1,192, 89
+    added (18 since 20aca5e), none removed or renamed.
+
+That is the hash. I stop here and wait for the lead's word; nothing more is pushed until it comes.
