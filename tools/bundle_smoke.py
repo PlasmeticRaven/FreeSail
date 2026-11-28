@@ -4,34 +4,59 @@ never sees that Python).
 
     python tools/bundle_smoke.py FreeSail-NAME-windows.zip
     python tools/bundle_smoke.py FreeSail-NAME-mac.zip
+    python tools/bundle_smoke.py FreeSail-NAME-mac.zip --without-isolation   # its teeth
+
+It touches nothing of the machine's own people: everything it writes, and the only places
+the game is let see as the player's, lie in ONE fresh temporary folder of its own (made by
+the system's `mkdtemp`, its name with a space and a letter outside English in it): a home
+of its own (HOME, APPDATA, LOCALAPPDATA, USERPROFILE and XDG_CONFIG_HOME are pointed into
+it, so the game's settings, saves and consent records, and Python's user site, are there),
+the unpacked folder, and the folder the launcher is started from. Nothing outside it is
+removed or written, and it is removed at the end.
 
 What it does, in order, as a friend's machine would:
 
-1. Unpacks the zip with the system's own tool into a fresh folder whose path has a space
-   and a letter outside English in it (`~/Free Sail Proof ä/`): Expand-Archive on
-   Windows; on the Mac `ditto`, after giving the zip the quarantine mark a browser gives
-   its downloads, so that every unpacked file carries it as a friend's do.
+1. Unpacks the zip with the system's own tool, as its own user would: on Windows
+   Expand-Archive into a folder named for the zip (what "Extract All" does); on the Mac
+   `ditto`, after giving the zip the quarantine mark a browser gives its downloads, so that
+   every unpacked file carries it as a friend's do. Either must make ONE folder, the
+   launcher at its top.
 2. Takes a digest of every file in the unpacked folder.
-3. Starts the game by the launcher's own road (`cmd /c FreeSail.cmd`, `bash
-   FreeSail.command`; `--no-browser`, which the launcher passes on), with the runner's
-   Python hidden from it: PATH cut to the system's own folders, and PYTHONPATH,
-   PYTHONHOME and PYTHONSTARTUP set to a folder of poisoned modules (`yaml.py`,
-   `sitecustomize.py`, ...) that leave a mark if anything imports them.
-4. Waits for the server; asks the harbour's page (taking its mark as a browser does), its
-   state and catalogue; begins the catalogue's first game (*A first passage*); asks the
-   game's page, its state and ship; runs sixty ticks (a minute of the game's time); reads
-   the primer's chapter 7 from the library; asks the harbour's chart; saves; and begins a
-   second game on the Channel's chart (*The tender*), runs a minute of it (its depth
-   tiles read) and asks its chart.
-5. Reads the running interpreter's path from the system (it must lie in the unpacked
+3. Plants poison where the download must never look, each a module named as one the game
+   imports (`freesail`, `yaml`, `numpy`, `fastapi`, `uvicorn`) or one Python runs by itself
+   (`sitecustomize`, `usercustomize`, and a `.pth` file), which leaves a mark if run:
+   (a) in a folder named by PYTHONPATH, PYTHONHOME and PYTHONSTARTUP, which the launchers
+   clear; (b) in the user's site-packages for that system (Windows'
+   `%APPDATA%\\Python\\Python311\\site-packages`; the Mac's `~/.local/lib/python3.11/...` and
+   `~/Library/Python/3.11/lib/python/...`), which the launchers do NOT clear and the
+   download must ignore by `-I`; (c) in the folder the launcher is started from, which
+   Python puts first on its path for `-m` unless `-I` (and on Windows the `._pth` file).
+4. Starts the game by the launcher's own road (`cmd /c FreeSail.cmd`, `bash
+   FreeSail.command`; `--no-browser`, which the launcher passes on), from (c), with the
+   runner's Python off the PATH.
+5. Waits for the server, and reads that a first start says nothing of its port being taken;
+   asks the harbour's page (taking its mark as a browser does), its state and catalogue;
+   begins the catalogue's first game (*A first passage*); asks the game's page, its state
+   and ship; runs sixty ticks (a minute of the game's time); reads the primer's chapter 7
+   from the library; asks the harbour's chart; saves; and begins a second game on the
+   Channel's chart (*The tender*), runs a minute of it (its depth tiles read) and asks its
+   chart.
+6. Reads the running interpreter's path from the system (it must lie in the unpacked
    folder), and looks for the poison's marks (there must be none).
-6. Stops the game (Control-C on the Mac, as a player does; on Windows Ctrl+Break, which
+7. Stops the game (Control-C on the Mac, as a player does; on Windows Ctrl+Break, which
    the server takes as Ctrl+C, a runner having no window to press Ctrl+C in), and reads
    the launcher's "FreeSail has stopped (exit code 0)" (on Windows 3, the code Windows
    ends a process with on a break the server has re-raised after its clean shutdown),
    and that the server no longer answers.
-7. Checks that no file in the unpacked folder is new, changed or gone, that the Mac's
-   quarantine marks are cleared, and that the save lies in the user's own data folder.
+8. Checks that no file in the unpacked folder is new, changed or gone; on the Mac that the
+   launcher cleared the quarantine of exactly its four folders and that the folder, the
+   launcher and the two pages beside it keep theirs; and that the save lies in the
+   player's own data folder.
+
+`--without-isolation` proves step 6 has teeth: it takes `-I` out of the unpacked launcher
+(and on Windows the interpreter's `python311._pth`), starts it, and passes only if the
+poison in (b) and (c) is run. (A Windows registry's Python paths are not poisoned: a
+runner's registry is the machine's own, and is not this test's to write.)
 
 Each finding is said as a GitHub annotation (`::notice::`, `::error::`) and in the job's
 summary, so that it is read without the log. Exit status 1 if anything failed.
@@ -124,19 +149,52 @@ def digests(top: Path) -> dict[str, str]:
     return out
 
 
-def user_data() -> Path:
+LAUNCHER = "FreeSail.cmd" if WINDOWS else "FreeSail.command"
+# The poison's modules: those the game imports, and those Python runs by itself at its start.
+POISONED = ("freesail", "yaml", "numpy", "fastapi", "uvicorn", "sitecustomize", "usercustomize")
+# What a player's unpacking leaves marked on the Mac, the launcher having cleared its four
+# folders (python-arm64, python-x86_64, game, licences): the folder, and the three beside them.
+KEPT_MARKED = ("FreeSail.command", "LICENCES.txt", "START HERE.txt")
+
+
+def player_env(home: Path) -> dict[str, str]:
+    """The variables by which the game, Python and the system find the player's own
+    places, every one pointed into `home` (the test's, never a person's)."""
+    return {
+        "HOME": str(home),
+        "USERPROFILE": str(home),
+        "APPDATA": str(home / "AppData" / "Roaming"),
+        "LOCALAPPDATA": str(home / "AppData" / "Local"),
+        "XDG_CONFIG_HOME": str(home / ".config"),
+        "XDG_DATA_HOME": str(home / ".local" / "share"),
+    }
+
+
+def user_data(home: Path) -> Path:
+    """The game's own folder in the player's place (freesail/settings.py), under `home`."""
     if WINDOWS:
-        return Path(os.environ["APPDATA"]) / "FreeSail"
+        return home / "AppData" / "Roaming" / "FreeSail"
     if MAC:
-        return Path.home() / "Library" / "Application Support" / "FreeSail"
-    return Path(os.environ.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "freesail"
+        return home / "Library" / "Application Support" / "FreeSail"
+    return home / ".config" / "freesail"
+
+
+def user_sites(home: Path) -> list[Path]:
+    """The user's site-packages a Python 3.11 of that system reads unless told not to (-s,
+    -I): site.getusersitepackages() for the home `home`."""
+    if WINDOWS:
+        return [home / "AppData" / "Roaming" / "Python" / "Python311" / "site-packages"]
+    sites = [home / ".local" / "lib" / "python3.11" / "site-packages"]
+    if MAC:  # a framework build's
+        sites.append(home / "Library" / "Python" / "3.11" / "lib" / "python" / "site-packages")
+    return sites
 
 
 def unpack(zip_path: Path, dest: Path, f: Findings) -> Path:
-    if dest.exists():
-        shutil.rmtree(dest)
     dest.mkdir(parents=True)
     if WINDOWS:
+        # "Extract All": a folder named for the zip, in which the zip's entries are laid
+        into = dest / zip_path.stem
         subprocess.run(
             [
                 "powershell",
@@ -144,7 +202,7 @@ def unpack(zip_path: Path, dest: Path, f: Findings) -> Path:
                 "-Command",
                 "Expand-Archive -LiteralPath $env:SMOKE_ZIP -DestinationPath $env:SMOKE_DEST",
             ],
-            env={**os.environ, "SMOKE_ZIP": str(zip_path), "SMOKE_DEST": str(dest)},
+            env={**os.environ, "SMOKE_ZIP": str(zip_path), "SMOKE_DEST": str(into)},
             check=True,
         )
     elif MAC:
@@ -155,9 +213,16 @@ def unpack(zip_path: Path, dest: Path, f: Findings) -> Path:
         subprocess.run(["ditto", "-x", "-k", str(zip_path), str(dest)], check=True)
     else:  # elsewhere (the harness's own trial): Info-ZIP keeps the modes
         subprocess.run(["unzip", "-q", str(zip_path), "-d", str(dest)], check=True)
-    tops = [p for p in dest.iterdir() if p.is_dir()]
-    f.check(len(tops) == 1, "the zip unpacks to one folder", tops[0].name if tops else "none")
-    return tops[0]
+    made = sorted(dest.iterdir())
+    top = made[0] if len(made) == 1 and made[0].is_dir() else None
+    f.check(
+        top is not None and (top / LAUNCHER).is_file(),
+        "the unpacking makes one folder, the launcher at its top",
+        f"{top.name}/{LAUNCHER}" if top is not None else ", ".join(p.name for p in made),
+    )
+    if top is None:
+        raise RuntimeError("the zip did not unpack to one folder")
+    return top
 
 
 def quarantined(top: Path, inside: tuple[str, ...] = ()) -> list[str]:
@@ -168,26 +233,42 @@ def quarantined(top: Path, inside: tuple[str, ...] = ()) -> list[str]:
     return [line.split(":")[0] for line in out.splitlines() if "com.apple.quarantine" in line]
 
 
-def poison(root: Path) -> tuple[Path, Path]:
-    """A folder of modules that leave a mark in `marks` if anything imports them."""
-    folder = root / "poison"
-    marks = root / "marks"
-    folder.mkdir(parents=True)
-    marks.mkdir()
-    for name in ("yaml", "sitecustomize", "usercustomize", "numpy", "fastapi", "freesail"):
+def plant(folder: Path, marks: Path, place: str) -> None:
+    """The poison's modules in `folder`, each leaving the mark `place-name` in `marks` if
+    it is run, and a `.pth` file that leaves `place-pth` if a site reads it."""
+    folder.mkdir(parents=True, exist_ok=True)
+    for name in POISONED:
+        mark = str(marks / f"{place}-{name}")
         (folder / f"{name}.py").write_text(
-            f"open({str(marks / name)!r}, 'w').write('imported')\n"
-            f"raise ImportError('the runner\\'s {name}, which the game must never see')\n",
+            f"open({mark!r}, 'w').write('run')\n"
+            f"raise ImportError('the {place} {name}, which the game must never see')\n",
             encoding="utf-8",
         )
-    (folder / "startup.py").write_text(
-        f"open({str(marks / 'startup')!r}, 'w').write('run')\n", encoding="utf-8"
+    pth = str(marks / f"{place}-pth")
+    (folder / "zz-poison.pth").write_text(
+        f"import os; open({pth!r}, 'w').write('run')\n", encoding="utf-8"
     )
-    return folder, marks
 
 
-def hidden_env(poison_dir: Path) -> dict[str, str]:
+def poison(work: Path, home: Path, started_from: Path) -> tuple[Path, Path]:
+    """The poison planted in its three places (the docstring's step 3); its marks' folder
+    and the folder PYTHONPATH names returned."""
+    marks = work / "marks"
+    marks.mkdir()
+    named = work / "named by PYTHONPATH"
+    plant(named, marks, "environment")
+    (named / "startup.py").write_text(
+        f"open({str(marks / 'environment-startup')!r}, 'w').write('run')\n", encoding="utf-8"
+    )
+    for site in user_sites(home):
+        plant(site, marks, "user-site")
+    plant(started_from, marks, "started-from")
+    return marks, named
+
+
+def hidden_env(home: Path, named: Path) -> dict[str, str]:
     env = {k: v for k, v in os.environ.items() if not k.upper().startswith("PYTHON")}
+    env.update(player_env(home))
     if WINDOWS:
         sysroot = os.environ.get("SystemRoot", r"C:\Windows")
         env["PATH"] = ";".join(
@@ -200,18 +281,33 @@ def hidden_env(poison_dir: Path) -> dict[str, str]:
         )
     else:
         env["PATH"] = "/usr/bin:/bin:/usr/sbin:/sbin"
-    env["PYTHONPATH"] = str(poison_dir)
-    env["PYTHONHOME"] = str(poison_dir)
-    env["PYTHONSTARTUP"] = str(poison_dir / "startup.py")
+    env["PYTHONPATH"] = str(named)
+    env["PYTHONHOME"] = str(named)
+    env["PYTHONSTARTUP"] = str(named / "startup.py")
     return env
 
 
-def start(top: Path, env: dict[str, str], log: Path) -> subprocess.Popen:
+def without_isolation(top: Path) -> str:
+    """The unpacked launcher's `-I` taken out, and on Windows the interpreter's `._pth`:
+    what the proof of the poison's teeth runs. What was taken out said."""
+    launcher = top / LAUNCHER
+    text = launcher.read_bytes()
+    if b" -I -B " not in text:
+        raise RuntimeError(f"{LAUNCHER} has no ' -I -B ' to take out")
+    launcher.write_bytes(text.replace(b" -I -B ", b" -B "))
+    taken = [f"-I from {LAUNCHER}"]
+    if WINDOWS:
+        (top / "python" / "python311._pth").unlink()
+        taken.append("python\\python311._pth")
+    return " and ".join(taken)
+
+
+def start(top: Path, env: dict[str, str], log: Path, cwd: Path) -> subprocess.Popen:
     out = open(log, "wb")
     if WINDOWS:
         return subprocess.Popen(
-            ["cmd.exe", "/c", str(top / "FreeSail.cmd"), "--no-browser"],
-            cwd=top,
+            ["cmd.exe", "/c", str(top / LAUNCHER), "--no-browser"],
+            cwd=cwd,
             env=env,
             stdin=subprocess.PIPE,
             stdout=out,
@@ -219,8 +315,8 @@ def start(top: Path, env: dict[str, str], log: Path) -> subprocess.Popen:
             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         )
     return subprocess.Popen(
-        ["/bin/bash", str(top / "FreeSail.command"), "--no-browser"],
-        cwd=top,
+        ["/bin/bash", str(top / LAUNCHER), "--no-browser"],
+        cwd=cwd,
         env=env,
         stdin=subprocess.DEVNULL,
         stdout=out,
@@ -320,23 +416,110 @@ def stop(proc: subprocess.Popen) -> str:
     return "Control-C in its window"
 
 
+PORT_WORDS = "FreeSail seems to be running already"
+
+
+def the_game(page: Page, f: Findings) -> None:
+    """The game played as a friend would, from the harbour (the docstring's step 5)."""
+    harbour = page.ask("GET", "/harbour")
+    m = re.search(r'<meta name="freesail-page" content="([^"]+)"', harbour)
+    f.check(bool(m), "the harbour's page, with the game's mark in it", f"{len(harbour)} bytes")
+    page.mark = m.group(1) if m else ""
+    state = page.ask("GET", "/api/harbour/state")
+    f.check(isinstance(state, dict), "the harbour's state")
+    cat = page.ask("GET", "/api/harbour/catalogue")
+    first = (cat or {}).get("first_game") or {}
+    f.check(
+        "first passage" in str(first.get("name", "")).lower(),
+        "the harbour's first game",
+        f"{first.get('name')} ({first.get('path')})",
+    )
+    begun = page.ask("POST", "/api/harbour/start", {"scenario": first.get("path", "")})
+    f.check(
+        isinstance(begun, dict) and "error" not in begun,
+        "A first passage begun from the harbour",
+        " / ".join((begun or {}).get("lines", [])[:1]) if isinstance(begun, dict) else "",
+    )
+    game = page.ask("GET", "/")
+    f.check("<html" in game.lower(), "the game's page", f"{len(game)} bytes")
+    for script in sorted(set(re.findall(r'src="(/client/[^"?]+)', game)))[:20]:
+        page.ask("GET", script)
+    tick0 = page.ask("GET", "/api/state").get("tick")
+    ship = page.ask("GET", "/api/ship")
+    f.check(isinstance(ship, dict) and bool(ship), "the ship's drawing")
+    page.ask("POST", "/api/driver", {"action": "tick", "value": 60})
+    tick1 = page.ask("GET", "/api/state").get("tick")
+    f.check(
+        isinstance(tick0, int) and tick1 == tick0 + 60,
+        "a minute of the game's time run",
+        f"tick {tick0} to {tick1}",
+    )
+    primer = page.ask("GET", "/api/library?topic=primer%207")
+    f.check(
+        "first passage" in (primer.get("title", "") + primer.get("text", "")).lower(),
+        "the primer's chapter 7 read",
+        primer.get("title", ""),
+    )
+    chart = page.ask("GET", "/api/harbour/chart")
+    f.check(
+        isinstance(chart, dict) and bool(chart),
+        "the harbour's chart",
+        f"{len(str(chart))} chars",
+    )
+    page.ask("POST", "/api/driver", {"action": "save", "value": SAVE_NAME})
+    # a second game, on the Channel's chart, whose minute opens the charts' depth tiles
+    # (A first passage is in open water and touches none)
+    begun = page.ask("POST", "/api/harbour/start", {"scenario": "data/scenarios/tender.yaml"})
+    t0 = page.ask("GET", "/api/state").get("tick")
+    page.ask("POST", "/api/driver", {"action": "tick", "value": 60})
+    t1 = page.ask("GET", "/api/state").get("tick")
+    sea = page.ask("GET", "/api/chart")
+    f.check(
+        isinstance(t0, int) and t1 == t0 + 60 and isinstance(sea, dict) and bool(sea),
+        "a second game on the Channel's chart: a minute run and its chart drawn",
+        " / ".join((begun or {}).get("lines", [])[:2]) if isinstance(begun, dict) else "",
+    )
+
+
+def stopped(proc: subprocess.Popen, f: Findings, seconds: float = 90) -> str:
+    road = stop(proc)
+    try:
+        proc.wait(timeout=seconds)
+    except subprocess.TimeoutExpired:
+        f.fail("the game stops when asked", f"still running after {seconds:.0f} s")
+        proc.kill()
+    return road
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("zip", help="the built download")
     ap.add_argument("--title", default="", help="the annotations' title")
+    ap.add_argument(
+        "--without-isolation",
+        action="store_true",
+        help="the proof of the poison check's teeth: -I (and Windows' ._pth) taken out of "
+        "the unpacked download, which must then read the poison",
+    )
     args = ap.parse_args(argv)
     zip_path = Path(args.zip).resolve()
     machine = platform.machine()
-    f = Findings(args.title or f"smoke test, {zip_path.name} on {sys.platform} {machine}")
+    teeth = args.without_isolation
+    f = Findings(
+        args.title
+        or f"smoke test{' without isolation' if teeth else ''}, {zip_path.name} on "
+        f"{sys.platform} {machine}"
+    )
     window = ""
-    work = Path(tempfile.mkdtemp(prefix="smoke-"))
-    dest = Path.home() / "Free Sail Proof ä"
-    saves = user_data() / "saves"
-    if saves.exists():
-        shutil.rmtree(saves)
+    # the test's one folder, and nothing of anyone's outside it
+    work = Path(tempfile.mkdtemp(prefix="FreeSail smoke ä "))
+    home = work / "home"
+    home.mkdir()
+    started_from = work / "started from here"
+    log = work / "window.txt"
     proc = None
     try:
-        top = unpack(zip_path, dest, f)
+        top = unpack(zip_path, work / "Free Sail Proof ä", f)
         if MAC:
             marked = quarantined(top)
             f.check(
@@ -344,76 +527,54 @@ def main(argv: list[str] | None = None) -> int:
                 "the unpacked files carry the quarantine mark, as a browser's download's do",
                 f"{len(marked)} files marked",
             )
+        if teeth:
+            f.ok("isolation taken out of the unpacked download", without_isolation(top))
         before = digests(top)
         f.ok("the unpacked folder", f"{top} ({len(before)} entries)")
-        poison_dir, marks = poison(work)
-        env = hidden_env(poison_dir)
-        log = work / "window.txt"
+        marks, named = poison(work, home, started_from)
+        f.ok(
+            "poison planted where the launchers clear nothing",
+            "; ".join(str(p) for p in [*user_sites(home), started_from]),
+        )
+        env = hidden_env(home, named)
         began = time.time()
-        proc = start(top, env, log)
+        proc = start(top, env, log, started_from)
+        if teeth:
+            places = (
+                ("started-from", "the folder it is started from"),
+                ("user-site", "the user's site-packages"),
+            )
+            up = -1.0
+            while time.time() - began < 120 and proc.poll() is None:
+                left = [p.name for p in marks.iterdir()]
+                if all(any(m.startswith(k + "-") for m in left) for k, _ in places):
+                    break
+                if up < 0 and wait_for_server(proc, 1) >= 0:
+                    up = time.time() - began
+                time.sleep(1)
+            if proc.poll() is None:
+                stopped(proc, f, 30)
+            window = log.read_text("utf-8", "replace")
+            left = sorted(p.name for p in marks.iterdir())
+            for place, what in places:
+                got = [m for m in left if m.startswith(place + "-")]
+                f.check(
+                    bool(got),
+                    f"without isolation, the poison in {what} is run (the check has teeth)",
+                    ", ".join(got) or "no mark",
+                )
+            f.ok("the server", f"answered after {up:.0f} s" if up >= 0 else "did not answer")
+            return 0 if f.passed else 1
         up = wait_for_server(proc, 240)
         window = log.read_text("utf-8", "replace")
         if not f.check(up >= 0, "the server answers", f"after {up:.0f} s" if up >= 0 else ""):
             return 1
-        page = Page()
-        harbour = page.ask("GET", "/harbour")
-        m = re.search(r'<meta name="freesail-page" content="([^"]+)"', harbour)
-        f.check(bool(m), "the harbour's page, with the game's mark in it", f"{len(harbour)} bytes")
-        page.mark = m.group(1) if m else ""
-        state = page.ask("GET", "/api/harbour/state")
-        f.check(isinstance(state, dict), "the harbour's state")
-        cat = page.ask("GET", "/api/harbour/catalogue")
-        first = (cat or {}).get("first_game") or {}
         f.check(
-            "first passage" in str(first.get("name", "")).lower(),
-            "the harbour's first game",
-            f"{first.get('name')} ({first.get('path')})",
+            PORT_WORDS not in window,
+            "a first start says nothing of its port being taken",
+            next((ln.strip() for ln in window.splitlines() if PORT_WORDS in ln), "no such word"),
         )
-        begun = page.ask("POST", "/api/harbour/start", {"scenario": first.get("path", "")})
-        f.check(
-            isinstance(begun, dict) and "error" not in begun,
-            "A first passage begun from the harbour",
-            " / ".join((begun or {}).get("lines", [])[:1]) if isinstance(begun, dict) else "",
-        )
-        game = page.ask("GET", "/")
-        f.check("<html" in game.lower(), "the game's page", f"{len(game)} bytes")
-        for script in sorted(set(re.findall(r'src="(/client/[^"?]+)', game)))[:20]:
-            page.ask("GET", script)
-        tick0 = page.ask("GET", "/api/state").get("tick")
-        ship = page.ask("GET", "/api/ship")
-        f.check(isinstance(ship, dict) and bool(ship), "the ship's drawing")
-        page.ask("POST", "/api/driver", {"action": "tick", "value": 60})
-        tick1 = page.ask("GET", "/api/state").get("tick")
-        f.check(
-            isinstance(tick0, int) and tick1 == tick0 + 60,
-            "a minute of the game's time run",
-            f"tick {tick0} to {tick1}",
-        )
-        primer = page.ask("GET", "/api/library?topic=primer%207")
-        f.check(
-            "first passage" in (primer.get("title", "") + primer.get("text", "")).lower(),
-            "the primer's chapter 7 read",
-            primer.get("title", ""),
-        )
-        chart = page.ask("GET", "/api/harbour/chart")
-        f.check(
-            isinstance(chart, dict) and bool(chart),
-            "the harbour's chart",
-            f"{len(str(chart))} chars",
-        )
-        page.ask("POST", "/api/driver", {"action": "save", "value": SAVE_NAME})
-        # a second game, on the Channel's chart, whose minute opens the charts' depth tiles
-        # (A first passage is in open water and touches none)
-        begun = page.ask("POST", "/api/harbour/start", {"scenario": "data/scenarios/tender.yaml"})
-        t0 = page.ask("GET", "/api/state").get("tick")
-        page.ask("POST", "/api/driver", {"action": "tick", "value": 60})
-        t1 = page.ask("GET", "/api/state").get("tick")
-        sea = page.ask("GET", "/api/chart")
-        f.check(
-            isinstance(t0, int) and t1 == t0 + 60 and isinstance(sea, dict) and bool(sea),
-            "a second game on the Channel's chart: a minute run and its chart drawn",
-            " / ".join((begun or {}).get("lines", [])[:2]) if isinstance(begun, dict) else "",
-        )
+        the_game(Page(), f)
         time.sleep(1)
         running = interpreters()
         here = os.path.normcase(str(top.resolve()))
@@ -426,13 +587,13 @@ def main(argv: list[str] | None = None) -> int:
             "; ".join(exe for exe, _ in running) or "no interpreter found",
         )
         left = sorted(p.name for p in marks.iterdir())
-        f.check(not left, "nothing of the runner's Python was read", ", ".join(left) or "no mark")
-        road = stop(proc)
-        try:
-            proc.wait(timeout=90)
-        except subprocess.TimeoutExpired:
-            f.fail("the game stops when asked", "still running after 90 s")
-            proc.kill()
+        f.check(
+            not left,
+            "none of the poison was run (the environment's, the user's site's, the folder "
+            "it is started from)",
+            ", ".join(left) or "no mark",
+        )
+        road = stopped(proc, f)
         window = log.read_text("utf-8", "replace")
         try:
             urllib.request.urlopen(BASE + "/harbour", timeout=3).read()
@@ -465,33 +626,40 @@ def main(argv: list[str] | None = None) -> int:
             or f"{len(after)} entries as unpacked",
         )
         if MAC:
-            # the download's own folders, which the launcher clears; the launcher itself, the
-            # pages beside it and the folder keep theirs (the player opened the launcher)
+            # the download's own folders, which the launcher clears; the folder, the launcher
+            # and the pages beside it keep theirs (the player opened the launcher, no more)
             marked = quarantined(top, ("python-arm64", "python-x86_64", "game", "licences"))
-            kept = sorted({Path(m).name for m in quarantined(top)} - {Path(m).name for m in marked})
             f.check(
                 not marked,
-                "the launcher cleared the quarantine on the download's folders",
-                f"{len(marked)} left in them; still marked at the top: {', '.join(kept) or 'none'}",
+                "the launcher cleared the quarantine on its four folders",
+                f"{len(marked)} left in them",
             )
-        saved = saves / f"{SAVE_NAME}.json"
-        f.check(saved.is_file(), "the save lies in the user's data folder", str(saved))
-        settings = user_data() / "settings.yaml"
-        f.ok("the user's data folder", f"{user_data()} (settings file there: {settings.is_file()})")
+            kept = sorted({Path(m).name for m in quarantined(top)})
+            f.check(
+                kept == sorted((top.name, *KEPT_MARKED)),
+                "the folder, the launcher and the pages beside it keep their mark",
+                ", ".join(kept) or "none",
+            )
+        data = user_data(home)
+        saved = data / "saves" / f"{SAVE_NAME}.json"
+        f.check(saved.is_file(), "the save lies in the player's own data folder", str(saved))
+        f.ok(
+            "the player's data folder",
+            f"{data} (settings file there: {(data / 'settings.yaml').is_file()})",
+        )
     except Exception as e:  # every failure said, never a bare traceback
         f.fail("the smoke test ran to its end", f"{type(e).__name__}: {e}")
         if proc is not None and proc.poll() is None:
-            stop(proc)
-            try:
-                proc.wait(timeout=30)
-            except subprocess.TimeoutExpired:
-                proc.kill()
+            stopped(proc, f, 30)
         try:
-            window = (work / "window.txt").read_text("utf-8", "replace")
+            window = log.read_text("utf-8", "replace")
         except OSError:
             pass
     finally:
+        if proc is not None and proc.poll() is None:
+            proc.kill()
         f.report(window)
+        shutil.rmtree(work, ignore_errors=True)
     return 0 if f.passed else 1
 
 

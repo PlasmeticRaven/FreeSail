@@ -1,5 +1,5 @@
 """The downloads for a machine without Python (package 130; tools/bundle.py, tools/bundle/,
-.github/workflows/downloads.yml; docs/design/Report-Package130.md). Truths 7-800 to 7-806.
+.github/workflows/downloads.yml; docs/design/Report-Package130.md). Truths 7-800 to 7-809.
 
 The downloads themselves are built and proven in the cloud, on Windows and on both kinds of
 Mac (tools/bundle_smoke.py). What is held here, on every push, is what a forgetful change
@@ -12,6 +12,7 @@ that the launchers and the "start here" pages say what they must.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
 import sys
@@ -172,24 +173,63 @@ def test_truth_7_801_the_downloads_ship_the_game_by_its_rule_and_not_the_records
         )
 
 
-def _locked(path: Path) -> dict[str, list[str]]:
-    """A lock file's packages, each with its hashes."""
+# What each lock file holds, by name: what `python tools/bundle.py lock` resolved from
+# pyproject.toml's base, server and agents extras, and nothing more, held by the count of
+# its names and the sha256 of them sorted, one a line. A change of a lock's set is a
+# declared change of this truth (the failure lists the names the lock now holds), never
+# one that passes unseen.
+LOCKED_NAMES = {
+    "windows": (62, "1bc53ea529ef83b2d6451031de16e6ea08ae2243fdc6232823db5d224674b620"),
+    "arm64": (60, "c367ec6d961bc85be8f2a128aeac5fe13f73c15441ba8a8fb66e00bbe228c851"),
+    "x86_64": (60, "c367ec6d961bc85be8f2a128aeac5fe13f73c15441ba8a8fb66e00bbe228c851"),
+}
+
+
+def _names_held(names: set[str]) -> tuple[int, str]:
+    joined = "\n".join(sorted(names))
+    return len(names), hashlib.sha256(joined.encode("utf-8")).hexdigest()
+
+
+# A lock's requirement, whole: `name==version`, an environment marker at most, and its
+# sha256 hashes; nothing else (no URL, no range, no extra, no option line).
+_REQUIREMENT = re.compile(
+    r"(?P<name>[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?)==(?P<version>[A-Za-z0-9.!+_-]+)"
+    r"(?: ; [^\\-]+?)?(?P<hashes>(?: --hash=sha256:[0-9a-f]{64})+)"
+)
+
+
+def _lock_lines(text: str) -> list[str]:
+    """A lock file's logical lines (a backslash at a line's end joins the next), spaces
+    made single, without the comments and the blank lines."""
+    joined = re.sub(r"\\[ \t]*\n", " ", text)
+    lines = []
+    for line in joined.splitlines():
+        line = " ".join(line.split())
+        if line and not line.startswith("#"):
+            lines.append(line)
+    return lines
+
+
+def _locked(text: str) -> dict[str, list[str]]:
+    """A lock file's packages, each with its hashes; a line that is not a whole requirement
+    as `_REQUIREMENT` has it refused, by an AssertionError naming it."""
     out: dict[str, list[str]] = {}
-    name = ""
-    for line in path.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"^([A-Za-z0-9_.-]+)==([^ \\;]+)", line)
-        if m:
-            name = m.group(1).lower().replace("_", "-")
-            out[name] = []
-        for h in re.findall(r"--hash=sha256:([0-9a-f]{64})", line):
-            out[name].append(h)
+    for line in _lock_lines(text):
+        m = _REQUIREMENT.fullmatch(line)
+        assert m, f"not a pinned requirement with its hashes: {line!r}"
+        name = m.group("name").replace("_", "-").replace(".", "-")
+        assert name not in out, f"twice: {name}"
+        out[name] = re.findall(r"[0-9a-f]{64}", m.group("hashes"))
     return out
 
 
 def test_truth_7_802_the_libraries_are_the_games_own_pinned_with_their_hashes():
-    """Truth 7-802: each platform's lock file pins every library by version with its
-    sha256, holds every one pyproject.toml names in its base and its server and agents
-    extras, and none that only its `dev` extra names."""
+    """Truth 7-802: each platform's lock file is nothing but requirements each pinned
+    `name==version` with its sha256 hashes (no URL, no range, no option line, which pip
+    would take under --require-hashes all the same); its names are exactly those resolved
+    for it (62 for Windows, 60 for each Mac: no library more, none less); and they hold every
+    one pyproject.toml names in its base and its server and agents extras, and none that
+    only its `dev` extra names. The refusal is proven on the lines it must refuse."""
     import tomllib
 
     project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]
@@ -200,13 +240,39 @@ def test_truth_7_802_the_libraries_are_the_games_own_pinned_with_their_hashes():
     wanted = names(bundle.requirements())
     dev_only = names(project["optional-dependencies"]["dev"]) - wanted - {"freesail"}
     assert wanted >= names(project["dependencies"])
+    assert {k: v[0] for k, v in LOCKED_NAMES.items()} == {
+        "windows": 62,
+        "arm64": 60,
+        "x86_64": 60,
+    }
     for which, name in bundle.LOCK_FILES.items():
-        locked = _locked(bundle.LOCKS / name)
-        assert locked, which
+        text = (bundle.LOCKS / name).read_text(encoding="utf-8")
+        locked = _locked(text)
+        assert _names_held(set(locked)) == LOCKED_NAMES[which], (which, sorted(locked))
         assert wanted <= set(locked), (which, wanted - set(locked))
         assert not dev_only & set(locked), (which, dev_only & set(locked))
         for package, hashes in locked.items():
             assert hashes, f"{which}: {package} has no hash"
+    h = "--hash=sha256:" + "0" * 64
+    good = f"pyyaml==6.0.2 \\\n    {h}\n"
+    assert _locked(good) == {"pyyaml": ["0" * 64]}
+    for bad in (
+        f"pyyaml @ https://example.org/PyYAML-6.0.2.whl {h}\n",
+        f"pyyaml>=6.0 {h}\n",
+        f"pyyaml==6.* {h}\n",
+        f"pyyaml[extra]==6.0.2 {h}\n",
+        "pyyaml==6.0.2\n",
+        f"pyyaml==6.0.2 --hash=md5:{'0' * 32}\n",
+        f"{good}--index-url https://example.org/simple\n",
+        f"{good}--extra-index-url https://example.org/simple\n",
+        f"{good}--find-links /somewhere\n",
+        f"{good}-e .\n",
+        f"{good}-r other.txt\n",
+        f"{good}./a-local.whl {h}\n",
+        f"pyyaml==6.0.2 ; python_version >= '3' --index-url https://example.org {h}\n",
+    ):
+        with pytest.raises(AssertionError):
+            _locked(bad)
 
 
 def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit():
@@ -257,7 +323,8 @@ def test_truth_7_803_every_third_party_is_pinned_and_every_action_by_its_commit(
 def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must():
     """Truth 7-804: each launcher runs the download's own interpreter by its own path,
     isolated (-I) and writing nothing (-B), passing its arguments on; the Windows one
-    refuses kindly to start inside its zip, the Mac one clears its folder's quarantine.
+    refuses kindly to start inside its zip, the Mac one clears the quarantine of its four
+    folders (the interpreters, the game, the licences) and of nothing else.
     Each "start here" page says how to start, the warning its system gives the first time
     and how to pass it, what the player will see, how to stop, where the saves and
     settings live, and where to tell what went wrong; and of a model at a station only
@@ -265,10 +332,25 @@ def test_truth_7_804_the_launchers_and_the_start_here_pages_say_what_they_must()
     cmd = (bundle.HERE / "FreeSail.cmd").read_text(encoding="utf-8")
     assert '"%HERE%python\\python.exe" -I -B -X utf8 -m freesail %*' in cmd
     assert "Extract All" in cmd and ":notunpacked" in cmd
+    # the one folder "Extract All" makes, by its name (the Windows zip holds no folder)
+    assert "the folder FreeSail-{{NAME}}-windows" in cmd
+    windows_page = (bundle.HERE / "START-HERE-windows.txt").read_text(encoding="utf-8")
+    assert "It makes one folder, FreeSail-{{NAME}}-windows, and opens it" in windows_page
     mac = (bundle.HERE / "FreeSail.command").read_text(encoding="utf-8")
     assert mac.startswith("#!/bin/bash\n")
     assert '"$PY" -I -B -X utf8 -m freesail "$@"' in mac
-    assert "xattr -dr com.apple.quarantine" in mac
+    # the quarantine cleared of the download's four folders, and of nothing else
+    clearing = re.search(r"/usr/bin/xattr -dr com\.apple\.quarantine ((?:\\\n|[^\n])*)", mac)
+    assert clearing, "the Mac launcher clears no quarantine"
+    operands = clearing.group(1).replace("\\\n", " ").split()
+    assert operands[-1] == "2>/dev/null", operands
+    assert operands[:-1] == [
+        '"$HERE/python-arm64"',
+        '"$HERE/python-x86_64"',
+        '"$HERE/game"',
+        '"$HERE/licences"',
+    ], operands
+    assert mac.count("xattr") == 1 and mac.count("quarantine") == 1
     assert "python-arm64/bin/python3.11" in mac and "python-x86_64/bin/python3.11" in mac
     for name, words in (
         (
@@ -313,7 +395,9 @@ def test_truth_7_805_from_a_download_the_consent_records_go_beside_the_settings(
     player's settings and saves, so that nothing is written in the unpacked folder; from a
     checkout, to the game's own `docs/agents/consent/` as ever. (A setting, or
     `--consent-records`, still wins: they are given as `records_dir` and never reach this
-    default.) The smoke test seats no model: this is the proof."""
+    default.) And as `py -m freesail` works it out, the download's place follows the
+    settings file in use, `--settings OTHER` too: beside OTHER, where the saves go. The
+    smoke test seats no model: this is the proof."""
     from freesail.agents import consent
 
     assert consent.DOWNLOAD_MARK == bundle.DOWNLOAD_MARK
@@ -331,6 +415,16 @@ def test_truth_7_805_from_a_download_the_consent_records_go_beside_the_settings(
     assert not (ROOT / consent.DOWNLOAD_MARK).exists()
     assert consent.RECORDS_DIR == ROOT / "docs" / "agents" / "consent"
     assert bundle.DOWNLOAD_MARK not in bundle.game_files()
+    # `py -m freesail`'s own road: from a download, beside the settings file IN USE (a
+    # `--settings OTHER` too, as the saves are); a place the settings name wins; from a
+    # checkout nothing is given, and the game's own place stands
+    from freesail.__main__ import consent_records_place
+
+    other = tmp_path / "elsewhere" / "other.yaml"
+    assert consent_records_place({}, other, download) == str(other.parent / "consent")
+    assert consent_records_place({"consent_records": "/r"}, other, download) == "/r"
+    assert consent_records_place({}, other, checkout) is None
+    assert consent_records_place({"consent_records": "/r"}, other, checkout) == "/r"
 
 
 def test_truth_7_806_a_port_taken_is_said_in_a_plain_sentence_and_the_game_stops_as_before(
@@ -373,3 +467,212 @@ def test_truth_7_806_a_port_taken_is_said_in_a_plain_sentence_and_the_game_stops
     port = free.getsockname()[1]
     free.close()
     assert port_taken_words("127.0.0.1", port) is None
+
+
+def test_truth_7_806_main_says_the_port_sentence_only_when_the_port_is_taken(
+    tmp_path, monkeypatch, capsys
+):
+    """Truth 7-806, at `main`'s own level: `py -m freesail` on a free port says no word of
+    it being taken, on a taken one says the sentence, and either way starts the server as
+    before (uvicorn's run, held here); and a probe the machine cannot make (`--host ::1`
+    without IPv6, errno 97) is no word and no error."""
+    import socket
+
+    import uvicorn
+
+    import freesail.__main__ as entry
+
+    ran: list[dict] = []
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kw: ran.append(kw))
+    monkeypatch.setenv("FREESAIL_SETTINGS", str(tmp_path / "settings.yaml"))
+    monkeypatch.chdir(ROOT)
+    free = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    free.bind(("127.0.0.1", 0))
+    port = free.getsockname()[1]
+    free.close()
+    first = port
+    assert entry.main(["--no-browser", "--port", str(port)]) == 0
+    out = capsys.readouterr().out
+    assert "seems to be running already" not in out and "FreeSail harbour" in out, out
+    held = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    held.bind(("127.0.0.1", 0))
+    held.listen(1)
+    try:
+        port = held.getsockname()[1]
+        assert entry.main(["--no-browser", "--port", str(port)]) == 0
+        out = capsys.readouterr().out
+        assert entry.port_taken_words("127.0.0.1", port) in out, out
+    finally:
+        held.close()
+    assert [kw["port"] for kw in ran] == [first, port]  # the server started, both times
+
+    def no_family(*args, **kwargs):
+        raise OSError(97, "Address family not supported by protocol")
+
+    monkeypatch.setattr(socket, "socket", no_family)
+    assert entry.port_taken_words("::1", 8000) is None
+
+
+def _snapshot(top: Path) -> dict[str, bytes]:
+    return {
+        p.relative_to(top).as_posix(): (p.read_bytes() if p.is_file() else b"<folder>")
+        for p in sorted(top.rglob("*"))
+    }
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="the trial's launcher is bash")
+def test_truth_7_807_the_smoke_test_touches_nothing_of_a_persons(tmp_path, monkeypatch):
+    """Truth 7-807 (the reader's finding 1): the smoke test, run on a person's own machine,
+    removes and writes nothing of his. Everything it writes lies in one temporary folder
+    of its own, removed at its end: the game and Python are given a home inside it (the
+    launcher sees HOME there), and his saves, on every system's road, and a folder named
+    as the old test's unpacking folder, are as they were. Run here on a trial zip whose
+    launcher says the home it sees and stops; and the script reads no person's place."""
+    import zipfile
+
+    import bundle_smoke
+
+    person = tmp_path / "a person's home"
+    for saves in (
+        person / ".config" / "freesail" / "saves",
+        person / "Library" / "Application Support" / "FreeSail" / "saves",
+        person / "AppData" / "Roaming" / "FreeSail" / "saves",
+        person / "Free Sail Proof ä",
+    ):
+        saves.mkdir(parents=True)
+        (saves / "precious.json").write_text("his", encoding="utf-8")
+    for name, value in {
+        "HOME": person,
+        "USERPROFILE": person,
+        "APPDATA": person / "AppData" / "Roaming",
+        "XDG_CONFIG_HOME": person / ".config",
+    }.items():
+        monkeypatch.setenv(name, str(value))
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)
+    seen = tmp_path / "the home the launcher saw.txt"
+    monkeypatch.setenv("SMOKE_TRUTH_OUT", str(seen))
+    temp = tmp_path / "temp"
+    temp.mkdir()
+    monkeypatch.setattr(bundle_smoke.tempfile, "tempdir", str(temp))
+    trial = tmp_path / "FreeSail-trial-mac.zip"
+    with zipfile.ZipFile(trial, "w") as z:
+        info = zipfile.ZipInfo("FreeSail-trial-mac/FreeSail.command")
+        info.external_attr = 0o755 << 16
+        z.writestr(info, '#!/bin/bash\necho "$HOME" > "$SMOKE_TRUTH_OUT"\nexit 1\n')
+    before = _snapshot(person)
+    assert bundle_smoke.main([str(trial)]) == 1  # the trial's game never answers
+    assert _snapshot(person) == before
+    home = Path(seen.read_text(encoding="utf-8").strip())
+    assert home.parent.parent == temp and home.name == "home", home
+    assert list(temp.iterdir()) == []  # its folder removed
+    source = Path(bundle_smoke.__file__).read_text(encoding="utf-8")
+    assert "Path.home()" not in source and "expanduser" not in source
+    assert 'environ["APPDATA"]' not in source and 'environ.get("APPDATA' not in source
+
+
+def test_truth_7_808_the_build_ships_no_link_and_no_interpreter_baggage(tmp_path):
+    """Truth 7-808 (the reader's findings 4a and 4d): (a) a symbolic link tracked among the
+    game's files is refused by the build (a link would ship what it points at), and the
+    same files without it are copied; (b) python-build-standalone's interpreter is
+    stripped, before the lock file's libraries go in, of its own pip and setuptools (its
+    site-packages, its console scripts, ensurepip's wheels) and of the compiled bytes it
+    carries, its site-packages left with its README alone, and the rest of it kept."""
+    import inspect
+    import subprocess
+
+    repo = tmp_path / "repo"
+    (repo / "freesail").mkdir(parents=True)
+    (repo / "data").mkdir()
+    (repo / "freesail" / "__main__.py").write_text("print('the game')\n", encoding="utf-8")
+    (repo / "data" / "a.yaml").write_text("a: 1\n", encoding="utf-8")
+    (tmp_path / "secret.txt").write_text("not the game's\n", encoding="utf-8")
+    (repo / "data" / "link.yaml").symlink_to(tmp_path / "secret.txt")
+    subprocess.run(["git", "init", "-q"], cwd=repo, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=repo, check=True)
+    with pytest.raises(SystemExit, match="symbolic link.*data/link.yaml"):
+        bundle.copy_game(tmp_path / "top", repo, allow_changed=True)
+    assert not (tmp_path / "top" / "game" / "data" / "a.yaml").exists()  # nothing copied
+    subprocess.run(["git", "rm", "-q", "--cached", "data/link.yaml"], cwd=repo, check=True)
+    (repo / "data" / "link.yaml").unlink()
+    assert bundle.copy_game(tmp_path / "top", repo, allow_changed=True) == 2
+
+    py = tmp_path / "python"
+    lib = py / "lib" / "python3.11"
+    site = lib / "site-packages"
+    for rel in (
+        "bin/python3.11",
+        "bin/pip",
+        "bin/pip3",
+        "bin/pip3.11",
+        "lib/python3.11/os.py",
+        "lib/python3.11/encodings/__init__.py",
+        "lib/python3.11/encodings/__pycache__/__init__.cpython-311.pyc",
+        "lib/python3.11/ensurepip/__init__.py",
+        "lib/python3.11/ensurepip/_bundled/pip-24.0-py3-none-any.whl",
+        "lib/python3.11/site-packages/README.txt",
+        "lib/python3.11/site-packages/distutils-precedence.pth",
+        "lib/python3.11/site-packages/pip/__init__.py",
+        "lib/python3.11/site-packages/pip-26.1.2.dist-info/METADATA",
+        "lib/python3.11/site-packages/setuptools/__init__.py",
+        "lib/python3.11/site-packages/_distutils_hack/__pycache__/__init__.cpython-311.pyc",
+    ):
+        (py / rel).parent.mkdir(parents=True, exist_ok=True)
+        (py / rel).write_text(rel, encoding="utf-8")
+    bundle.strip_interpreter(py)
+    left = sorted(p.relative_to(py).as_posix() for p in py.rglob("*") if p.is_file())
+    assert left == [
+        "bin/python3.11",
+        "lib/python3.11/encodings/__init__.py",
+        "lib/python3.11/ensurepip/__init__.py",
+        "lib/python3.11/os.py",
+        "lib/python3.11/site-packages/README.txt",
+    ], left
+    assert [p.name for p in site.iterdir()] == ["README.txt"]
+    assert not list(py.rglob("__pycache__")) and not (lib / "ensurepip" / "_bundled").exists()
+    built = inspect.getsource(bundle.build_mac)
+    assert built.index("strip_interpreter(py)") < built.index("install_dependencies(arch")
+
+
+def test_truth_7_809_pip_installs_by_the_lock_alone_for_the_downloads_platform(
+    tmp_path, monkeypatch
+):
+    """Truth 7-809 (the reader's finding 3e): the command the build runs pip by, read from
+    tools/bundle.py itself, is exactly: isolated from the machine's pip configuration,
+    into the download's folder, with no dependency of its own resolving (`--no-deps`),
+    every artifact checked against the lock's hashes (`--require-hashes`), wheels alone
+    (`--only-binary=:all:`), nothing compiled, for the download's platform tag (Windows'
+    win_amd64; macosx_12_0_arm64 and macosx_12_0_x86_64, macOS 12 the oldest promised),
+    CPython 3.11, from that platform's lock file alone. Any flag more or less is a declared
+    change of this truth."""
+    calls: list[list[str]] = []
+    monkeypatch.setattr(bundle.subprocess, "run", lambda cmd, **kw: calls.append(cmd))
+    tags = {"windows": "win_amd64", "arm64": "macosx_12_0_arm64", "x86_64": "macosx_12_0_x86_64"}
+    assert bundle.PIP_PLATFORMS == tags
+    for which in bundle.LOCK_FILES:
+        bundle.install_dependencies(which, tmp_path / which)
+    assert len(calls) == 3
+    for which, cmd in zip(bundle.LOCK_FILES, calls, strict=True):
+        assert cmd == [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "--quiet",
+            "--disable-pip-version-check",
+            "--no-input",
+            "--isolated",
+            "--target",
+            str(tmp_path / which),
+            "--no-deps",
+            "--require-hashes",
+            "--only-binary=:all:",
+            "--no-compile",
+            "--platform",
+            tags[which],
+            "--python-version",
+            "3.11",
+            "--implementation",
+            "cp",
+            "-r",
+            str(bundle.LOCKS / bundle.LOCK_FILES[which]),
+        ], (which, cmd)

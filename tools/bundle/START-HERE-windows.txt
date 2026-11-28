@@ -4,7 +4,8 @@ FreeSail, for Windows (10 and 11, 64-bit)                      download {{NAME}}
 STARTING
   1. Unpack the zip: right-click it, choose "Extract All...", then "Extract".
      Any folder you like will do (Downloads, the Desktop, Documents).
-  2. In the folder it makes, double-click FreeSail (a "Windows Command Script").
+  2. It makes one folder, FreeSail-{{NAME}}-windows, and opens it: in it,
+     double-click FreeSail (a "Windows Command Script").
   3. The first time only, Windows warns you that it does not know who made it:
        "Windows protected your PC": click "More info", then "Run anyway".
        or "The publisher could not be verified. Are you sure you want to run

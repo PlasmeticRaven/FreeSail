@@ -32,7 +32,9 @@ Nothing in a download reads the machine's own Python: on Windows the interpreter
 
 The zip is deterministic in what it holds: its entries sorted, each dated by the commit
 built, its mode kept (the Mac's launcher and interpreter executable), the tiles and other
-compressed files stored and the rest deflated.
+compressed files stored and the rest deflated. Each system's unpacking makes ONE folder
+with the launcher at its top: the Mac's zip holds that folder, and Windows' holds its
+contents, since "Extract All" itself makes a folder of the zip's name.
 """
 
 from __future__ import annotations
@@ -306,10 +308,21 @@ def _text(name: str, fill: dict[str, str], crlf: bool) -> bytes:
 DOWNLOAD_MARK = "FROM-A-DOWNLOAD.txt"
 
 
+def _through_a_link(root: Path, rel: str) -> bool:
+    """Whether the file `rel` under `root`, or a folder on the way to it, is a symbolic link."""
+    path = Path(root)
+    for part in rel.split("/"):
+        path = path / part
+        if path.is_symlink():
+            return True
+    return False
+
+
 def copy_game(top: Path, root: Path = ROOT, allow_changed: bool = False) -> int:
     """The game's files into `top/game/`, as the commit has them: refused when the files
     in the checkout differ from the commit (unless `allow_changed`, for a trial), so that a
-    download said to be of a commit is that commit."""
+    download said to be of a commit is that commit; and refused when one of them is a
+    symbolic link, or lies in a linked folder, which would ship what it points at."""
     names = game_files(root, strict=True)
     changed = subprocess.run(
         ["git", "status", "--porcelain", "--", *GAME_DIRS, *GAME_FILES],
@@ -320,6 +333,10 @@ def copy_game(top: Path, root: Path = ROOT, allow_changed: bool = False) -> int:
     ).stdout.strip()
     if changed and not allow_changed:
         raise SystemExit(f"The game's files differ from the commit:\n{changed}\nCommit them first.")
+    # a link would ship what it points at, wherever that is: none is tracked, and none may be
+    linked = sorted(rel for rel in names if _through_a_link(root, rel))
+    if linked:
+        raise SystemExit(f"A symbolic link among the game's files, refused: {', '.join(linked)}")
     for rel in names:
         dest = top / "game" / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -385,9 +402,32 @@ def build_windows(
         shutil.copyfile(py / "LICENSE.txt", lic / "python" / "LICENSE.txt")
         dists = dependency_licences(site, lic)
         licences_readme(top, [pin], dists, "Windows (64-bit)", "licences/<its name>/")
-        path = write_zip(top, out / f"FreeSail-{name}-windows.zip", ts)
+        # no folder inside the zip: Windows' "Extract All" makes one of the zip's own name,
+        # and the launcher and this page lie at its top
+        path = write_zip(top, out / f"FreeSail-{name}-windows.zip", ts, folder=False)
     print(f"{path}: the game's {n} files, Python {pin.version}, {len(dists)} libraries")
     return path
+
+
+def strip_interpreter(py: Path) -> None:
+    """What python-build-standalone's interpreter carries that the game never runs, taken
+    out: its own pip and setuptools (in its site-packages, as console scripts in `bin/`, and
+    as ensurepip's wheels), and the compiled bytes it ships beside a few of its modules (the
+    download writes none, and carries the sources). Its site-packages is then empty but for
+    its README, and the libraries in it are the lock file's alone."""
+    lib = py / "lib" / "python3.11"
+    site = lib / "site-packages"
+    for p in site.iterdir():
+        if p.name != "README.txt":
+            shutil.rmtree(p) if p.is_dir() and not p.is_symlink() else p.unlink()
+    for p in (py / "bin").glob("pip*"):
+        p.unlink()
+    shutil.rmtree(lib / "ensurepip" / "_bundled", ignore_errors=True)
+    for cache in sorted(py.rglob("__pycache__"), reverse=True):
+        shutil.rmtree(cache)
+    left = [p.name for p in site.iterdir()]
+    if left != ["README.txt"]:
+        raise SystemExit(f"{site}: {left} left beside the lock file's libraries; refused.")
 
 
 def build_mac(
@@ -406,6 +446,7 @@ def build_mac(
                 staging = Path(tmp) / f"x-{arch}"
                 t.extractall(staging, filter="tar")
             (staging / "python").rename(py)
+            strip_interpreter(py)
             site = py / "lib" / "python3.11" / "site-packages"
             install_dependencies(arch, site)
             # the game, two folders up from the interpreter's own: site joins a relative
@@ -440,15 +481,18 @@ def build_mac(
 STORED = (".npz", ".zip", ".gz", ".png", ".jpg", ".whl")
 
 
-def write_zip(top: Path, path: Path, ts: int) -> Path:
-    """The folder `top` as one zip with `top`'s name as its first folder: entries sorted,
-    dated by `ts`, modes kept, symbolic links kept as links (a Mac's unzip makes them)."""
+def write_zip(top: Path, path: Path, ts: int, folder: bool = True) -> Path:
+    """The folder `top` as one zip: entries sorted, dated by `ts`, modes kept, symbolic links
+    kept as links (a Mac's unzip makes them). With `folder` (the Mac's), `top`'s name is its
+    one first folder, which the Mac's unzip makes and nothing more; without (Windows'), its
+    entries lie at the zip's top, and "Extract All" makes the one folder, named for the zip
+    (a folder inside would be a folder inside a folder)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     stamp = time.gmtime(max(ts, 315532800))[:6]
     entries = sorted(p for p in top.rglob("*") if p.is_file() or p.is_symlink())
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for p in entries:
-            arc = f"{top.name}/{p.relative_to(top).as_posix()}"
+            arc = (f"{top.name}/" if folder else "") + p.relative_to(top).as_posix()
             info = zipfile.ZipInfo(arc, date_time=stamp)
             info.create_system = 3  # unix, so that the modes are read
             st = p.lstat()

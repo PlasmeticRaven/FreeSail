@@ -44,7 +44,8 @@ echo   FreeSail cannot start from here: its folder is still inside the zip, or n
 echo   was unpacked.
 echo.
 echo   Close this window. Right-click the zip you downloaded, choose "Extract All...",
-echo   then open the folder it makes and double-click FreeSail in it.
+echo   then "Extract": it makes the folder FreeSail-{{NAME}}-windows. Double-click
+echo   FreeSail in that folder.
 echo.
 pause
 exit /b 1

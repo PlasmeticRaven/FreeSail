@@ -45,7 +45,7 @@ on:
       - "tools/bundle/**"
       - "tools/bundle_smoke.py"
       - ".github/workflows/downloads.yml"
-      # the truths of what the downloads ship (7-800 to 7-806)
+      # the truths of what the downloads ship (7-800 to 7-809)
       - "tests/test_downloads.py"
       # the dependencies the lock files are resolved from
       - "pyproject.toml"
@@ -176,6 +176,17 @@ jobs:
           PYTHONUTF8: "1"
           LABEL: ${{ matrix.label }}
         run: python tools/bundle_smoke.py downloaded/FreeSail-*.zip --title "smoke test on $LABEL"
+      # The smoke test's poison check has teeth: the same zip, unpacked afresh, with -I taken
+      # out of its launcher (and on Windows the interpreter's ._pth), must run the poison in
+      # the user's site-packages and in the folder it is started from.
+      - name: The poison check's teeth, without isolation
+        shell: bash
+        env:
+          PYTHONUTF8: "1"
+          LABEL: ${{ matrix.label }}
+        run: >-
+          python tools/bundle_smoke.py downloaded/FreeSail-*.zip --without-isolation
+          --title "the poison check's teeth on $LABEL"
 
   publish:
     name: publish the pre-release
