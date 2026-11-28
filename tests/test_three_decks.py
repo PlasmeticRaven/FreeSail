@@ -311,6 +311,73 @@ def test_fire_the_second_deck_fires_her_middle_deck_and_the_main_deck_is_refused
     )
 
 
+def _probe_without(decks: set[str], folder: Path, name: str) -> str:
+    """The probe with no gun on `decks` in any fit, its magazine and shot left with the kinds
+    and calibres of the guns kept (the loader refuses cartridges for a gun she has not), written
+    as a ship file: a file that loads, with guns on a middle deck and not on all three."""
+    doc = three_decker_probe_doc()
+    for fit in doc["armament"]["fits"].values():
+        fit["guns"] = [g for g in fit["guns"] if g.get("deck") not in decks]
+        kept = {(g["kind"], g["pounder"]) for g in fit["guns"]}
+        for key in ("cartridges", "charges"):
+            by_kind = {
+                k: {p: n for p, n in by.items() if (k, p) in kept} for k, by in fit[key].items()
+            }
+            fit[key] = {k: by for k, by in by_kind.items() if by}
+        fit["shot"] = {p: n for p, n in fit["shot"].items() if any(q == p for _k, q in kept)}
+    return str(write_ship(doc, folder, name))
+
+
+def test_a_file_with_guns_on_two_of_three_gun_decks_is_told_the_two(tmp_path):
+    """The lead's reader (nudge 94): a file with guns on a middle and an upper deck and none on the
+    lower loads, and is told what it gives. Its beat says its two gun decks' lines, as a
+    two-decker's does (`_deck_lines`, two gun decks or more); "the main deck" is refused naming the
+    two; "the second deck" and "the third deck" fire them. Old (A9 as merged, eb018d1): no deck's
+    line, and 'She has three gun decks, the middle deck and the upper deck, and 'the main deck'
+    names none of them: ...', untrue."""
+    path = _probe_without({"lower"}, tmp_path, "middle-and-upper")
+    _w, said, q = _beaten(path)
+    assert q.describe()[1:3] == [
+        "The middle deck: 14 gun crews, 126 men.",
+        "The upper deck: 14 gun crews, 126 men.",
+    ]
+    assert "The middle deck: 14 gun crews, 126 men. The upper deck:" in said.text
+    w = _engaged_at_quarters(path)
+    said = w.submit("fire the starboard main deck")
+    assert said.kind == "order.rejected", said.text
+    assert said.text == (
+        "Order not carried out ('fire the starboard main deck'): She has guns on two gun decks, "
+        "the middle deck and the upper deck, and 'the main deck' names neither of them: name the "
+        "deck, as 'fire the middle deck' (or 'the second deck'; 'the third deck' is the upper)."
+    )
+    for words in ("second", "third"):
+        assert w.submit(f"fire the {words} deck").kind == "guns.fire", words
+
+
+def test_a_file_with_guns_on_the_middle_deck_alone_is_told_the_one(tmp_path):
+    """The lead's reader (nudge 94): a file with guns on a middle deck alone of the three, and on
+    her upper works, loads; its beat says no deck's line, as a ship of one gun deck's (a
+    frigate's) does not; "the main deck" is refused naming its one gun deck, the third deck's word
+    left out, and "the third deck" names no gun of hers. Old (eb018d1): 'She has three gun decks,
+    the middle deck, and 'the main deck' names none of them: name the deck, as 'fire the middle
+    deck' (or 'the second deck'; 'the third deck' is the upper).', untrue, with a stray comma."""
+    path = _probe_without({"lower", "upper"}, tmp_path, "middle-alone")
+    _w, said, q = _beaten(path)
+    assert not [line for line in q.describe() if line.startswith("The middle deck:")]
+    assert "The middle deck:" not in said.text and "gun crews manned" in said.text
+    w = _engaged_at_quarters(path)
+    said = w.submit("fire the starboard main deck")
+    assert said.kind == "order.rejected", said.text
+    assert said.text == (
+        "Order not carried out ('fire the starboard main deck'): She has guns on one gun deck, the "
+        "middle deck, and 'the main deck' does not name it: name the deck, as 'fire the middle "
+        "deck' (or 'the second deck')."
+    )
+    assert w.submit("fire the second deck").kind == "guns.fire"
+    third = w.submit("fire the third deck")
+    assert third.kind == "order.rejected" and "'the third deck' names no gun of hers" in third.text
+
+
 def test_on_the_74_fire_the_second_deck_is_refused_as_before_and_the_main_deck_fires():
     """On the 74 the words are as before A9 (measured at 93cf624c): "fire the second deck" names
     no gun of hers, in the refusal's old words; "fire the starboard main deck" fires her upper

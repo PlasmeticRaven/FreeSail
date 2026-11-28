@@ -84,9 +84,10 @@ did; "the second deck" names it too and "the third deck" her upper deck (James's
 Spanish prizes' middle and upper decks, vol. 2 p. 51; Falconer's "the second or middle deck"), in
 every form a deck is named by above, with a number or without. "The main deck", the upper deck's
 word on a two-decker, is no deck's word on her (the word is ambiguous in the period on a
-three-decker), and "fire" refuses it in words naming her three gun decks. On a two-decker "the
-second deck" and "the third deck" name no gun of hers, as before, and "the main deck" her upper
-deck, as before.
+three-decker), and "fire" refuses it in words naming her three gun decks (a file with guns on a
+middle deck and not on all three is told the gun decks it gives: the lead's reader, nudge 94). On
+a two-decker "the second deck" and "the third deck" name no gun of hers, as before, and "the main
+deck" her upper deck, as before.
 """
 
 from __future__ import annotations
@@ -927,11 +928,17 @@ def _deck_of_word(word: str, broadside: list[Gun]) -> str | None:
 
 
 def _the_main_deck_of_three(ship: Any, w: str) -> str:
-    """The words "the main deck" refused on a ship of three gun decks, naming them (package 90,
-    A9; the lead's ruling 7 of 2026-11-18): 'She has three gun decks, the lower deck, the middle
-    deck and the upper deck, and 'the main deck' names none of them: name the deck, as 'fire the
-    middle deck' (or 'the second deck'; 'the third deck' is the upper).' Empty where the words do
-    not name the main deck, or she is no ship of three gun decks."""
+    """The words "the main deck" refused on a ship of three gun decks, naming the gun decks she
+    carries guns on (package 90, A9; the lead's ruling 7 of 2026-11-18): on the three-decker,
+    'She has three gun decks, the lower deck, the middle deck and the upper deck, and 'the main
+    deck' names none of them: name the deck, as 'fire the middle deck' (or 'the second deck';
+    'the third deck' is the upper).' A file with guns on a middle deck and not on all three is told
+    what it gives (the lead's reader, nudge 94; old: 'She has three gun decks' and the decks with
+    guns alone, untrue, and a stray comma before 'and' with one): 'She has guns on two gun decks,
+    the middle deck and the upper deck, and 'the main deck' names neither of them: ...', or on one
+    gun deck, 'and 'the main deck' does not name it', the third deck's word given only where she
+    has guns on her upper deck. Empty where the words do not name the main deck, or she is no ship
+    of three gun decks."""
     guns: dict[str, Gun] = getattr(ship, "guns", {}) or {}
     broadside = [g for g in guns.values() if g.place == "broadside"]
     if not _of_three_gun_decks(broadside):
@@ -940,11 +947,15 @@ def _the_main_deck_of_three(ship: Any, w: str) -> str:
     if not re.search(r"\bmain(?:\s+|-)deck", " ".join(x for x in words if x != "port")):
         return ""
     decks = [d for d in ("lower", "middle", "upper") if any(g.deck == d for g in broadside)]
-    return (
-        f"She has three gun decks, {_and([DECK_SAID[d] for d in decks])}, and 'the main deck' "
-        "names none of them: name the deck, as 'fire the middle deck' (or 'the second deck'; "
-        "'the third deck' is the upper)."
-    )
+    said = _and([DECK_SAID[d] for d in decks])
+    if len(decks) == 3:
+        head = f"She has three gun decks, {said}, and 'the main deck' names none of them"
+    elif len(decks) == 2:
+        head = f"She has guns on two gun decks, {said}, and 'the main deck' names neither of them"
+    else:
+        head = f"She has guns on one gun deck, {said}, and 'the main deck' does not name it"
+    third = "; 'the third deck' is the upper" if "upper" in decks else ""
+    return f"{head}: name the deck, as 'fire the middle deck' (or 'the second deck'{third})."
 
 
 def _of_her_gun_deck(ship: Any) -> str:

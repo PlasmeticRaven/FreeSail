@@ -56,6 +56,9 @@ deck's, the sea shutting her middle tier at a greater heel than her lower; and o
 open, the upper deck's and the upper works' go first, the middle deck's after them and the lower
 deck's last, the lighter metal before the heavier (the 74's reason for her lower deck's last,
 carried a deck up: judgement). A two-decker's order and words are as they were, rank for rank.
+The beat says a line a deck wherever the crews stand on two gun decks or more of the three, so
+that a file with guns on a middle and an upper deck and none on the lower says its two (the lead's
+reader, nudge 94; old: the lower and the upper both wanted).
 
 **Numbered by deck** (package 75, B7.d: Bel-D §5.2, the lead's answer (3) of 2026-10-29): on a ship
 whose file numbers her guns by deck (the 74 and the 64), a pair's crew is keyed by its deck and
@@ -115,6 +118,9 @@ LOWER = "lower"
 MIDDLE = "middle"
 # The gun decks whose crews are counted shut by the sea, for the robbing (`_shut_crews`)
 _SHUT_DECKS = (LOWER, MIDDLE)
+# The gun decks, from below: crews on two or more of them give the beat its lines by deck
+# (`Quarters._deck_lines`; the lead's reader, nudge 94)
+_GUN_DECKS = (LOWER, MIDDLE, "upper")
 # The decks in the beat's lines, from below, and their words (`schema.DECK_WORDS`; the
 # `roundhouse` is the poop: Bel-D §3.5; the words `parts.DECK_SAID`, a gun's name's since B7.d).
 _DECK_ORDER = ("lower", "middle", "upper", "quarterdeck", "forecastle", "roundhouse")
@@ -511,15 +517,18 @@ class Quarters:
         return lines
 
     def _deck_lines(self) -> list[str]:
-        """A line a deck on a ship whose broadside guns stand on two gun decks, the lower and the
-        upper (package 75, B7.b: the 74 and the 64): 'The lower deck: 14 gun crews, 182 men.';
-        on a ship of three the middle deck's line between them, from below (package 90, A9).
-        None on a ship of one gun deck."""
+        """A line a deck on a ship whose crews stand on two gun decks or more of the lower, the
+        middle and the upper (package 75, B7.b: the 74 and the 64, the lower and the upper): 'The
+        lower deck: 14 gun crews, 182 men.'; on a ship of three the middle deck's line between
+        them, from below (package 90, A9). None on a ship of one gun deck. Old (before the lead's
+        reader, nudge 94): the lower and the upper both wanted, so that a file with guns on a
+        middle and an upper deck and none on the lower said no deck's line; every committed file
+        is read as before, none but hers having a middle deck."""
         decks: dict[str, list[GunCrew]] = {}
         for gc in self.crews.values():
             if gc.deck:
                 decks.setdefault(gc.deck, []).append(gc)
-        if LOWER not in decks or "upper" not in decks:
+        if len([d for d in _GUN_DECKS if d in decks]) < 2:
             return []
         lines = []
         for deck in sorted(decks, key=_deck_rank):
