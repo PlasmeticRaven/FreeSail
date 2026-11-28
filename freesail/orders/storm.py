@@ -73,10 +73,11 @@ KEPT = "jibs_kept"
 
 # A kept jib seen through on a ship whose captain gives no judgements of his own (the lead's
 # ruling on the reader's finding of 2026-11-28): the order `shorten sail` left it on her, so
-# the order's hands take it in before it goes, at its strain's second line or its first dire
-# line (`physics.strain`, read), whichever comes first. The first line is the player's warning,
-# the order named in it. Where each kept jib's lines are counted (`see_kept_jibs_through`).
-HANDS_TAKE_IN_LINE = 2
+# the order's hands take it in before it goes, at its strain's first dire line since it was kept
+# (`physics.strain`, read: loaded past `CARRY_AWAY_RATIO`, where it may go). Its lesser lines
+# are the player's warning, the order named in them. Taken in at its second line instead, it
+# came in during a long shortening and cost the corvette her three tacks in 30 knots (the
+# report's §14). Where each kept jib's dire line is watched (`see_kept_jibs_through`).
 SEEN = "jibs_kept_seen"
 
 STORM_VERBS = frozenset({"set the storm staysails"})
@@ -544,7 +545,7 @@ def keep_jibs(ship: Ship, kept: list[Sail]) -> None:
         seen = ship.extra.setdefault(SEEN, {})
         for sl in kept:
             marks[sl.id] = True
-            seen[sl.id] = {**_strain_lines(ship, sl.id), "lines": 0}
+            seen[sl.id] = _strain_lines(ship, sl.id)
 
 
 def _strain_lines(ship: Ship, sid: str) -> dict[str, float | None]:
@@ -559,9 +560,9 @@ def _strain_lines(ship: Ship, sid: str) -> dict[str, float | None]:
 def see_kept_jibs_through(ship: Ship) -> None:
     """Once a tick, from the world, on a ship whose captain gives no judgements of his own (a
     player's ship, or one with a model at his station): a jib `shorten sail` left on her is
-    taken in by the hands at its strain's `HANDS_TAKE_IN_LINE` line since it was kept, or at
-    its first dire line, before it goes, and the log says so. A jib set again by the player's
-    own order is his, and is not kept (`forget_kept_jibs`)."""
+    taken in by the hands at its strain's first dire line since it was kept, before it goes, and
+    the log says so. A jib set again by the player's own order is his, and is not kept
+    (`forget_kept_jibs`)."""
     marks = ship.extra.get(KEPT)
     seen = ship.extra.get(SEEN)
     if not isinstance(marks, dict) or not isinstance(seen, dict):
@@ -572,19 +573,15 @@ def see_kept_jibs_through(ship: Ship) -> None:
         rec = seen.get(sid)
         if sail is None or not sail.is_set or not isinstance(rec, dict):
             continue
-        now = _strain_lines(ship, sid)
-        dire = now["dire"] is not None and now["dire"] != rec.get("dire")
-        if now["at"] is not None and now["at"] != rec.get("at"):
-            rec["lines"] = int(rec.get("lines", 0)) + 1
-        rec.update(now)
-        if not dire and rec["lines"] < HANDS_TAKE_IN_LINE:
+        dire = _strain_lines(ship, sid)["dire"]
+        if dire is None or dire == rec.get("dire"):
             continue
+        rec["dire"] = dire
         vocab = vocab or load_vocabulary()
         name = _name(ship, sail)
         try:
             _run(ship, f"take in the {name}", vocab)
         except OrderError as e:
-            rec["lines"] = HANDS_TAKE_IN_LINE - 1  # tried again at its next line
             ship.note(
                 "notable",
                 "sail.kept_jib",

@@ -683,14 +683,15 @@ def test_a_jib_kept_at_its_limit_is_taken_in_by_the_captain_before_it_goes(ship,
     assert any("shortening sail" in t or "taking in the jib" in t for t in by_him), by_him
 
 
-def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_its_second_line():
+def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_its_dire_line():
     """Package 125, D (the lead's ruling on the reader's finding of 2026-11-28): on a ship whose
     captain gives no judgements (a player's ship), a jib `shorten sail` left on her is seen
-    through by the order's hands. Its strain's first line after it is kept is the player's
-    warning, and nothing is done; at the second, or at the first dire line, it is taken in and
-    the log says so: "Taking in the jib before it goes: she will gripe without it." Under a
-    captain who commands, the hands leave it to him. The lines are the strain state's own
-    (`physics.strain`), stamped here as the strain would stamp them."""
+    through by the order's hands. Its strain's lesser lines after it is kept are the player's
+    warning, and nothing is done; at its first dire line it is taken in and the log says so:
+    "Taking in the jib before it goes: she will gripe without it." Under a captain who
+    commands, the hands leave it to him. The lines are the strain state's own
+    (`physics.strain`), stamped here as the strain would stamp them. Old (1b6a90a1): taken in
+    at its second line, which cost the corvette three tacks in a long shortening."""
     from freesail.orders import storm
     from freesail.physics.strain import strain_state
 
@@ -711,10 +712,11 @@ def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_i
             st.__dict__.setdefault("last_dire_s", {})["jib"] = st.elapsed_s
 
     w, jib, st = kept_world()
-    line(st)
-    w.run(5)
+    for _ in range(3):
+        line(st)
+        w.run(5)
     assert jib.is_set and not [e for e in w.log if e.kind == "sail.kept_jib"]  # the warning
-    line(st)
+    line(st, dire=True)
     w.tick()
     taken = [e.text for e in w.log if e.kind == "sail.kept_jib"]
     assert taken == [said], taken
@@ -724,7 +726,7 @@ def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_i
     w, jib, st = kept_world()
     line(st, dire=True)
     w.tick()
-    assert [e.text for e in w.log if e.kind == "sail.kept_jib"] == [said]
+    assert [e.text for e in w.log if e.kind == "sail.kept_jib"] == [said]  # its first line dire
 
     w, jib, st = kept_world()
     cap, _given = _on_a_leg(w, "beating")
@@ -736,12 +738,18 @@ def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_i
     assert jib.is_set and not [e for e in w.log if e.kind == "sail.kept_jib"]  # his to take in
 
 
+# the hours above where the kept jib comes to its dire line on a player's ship, measured: the
+# others' stands all hour under it (1.19 and 1.2 of its rating at the most), its line said
+KEPT_JIB_DIRE = {("brig", 35.0, 7), ("razee-44", 28.0, 11)}
+
+
 @pytest.mark.parametrize(("ship", "knots", "seed"), KEPT_JIB_HOURS)
 def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_before_it_goes(ship, knots, seed):
     """Package 125, D (the lead's ruling on the reader's finding of 2026-11-28): the hour in
     rising wind of the test above, the ship a player's (no intent): the jib `shorten sail` left
-    on her is taken in by the hands at its strain's second line ("Taking in the jib before it
-    goes: she will gripe without it.") and never blows out. Old (b5ddfa6a): it stood all hour
+    on her is taken in by the hands at its strain's first dire line ("Taking in the jib before
+    it goes: she will gripe without it.") where it comes to it, and stands under it, its line
+    said, where it does not; it never blows out. Old (b5ddfa6a): it stood all hour
     at 1.19 to 1.73 of its rating, its line said every ten minutes, and the brig's in 35 knots
     at seed 7 blew out at 1596 s."""
     from freesail import units
@@ -781,12 +789,16 @@ def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_before_it_goes(sh
             most = max(most, jib.load_kn / jib.effective_cloth_rating_kn)
         elif in_at is None:
             in_at = i
-    assert in_at is not None and not jib.is_set
     assert most < strain.BLOW_OUT_RATIO, most
     lines = [e for e in w.log[n:] if e.subject == "jib"]
     assert not [e.text for e in lines if e.kind == "sail.blown_out"]
     hands = [e.text for e in lines if e.kind == "sail.kept_jib"]
-    assert hands == ["Taking in the jib before it goes: she will gripe without it."], hands
+    if (ship, knots, seed) in KEPT_JIB_DIRE:
+        assert in_at is not None and not jib.is_set
+        assert hands == ["Taking in the jib before it goes: she will gripe without it."], hands
+    else:
+        assert in_at is None and most <= strain.CARRY_AWAY_RATIO and hands == [], (most, hands)
+        assert [e for e in lines if e.text == "Jib straining at the bolt-ropes: take in the jib."]
 
 
 def test_the_gale_books_mending_the_head_sails_in_and_the_luggers_storm_lug():
