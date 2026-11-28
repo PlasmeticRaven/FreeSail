@@ -42,7 +42,9 @@ def _probe(tmp_path, towed: bool = True) -> str:
     doc = tartane_probe_doc()
     if towed:
         doc["boats"][0]["towed"] = True
-    return str(write_ship(doc, tmp_path, "tartane-towed" if towed else "tartane"))
+    # written under a stem of its own: a probe named `tartane` binds the tartane's committed
+    # people file by its stem (`data/people/tartane.yaml`, package 90), and the probe is as filed
+    return str(write_ship(doc, tmp_path, "tartane-towed" if towed else "tartane-on-deck"))
 
 
 def _phases(w, until_home: int = 7200) -> list[tuple[int, str]]:
@@ -59,14 +61,28 @@ def _phases(w, until_home: int = 7200) -> list[tuple[int, str]]:
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_no_committed_file_tows_a_boat_so_no_ship_is_given_her_drag(path):
+def test_a_committed_file_is_given_her_boats_drag_only_where_it_tows_her(path):
     """The guard: a ship whose file tows no boat is never given `boat_in_tow`, at home or with
-    her boat away or lost, so nothing of the eighteen files moves by the tow's drag."""
+    her boat away or lost, so nothing of the other files moves by the tow's drag. The tartane's
+    two files (package 90, her builder) tow their one boat on the 16-ft yawl's file: in tow at
+    home, her hull the yawl's, and not with her away or lost (old: no committed file towed, the
+    name `test_no_committed_file_tows_a_boat_so_no_ship_is_given_her_drag`)."""
     ship = load_ship(path)
-    ship.extra = {}
-    for state in (BoatState(), BoatState(away=True, boat_id="boat"), BoatState(lost="stove")):
+    tows = path.stem in ("tartane", "coastguard-tartane")
+    assert any(b.towed for b in ship.spec.boats) == tows
+    yawl = load_ship("data/ships/boat-yawl-16.yaml").hull
+    # her boat away or lost by her id, as the away state names her (old: the lost state named no
+    # boat, which no towing file could tell from her at home)
+    away, lost = BoatState(away=True, boat_id="boat"), BoatState(lost="stove", boat_id="boat")
+    for state in (BoatState(), away, lost):
+        ship.extra = {}
         B.keep_in_tow(ship, state)
-        assert "boat_in_tow" not in ship.extra
+        at_home = not (state.away or state.lost)
+        if tows and at_home:
+            in_tow = ship.extra["boat_in_tow"]
+            assert len(in_tow) == 1 and in_tow[0].wetted_area == yawl.wetted_area
+        else:
+            assert "boat_in_tow" not in ship.extra
 
 
 def test_a_towed_boat_lies_astern_on_her_painter_and_her_drag_is_on_the_ship(tmp_path):

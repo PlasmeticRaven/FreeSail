@@ -239,18 +239,24 @@ def test_the_three_decker_probe_has_three_gun_decks_and_her_company():
 # carries the key, and no file outside it does. Before A3 it was one guard that no file carried
 # any of them.
 TILLER_FILES = (
+    "coastguard-tartane",
     "cutter",
     "hermaphrodite-brig",
     "lugger",
     "privateer-schooner",
     "smack",
+    "tartane",
     "topsail-schooner",
 )
+# The tartane's two files (package 90, her builder, on the package's branch at 8a27d9b1): her
+# boat towed (A4), her tiller (A3) and her whole lateens dipping (A1a). Old: no row carried a
+# file of hers; `towed` and `dipping` empty, `helm` the six tiller-steered files of A3.
+TARTANES = frozenset({"tartane", "coastguard-tartane"})
 KEY_CARRIERS: dict[str, frozenset[str]] = {
     "sweeps": frozenset(),  # a ship's own sweeps, or a fit's: step A7, the xebec's
-    "towed": frozenset(),  # a boat towed astern: step A4, the tartane's
-    "helm": frozenset(TILLER_FILES),  # the hull's helm: step A3, the six tiller-steered files
-    "dipping": frozenset(),  # a whole lateen dipped: the lateen hulls' files, after stage 0L
+    "towed": TARTANES,  # a boat towed astern: step A4, the tartane's
+    "helm": frozenset(TILLER_FILES),  # the hull's helm: step A3, the six, and the tartane's two
+    "dipping": TARTANES,  # a whole lateen dipped: the lateen hulls' files, after stage 0L
 }
 
 

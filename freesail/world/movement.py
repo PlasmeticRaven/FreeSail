@@ -486,12 +486,16 @@ BELAY_VERBS = frozenset({"belay that", "belay the work", "belay all work"})
 
 def _in_the_boat_at_the_side(world: Any, person: Any) -> bool:
     """Whether the person sits in the ship's boat on an errand that has not left her side:
-    waiting for her hands, or hoisting out (package 109)."""
+    waiting for her hands, or hoisting out (package 109), or a towed boat hauled up alongside
+    (package 90, A4, with the tartane's file: the lead's nudge 44, point 1; old: hoisting out
+    alone, so one in a towed boat hauled alongside was told he was away in the boat)."""
+    from freesail.world.dealings import OUT_PHASES
+
     if person.aboard or person.where != "boat":
         return False
     dealings = getattr(world, "dealings", None)
     boat = getattr(dealings, "boat", None)
-    if boat is None or not boat.away or boat.phase != "hoisting out":
+    if boat is None or not boat.away or boat.phase not in OUT_PHASES:
         return False
     return str(person.id) in {str(p) for p in boat.people}
 

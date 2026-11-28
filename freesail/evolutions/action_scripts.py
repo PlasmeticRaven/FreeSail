@@ -114,6 +114,11 @@ class ClearForActionScript(_QuartersScript):
         return None
 
     def phase_s(self, name: str) -> float:
+        if name == "boats" and _boats_all_astern(self.ship):
+            # her boats tow astern on their painters already: none is griped on the booms, so
+            # the boats' share takes no time (package 90, A4 with the tartane's file: the lead's
+            # nudge 44, point 3; old: the share given whatever the boats' place)
+            return 0.0
         if name in self.SHARES:
             return self.timing_value(f"{name}_s", self.SHARES[name] * clear_seconds(self.ship))
         return super().phase_s(name)
@@ -177,6 +182,17 @@ def _boats_cleared_words(ship: Ship) -> str:
         return "The ship is clear."
     head = "; ".join(said)
     return f"{head[:1].upper()}{head[1:]}; the ship is clear."
+
+
+def _boats_all_astern(ship: Ship) -> bool:
+    """Whether every boat she has, none lost, tows astern by her file (a boat's `towed`) and none
+    is on the booms: then clearing for action has no boat to secure. A ship with a boat on the
+    booms, or with none, clears as she always did."""
+    boats = list(getattr(getattr(ship, "spec", None), "boats", None) or [])
+    lost = _lost_boat(ship) if boats else None
+    if lost is not None:
+        boats = [b for b in boats if b.id != lost.id]
+    return bool(boats) and all(getattr(b, "towed", False) for b in boats)
 
 
 def _lost_boat(ship: Ship) -> Any:

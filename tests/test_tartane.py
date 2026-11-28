@@ -332,33 +332,43 @@ def test_her_great_lateen_is_cut_by_forfaits_rule_and_her_sail_is_his(built):
     is tacked at the stem, its clew on the deck at the mast's foot (her design's reading, R); the
     mizen lateen 'semblable' (Forfait pp. 124-125), its clew at its own mast's foot, its peak inside
     the outrigger's end; her plain sail checked against the Humble's 2,237½ square pieds less his
-    topgallant's 20 m² (JUDGEMENT), within ±15%: 216.1 m², +0.0%."""
+    topgallant's 20 m² (JUDGEMENT), within ±15%: 197.6 m², -8.5%, a departure, her topsail cut
+    3 pieds clear of the great lateen's slings, its foot 0.9 of its own yard (the lead's nudge 89;
+    old: 216.1 m², +0.0%, the topsail 77 m² cut down to the hounds)."""
     spec = load_spec(HER)
     sails = {s.id: s for s in spec.sails}
     great = sails["main.lateen"]
-    assert great.cls == "lateen" and not great.cut_at_mast and not great.dipping
+    # whole and dipping: set to leeward and shifted round its mast by itself (A1a; old: not
+    # dipping, before the step was on the package's branch), the mizen and the bouffette alike
+    assert great.cls == "lateen" and not great.cut_at_mast and great.dipping
+    assert sails["mizzen.lateen"].dipping and sails["main.bouffette"].dipping
     tack, throat, peak, clew = great.corners_m
     assert math.dist(throat, peak) == pytest.approx((75 - 2.25) * PIED, abs=0.02)
     assert clew == (3.87, 0.31)  # the deck at the main's foot, above the datum
     assert tack[0] == throat[0] and throat[1] - tack[1] == pytest.approx(0.3)
     _, stderr = built
     assert _report(stderr, "tartane: the great yard peaked 34.4 degrees to tack its car")
-    assert _report(stderr, "tartane: her plain sail 216.1 m² against Forfait's 236.0 m²")
+    assert _report(stderr, "tartane: her plain sail 197.6 m² against Forfait's 236.0 m²")
+    assert _report(stderr, "(216.0): -8.5%, within ±15%: a departure")
     plain = sum(sails[s].area_m2 for s in load_ship(HER).groups["plain sail"])
-    assert plain == 216
+    assert plain == 197  # old 216
     assert (sails["main.lateen"].area_m2, sails["mizzen.lateen"].area_m2) == (79, 26)
-    assert (sails["main.topsail"].area_m2, sails["jib"].area_m2) == (77, 34)
+    assert (sails["main.topsail"].area_m2, sails["jib"].area_m2) == (58, 34)  # old 77, 34
 
 
 def test_her_groups_are_her_designs_and_name_no_courses():
-    """Tar-D §4.4: plain sail the two lateens, the topsail and the jib; all sail those and the
-    tréou; no "courses" (her lateen is no course). Her design's "lateens" group waits on A1b,
-    which builds the orders that name it and adds the family to the standing book's (truth
-    7-625)."""
+    """Tar-D §4.4: plain sail the two lateens, the topsail and the jib, set in the order jib,
+    topsail, great lateen, mizen, so that the headsail and the square sail cast her head before
+    the lateens draw (the lead's nudge 90, JUDGEMENT; old: the great lateen first). All sail is
+    her plain sail: the tréou is no sail by the wind, set by its own order, and never with the
+    great lateen (the lead's nudge 90; old: all sail the tréou with them). No "courses" (her
+    lateen is no course). Her design's "lateens" group is not filed: the standing book has no
+    "lateens" family (truth 7-625; `freesail/standing/book.py`), which A1b did not add."""
     ship = load_ship(HER)
     g = ship.groups
-    assert set(g["plain sail"]) == {"main.lateen", "main.topsail", "mizzen.lateen", "jib"}
-    assert set(g["all sail"]) == set(g["plain sail"]) | {"main.treou"}
+    assert g["plain sail"] == ["jib", "main.topsail", "main.lateen", "mizzen.lateen"]
+    assert g["all sail"] == g["plain sail"] and "main.treou" not in g["all sail"]
+    assert set(g["square sails"]) == {"main.topsail", "main.treou"}
     assert "courses" not in g and "lateens" not in g
     assert ship.aliases["mainsail"] == "main.lateen" and ship.aliases["mizen"] == "mizzen.lateen"
     sails = {s.id: s for s in load_spec(HER).sails}
@@ -597,12 +607,21 @@ def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_calle
         for given in ("heave to", LIE_TO):
             road = (watch, given)
             w, crew, _runner = trader_at(HER, 2, watch)
-            for sid in w.ship.groups["plain sail"]:
-                w.ship.sails[sid].state = SailState.SET
-            w.ship.dyn.heading = units.deg_to_rad(215.0)
+            # her plain sail set and trimmed by the game's own orders, all hands up, and piped
+            # down to her watch: by the wind on the starboard tack, SSW 68 degrees off a westerly
+            # (old: set by hand on 215, 55 off, nearer than she lies; since A5 her topsail is a
+            # topsail, and set by hand its yard stands square and aback, she makes sternway and
+            # will not lie to)
+            w.ship.dyn.heading = units.deg_to_rad(202.0)
             w.ship.dyn.speed = units.knots_to_ms(5.0)
-            w.submit("steer 215")
-            w.run(400)
+            for order in ("call all hands", "set plain sail", "steer 202"):
+                w.submit(order)
+            w.run(600)
+            w.submit("trim sails")
+            w.run(300)
+            w.submit("pipe down")
+            w.run(300)
+            assert crew.watch_on_deck is watch and not crew.all_hands_called, road
             t0 = w.clock.tick
             w.submit(given)
             w.run(600)
@@ -613,7 +632,9 @@ def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_calle
                 ], road
             called = [e.text for e in ev if e.kind == "crew.all_hands"]
             assert called == (["All hands! (to heave to)"] if too_few else []), road
-            assert not [e for e in ev if e.kind == "crew.all_hands_up"], road
+            # the watch below up before she is hove to (old: hove to before it, 76 s)
+            up = [e.kind for e in ev if e.kind == "crew.all_hands_up"]
+            assert up == (["crew.all_hands_up"] if too_few else []), road
             assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
             hove = [e.tick for e in ev if e.kind == "ship.hove_to"]
             piped = [e for e in ev if e.kind == "crew.piped_down"]
@@ -641,8 +662,8 @@ def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_calle
                 ], road
             called = [e.text for e in ev if e.kind == "crew.all_hands"]
             assert called == (["All hands! (to fill away)"] if too_few else []), road
-            up = [e.kind for e in ev if e.kind == "crew.all_hands_up"]
-            assert up == (["crew.all_hands_up"] if too_few else []), road
+            # filled away before the watch below is up (old: after it, at 181 s)
+            assert not [e for e in ev if e.kind == "crew.all_hands_up"], road
             assert not [e for e in ev if e.kind in ("evolution.waiting", "evolution.failed")]
             filled = [e.tick for e in ev if e.kind == "ship.filled_away"]
             piped = [e for e in ev if e.kind == "crew.piped_down"]
@@ -655,3 +676,101 @@ def test_truth_7_695_by_night_her_watch_heaves_to_and_fills_away_all_hands_calle
             else:
                 assert not piped, road
             assert crew.watch_on_deck is watch and not crew.all_hands_called, road
+
+
+# -- With the engine's steps on the package's branch (8a27d9b1): her keys, her re-cut, and the
+# -- lead's nudges 43 and 44 ------------------------------------------------------------------
+
+
+def test_one_in_her_towed_boat_hauled_alongside_is_in_the_boat_at_the_side():
+    """The lead's nudge 44, point 1, with her file, the first that tows (A4): a person in a towed
+    boat while she is hauled up alongside is in the boat at the side, as one in a boat hoisting
+    out is (`world/movement.py`, `_in_the_boat_at_the_side`, `dealings.OUT_PHASES`): her
+    captain, going ashore off Groix, may belay her and is on deck again. Old (hoisting out
+    alone): "You are in the boat; you must be aboard and on deck to give an order of the
+    deck." """
+    from tests.test_ports import GROIX_ROAD, at_anchor_in
+
+    w = at_anchor_in(GROIX_ROAD, ship=HER, chart="atlantic-east")
+    assert w.submit("go ashore").kind == "order.accepted"
+    w.tick()
+    captain = w.people.captain
+    assert (w.dealings.boat.phase, captain.where) == ("hauling alongside", "boat")
+    e = w.submit("belay that")
+    assert e.kind == "work.belayed", e.text
+    w.run(120)
+    assert captain.aboard and captain.where in ("deck", "quarterdeck"), captain.where
+
+
+def test_clearing_for_action_gives_no_time_to_her_boat_towing_astern(tmp_path):
+    """The lead's nudge 44, point 3 (`evolutions/action_scripts.py`, `_boats_all_astern`): her
+    one boat tows astern, so clearing for action has no boat to secure and the boats' share of
+    her clearing time is none: clear 282 s after the order and at quarters at 387 s, where a
+    copy of her file with the boat on deck is clear at 351 s and at quarters at 456 s, as she
+    was before (old: 351 and 456 s either way). Its line says where the boat is and never that
+    she was got out."""
+    from tests.test_known_truths import make
+
+    doc = (ROOT / HER).read_text(encoding="utf-8")
+    assert doc.count("  towed: true\n") == 1
+    on_deck = tmp_path / "tartane-boat-on-deck.yaml"
+    on_deck.write_text(doc.replace("  towed: true\n", ""), encoding="utf-8")
+    said = {}
+    for path in (HER, str(on_deck)):
+        w = make(path, 292.0, 12.0, 4.0, seed=7)
+        w.submit("call all hands")
+        w.run(120)
+        t0 = w.clock.tick
+        w.submit("clear for action")
+        w.run(600)
+        said[path] = [
+            (e.tick - t0, e.text[:52])
+            for e in w.log
+            if e.tick >= t0
+            and e.kind in ("evolution.step", "ship.cleared")
+            and "clear" in e.text.lower()
+        ]
+    assert said[HER] == [
+        (282, "The boat towing astern on her painter; the ship is c"),
+        (387, "Cleared for action and beat to quarters. Quarters: n"),
+    ]
+    assert said[str(on_deck)] == [
+        (351, "The boat griped fast on the booms; the ship is clear"),
+        (456, "Cleared for action and beat to quarters. Quarters: n"),
+    ]
+
+
+def test_her_heave_to_asks_what_she_carries_and_hove_to_under_plain_sail_she_lies_to():
+    """The lead's nudge 43 (A1a's `HeaveToScript.check`, read by what she carries): with her
+    great lateen and mizen set and her topsail and jib furled, `heave to` is refused in the
+    words "No head sail is set to haul to windward, nor a topsail to lay aback." Under plain
+    sail, by the wind on the starboard tack in 15 kn, she heaves to with her topsail to the
+    mast and lies to inside truth 12's band, 60 degrees off at 0.8 kn after fifteen minutes.
+    Measured, not asserted: with her topsail and lateens set and her jib furled she does not
+    lie to ("she would not lie to ..."), falling off to the quarter with sternway."""
+    from tests.test_known_truths import make, off_wind, settle
+
+    w = make(HER, 292.5, 15.0, 5.0, seed=7)
+    settle(w, ["call all hands", "set the mainsail", "set the mizen", "trim sails"], 900, 300)
+    assert {s for s, sl in w.ship.sails.items() if sl.is_set} == {"main.lateen", "mizzen.lateen"}
+    t0 = w.clock.tick
+    w.submit("heave to")
+    w.run(60)
+    failed = [e.text for e in w.log if e.tick >= t0 and e.kind == "evolution.failed"]
+    assert failed == [
+        "Could not heave to: No head sail is set to haul to windward, nor a topsail to lay aback."
+    ]
+    w = make(HER, 292.5, 15.0, 5.0, seed=7)
+    settle(
+        w,
+        ["call all hands", "set plain sail", "brace sharp up on the starboard tack"],
+        sail_wait=1800,
+        ticks=600,
+    )
+    t0 = w.clock.tick
+    w.submit("heave to")
+    w.run(900)
+    hove = [e.text for e in w.log if e.tick >= t0 and e.kind == "ship.hove_to"]
+    assert hove == ["Hove to on the starboard tack, topsail to the mast, helm a-lee."]
+    assert 45.0 <= off_wind(w) <= 65.0
+    assert abs(w.ship.dyn.u) < 1.0  # m/s: under two knots either way

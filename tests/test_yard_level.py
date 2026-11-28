@@ -45,14 +45,18 @@ def _by_its_spar(ship, yard) -> int:
 def test_every_files_yard_levels_are_as_they_were_but_the_smacks_topsail(path):
     """The guard, old beside new: every braced yard of every committed file at the level the
     class of its spar gave it, the smack's topsail alone moving, 0 (a course) to 1 (a topsail):
-    the one committed yard crossing a mast's own head over another (`data/ships/smack.yaml`)."""
+    the one committed yard crossing a mast's own head over another (`data/ships/smack.yaml`).
+    And the tartane's two files' (package 90, her builder), her topsail on her pole main over her
+    tréou's yard, 0 to 1 as the smack's (old: the smack's alone, before her files)."""
     ship = load_ship(path)
     moved = {
         sp.id: (_by_its_spar(ship, sp), ship.yard_level(sp))
         for sp in ship.spars.values()
         if sp.cls == "yard" and _by_its_spar(ship, sp) != ship.yard_level(sp)
     }
-    assert moved == ({"topsail.yard": (0, 1)} if path.stem == "smack" else {})
+    want = {"smack": {"topsail.yard": (0, 1)}}
+    want.update({stem: {"main.topsail.yard": (0, 1)} for stem in ("tartane", "coastguard-tartane")})
+    assert moved == want.get(path.stem, {})
 
 
 # Every committed file's braced yards and their levels as the files stand (the lead's nudge 56):
@@ -101,6 +105,9 @@ COMMITTED_YARD_LEVELS: dict[str, dict[str, int]] = {
         "mizzen.royal.yard": 3,
         "mizzen.crossjack.yard": 0,
     },
+    # the tartane's two (package 90, her builder): her topsail over her tréou's yard on her pole
+    # main, read off her files as committed. Old: no rows, before her files
+    "coastguard-tartane": {"main.topsail.yard": 1, "main.treou.yard": 0},
     "cutter": {"square_sail.yard": 0, "topsail.yard": 1, "topgallant.yard": 2},
     "frigate-36": {
         "fore.yard": 0,
@@ -184,14 +191,16 @@ COMMITTED_YARD_LEVELS: dict[str, dict[str, int]] = {
         "sprit_topsail.yard": -1,
     },
     "smack": {"square_sail.yard": 0, "topsail.yard": 1},
+    "tartane": {"main.topsail.yard": 1, "main.treou.yard": 0},  # the tartane's (package 90)
     "topsail-schooner": {"fore.topsail.yard": 1, "fore.topgallant.yard": 2},
 }
 
 
 def test_the_table_of_yard_levels_has_a_row_for_every_committed_file_and_no_other():
     assert set(COMMITTED_YARD_LEVELS) == {p.stem for p in SHIP_FILES}
-    # 91 before the Diana's file (package 90), her twelve the frigate-36's yards
-    assert sum(len(row) for row in COMMITTED_YARD_LEVELS.values()) == 103
+    # 91 before the Diana's file (package 90), her twelve the frigate-36's yards; 103 before the
+    # tartane's two (package 90), two yards each, her topsail's and her tréou's
+    assert sum(len(row) for row in COMMITTED_YARD_LEVELS.values()) == 107
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])

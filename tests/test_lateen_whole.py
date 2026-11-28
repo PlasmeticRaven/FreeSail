@@ -47,11 +47,31 @@ from freesail.standing.runtime import contrary
 from freesail.world import captains as C
 
 XEBEC_LATEENS = ("fore.lateen", "main.lateen", "mizzen.lateen")
+# The committed files with a whole lateen, and its sails (package 90: the tartane's two files,
+# her builder's, her great lateen, her mizen and her bouffette dipping; old: none, every guard
+# below over every committed file). The guards of "a ship with no whole lateen" range over the
+# rest, `NO_WHOLE_LATEEN`; her own cases are hers (`tests/test_tartane.py`).
+WHOLE_LATEENS_OF = {
+    stem: {"main.lateen", "mizzen.lateen", "main.bouffette"}
+    for stem in ("coastguard-tartane", "tartane")
+}
+NO_WHOLE_LATEEN = [
+    str(p) for p in sorted(Path("data/ships").glob("*.yaml")) if p.stem not in WHOLE_LATEENS_OF
+]
 # the trunk's answer to words that begin with no verb of hers (nudge 46, item 4)
 NOT_HERS = (
     "is not an order this ship understands. An order begins with a verb such as set, take in, "
     "furl, reef, shake out, brace, trim or haul."
 )
+
+
+def test_the_committed_files_with_a_whole_lateen_are_the_tartanes_and_no_other():
+    """The table both ways: each committed file's whole lateens (`scripts.is_whole_lateen`) are its
+    row of `WHOLE_LATEENS_OF`, and a file with no row has none (package 90, the tartane's builder;
+    old: no committed file carried one)."""
+    for path in sorted(Path("data/ships").glob("*.yaml")):
+        whole = {sl.id for sl in load_ship(path).sails.values() if scripts.is_whole_lateen(sl)}
+        assert whole == WHOLE_LATEENS_OF.get(path.stem, set()), path
 
 
 def _dipping(doc: dict) -> dict:
@@ -1134,7 +1154,8 @@ def test_through_the_stern_the_cloth_goes_over_against_its_mast_on_the_bad_hand(
 def test_a_whole_lateens_sheet_keeps_the_side_it_is_drawn_to_and_no_other_sail_does(xebec):
     """`set_sheet_angle` keeps a whole lateen's drawn side, the lee included (Eng §2.4.3), so
     that the wind come round ahead holds it there; a jib-headed sail's single sheet is held only
-    off the lee, as it always was. No sail of a committed file keeps its side."""
+    off the lee, as it always was. No sail of a committed file keeps its side but a whole
+    lateen's (`WHOLE_LATEENS_OF`: the tartane's; old: none)."""
     world = _from(xebec)
     ship = world.ship
     main = ship.sails["main.lateen"]
@@ -1145,7 +1166,8 @@ def test_a_whole_lateens_sheet_keeps_the_side_it_is_drawn_to_and_no_other_sail_d
     yard_trim.set_sheet_angle(ship, jib, jib.sheet_angle, None)
     assert all(ln.held_side is None for ln in ship.sheets_of(jib))
     for path in sorted(Path("data/ships").glob("*.yaml")):
-        assert not any(yard_trim.keeps_its_side(sl) for sl in load_ship(path).sails.values()), path
+        kept = {sl.id for sl in load_ship(path).sails.values() if yard_trim.keeps_its_side(sl)}
+        assert kept == WHOLE_LATEENS_OF.get(path.stem, set()), path
 
 
 def test_at_let_go_and_haul_the_lateens_left_are_drawn_over_and_filled_on_the_bad_hand(xebec):
@@ -1701,7 +1723,7 @@ def test_a_rig_of_lateens_with_a_head_sail_or_a_yard_not_set_is_told_what_is_not
         assert reply.kind == "order.rejected" and reply.text.endswith(said), (head, yard, reply)
 
 
-@pytest.mark.parametrize("path", sorted(str(p) for p in Path("data/ships").glob("*.yaml")))
+@pytest.mark.parametrize("path", NO_WHOLE_LATEEN)
 def test_leave_is_no_order_of_a_ship_with_no_whole_lateen_and_answers_as_before(path):
     """Nudge 46, item 4: `leave` is an order only in the practice's forms, and only on a hull with
     a whole lateen. On every committed ship "leave port", "leave the ship" and a bare "leave" are
@@ -1762,7 +1784,7 @@ def test_a_whole_lateens_shift_and_its_shift_for_a_new_one_stay_contrary(xebec):
     assert contrary(ship, "shift the jib", "shift the jib for a new one") == ""
 
 
-@pytest.mark.parametrize("path", sorted(str(p) for p in Path("data/ships").glob("*.yaml")))
+@pytest.mark.parametrize("path", NO_WHOLE_LATEEN)
 def test_the_practices_row_is_in_no_sample_of_a_ship_with_no_whole_lateen(path):
     """Nudge 46, item 6: "no whole lateen aboard" was in every station's sample on all eighteen
     ships. The row is left out of the sample where she carries no whole lateen
@@ -1917,7 +1939,7 @@ def _both_doors(world, senses, monkeypatch) -> tuple[str | None, str]:
     return Harness._readings_elsewhere(world, senses), queries.knowledge_block(world)["words"]
 
 
-@pytest.mark.parametrize("path", sorted(str(p) for p in Path("data/ships").glob("*.yaml")))
+@pytest.mark.parametrize("path", NO_WHOLE_LATEEN)
 def test_the_rows_not_to_be_had_are_counted_as_at_the_trunk_on_a_ship_with_no_lateen(
     path, monkeypatch
 ):

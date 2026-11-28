@@ -985,6 +985,9 @@ and 4 as picked, 5 and 6 standing as recommended, question 2 in the owner's own 
   moment is 0.6% less, and her KM is H's, 3.15 m (3.16 m on H′, recorded). Her `breadth_m`
   half-breadths at the water are H's likewise: narrower by 0.03 m a side at aft 6 and aft 7 and wider
   by up to 0.02 m at fore 8 and fore 9 than the plan's line (computed by the sections' flare).
+- **Her boat in a blow** (the lead's nudges 44 and 45): no order veers her towed boat long or
+  hoists her in on passage, as §11 has her; her ship file's note on her boat says so, with her
+  drag past the yawl's hull speed. Listed for the ship and her people's milestone.
 
 ---
 

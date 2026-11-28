@@ -49,7 +49,8 @@ from freesail.ship.schema import HELM_KINDS
 
 ROOT = Path(__file__).resolve().parents[1]
 SHIP_FILES = sorted((ROOT / "data" / "ships").glob("*.yaml"))
-# The six files whose notes say tiller (the ground report's §3), and every other a wheel's
+# The six files whose notes say tiller (the ground report's §3), and the tartane's two (package
+# 90, her builder: her design's tiller; old: the six), and every other a wheel's
 TILLER_FILES = {
     "cutter",
     "lugger",
@@ -57,6 +58,8 @@ TILLER_FILES = {
     "topsail-schooner",
     "privateer-schooner",
     "hermaphrodite-brig",
+    "tartane",
+    "coastguard-tartane",
 }
 
 # Package 116's words for the wheel, each as its lines gave it before this step: kept exactly
@@ -151,7 +154,9 @@ def test_a_ship_with_no_hull_spec_is_given_the_wheels_words():
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_six_files_steer_by_a_tiller_with_a_note_and_the_rest_by_the_wheel(path):
+def test_the_tiller_files_steer_by_a_tiller_with_a_note_and_the_rest_by_the_wheel(path):
+    """The six of A3 and the tartane's two (package 90, her builder: Chapman's plate, her source;
+    old: the six, the name `test_six_files_steer_by_a_tiller_...`)."""
     text = path.read_text(encoding="utf-8")
     doc = yaml.safe_load(text)
     ship = load_ship(path)
@@ -169,7 +174,13 @@ def test_six_files_steer_by_a_tiller_with_a_note_and_the_rest_by_the_wheel(path)
         "  # JUDGEMENT: she steers by a tiller on deck"
     ), note
     # sourced: a book and its page or plate, or the rule's article, and its mark where it is one
-    sources = ("Chapelle 1930 p. 83", "Chapelle 1930 p. 136", "Holdsworth 1874", "Falconer 1780")
+    sources = (
+        "Chapelle 1930 p. 83",
+        "Chapelle 1930 p. 136",
+        "Holdsworth 1874",
+        "Falconer 1780",
+        "Chapman 1768 Pl. LXII",  # the tartane's (package 90; old: the four)
+    )
     assert any(src in note for src in sources), note
     assert ("Judgement." in note) or ("JUDGEMENT" in note) or ("Chapelle 1930 p. 83" in note)
     # the key is the hull's, after her existing keys and before her drawn lines

@@ -57,6 +57,8 @@ hull:
     max_angle_deg: 35
     rate_deg_s: 5.0
     span_m: 2.3
+  # She steers by a tiller on deck: Chapman 1768 Pl. LXII No. 16 draws a tartane's short spar from the rudder head forward, about 7 ft, read as a tiller (Pages §7; JUDGEMENT on the reading), a coaster's and the cutter's way, as her design has it (Tar-D §5.4 item 9).
+  helm: tiller
   # Her lines (Build-Ships.md §5.0-§5.3; Tar-D §3): Chapman 1768, Pl. LVII No. 16, the French tartane, measured on the Sjöhistoriska museet's photograph (Pages; never copied) and scaled to her, lengths by 1.100 and sections by 1.268, heights above the water by principle 7's split (Pages §3.4): rung S†, the type's only lines. Her load line is H, the line the sheet marks (the lead's ruling 1); every point is in its frame. The half-breadths are the plate's moulded ones and the plank, 2½ pouces a side (JUDGEMENT).
   profile:
     # The top of the side, taffrail to stem head: aft, the rail from the taffrail; the waist bulwark from its upright after end at x -7.06 (two points a centimetre apart), its top 1.72 m above the water amidships, to the bow rail by the stem head (Pages §5.2). A war tartane's bulwark, kept for the trader (JUDGEMENT: the plate is her lines). A point at each traced frame's station at the line's own height to the centimetre, each frame's head cut there (Pages §5.1).
@@ -132,7 +134,7 @@ spars:
   class: mast
   x_m: 3.87
   height_m: 16.75
-  rating_kn: 132.7
+  rating_kn: 120.6
 # the great lateen yard, the antenne, 75 pieds, 9¼ pouces in the slings, its ends 1½ pieds at the penne and ¾ at the car (Forfait 1788 Table II, 1.195 of her length: longer than the vessel); of two pieces of fir fished together, slung by its parrel a third of its length from the car (Lescallier 1791 pp. 378-379) at the main's hounds, where its jeers' block hangs at the foot of the ton (Tar §2.1, JUDGEMENT on the reading; Forfait p. 121); height_m the sling. Peaked so that the car is tacked at the stem (Forfait p. 121), an angle her report gives; Chapman's Pl. LXII peaks his tartane's main yard about 55 degrees on another rig (Pages §7, recorded). Not braced: its trim is its sheet's, its ourses' and its vangs'. Rating: main.lateen in 45 kn.
 - id: main.lateen_yard
   class: lateen_yard
@@ -147,15 +149,15 @@ spars:
   length_m: 10.39
   height_m: 15.78
   brace_limit_deg: 64
-  rating_kn: 22.0
-# the tréou's yard, 41 pieds, 8½ pouces (Forfait 1788 Table II: the Espiègle's square yard and the square-sail column's), hoisted to the main's hounds, where it spreads the topsail's foot when it is up (the cutter's square-sail yard's place). Not crossed in plain sail: sent up with the tréou and struck with it, the period's way of setting it flying (Tar-D decision 9; the owner's reading of the prints, 2026-11-19: no yard under the topsail), so its sail is set flying. Braced 58 degrees from square, the cutter's square-sail yard's (JUDGEMENT). Provisional (truth 9), see gen_ships.py. Rating: main.treou in 22 kn.
+  rating_kn: 16.7
+# the tréou's yard, 41 pieds, 8½ pouces (Forfait 1788 Table II: the Espiègle's square yard and the square-sail column's), hoisted 1 pied under the great lateen's slings at the main's hounds, its parrel's room (JUDGEMENT, declared; the lead's nudge 90): the cutter's square-sail yard's place, so that the two yards never stand at one height. Not crossed in plain sail: sent up with the tréou and struck with it, the period's way of setting it flying (Tar-D decision 9; the owner's reading of the prints, 2026-11-19: no yard under the topsail), so its sail is set flying. Braced 58 degrees from square, the cutter's square-sail yard's (JUDGEMENT). Provisional (truth 9), see gen_ships.py. Rating: main.treou in 22 kn.
 - id: main.treou.yard
   class: yard
   'on': main.mast
   length_m: 13.32
-  height_m: 8.31
+  height_m: 7.98
   brace_limit_deg: 58
-  rating_kn: 5.9
+  rating_kn: 5.6
 # the mizen (Forfait's tapecul, the Levant's misaine), 30 pieds heel to head, 10 pouces, its head 6 pieds, stepped 15 pieds 2 pouces abaft the middle (Forfait 1788 Table II, the Humble), raked aft 10 degrees (JUDGEMENT on Forfait p. 128: the lateen xebec's after mast 'panché vers l'arrière'; no plate of Chapman's draws a tartane's mizen, Pages §7, the lead's ruling 7). Its heel on a keelson, 2.85 m below the deck at side (Pages §6.4; JUDGEMENT on the keelson). Added to lateen vessels 'to bring them to the wind' (Lescallier p. 393). Provisional (truth 9), see gen_ships.py. Rating: mizzen.lateen in 55 kn.
 - id: mizzen.mast
   class: mast
@@ -178,7 +180,7 @@ spars:
   height_m: 2.31
   rating_kn: 15.5
 sails:
-# the great lateen (la mestre), whole, three-cornered (Lescallier p. 378), cut by tools/ships/lateen.py: its head the yard less its ends, 72¾ pieds (Forfait p. 121); the yard peaked 34.4 degrees so that the car is tacked at the stem, and the clew on the deck at the foot of the mast (Forfait p. 121, as her design reads it, R; Tar §3.4); the tack a short luff under the throat, the car's lashing (JUDGEMENT), so that it is written with four corners for the drawing. Plainly: the design's 100 to 140 m² (JUDGEMENT) is missed, its own rule giving less; her plain sail meets Forfait's (her report). One reef band (Lescallier p. 379: oblique in the period; the engine's band parallel to the foot). Whole, with no cut_at_mast; its side (dipping) waits on the engine's step A1a. Canvas No. 2 (JUDGEMENT: no period number for a lateen found; the lugger's lug's, the cutter's mainsail's No. 1 or 2 (Steel 1794 p. 120)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
+# the great lateen (la mestre), whole, three-cornered (Lescallier p. 378), cut by tools/ships/lateen.py: its head the yard less its ends, 72¾ pieds (Forfait p. 121); the yard peaked 34.4 degrees so that the car is tacked at the stem, and the clew on the deck at the foot of the mast (Forfait p. 121, as her design reads it, R; Tar §3.4); the tack a short luff under the throat, the car's lashing (JUDGEMENT), so that it is written with four corners for the drawing. Plainly: the design's 100 to 140 m² (JUDGEMENT) is missed, its own rule giving less; her plain sail meets Forfait's (her report). One reef band (Lescallier p. 379: oblique in the period; the engine's band parallel to the foot). Whole, with no cut_at_mast, and dipping: set to leeward of its mast and shifted round it by itself (the engine's step A1a). Canvas No. 2 (JUDGEMENT: no period number for a lateen found; the lugger's lug's, the cutter's mainsail's No. 1 or 2 (Steel 1794 p. 120)); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: main.lateen
   class: lateen
   yard: main.lateen_yard
@@ -189,27 +191,28 @@ sails:
   canvas_no: 2
   cloth_rating_kn: 25.3
   corners_m: [[10.38, 3.56], [10.38, 3.86], [-9.13, 17.2], [3.87, 0.31]]
-# the topsail (le hunier), square, loose-footed, cut by the cutter's topsail rule (the cutter's file; Steel 1794 p. 125, 'Sloop's topsail') between its yard and the main's hounds: its head 0.82 of its yard, its foot 0.9 of the tréou's yard, the square-sail yard below it; its sheets to the deck, no lower yard set in plain sail (Tar-D decision 8; the owner's reading of the prints, 2026-11-19). On a pole main it is a course to the engine until the steps A5 and A6. One reef band (the cutter's topsail's). Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the cutter's light flying topsail that the schooner's file set aside as not hers; it is this one's); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+  dipping: true
+# the topsail (le hunier), square, loose-footed, no lower yard set in plain sail (Tar-D decision 8; the owner's reading of the prints, 2026-11-19), its sheets to the deck: its head 0.82 of its yard, the cutter's topsail rule's (the cutter's file; Steel 1794 p. 125, 'Sloop's topsail'); its foot 0.9 of its own yard, the cut of a sail flown with the tréou's yard not crossed; its foot 3 pieds clear above the great lateen's slings at the hounds. JUDGEMENT, declared (the lead's nudge 89): no source gives its depth, the head (Forfait 1788 Table II, the Humble's 26 pieds) and the hoist (Forfait p. 121) being sourced; 1 pied clear, 63.9 m², the cut not taken. Her plain sail is then 8.5% under Forfait's, a departure (her report). On her pole main a topsail by its level (the engine's steps A5 and A6). One reef band (the cutter's topsail's). Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 125, 'Sloop's topsail': No. 6 or 7, the cutter's light flying topsail that the schooner's file set aside as not hers; it is this one's); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: main.topsail
   class: square
   yard: main.topsail.yard
-  area_m2: 77
+  area_m2: 58
   reef_bands: 1
   x_m: 3.87
-  centre_height_m: 12.6
+  centre_height_m: 13.1
   canvas_no: 6
-  cloth_rating_kn: 17.6
-# the tréou, the square sail set before the wind and in too much wind (Lescallier pp. 395, 401; Falconer 1780, TREOU, SQUARE-SAIL; Steel: 'like a cross-jack'), never in plain sail; as broad as its yard, 0.9 of it, from its yard at the hounds to the bulwark's top at the mast (JUDGEMENT: 'from its yard to near the deck'). Set flying, its yard sent up with it and struck with it (Tar-D decision 9), never reefed aloft. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 124, 'Sloop's square-sail, or cross-jack': No. 6 or 7; the heavier taken); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
+  cloth_rating_kn: 13.3
+# the tréou, the square sail set before the wind and in too much wind (Lescallier pp. 395, 401; Falconer 1780, TREOU, SQUARE-SAIL; Steel: 'like a cross-jack'), never in plain sail; as broad as its yard, 0.9 of it, from its yard 1 pied under the great lateen's slings to the bulwark's top at the mast (JUDGEMENT: 'from its yard to near the deck'). Set flying, its yard sent up with it and struck with it (Tar-D decision 9), never reefed aloft. Not set with the great lateen: the one is taken in for the other (Forfait p. 124, the great lateen taken away for a square sail; the lead's nudge 90), and it is set by its own order, in no group with the great lateen but the square sails. Canvas No. 6 (Steel 1794 vol. I, Sail-making p. 124, 'Sloop's square-sail, or cross-jack': No. 6 or 7; the heavier taken); cloth 0.229 kN/m2, 0.71 of No. 2 by Luce App. E.
 - id: main.treou
   class: square
   yard: main.treou.yard
-  area_m2: 81
+  area_m2: 77
   x_m: 3.87
-  centre_height_m: 5.8
+  centre_height_m: 5.6
   canvas_no: 6
-  cloth_rating_kn: 18.5
+  cloth_rating_kn: 17.6
   flying: true
-# the mizen lateen, whole, 'semblable' to the great lateen and smaller (Forfait pp. 124-125), cut by the same rule (Forfait p. 121): its head the yard less its ends, the yard peaked as the great yard (JUDGEMENT), the clew on the deck at the foot of its mast; its sheet led to the outrigger over the stern, whose end stands -14.67 m in her frame, two-thirds of the lugger's bout-dehors de tapecul outboard (Forfait Table VII, 0.364 of the length; JUDGEMENT on the carrying). Plainly: the design's 30 to 45 m² (JUDGEMENT) is missed, its own rule giving less. Worked as a ship's mizen going about and kept set hove to (Tar-D §4.2; the plan's §4 row 4); its side waits on the step A1a. Canvas No. 3 (JUDGEMENT: a lighter lateen than the great sail, the lugger's mizen's); cloth 0.282 kN/m2, 0.88 of No. 2 by Luce App. E.
+# the mizen lateen, whole, 'semblable' to the great lateen and smaller (Forfait pp. 124-125), cut by the same rule (Forfait p. 121): its head the yard less its ends, the yard peaked as the great yard (JUDGEMENT), the clew on the deck at the foot of its mast; its sheet led to the outrigger over the stern, whose end stands -14.67 m in her frame, two-thirds of the lugger's bout-dehors de tapecul outboard (Forfait Table VII, 0.364 of the length; JUDGEMENT on the carrying). Plainly: the design's 30 to 45 m² (JUDGEMENT) is missed, its own rule giving less. Worked as a ship's mizen going about and kept set hove to (Tar-D §4.2; the plan's §4 row 4); dipping, its side found and shifted as the great lateen's (A1a). Canvas No. 3 (JUDGEMENT: a lighter lateen than the great sail, the lugger's mizen's); cloth 0.282 kN/m2, 0.88 of No. 2 by Luce App. E.
 - id: mizzen.lateen
   class: lateen
   yard: mizzen.lateen_yard
@@ -220,6 +223,7 @@ sails:
   canvas_no: 3
   cloth_rating_kn: 7.3
   corners_m: [[-1.35, 2.23], [-1.35, 2.53], [-13.42, 10.78], [-4.44, 0.39]]
+  dipping: true
 # the one great jib (le foc: Lescallier p. 401; Steel, 'a large jib'; Röding) from the berthelot's end to the main's hounds, one headsail on the owner's reading of the prints (2026-11-19; Tar-D decision 11): cut by the cutter's foresail rule on her stay (Fincham 1843 art. 87): the luff 0.85 of the stay, the foot 0.9 of the stay's span to the mast, the leech 0.8 of the luff; its clew 3 pieds above her deck. No reef bands: the storm jib is shifted for it. Canvas No. 2 (Steel 1794 vol. I, Sail-making, 'Smack's jib' (OCR line 15709): No. 1 or 2); cloth 0.320 kN/m2, 1.00 of No. 2 by Luce App. E.
 - id: jib
   class: jibheaded
@@ -230,7 +234,7 @@ sails:
   canvas_no: 2
   cloth_rating_kn: 10.9
   corners_m: [[13.99, 2.31], [5.39, 7.41], [4.89, 1.43]]
-# the bouffette, a smaller lateen bent to the great yard in the great lateen's place in a blow (Lescallier pp. 394-395, the galley's; Forfait p. 129), as the lugger's taille-vent: two-thirds of the great lateen's area, cut alike about its throat (JUDGEMENT, Tar-D §4.1); in the sail room. Canvas No. 1 (JUDGEMENT: the storm lateen, of the heaviest, as the lugger's taille-vent); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
+# the bouffette, a smaller lateen bent to the great yard in the great lateen's place in a blow (Lescallier pp. 394-395, the galley's; Forfait p. 129), as the lugger's taille-vent: two-thirds of the great lateen's area, cut alike about its throat (JUDGEMENT, Tar-D §4.1); in the sail room; dipping as the great lateen (Tar-D §4.2). Canvas No. 1 (JUDGEMENT: the storm lateen, of the heaviest, as the lugger's taille-vent); cloth 0.358 kN/m2, 1.12 of No. 2 by Luce App. E.
 - id: main.bouffette
   class: lateen
   yard: main.lateen_yard
@@ -242,6 +246,7 @@ sails:
   corners_m: [[10.38, 3.56], [10.38, 3.86], [-5.55, 14.75], [5.07, 0.96]]
   bent: false
   in_place_of: main.lateen
+  dipping: true
 # the storm jib, two-thirds of the jib (Steel 1794 p. 190, the sloop's), the cutter's pattern (JUDGEMENT, Tar-D §4.3), cut alike on the jib's stay about its tack at the berthelot's end; in the sail room. Canvas No. 1 (Steel 1794 vol. I, Sail-making, the sloop's jibs (p. 190): 'No. 1 or 2 ... two-thirds of the size of the first jib, and is used in stormy weather, in lieu of a larger one'); rated for the wind it is cut for (package 45): 0.90 kN/m2, the model's force on a jib-headed sail at 70 knots apparent over a strain of 1.35, where the cloth's own rating of 0.358 kN/m2 (1.12 of No. 2 by Luce App. E) blew it out at sixty.
 - id: storm_jib
   class: jibheaded
@@ -537,16 +542,15 @@ lines:
   rating_kn: 9.7
 groups:
   plain sail:
-  - main.lateen
-  - main.topsail
-  - mizzen.lateen
   - jib
+  - main.topsail
+  - main.lateen
+  - mizzen.lateen
   all sail:
-  - main.lateen
-  - main.topsail
-  - main.treou
-  - mizzen.lateen
   - jib
+  - main.topsail
+  - main.lateen
+  - mizzen.lateen
   square sails:
   - main.topsail
   - main.treou
@@ -894,7 +898,7 @@ pumps:
   hands: 2
 # The boats (package 35, spec M5 §23): their lengths by Luce 1866's rule ('Boats', 'Rules for Size of Boats for Ships-of-War': the launch 2.6 times the square root of the ship's length, the cutters 0.9 of it), the allowance after Steel 1794 vol. II and Falconer 1780 (BOAT, PINNACE, YAWL), the oars a thwart to three feet, the tons by Luce's weight rule for the boat herself; see tools/gen_ships.py.
 boats:
-# Her one boat, about 4.5 m (Tar-D §11, decision 19; JUDGEMENT on its size), a yawl by the house's kinds; towed astern on passage by her design, which the boat's towed key says once the engine's step A4 is merged.
+# Her one boat, about 4.5 m (Tar-D §11, decision 19; JUDGEMENT on its size), a yawl by the house's kinds, manned as a hull on the 16-ft yawl's file (package 82), a foot longer than hers as the cutter's boat is on it (JUDGEMENT). Towed astern on her painter on passage by her design (the engine's step A4): hauled up alongside and manned, and veered astern again. No order veers her long or hoists her in on passage, as her design has her in a blow (Tar-D §11: listed for the ship and her people's milestone); in tow she drags as the yawl does at her speed, the more the farther past the yawl's own hull speed she is driven.
 - id: boat
   kind: yawl
   name: the boat
@@ -902,3 +906,5 @@ boats:
   oars: 4
   crew: 5
   tons: 0.1
+  file: data/ships/boat-yawl-16.yaml
+  towed: true

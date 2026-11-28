@@ -30,14 +30,19 @@ SHIP_FILES = sorted(Path("data/ships").glob("*.yaml"))
 
 
 @pytest.mark.parametrize("path", SHIP_FILES, ids=[p.stem for p in SHIP_FILES])
-def test_the_smacks_main_is_the_one_committed_pole(path):
-    """Of the committed files the smack's main alone carries a braced yard above its lowest on the
+def test_the_smacks_main_and_the_tartanes_are_the_committed_poles(path):
+    """Of the committed files the smack's main carries a braced yard above its lowest on the
     lower mast with no topmast (`data/ships/smack.yaml`: "No topmast to strike: the topsail yard
-    crosses the mast's own head"), and her topsail alone is on one."""
+    crosses the mast's own head"), and her topsail is on one; and so the tartane's two files'
+    (package 90, her builder): her topsail on her pole main over her tréou's yard (old: the
+    smack's alone, the name `..._the_one_committed_pole`, before her files)."""
     ship = load_ship(path)
     poles = [sp.id for sp in ship.spars.values() if sp.cls == "mast" and ship.is_pole_mast(sp)]
     on = [sl.id for sl in ship.sails.values() if ship.on_pole(sl)]
-    assert (poles, on) == ((["main.mast"], ["topsail"]) if path.stem == "smack" else ([], []))
+    want = {"smack": (["main.mast"], ["topsail"])}
+    tartanes = ("tartane", "coastguard-tartane")
+    want.update({stem: (["main.mast"], ["main.topsail"]) for stem in tartanes})
+    assert (poles, on) == want.get(path.stem, ([], []))
 
 
 def test_a_pole_takes_its_topsail_in_by_the_pole_and_its_course_as_a_course(tmp_path):

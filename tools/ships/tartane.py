@@ -37,10 +37,12 @@ departures and judgements. A figure a rule computes from the file's own keys (an
 a rating, the drawn displacement, a port's gap) is printed by `her_report()` and held by her
 tests, where it cannot go stale.
 
-**Keys her file does not carry yet** (each a guard of `tests/test_probes_90.py` until its step
-is merged): `dipping` on her two whole lateens (A1a), the hull's `helm: tiller` (A3), her boat
-`towed` (A4). Her topsail on a pole main is a course to the engine until A5 and A6. They are
-added when those steps are merged into the package's branch.
+**The engine's keys she carries** (stage 0's, each a row of `tests/test_probes_90.py`'s
+`KEY_CARRIERS`), written once their steps were merged into the package's branch (8a27d9b1):
+`dipping` on her whole lateens, the great lateen, the mizen and the bouffette (A1a: each set to
+leeward and shifted round its mast by itself), the hull's `helm: tiller` (A3), and her boat
+`towed` astern on her own file's hull (A4). Her topsail on her pole main is a topsail to the
+engine by A5 and A6.
 
 The module is imported only by the generator's entry block, after `gen_ships` is made the running
 script, and takes every helper as `g.<name>`. No function or table of the generator is changed;
@@ -413,6 +415,10 @@ HULL_NOTES = {
     "rudder": "No rudder is drawn on Pl. LVII No. 16 (Pages §5.5, §9): the cutter's blade by her "
     "length and draught, 1.3 m², its span her after draught less the heel (JUDGEMENT); 35 degrees "
     "the period's stop, a tiller's rate, the cutter's (JUDGEMENT).",
+    # package 90, A3: the hull's helm, which a tiller's words are read by
+    "helm": "She steers by a tiller on deck: Chapman 1768 Pl. LXII No. 16 draws a tartane's short "
+    "spar from the rudder head forward, about 7 ft, read as a tiller (Pages §7; JUDGEMENT on the "
+    "reading), a coaster's and the cutter's way, as her design has it (Tar-D §5.4 item 9).",
 }
 
 PROFILE_NOTES = {
@@ -589,6 +595,7 @@ def particulars(armed: bool) -> Particulars:
         "hull_speed_kn": HULL_SPEED_KN,
         "deck_height_m": DATUM,
         "rudder": dict(RUDDER),
+        "helm": "tiller",
     }
     return Particulars(
         hull=hull,
@@ -682,10 +689,21 @@ JIB_LUFF_OF_STAY = 0.85
 JIB_FOOT_OF_SPAN = 0.9
 JIB_LEECH_OF_LUFF = 0.8
 STORM_JIB_SHARE = 2.0 / 3.0  # Steel 1794 p. 190, the sloop's: two-thirds of the first jib
-# The cutter's topsail rule (the cutter's file; Steel 1794 p. 125, 'Sloop's topsail'): the head
-# 0.82 of its yard, the foot 0.9 of the square-sail yard below it, here the tréou's (Tar-D §4.1).
+# Her topsail's cut (the lead's nudges 88 and 89): loose-footed, no yard below it in plain sail
+# (decision 9). Its head 0.82 of its yard, the cutter's topsail rule (the cutter's file; Steel 1794
+# p. 125, 'Sloop's topsail'); its foot 0.9 of its own yard, the cut of a sail flown with the tréou's
+# yard not crossed, which is most of her days; its foot 3 pieds clear above the great lateen's
+# slings at the hounds, so that it may set over the yard. JUDGEMENT, declared: no source gives the
+# topsail's depth (Forfait gives its yard and his whole sail with a topgallant). The cut not taken,
+# 1 pied clear, gives 63.9 m². Old (to 3c584e0f): the cutter's rule whole, its foot 0.9 of the
+# tréou's yard, cut down to the hounds, the foot at the slings' very height.
 TOPSAIL_HEAD_OF_YARD = 0.82
-FOOT_OF_YARD_BELOW = 0.9
+TOPSAIL_FOOT_OF_YARD = 0.9
+TOPSAIL_CLEAR_OF_SLINGS = pieds(3)
+# The tréou's yard hoisted 1 pied below the great lateen's slings, its parrel's room (the lead's
+# nudge 90; JUDGEMENT, declared: the two yards' half-diameters, 0.13 and 0.12 m, and the parrel's
+# trucks), so that the two yards never stand at one height on the mast. Old: at the hounds.
+TREOU_YARD_UNDER_SLINGS = pieds(1)
 # The tréou (Tar-D §4.1): as broad as its yard, 0.9 of it at the head (the cutter's square sail's
 # 0.9 x its yard x its depth), from its yard at the hounds to the bulwark's top at the mast
 # (JUDGEMENT: "from its yard to near the deck").
@@ -844,16 +862,18 @@ def square_cuts(m: dict[str, Mast]) -> dict:
     their areas, their centres (x, z)."""
     main = m["main"]
     ts_yard_z = main.head_z - TOPSAIL_YARD_BELOW_HEAD
-    hounds = main.hounds_z
+    hounds = main.hounds_z  # the great lateen's slings (its hoist, Forfait p. 121 as read)
     ts_yard, treou_yard = humble("topsail_yard"), pieds(*TREOU_YARD)
-    depth = ts_yard_z - hounds
-    head, foot = TOPSAIL_HEAD_OF_YARD * ts_yard, FOOT_OF_YARD_BELOW * treou_yard
+    foot_z = hounds + TOPSAIL_CLEAR_OF_SLINGS
+    depth = ts_yard_z - foot_z
+    head, foot = TOPSAIL_HEAD_OF_YARD * ts_yard, TOPSAIL_FOOT_OF_YARD * ts_yard
     ts_area = (head + foot) / 2.0 * depth
-    ts_z = hounds + depth / 2.0
+    ts_z = foot_z + depth / 2.0
     rail = interp(RAIL_M, main.x_deck)
-    tr_depth = hounds - rail
+    tr_yard_z = hounds - TREOU_YARD_UNDER_SLINGS
+    tr_depth = tr_yard_z - rail
     tr_area = TREOU_BREADTH_OF_YARD * treou_yard * tr_depth
-    tr_z = hounds - 0.45 * tr_depth  # the cutter's square sail's centre, 0.45 under its yard
+    tr_z = tr_yard_z - 0.45 * tr_depth  # the cutter's square sail's centre, 0.45 under its yard
     return {
         "main.topsail": {
             "yard_z": ts_yard_z,
@@ -864,7 +884,7 @@ def square_cuts(m: dict[str, Mast]) -> dict:
             "foot": foot,
         },
         "main.treou": {
-            "yard_z": hounds,
+            "yard_z": tr_yard_z,
             "area": tr_area,
             "centre": (main.x_at(tr_z), tr_z),
             "depth": tr_depth,
@@ -968,7 +988,8 @@ def check_rig(m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> list[
         )
     out.append(
         f"her plain sail {plain:.1f} m² against Forfait's {FORFAIT_SAIL_M2:.1f} m² less the "
-        f"topgallant's {TOPGALLANT_SHARE_M2:g} ({want:.1f}): {off:+.1%}, within ±{SAIL_BAND:.0%}."
+        f"topgallant's {TOPGALLANT_SHARE_M2:g} ({want:.1f}): {off:+.1%}, within ±{SAIL_BAND:.0%}: "
+        "a departure, her topsail cut clear of the slings (the lead's nudge 89)."
     )
     return out
 
@@ -1169,8 +1190,9 @@ def spars(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         brace_limit_deg=BRACE_LIMIT_DEG["main.treou.yard"],
         rating_kn=g.design_kn([ld["main.treou"]], dw["treou"]),
         note="the tréou's yard, 41 pieds, 8½ pouces (Forfait 1788 Table II: the Espiègle's square "
-        "yard and the square-sail column's), hoisted to the main's hounds, where it spreads the "
-        "topsail's foot when it is up (the cutter's square-sail yard's place). Not crossed in "
+        "yard and the square-sail column's), hoisted 1 pied under the great lateen's slings at the "
+        "main's hounds, its parrel's room (JUDGEMENT, declared; the lead's nudge 90): the cutter's "
+        "square-sail yard's place, so that the two yards never stand at one height. Not crossed in "
         "plain sail: sent up with the tréou and struck with it, the period's way of setting it "
         "flying (Tar-D decision 9; the owner's reading of the prints, 2026-11-19: no yard under "
         "the topsail), so its sail is set flying. Braced 58 degrees from square, the cutter's "
@@ -1293,8 +1315,9 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         "with four corners for the drawing. Plainly: the design's 100 to 140 m² (JUDGEMENT) is "
         "missed, its own rule giving less; her plain sail meets Forfait's (her report). One reef "
         "band (Lescallier p. 379: oblique in the period; the engine's band parallel to the foot). "
-        "Whole, with no cut_at_mast; its side (dipping) waits on the engine's step A1a."
-        + g.canvas_note(CANVAS["lateen"]),
+        "Whole, with no cut_at_mast, and dipping: set to leeward of its mast and shifted round it "
+        "by itself (the engine's step A1a)." + g.canvas_note(CANVAS["lateen"]),
+        dipping=True,
     )
     ts = squares["main.topsail"]
     b.sail(
@@ -1307,12 +1330,16 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         centre_height_m=round(ts["centre"][1], 1),
         canvas_no=CANVAS["topsail"][0],
         cloth_rating_kn=g.cloth(round(ts["area"]), CANVAS["topsail"][0]),
-        note="the topsail (le hunier), square, loose-footed, cut by the cutter's topsail rule "
-        "(the cutter's file; Steel 1794 p. 125, 'Sloop's topsail') between its yard and the "
-        "main's hounds: its head 0.82 of its yard, its foot 0.9 of the tréou's yard, the square-"
-        "sail yard below it; its sheets to the deck, no lower yard set in plain sail (Tar-D "
-        "decision 8; the owner's reading of the prints, 2026-11-19). On a pole main it is a course "
-        "to the engine until the steps A5 and A6. One reef band (the cutter's topsail's)."
+        note="the topsail (le hunier), square, loose-footed, no lower yard set in plain sail "
+        "(Tar-D decision 8; the owner's reading of the prints, 2026-11-19), its sheets to the "
+        "deck: its head 0.82 of its yard, the cutter's topsail rule's (the cutter's file; Steel "
+        "1794 p. 125, 'Sloop's topsail'); its foot 0.9 of its own yard, the cut of a sail flown "
+        "with the tréou's yard not crossed; its foot 3 pieds clear above the great lateen's "
+        "slings at the hounds. JUDGEMENT, declared (the lead's nudge 89): no source gives its "
+        "depth, the head (Forfait 1788 Table II, the Humble's 26 pieds) and the hoist (Forfait "
+        "p. 121) being sourced; 1 pied clear, 63.9 m², the cut not taken. Her plain sail is then "
+        "8.5% under Forfait's, a departure (her report). On her pole main a topsail by its level "
+        "(the engine's steps A5 and A6). One reef band (the cutter's topsail's)."
         + g.canvas_note(CANVAS["topsail"]),
     )
     tr = squares["main.treou"]
@@ -1328,9 +1355,12 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         flying=True,
         note="the tréou, the square sail set before the wind and in too much wind (Lescallier pp. "
         "395, 401; Falconer 1780, TREOU, SQUARE-SAIL; Steel: 'like a cross-jack'), never in plain "
-        "sail; as broad as its yard, 0.9 of it, from its yard at the hounds to the bulwark's top "
-        "at the mast (JUDGEMENT: 'from its yard to near the deck'). Set flying, its yard sent up "
-        "with it and struck with it (Tar-D decision 9), never reefed aloft."
+        "sail; as broad as its yard, 0.9 of it, from its yard 1 pied under the great lateen's "
+        "slings to the bulwark's top at the mast (JUDGEMENT: 'from its yard to near the deck'). "
+        "Set flying, its yard sent up with it and struck with it (Tar-D decision 9), never reefed "
+        "aloft. Not set with the great lateen: the one is taken in for the other (Forfait p. 124, "
+        "the great lateen taken away for a square sail; the lead's nudge 90), and it is set by "
+        "its own order, in no group with the great lateen but the square sails."
         + g.canvas_note(CANVAS["treou"]),
     )
     miz = cuts["mizzen"]
@@ -1354,8 +1384,9 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         "in her frame, two-thirds of the lugger's bout-dehors de tapecul outboard (Forfait Table "
         "VII, 0.364 of the length; JUDGEMENT on the carrying). Plainly: the design's 30 to 45 m² "
         "(JUDGEMENT) is missed, its own rule giving less. Worked as a ship's mizen going about and "
-        "kept set hove to (Tar-D §4.2; the plan's §4 row 4); its side waits on the step A1a."
-        + g.canvas_note(CANVAS["mizen"]),
+        "kept set hove to (Tar-D §4.2; the plan's §4 row 4); dipping, its side found and shifted "
+        "as the great lateen's (A1a)." + g.canvas_note(CANVAS["mizen"]),
+        dipping=True,
     )
     tack, head, clew = jib["corners"]
     b.sail(
@@ -1393,7 +1424,9 @@ def sails(b, m: dict[str, Mast], cuts: dict, squares: dict, jib: dict) -> None:
         note="the bouffette, a smaller lateen bent to the great yard in the great lateen's place "
         "in a blow (Lescallier pp. 394-395, the galley's; Forfait p. 129), as the lugger's "
         "taille-vent: two-thirds of the great lateen's area, cut alike about its throat "
-        "(JUDGEMENT, Tar-D §4.1); in the sail room." + g.canvas_note(CANVAS["bouffette"]),
+        "(JUDGEMENT, Tar-D §4.1); in the sail room; dipping as the great lateen (Tar-D §4.2)."
+        + g.canvas_note(CANVAS["bouffette"]),
+        dipping=True,
     )
     storm = round(jib["storm"])
     b.sail(
@@ -1438,8 +1471,14 @@ def groups_and_aliases(b) -> None:
     the practice's orders, waits on the step A1b that builds those orders: a one-word family of
     sails is one the standing book's fitting knows (`standing.book.SAIL_FAMILIES`, truth 7-625:
     "a new one is added on purpose"), which A1b adds with it."""
-    b.group("plain sail", ["main.lateen", "main.topsail", "mizzen.lateen", "jib"])
-    b.group("all sail", ["main.lateen", "main.topsail", "main.treou", "mizzen.lateen", "jib"])
+    # set in this order (the watch takes them in turn): the jib and the topsail cast her head
+    # before the lateens draw, as a seaman gets her under way (JUDGEMENT, declared; the lead's
+    # nudge 90). `all sail` keeps the great lateen and not the tréou, which is set by its own
+    # order for the wind aft or a wind too strong, as a studding sail is no part of a ship's sail
+    # by the wind (the lead's nudge 90): so it is her plain sail. Old: the great lateen first, and
+    # `all sail` the tréou with them.
+    b.group("plain sail", ["jib", "main.topsail", "main.lateen", "mizzen.lateen"])
+    b.group("all sail", ["jib", "main.topsail", "main.lateen", "mizzen.lateen"])
     b.group("square sails", ["main.topsail", "main.treou"])
     b.group("fore-and-aft sails", ["main.lateen", "mizzen.lateen", "jib"])
     b.group("headsails", ["jib"])
@@ -1718,18 +1757,34 @@ def hold_pumps_boat(b, role: str) -> None:
                     "yawl",
                     "the boat",
                     BOAT_M / FT / launch,
-                    "Her one boat, about 4.5 m (Tar-D §11, decision 19; JUDGEMENT on its size), a "
-                    "yawl by the house's kinds; towed astern on passage by her design, which the "
-                    "boat's towed key says once the engine's step A4 is merged.",
+                    BOAT_NOTE,
+                    BOAT_FILE,
                 ),
             ],
         ),
     )
+    # towed astern on her painter (A4): the generator's boats take no such key, so it is set
+    # here on her one boat, after the rest of its mapping
+    b.doc["boats"][0]["towed"] = True
 
 
 # ---------------------------------------------------------------------------
 # The coastguard's guns, magazine and quarter bill (Tar-D §7; package 81's checklist)
 # ---------------------------------------------------------------------------
+
+# Her boat (Tar-D §11, decision 19): one, about 4.5 m, manned as a hull on the house's 16-ft
+# yawl's file (package 82), a foot longer than hers by Luce's rule, as the cutter's 15-ft boat is
+# on it (JUDGEMENT); towed astern on passage (A4), the first file that tows.
+BOAT_FILE = "data/ships/boat-yawl-16.yaml"
+BOAT_NOTE = (
+    "Her one boat, about 4.5 m (Tar-D §11, decision 19; JUDGEMENT on its size), a yawl by the "
+    "house's kinds, manned as a hull on the 16-ft yawl's file (package 82), a foot longer than "
+    "hers as the cutter's boat is on it (JUDGEMENT). Towed astern on her painter on passage by her "
+    "design (the engine's step A4): hauled up alongside and manned, and veered astern again. No "
+    "order veers her long or hoists her in on passage, as her design has her in a blow (Tar-D "
+    "§11: listed for the ship and her people's milestone); in tow she drags as the yawl does at "
+    "her speed, the more the farther past the yawl's own hull speed she is driven."
+)
 
 GUN_POUNDER = 4
 GUN_CWT = g.LONG_GUN_CWT[GUN_POUNDER]  # the 4-pounder of 6 ft, 12½ cwt (the house's table)

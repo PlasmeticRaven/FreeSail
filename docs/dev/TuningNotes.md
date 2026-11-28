@@ -40968,3 +40968,94 @@ called, plain sail, braced sharp up and settled; each old figure measured again 
 Each bill has a heading in that quarter point from which she will not wear. A1a to A1d change her
 going about wholly (the lateen's side, the yard's change), so this is recorded, not tuned. No
 test reads her wear: T-3 waits on them.
+
+### With the engine's steps: her keys, her re-cut, her groups, and the towing items (2026-11-28)
+
+The package's branch merged into hers at 8a27d9b1 (the coordinating session's news of nudge 100; as
+`f0d785d`): the engine's lateen hulls' list and the Diana's file. The conflicts were rows both
+sides added, the Diana's beside hers, and counts both moved: twenty-one ship files, eleven armed.
+Then the lead's rulings for her hash (nudges 43, 44, 45, 88, 89 and 90), built through her module
+and the generator; the other nineteen files byte for byte.
+
+**Her files, old beside new:**
+
+| What | Old | New |
+|---|---|---|
+| `dipping` | on none of her lateens | the great lateen, the mizen and the bouffette (A1a) |
+| her hull's `helm` | none, so the wheel | `tiller`: Chapman 1768 Pl. LXII No. 16's short spar from the rudder head, read as a tiller (Pages §7; JUDGEMENT on the reading) |
+| her boat | on deck, no file of her own | `file: data/ships/boat-yawl-16.yaml` and `towed: true` (A4); her note: no order veers her long or hoists her in on passage (the lead's nudge 45, (a)) |
+| her topsail | 77 m² (76.6), 7.47 m deep: its foot 0.9 of the tréou's yard (11.99 m), cut to the hounds | 58 m² (58.1), 6.50 m deep: its foot 0.9 of its own yard (9.35 m), 3 pieds clear of the slings (the lead's nudge 89) |
+| her tréou's yard | at the hounds: 8.85 m above her water, 8.31 m above her datum | 1 pied under the slings: 8.52 m, 7.99 m (the lead's nudge 90) |
+| her tréou | 81 m² (81.3), 6.78 m deep | 77 m² (77.4), 6.46 m deep |
+| her plain sail | 216.1 m², +0.0% of Forfait's 216.0 | 197.6 m², -8.5%: a departure, inside the band |
+| `plain sail` | great lateen, topsail, mizen, jib | jib, topsail, great lateen, mizen (the lead's nudge 90, 3(a)) |
+| `all sail` | plain sail and the tréou | plain sail: the tréou by its own order (the lead's nudge 90, 1) |
+
+**The pins her files move**, each old beside new:
+- `tests/test_probes_90.py`, `KEY_CARRIERS`: `towed` and `dipping` from none to her two files;
+  `helm` from the six tiller files to eight.
+- `tests/test_helm_kind.py`: `TILLER_FILES` from six to eight. The case renamed from
+  `test_six_files_steer_by_a_tiller_...` to `test_the_tiller_files_steer_by_a_tiller_...`, and its
+  sources take hers, "Chapman 1768 Pl. LXII".
+- `tests/test_yard_level.py`: her two rows (her topsail 1, her tréou 0), the table's yards 103 to
+  107; the guard's moved yards take her topsail, 0 to 1, as the smack's.
+- `tests/test_pole_mast.py`: renamed from `test_the_smacks_main_is_the_one_committed_pole` to
+  `test_the_smacks_main_and_the_tartanes_are_the_committed_poles`; her main and her topsail on it.
+- `tests/test_boat_towed.py`: the guard renamed from
+  `test_no_committed_file_tows_a_boat_so_no_ship_is_given_her_drag` to
+  `test_a_committed_file_is_given_her_boats_drag_only_where_it_tows_her`: her boat in tow at home
+  on the yawl's hull, and not with her away or lost, the lost state naming her boat as the away
+  state does. The kedge case's filed probe is written as `tartane-on-deck`, not `tartane`: under
+  that stem it bound her committed people file (`data/people/tartane.yaml`), and was hoisted out
+  in 377 s against 413 (found on the merge, before her keys).
+- `tests/test_lateen_whole.py`: the committed files with a whole lateen named
+  (`WHOLE_LATEENS_OF`, hers), held both ways by a new guard. The three guards of "a ship with no
+  whole lateen" range over the rest (old: every file). The sheet guard's "no committed sail keeps
+  its side" holds her three whole lateens keeping theirs.
+- `tests/test_tartane.py`: her great lateen, mizen and bouffette dipping (old: not); her plain sail
+  216 to 197 m², her topsail 77 to 58; her groups and their order; truth 7-695's road (below).
+
+**Truth 7-695's road.** With A5 her topsail is a topsail. Set by hand on 215, 55 degrees off a
+westerly and nearer than she lies, its yard stood square and aback, she made sternway and would
+not lie to: "Could not heave to: she would not lie to on the starboard tack, the wind on the
+starboard beam; the topsail left aback and the helm amidships." The road is now the game's own
+orders: from SSW, 202, 68 off, `call all hands`, `set plain sail`, `steer 202`, `trim sails` at 600
+s, `pipe down` at 900 s, her watch on deck. Then, by order and by the standing order:
+
+| Her watch | Hove to | Filled away |
+|---|---|---|
+| the starboard's four, no call | 110 s (111) | 91 s (79) |
+| the larboard's three, all hands called | the watch below up at 90 s, hove to at 139 (140), piped down (old: hove to at 76 s, before the watch below was up) | filled away at 63 s (55), piped down, before the watch below is up (old: at 181 s, after it, at 90) |
+
+**Measured, not asserted: filled away, she is not under way.** 7-704's last clause (over 3 kn by
+order, over 1.5 kn by the standing order with the wind fallen to 6) at 900 s after filling away:
+the starboard by order 41.8 degrees off with 0.65 kn of sternway; by the standing order 67.5 off at
+1.72 kn; the larboard by order 40.2 off with 1.04 kn of sternway; by the standing order 38.5 off
+with 0.40 kn of sternway. Her topsail is filled (A5), and she luffs: at low way her helm does not
+bear her away against her lateens. `trim sails` 120 s after filling away gets her under way on
+the larboard by order (3.39 kn) and not on the other two. For the lead.
+
+**The towing items** (the lead's nudge 44), each with a proof in `tests/test_tartane.py`:
+- point 1, `world/movement.py`, `_in_the_boat_at_the_side`: `boat.phase not in OUT_PHASES`. Off
+  Groix her captain going ashore, in her boat hauled alongside, belays her and is on deck again;
+  with the old line, "You are in the boat; you must be aboard and on deck to give an order of the
+  deck.";
+- point 2 was built in the lateen hulls' list ("stove by a shot as she tows astern");
+- point 3, `evolutions/action_scripts.py`, `_boats_all_astern`: her boat towing, her clearing
+  for action's boats share takes no time. She is clear 282 s after the order and at quarters at
+  387 s, against 351 and 456 s for a copy of her file with the boat on deck, as before (old: 351
+  and 456 either way). No other committed file tows, so none moves;
+- point 4: her boat's note (above), and the line in her design's open list (owed with it).
+
+**Nudge 43, pinned with her case:** with her great lateen and mizen set and her topsail and jib
+furled, "Could not heave to: No head sail is set to haul to windward, nor a topsail to lay
+aback."; under plain sail, by the wind in 15 kn, hove to with her topsail to the mast and 60
+degrees off at 0.84 kn after fifteen minutes, inside truth 12's band. Measured, not asserted:
+with her topsail and lateens set and her jib furled she does not lie to, falling off to the
+quarter with 1.1 kn of sternway.
+
+**Stopped, not mine:** `tests/test_helm_kind.py::test_the_primer_says_of_a_tiller_what_the_game_does`
+holds `TILLER_FILES` to the six hulls that the primer's chapter 2 names
+(`docs/primer/02-the-wind-and-the-points-of-sail.md`: "the cutter, the lugger, the smack, the two
+schooners and the hermaphrodite brig"). With her tiller it fails until that clause names the
+tartane. The primer is not in my row.
