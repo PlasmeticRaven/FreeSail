@@ -54,6 +54,21 @@ reproduced: from rest she cannot be got under way on five of the eight points, h
 aback with its yard square. Her proof runs on the trunk that holds the engine's steps. §16.4
 corrects a wrong claim of §15.
 
+**The lead's nudge 90 (§17).** Ruled for her hash:
+- the tréou and the great lateen do not stand together, and `all sail` keeps the great lateen
+  without the tréou;
+- the tréou's yard goes 1 pied below the slings;
+- her plain sail is set jib first;
+- her proof from rest uses the primer's orders, in gusts and steady both.
+
+Answered now:
+- the settee's `yard_lowered` cannot serve her as it stands;
+- her file can say her plain sail's order;
+- the preview's difference on the mizen is the helm's: in gusts, a course dead before the wind lay
+  past her stern and was dropped after a wear that failed for want of way.
+
+By the primer's orders, on today's tree, she gets under way from rest on all eight points.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -350,11 +365,19 @@ Both are owed with her hash, beside the other towing items. Also noted there, an
 towed boat with no file of her own puts no drag on the ship, and the generator may refuse `towed`
 on such a boat when her files come.
 
-**Owed with her hash, as the lead rules** (nudges 88 and 89):
-- her topsail cut 3 pieds clear of the lateen yard's slings, the foot 0.9 of its own yard (§16.1);
-- the tréou's yard and the great lateen as ruled on §16.2;
-- her proof from rest by the eight points, with her wear and her tack from each, on the trunk that
-  holds the engine's steps (§16.3).
+**Owed with her hash, as the lead rules** (nudges 88, 89 and 90):
+- her topsail cut 3 pieds clear of the lateen yard's slings, the foot 0.9 of its own yard, declared
+  as judgement, the head and the hoist as sourced (§16.1);
+- the tréou and the great lateen not set together. Her groups say so: `all sail` keeps the great
+  lateen and not the tréou, which is set by its own order. The engine's order that takes the one in
+  for the other is the engine's builder's, before her file (§16.2; nudge 90, 1);
+- the tréou's yard 1 pied below the slings, judgement, declared, 6.46 m deep; truth 7-688 measured
+  again (nudge 90, 2);
+- her `plain sail` group in the order jib, topsail, great lateen, mizen, judgement, declared
+  (§17.2; nudge 90, 3(a));
+- her proof from rest by the eight points, by the primer's orders, in the default gusts and in
+  steady wind. From each point she takes her course (a close-hauled one as near as she lies), wears,
+  and tacks where she has the way (§17.4; nudge 90, 3(b)).
 
 ## 7. The pictures
 
@@ -1159,3 +1182,99 @@ committed:
 
 So neither of her yards' levels turns on the foot's arithmetic. The re-cut stands on the lead's
 reasons and on the drawing's.
+
+## 17. The lead's nudge 90: what it asks of the report now
+
+The lead's nudge 90, in the note at the end of `docs/dev/M7-WorkPackages.md` on the trunk at
+c054c307, which I read whole. Everything it rules is for her hash, and is in §6's owed list. Nothing
+is built now. It asks three things of the report now, answered in §17.1 to §17.3. §17.4 gives a
+first run of the corrected proof on today's tree.
+
+### 17.1 The settee's `yard_lowered`: it cannot serve her as it stands
+
+- **It is a settee's flag alone.** The schema allows `settee` only on a dipping lug with four
+  corners, never set flying (`freesail/ship/schema.py`, `_settee`). Her great lateen is a whole
+  lateen.
+- **The engine sets it only in a manoeuvre's dip** (`SetteeChange.lower`,
+  `freesail/evolutions/scripts.py`). It clears it at the hoist, when she heaves to, and when a
+  settee is set. No take-in sets it: a settee taken in is clewed up aloft, its yard standing.
+- **Only the snapshot and the drawing read it.** `freesail/api/queries.py` serves it while it is
+  true, and `client/projection.js` draws a settee's yard on deck then. No windage, strain or refusal
+  reads it.
+
+So it could become her flag, a sail's runtime key served only while true, if two things changed:
+- the engine let a whole lateen carry it, and her take-in for the tréou set it;
+- what a yard on deck needs beyond the drawing were read from it (no windage on the yard; the
+  tréou's yard free at the slings).
+
+That is engine work, for the lead's wanted seamanship.
+
+### 17.2 Her plain sail's order: her file can say it
+
+`set plain sail` sets her sails in the order her `plain sail` group lists them, the watch taking
+them in turn. Measured from rest at 292, seed 7:
+
+| Her `plain sail` group | Set, in order |
+|---|---|
+| as committed: great lateen, topsail, mizen, jib | the great lateen at 132 s, the topsail at 583, the mizen at 715, the jib at 814 |
+| jib, topsail, great lateen, mizen (a scratch copy) | the jib at 99 s, the topsail at 550, the great lateen at 682, the mizen at 814 |
+
+So it is her module's list, written by the generator. No engine help is needed.
+
+### 17.3 The mizen in the preview: gusts against steady, measured
+
+The start is the preview's: from rest at 292, wind N at 12 kn. `set plain sail` is given at 0 s,
+`steer south` at 600 s and `take in the mizen` at 1500 s. In steady wind every seed runs alike:
+aback with sternway of 0.7 kn, then within 5 degrees of S at over 2 kn 398 s after the mizen's
+order (the helm's "Steady on S" comes at 433 s, §16.3). In the game's default
+gusts (`gustiness` and `variability` 0.3):
+
+| Seed | At the mizen's order | Then |
+|---|---|---|
+| 7 | under way at 4.1 kn, on 274 | not on S 1500 s later |
+| 8 | aback, sternway 1.1 kn | on S at +326 s |
+| 9 | under way at 4.1 kn, on 082 | not on S 1500 s later |
+| 10 | on S already | on S |
+| 11 | sternway 1.4 kn | on S at +881 s |
+| 12 | aback, sternway 1.2 kn | on S at +431 s |
+
+**The difference is the helm's reading of the course.**
+- **In steady wind** from 0, S is dead astern, and the helm bears her away to it ("Helm ordered:
+  steer S (180°).").
+- **In gusts,** at seed 7 the wind stands about 3 degrees east of north when the order is given. S then
+  lies just past her stern, on her other side. The helm reads it as a course "across the wind from
+  her head, by the stern": she is braced up and "kept full and by", and a wear is ordered for it.
+- **The wear fails for want of way** at 881 s ("She has no way on her to wear: 0.5 kn through the
+  water"). Her helm then stays "Steady, full and by", and S is not steered again. So the mizen's
+  order changes nothing, because her course is no longer S.
+
+That is the preview's case, at seed 7 as the owner's game was. It is the engine's helm, and it
+reaches any ship given a course dead before the wind in a shifting wind. Recorded for the lead.
+
+### 17.4 The corrected proof: a first run on today's tree
+
+This is not her hash's proof: it runs on today's tree, before the re-cut, the tréou's yard and the
+engine's tréou order. The orders are as the primer teaches (chapters 4 and 7):
+- from rest, `set plain sail` and `steer <course>`;
+- at 900 s, with her sails up, the trim for the course's point: `trim for close hauled`, `for the
+  wind abeam`, `for the wind large` or `to run`;
+- then `wear ship`, or `tack ship`.
+
+The course is the start heading where that is 67.5 degrees or more off the wind, else 67.5 off on
+her side. Each case is run in steady wind and in the default gusts:
+
+| | Her file as committed | Her plain sail reordered (a scratch copy) |
+|---|---|---|
+| Takes her course from rest | on all eight points in both winds, 3.07 to 4.36 kn | on all eight in both, 3.08 to 4.64 kn |
+| Wears from it | from all but one; in gusts from 045, close-hauled, "Could not wear: she would not come round." | from all eight in both, in 225 to 602 s |
+| Tacks from it | not run | from the five courses by the wind or abeam, in 104 to 173 s; from the three abaft the beam, refused: "She is not close-hauled; bring her by the wind before going about." |
+
+**What it shows:**
+- By the primer's orders she gets under way from rest on every point. What left her aback in the
+  preview was its two orders without the trim (§16.3), and that is the carried list's (nudge 90,
+  3(c)).
+- The one wear that fails, her file as committed in gusts close-hauled from 045, is the knife's edge
+  of §3 and §13.2. It is measured again with her hash.
+- In her hash's proof she lies as near as she will on her close-hauled courses, by her polar, not at
+  67.5. From the three courses abaft the beam she is brought by the wind before she tacks, as the
+  refusal tells a player.
