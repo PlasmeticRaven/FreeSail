@@ -319,9 +319,10 @@ class Dealings:
                     self._apply_job(job)
         if self._tows_a_boat():
             # package 90, A4: a boat towed astern, in tow or not, for her drag on the ship
-            from freesail.world.boats import keep_in_tow
+            from freesail.world.boats import keep_in_tow, stove_in_tow
 
             keep_in_tow(world.ship, self.boat)
+            stove_in_tow(world, world.own)
         if self.coarse:
             return  # asleep: her jobs alone (the boat's errands by the plan's time; step 4)
         if world.clock.ship_time.second == 0 and self.ports and world.position is not None:
@@ -2750,18 +2751,10 @@ class Dealings:
         return bool(getattr(boat, "towed", False))
 
     def _boat_words(self) -> str:
-        """Her boat's state in words (`BoatState.words`): a boat towed astern stove by a shot and
-        cut adrift (package 90, the lead's nudge 76, item 3; `combat.hits`) is said so, not
-        "towing astern on her painter"."""
-        towed = self._towed()
-        if towed and not self.boat.away and not self.boat.lost:
-            extra = getattr(self.world.ship, "extra", None)
-            stove = set(extra.get("boats_stove") or ()) if isinstance(extra, dict) else set()
-            boats = getattr(getattr(self.world.ship, "spec", None), "boats", None) or []
-            in_tow = [b for b in boats if getattr(b, "towed", False)]
-            if in_tow and all(b.id in stove for b in in_tow):
-                return f"{self.boat.boat_name} stove by a shot and cut adrift"
-        return self.boat.words(towed, self._towed_too_fast())
+        """Her boat's state in words (`BoatState.words`): towed and towed too fast as the boats'
+        keys say (package 90, A4; the lead's nudge 60, item 8); a towed boat stove by a shot is
+        lost by `boats.stove_in_tow`, and said as any boat lost."""
+        return self.boat.words(self._towed(), self._towed_too_fast())
 
     def _towed_too_fast(self) -> bool:
         """Whether her boat in tow is towed faster than her hull speed (package 90, the lead's

@@ -1016,6 +1016,27 @@ def keep_in_tow(ship: Any, state: Any) -> None:
     _towed_too_fast(ship, extra, in_tow, state)
 
 
+def stove_in_tow(world: Any, ship_hull: Any) -> None:
+    """The ship's boat towed astern stove by a shot (`combat.hits`, `ship.extra["boats_stove"]`)
+    is lost, cut adrift, by the road a boat swamped or cut adrift by order takes (`lose_boat`):
+    sent, manned and used by nobody till the yard replaces her (package 90, the lead's nudge 77,
+    item 1: stove and cut adrift, she was still sent ashore, laid out the kedge and was gone to).
+    Once; nothing of a boat away, lost already or on the booms. Kept every tick by her
+    dealings, after `keep_in_tow`."""
+    dealings = getattr(ship_hull, "dealings", None)
+    if dealings is None:
+        return
+    state = dealings.boat
+    if state.away or state.lost:
+        return
+    extra = getattr(ship_hull.ship, "extra", None)
+    stove = set(extra.get("boats_stove") or ()) if isinstance(extra, dict) else set()
+    boat = dealings.boat_spec()
+    if boat is None or not getattr(boat, "towed", False) or boat.id not in stove:
+        return
+    lose_boat(world, ship_hull, "stove", "stove by a shot as she towed astern, and cut adrift")
+
+
 def _towed_too_fast(ship: Any, extra: dict, in_tow: list, state: Any) -> None:
     """Each boat in tow faster than her hull speed said once as she passes it (`TOWED_TOO_FAST`);
     nothing of a boat away or lost, or of a ship making sternway (her painter slack)."""
