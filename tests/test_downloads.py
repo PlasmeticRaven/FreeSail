@@ -520,6 +520,36 @@ def _snapshot(top: Path) -> dict[str, bytes]:
     }
 
 
+@pytest.mark.parametrize("windows", [False, True])
+def test_truth_7_807_the_teeth_take_out_every_guard_of_both_launchers(
+    tmp_path, monkeypatch, windows
+):
+    """The poison check's teeth (the smoke test's `--without-isolation`) run each launcher
+    with every guard against the poison taken out: `-I`, the `PYTHONNOUSERSITE` it sets (a
+    second guard of the user site, which left in made the first teeth run on every system
+    find no user-site mark) and, on Windows, the `._pth`; nothing else of the launcher is
+    changed."""
+    import bundle_smoke
+
+    monkeypatch.setattr(bundle_smoke, "WINDOWS", windows)
+    name = "FreeSail.cmd" if windows else "FreeSail.command"
+    monkeypatch.setattr(bundle_smoke, "LAUNCHER", name)
+    text = bundle._text(name, {"NAME": "t"}, crlf=windows)
+    (tmp_path / name).write_bytes(text)
+    if windows:
+        (tmp_path / "python").mkdir()
+        (tmp_path / "python" / "python311._pth").write_bytes(b"x")
+    bundle_smoke.without_isolation(tmp_path)
+    after = (tmp_path / name).read_bytes()
+    assert b" -I -B " not in after and b"PYTHONNOUSERSITE=1" not in after
+    assert b" -B -X utf8 -m freesail" in after
+    assert not (tmp_path / "python" / "python311._pth").exists()
+    guarded = [ln for ln in text.splitlines() if b" -I -B " in ln or b"PYTHONNOUSERSITE" in ln]
+    assert len(guarded) == 2
+    kept = [ln for ln in text.splitlines() if ln not in guarded]
+    assert [ln for ln in after.splitlines() if ln in kept] == kept
+
+
 @pytest.mark.skipif(sys.platform.startswith("win"), reason="the trial's launcher is bash")
 def test_truth_7_807_the_smoke_test_touches_nothing_of_a_persons(tmp_path, monkeypatch):
     """Truth 7-807 (the reader's finding 1): the smoke test, run on a person's own machine,

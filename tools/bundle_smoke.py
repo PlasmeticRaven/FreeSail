@@ -288,14 +288,19 @@ def hidden_env(home: Path, named: Path) -> dict[str, str]:
 
 
 def without_isolation(top: Path) -> str:
-    """The unpacked launcher's `-I` taken out, and on Windows the interpreter's `._pth`:
-    what the proof of the poison's teeth runs. What was taken out said."""
+    """Every guard of the unpacked launcher against the poison taken out: its `-I`, the
+    `PYTHONNOUSERSITE` it sets (a second guard of the user site: with it left in, the
+    user site's poison is not run even without `-I`), and on Windows the interpreter's
+    `._pth`. What the proof of the poison's teeth runs; what was taken out said."""
     launcher = top / LAUNCHER
     text = launcher.read_bytes()
-    if b" -I -B " not in text:
-        raise RuntimeError(f"{LAUNCHER} has no ' -I -B ' to take out")
-    launcher.write_bytes(text.replace(b" -I -B ", b" -B "))
-    taken = [f"-I from {LAUNCHER}"]
+    nousersite = b'set "PYTHONNOUSERSITE=1"\r\n' if WINDOWS else b" PYTHONNOUSERSITE=1"
+    for guard in (b" -I -B ", nousersite):
+        if text.count(guard) != 1:
+            raise RuntimeError(f"{LAUNCHER} has not one {guard!r} to take out")
+    text = text.replace(b" -I -B ", b" -B ").replace(nousersite, b"")
+    launcher.write_bytes(text)
+    taken = [f"-I and PYTHONNOUSERSITE from {LAUNCHER}"]
     if WINDOWS:
         (top / "python" / "python311._pth").unlink()
         taken.append("python\\python311._pth")
