@@ -40429,7 +40429,7 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - the 11 jibs lost on every tree are ones `shorten sail` did not keep, and they are alike on all three.
 - **The tack matrix** (1,596 cells with the default gusts):
   - against b5ddfa6a, 2 cells move, both D's: the razee shortened in 30 kn at seed 11, from 290 missed stays then refused now, and from 295 refused on both, in other words. No tack lost or gained;
-  - against the trunk e3d50aac, 28 cells move: C 16, D 12 (the brig 4, the hermaphrodite brig 3, the razee 3 by tmxrule, and the corvette 3), A 0. Made 838 against 829, refused 609 against 613, 9 gained, none lost.
+  - against the trunk e3d50aac, 28 cells move: C 12 (the brig 8, the merchant brig 4), D 16 (the brig 4; the corvette, the frigate in 25 kn, the hermaphrodite brig and the razee 3 each), A 0 (counted again 2026-11-28 with tmxrule's own rule letters over every moved cell; given first as C 16, D 12, which was wrong, the reader's count being right). Made 838 against 829, refused 609 against 613, 9 gained, none lost.
 - **The two-fifths figure (the reader's M02, `HAUL_WAY_FRACTION` = 1.0, lived):** new truth 7-763c. The frigate in 15 kn with the habit set in memory keeps 0.53 of her way at the point and hauls there, 8 to 11.25 degrees off. M02 now fails it and no other test.
 - **Her words (`tests/test_diana.py`, the gripe truth):**
   - Old: "she gripes past what her rudder holds, comes up toward the wind with her way going".
@@ -40455,9 +40455,28 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
 
 - **The cause:** rule D's kept jib at the captain's `shorten sail`. With `HELM_IN_HAND_SHARE` at 99 (no jib kept) both return exactly to the trunk's figures. With the hands' take-in off they keep the new ones.
 - **`PASSAGE_DECLARED`:**
-  - the brig's seed 3 is taken out. She is now no worse than the trunk's captain on every count: brought to 178 s before him, 4.9 nm more made good, 27 fewer minutes astern, one fewer time aback. A good move. Her way is 3.0 nm less than this tree's captain made before rule D;
+  - the brig's seed 3 is taken out. Her three rows, as the reader measured them too:
+    - this captain on today's tree: 7.61 nm, 17 minutes astern, 5 times aback, brought to at 6096 s;
+    - the stand-in (the captain before package 126 on today's tree, rule D in it): 2.70, 44, 6, 6274;
+    - this captain on the trunk's own tree, before rule D: 10.61, 18, 4, 6963.
+  - Against the stand-in she is no worse on any count, and is inside the rule.
+  - Against the trunk's own tree she is NOT better on every count. She makes 3.0 nm less and is aback once more. She is brought to 867 s sooner, and one minute fewer astern. That is the trade rule D makes for her here (the lead accepts it, 2026-11-28, 09:35, (2));
   - the frigate's seed 3 stays outside (brought to 654 s after the trunk's captain, where it was 545). Its words give the new figures: 15.77 nm against 12.56, 12 minutes astern against 17.
-- **The slow tier from now on** takes `tests/test_mends_126.py`, `tests/test_captains.py` and `tests/test_known_truths.py` whole.
+- **The slow tier from now on** takes every test file.
+- **The yardstick, in words (the lead's (2) of 09:35):**
+  - "The trunk's captain" in the truth is the stand-in `_spar_passage` runs: the captain before package 126 on today's tree, and so rule D's wherever D acts. The truth's docstring and `PASSAGE_DECLARED`'s comment now say so.
+  - The self-check (`..._the_trunk_in_this_tree_is_the_trunk`, the bilander, where D does not act) says what it proves and what it does not.
+  - The new slow truth `..._the_stand_in_carries_rule_d_where_it_acts` pins the frigate's stand-in at seed 3 at 12.56 nm, 17, 5, 5291 s. It reads 12.34, 17, 5, 5293 with `HELM_IN_HAND_SHARE` at 99, as on the trunk's tree.
+
+**The hands' take-in while it waits, or is belayed (the lead's list of 2026-11-28, 09:35, (1); the reader's case, the frigate in 25 kn at seed 11, her jib's dire line come during a wear).**
+- **The finding:** "Taking in the jib before it goes" was said in the same second as "Not hands enough on deck to take in the jib; the watch is wearing ship", and the jib came down 845 s later. The hook dropped the jib's watch as the order was given, so a second dire line got no word, and a take-in belayed (`belay that`) was never tried again.
+- **Built (`storm.see_kept_jibs_through`):**
+  - the jib is watched until it is in (`forget_kept_jibs`) or is the player's again;
+  - at each dire line the take-in is given only where no work is on the jib already (none, or belayed and gone). One line a dire line, never one a tick;
+  - the line says "Taking in the jib" only where the hands are at it (begun, not waiting, not held: `_hands_on`). Otherwise it says "The jib is to be taken in before it goes: she will gripe without it.", as the storm canvas's does by the ruling (13)(v). The runner's own line says why it waits;
+  - a wear's belay holds the take-in, and the runner takes it up after the wear.
+- **Pins:** `tests/test_captains.py::test_a_kept_jibs_take_in_that_waits_for_hands_is_said_to_wait_and_is_seen_through` (the wear, as the reader ran it) and `..._take_in_belayed_is_taken_up_again_at_its_next_dire_line` (`belay that`, then a wear's belay).
+- **Mutants:** "taking in" said always; the watch dropped at the order (the old code); the take-in given again though work is on it. Each fails both pins.
 
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 

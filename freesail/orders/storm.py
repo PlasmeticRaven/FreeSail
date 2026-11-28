@@ -561,8 +561,13 @@ def see_kept_jibs_through(ship: Ship) -> None:
     """Once a tick, from the world, on a ship whose captain gives no judgements of his own (a
     player's ship, or one with a model at his station): a jib `shorten sail` left on her is
     taken in by the hands at its strain's first dire line since it was kept, before it goes, and
-    the log says so. A jib set again by the player's own order is his, and is not kept
-    (`forget_kept_jibs`)."""
+    the log says so: "Taking in the jib" where hands are on it, "The jib is to be taken in"
+    where the take in waits for them (the lead's ruling (13)(v) of 2026-11-09, as for the storm
+    canvas in `_ease_the_loaded`; the runner's own line says why it waits). The jib is watched
+    until it is in (`forget_kept_jibs`) or is the player's again: a take in that waits, is
+    belayed or is refused is taken up again at its next dire line, one line a dire line (the
+    lead's list of 2026-11-28, 09:35, (1)). A jib set again by the player's own order is his,
+    and is not kept."""
     marks = ship.extra.get(KEPT)
     seen = ship.extra.get(SEEN)
     if not isinstance(marks, dict) or not isinstance(seen, dict):
@@ -577,25 +582,35 @@ def see_kept_jibs_through(ship: Ship) -> None:
         if dire is None or dire == rec.get("dire"):
             continue
         rec["dire"] = dire
-        vocab = vocab or load_vocabulary()
         name = _name(ship, sail)
-        try:
-            _run(ship, f"take in the {name}", vocab)
-        except OrderError as e:
-            ship.note(
-                "notable",
-                "sail.kept_jib",
-                f"The {name} is at its limit and is not taken in: {str(e).rstrip('.')}.",
-                sid,
-            )
-            continue
-        seen.pop(sid, None)
+        if not _work_on(ship, sid):
+            vocab = vocab or load_vocabulary()
+            try:
+                _run(ship, f"take in the {name}", vocab)
+            except OrderError as e:
+                ship.note(
+                    "notable",
+                    "sail.kept_jib",
+                    f"The {name} is at its limit and is not taken in: {str(e).rstrip('.')}.",
+                    sid,
+                )
+                continue
+        doing = f"Taking in the {name}" if _hands_on(ship, sid) else f"The {name} is to be taken in"
         ship.note(
-            "notable",
-            "sail.kept_jib",
-            f"Taking in the {name} before it goes: she will gripe without it.",
-            sid,
+            "notable", "sail.kept_jib", f"{doing} before it goes: she will gripe without it.", sid
         )
+
+
+def _hands_on(ship: Ship, sail_id: str) -> bool:
+    """Whether the hands are at the work on this sail: begun, and neither waiting (for hands or
+    its turn) nor held by a belay or a post (`Runner._hold`)."""
+    runner = ship.extra.get("evolutions")
+    return any(
+        getattr(inst, "subject_id", None) == sail_id
+        and not getattr(inst, "waiting", True)
+        and not getattr(inst, "paused", False)
+        for inst in getattr(runner, "instances", None) or ()
+    )
 
 
 def forget_kept_jibs(ship: Ship) -> None:

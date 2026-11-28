@@ -1217,7 +1217,9 @@ PASSAGE_WAY_FLOOR_NM = 1.0
 PASSAGE_CELLS = [(ship, wind) for ship in PASSAGE_SPARS for wind in PASSAGE_WINDS]
 # The cell-seeds outside the rule, each with its cause (the report's section 9 says each in a
 # sentence); the truth holds the set exactly, so that one more outside, or one of these come
-# inside, fails it.
+# inside, fails it. "The trunk's captain" in these words is the stand-in: the captain before
+# package 126 on today's tree, rule D and all (package 125; the lead's list of 2026-11-28,
+# 09:35, (2)), and the figures are today's tree's.
 PASSAGE_DECLARED: dict[tuple[str, str, int], str] = {
     ("topsail-schooner", "20-38", 3): (
         "her fore topmast gone, she has no topsail to lie a-try under and is given `heave to`, "
@@ -1370,7 +1372,12 @@ def test_truth_7_779_b_her_spar_carried_away_she_does_no_worse_than_the_trunk_on
     no longer and is taken aback no more often than the trunk's captain, or, where the wreck
     cleared at once is itself worse than the trunk, than that (`_seed_verdict`); is brought to
     not later than five minutes after it, and wherever the trunk's captain is. The cell-seeds
-    outside are `PASSAGE_DECLARED`'s, exactly."""
+    outside are `PASSAGE_DECLARED`'s, exactly. "The trunk's captain" is the stand-in
+    `_spar_passage` runs: the captain before package 126 on TODAY's tree, all else equal, and all
+    else includes what came after him, package 125's rule D among it wherever D acts (the
+    frigate's in twenty rising to thirty-eight at seed 3 reads 12.34 nm on the trunk's tree
+    before D and 12.56 on today's; the lead's list of 2026-11-28, 09:35, (2)). The truth weighs
+    package 126's captain against the one before it, not today's ship against the trunk's."""
     outside = {}
     for seed in PASSAGE_SEEDS:
         t, i, m = (_spar_passage(ship, wind, seed, how) for how in ("trunk", "instant", "mine"))
@@ -1381,11 +1388,32 @@ def test_truth_7_779_b_her_spar_carried_away_she_does_no_worse_than_the_trunk_on
     assert set(outside) == declared, outside
 
 
+@pytest.mark.slow
+def test_truth_7_779_b_the_stand_in_carries_rule_d_where_it_acts():
+    """The lead's list of 2026-11-28, 09:35, (2): on a cell where package 125's rule D acts (the
+    frigate in twenty knots rising to thirty-eight, seed 3: her jib kept at `shorten sail`), the
+    stand-in for the trunk's captain is the captain before package 126 on today's tree, rule D
+    in it: 12.56 nm made good, 17 minutes astern, 5 times aback, brought to at 5291 s. On the
+    trunk's tree before D (e3d50aac) it read 12.34 nm, 17, 5, 5293 s. A change to the stand-in,
+    or to D's part in it, moves this."""
+    got = _spar_passage("frigate-36", "20-38", 3, "trunk")
+    assert (round(got["made_good"], 2), got["astern"], got["aback"], got["brought_to"]) == (
+        12.56,
+        17,
+        5,
+        5291,
+    )
+
+
 def test_truth_7_779_b_the_trunk_in_this_tree_is_the_trunk():
     """The stand-in `_spar_passage` runs for the trunk's captain (his spar work, the bring-to
     given again and the narrowed `lie a-try` patched out) is the trunk's own on a cell that
     carries a spar's work: these figures were the trunk's at f09fe283 (and the stand-in's, on
-    all 84 cell-seeds, in every line and position: the report's section 8)."""
+    all 84 cell-seeds, in every line and position: the report's section 8). What it proves: the
+    patching-out of package 126's captain is whole, on a cell where nothing after him acts. What
+    it does not: that the stand-in is the trunk's tree on a cell where later work acts. There it
+    is the captain before package 126 with that work in it, and package 125's rule D moves the
+    frigate's (the next truth)."""
     got = _spar_passage("bilander", "20-38", 7, "trunk")
     assert (round(got["made_good"], 2), got["astern"], got["aback"], got["brought_to"]) == (
         8.9,

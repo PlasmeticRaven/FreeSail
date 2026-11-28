@@ -738,6 +738,111 @@ def test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_i
     assert jib.is_set and not [e for e in w.log if e.kind == "sail.kept_jib"]  # his to take in
 
 
+def _kept_jib_world():
+    """The frigate as a player's ship with her jib set and kept by `shorten sail`'s rule D, and
+    her strain state, for the hands' pins below."""
+    from freesail.orders import storm
+    from freesail.physics.strain import strain_state
+
+    w = world_at(49.5, -5.5, ship=FRIGATE)
+    w.submit("set the jib")
+    w.run(120)
+    jib = w.ship.sails["jib"]
+    assert jib.is_set and not w.captain.commands
+    storm.keep_jibs(w.ship, [jib])
+    return w, jib, strain_state(w.ship)
+
+
+def _dire_line(st, sid="jib"):
+    """A dire strain line on the sail, stamped as `physics.strain` stamps one."""
+    st.last_warning_s[sid] = st.elapsed_s
+    st.__dict__.setdefault("last_dire_s", {})[sid] = st.elapsed_s
+
+
+def _jib_lines(w, n0=0):
+    return [e.text for e in w.log[n0:] if e.kind == "sail.kept_jib"]
+
+
+def _jib_work(w):
+    return [i for i in w.ship.extra["evolutions"].instances if i.subject_id == "jib"]
+
+
+def test_a_kept_jibs_take_in_that_waits_for_hands_is_said_to_wait_and_is_seen_through():
+    """Package 125, D (the lead's list of 2026-11-28, 09:35, (1), the reader's case: the frigate
+    in 25 knots at seed 11, her jib's dire line come while a wear was in hand). The hands' take
+    in that must wait for hands is not yet a taking in, and the line says so, as the storm
+    canvas's does (the lead's ruling (13)(v)): "The jib is to be taken in before it goes: she
+    will gripe without it.", the runner's own line saying why it waits. The jib is watched till
+    it is in: a second dire line while it waits is said once, and no second take in is
+    given. Old (4d264cef): "Taking in the jib" in the same second as "Not hands enough on deck
+    to take in the jib", and the next dire line unsaid."""
+    from freesail.orders import storm
+
+    waits = "The jib is to be taken in before it goes: she will gripe without it."
+    w, jib, st = _kept_jib_world()
+    w.submit("wear ship")
+    w.run(3)
+    n0 = len(w.log)
+    _dire_line(st)
+    w.tick()
+    assert _jib_lines(w, n0) == [waits]
+    assert any(
+        e.kind == "evolution.waiting" and "Not hands enough on deck to take in the jib" in e.text
+        for e in w.log[n0:]
+    )
+    work = _jib_work(w)
+    assert len(work) == 1 and work[0].waiting_for == "hands"
+    w.run(10)
+    assert _jib_lines(w, n0) == [waits]  # one line a dire line, never one a tick
+    _dire_line(st)
+    w.tick()
+    assert _jib_lines(w, n0) == [waits, waits] and _jib_work(w) == work  # no second take in
+    w.run(900)
+    assert not jib.is_set and storm.KEPT not in w.ship.extra and storm.SEEN not in w.ship.extra
+    assert any(e.kind == "sail.taken_in" and "jib" in e.text for e in w.log[n0:])
+
+
+def test_a_kept_jibs_take_in_belayed_is_taken_up_again_at_its_next_dire_line():
+    """Package 125, D (the lead's list of 2026-11-28, 09:35, (1)): a take in by the hands that
+    is belayed leaves the jib set and still watched, and at its next dire line the hands take
+    it in again; held by a wear's belay it is "to be taken in", the runner's held work taking
+    it up after the wear. Old (4d264cef): the watch dropped as the order was given, and a jib
+    whose take in was belayed was never taken in again."""
+    from freesail.orders import storm
+
+    said = "Taking in the jib before it goes: she will gripe without it."
+    w, jib, st = _kept_jib_world()
+    _dire_line(st)
+    w.tick()
+    assert _jib_lines(w) == [said] and len(_jib_work(w)) == 1
+    w.submit("belay that")
+    w.run(10)
+    assert jib.is_set and not _jib_work(w) and storm.SEEN in w.ship.extra
+    assert _jib_lines(w) == [said]
+    _dire_line(st)
+    w.tick()
+    assert _jib_lines(w) == [said, said] and len(_jib_work(w)) == 1
+    w.run(120)
+    assert not jib.is_set and storm.KEPT not in w.ship.extra
+
+    w, jib, st = _kept_jib_world()
+    _dire_line(st)
+    w.tick()
+    w.submit("wear ship")
+    w.run(10)
+    work = _jib_work(w)
+    assert jib.is_set and len(work) == 1 and work[0].paused  # held by the wear's belay
+    _dire_line(st)
+    w.tick()
+    assert _jib_lines(w) == [
+        said,
+        "The jib is to be taken in before it goes: she will gripe without it.",
+    ]
+    assert _jib_work(w) == work
+    w.run(900)
+    assert not jib.is_set and storm.KEPT not in w.ship.extra
+
+
 # the hours above where the kept jib comes to its dire line on a player's ship, measured: the
 # others' stands all hour under it (1.19 and 1.2 of its rating at the most), its line said
 KEPT_JIB_DIRE = {("brig", 35.0, 7), ("razee-44", 28.0, 11)}
