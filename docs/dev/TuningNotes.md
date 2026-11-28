@@ -40429,7 +40429,7 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - the 11 jibs lost on every tree are ones `shorten sail` did not keep, and they are alike on all three.
 - **The tack matrix** (1,596 cells with the default gusts):
   - against b5ddfa6a, 2 cells move, both D's: the razee shortened in 30 kn at seed 11, from 290 missed stays then refused now, and from 295 refused on both, in other words. No tack lost or gained;
-  - against the trunk e3d50aac, 28 cells move: C 16, D 12 (the brig 4, the hermaphrodite brig 3, the razee 3 by tmxrule, and the corvette 3), A 0. Made 838 against 829, refused 609 against 613, 9 gained, none lost.
+  - against the trunk e3d50aac, 28 cells move: C 12 (the brig 8, the merchant brig 4), D 16 (the brig 4; the corvette, the frigate in 25 kn, the hermaphrodite brig and the razee 3 each), A 0 (counted again 2026-11-28 with tmxrule's own rule letters over every moved cell; given first as C 16, D 12, which was wrong, the reader's count being right). Made 838 against 829, refused 609 against 613, 9 gained, none lost.
 - **The two-fifths figure (the reader's M02, `HAUL_WAY_FRACTION` = 1.0, lived):** new truth 7-763c. The frigate in 15 kn with the habit set in memory keeps 0.53 of her way at the point and hauls there, 8 to 11.25 degrees off. M02 now fails it and no other test.
 - **Her words (`tests/test_diana.py`, the gripe truth):**
   - Old: "she gripes past what her rudder holds, comes up toward the wind with her way going".
@@ -40455,9 +40455,28 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
 
 - **The cause:** rule D's kept jib at the captain's `shorten sail`. With `HELM_IN_HAND_SHARE` at 99 (no jib kept) both return exactly to the trunk's figures. With the hands' take-in off they keep the new ones.
 - **`PASSAGE_DECLARED`:**
-  - the brig's seed 3 is taken out. She is now no worse than the trunk's captain on every count: brought to 178 s before him, 4.9 nm more made good, 27 fewer minutes astern, one fewer time aback. A good move. Her way is 3.0 nm less than this tree's captain made before rule D;
+  - the brig's seed 3 is taken out. Her three rows, as the reader measured them too:
+    - this captain on today's tree: 7.61 nm, 17 minutes astern, 5 times aback, brought to at 6096 s;
+    - the stand-in (the captain before package 126 on today's tree, rule D in it): 2.70, 44, 6, 6274;
+    - this captain on the trunk's own tree, before rule D: 10.61, 18, 4, 6963.
+  - Against the stand-in she is no worse on any count, and is inside the rule.
+  - Against the trunk's own tree she is NOT better on every count. She makes 3.0 nm less and is aback once more. She is brought to 867 s sooner, and one minute fewer astern. That is the trade rule D makes for her here (the lead accepts it, 2026-11-28, 09:35, (2));
   - the frigate's seed 3 stays outside (brought to 654 s after the trunk's captain, where it was 545). Its words give the new figures: 15.77 nm against 12.56, 12 minutes astern against 17.
-- **The slow tier from now on** takes `tests/test_mends_126.py`, `tests/test_captains.py` and `tests/test_known_truths.py` whole.
+- **The slow tier from now on** takes every test file.
+- **The yardstick, in words (the lead's (2) of 09:35):**
+  - "The trunk's captain" in the truth is the stand-in `_spar_passage` runs: the captain before package 126 on today's tree, and so rule D's wherever D acts. The truth's docstring and `PASSAGE_DECLARED`'s comment now say so.
+  - The self-check (`..._the_trunk_in_this_tree_is_the_trunk`, the bilander, where D does not act) says what it proves and what it does not.
+  - The new slow truth `..._the_stand_in_carries_rule_d_where_it_acts` pins the frigate's stand-in at seed 3 at 12.56 nm, 17, 5, 5291 s. It reads 12.34, 17, 5, 5293 with `HELM_IN_HAND_SHARE` at 99, as on the trunk's tree.
+
+**The hands' take-in while it waits, or is belayed (the lead's list of 2026-11-28, 09:35, (1); the reader's case, the frigate in 25 kn at seed 11, her jib's dire line come during a wear).**
+- **The finding:** "Taking in the jib before it goes" was said in the same second as "Not hands enough on deck to take in the jib; the watch is wearing ship", and the jib came down 845 s later. The hook dropped the jib's watch as the order was given, so a second dire line got no word, and a take-in belayed (`belay that`) was never tried again.
+- **Built (`storm.see_kept_jibs_through`):**
+  - the jib is watched until it is in (`forget_kept_jibs`) or is the player's again;
+  - at each dire line the take-in is given only where no work is on the jib already (none, or belayed and gone). One line a dire line, never one a tick;
+  - the line says "Taking in the jib" only where the hands are at it (begun, not waiting, not held: `_hands_on`). Otherwise it says "The jib is to be taken in before it goes: she will gripe without it.", as the storm canvas's does by the ruling (13)(v). The runner's own line says why it waits;
+  - a wear's belay holds the take-in, and the runner takes it up after the wear.
+- **Pins:** `tests/test_captains.py::test_a_kept_jibs_take_in_that_waits_for_hands_is_said_to_wait_and_is_seen_through` (the wear, as the reader ran it) and `..._take_in_belayed_is_taken_up_again_at_its_next_dire_line` (`belay that`, then a wear's belay).
+- **Mutants:** "taking in" said always; the watch dropped at the order (the old code); the take-in given again though work is on it. Each fails both pins.
 
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
@@ -40543,3 +40562,243 @@ The bilander's fore topmast and the 74's are forward of her centre of effort;
 cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 171 minutes astern
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
+
+## Package 90, the viewer: the whole lateen, the pole mast and the yard below that does not stand (2026-11-28)
+
+`docs/design/Plan-Package90.md` §6's V1 and V2, in `client/projection.js` alone, keyed as the engine's steps A1 (a lateen with `dipping`, not cut at the mast: `scripts.is_whole_lateen`) and A6 (`Ship.on_pole`). No committed file carries a whole lateen; the smack's topsail is the one committed sail on a pole and the tartane's topsail the one square sail over a flying yard (both on her builder's branch, not on the package's). Every figure below is measured with the client's own `buildSkeleton` from the game's snapshot, old (the projection at 93cf624c) beside new. The tartane's figures are on her two files read from her branch at 3c584e0f into a scratch folder outside the tree, with `dipping: true` on her two whole lateens and her bouffette as her design gives them (Tar-D §4.2: "its side waits on the engine's step A1a"); seed 7, 12 kn, all hands. Pictures are the coordinating session's, in a live preview.
+
+### V1: the whole lateen drawn
+
+- **Its cut.** Three corners on its yard, from the file's `corners_m` (tools/ships/lateen.py's contract, the tack a short luff under the throat). The yard is drawn whole, car to penne, along the head's line: slung **a third of its length from the car** where the head crosses the yard's filed height, on its mast's raked line, a mast's half-diameter (`LUG_LEE_OF_MAST_OF_BEAM`) to the side the game serves it hanging (`lug_side`). The whole cut swings about its slings by its sheet's angle, as a lug's.
+- **Its side.** The cloth lies to the lee of the tack wherever its yard hangs (as a settee's), so on the bad hand, its yard to windward, it lies **against its mast**; held aback (A1d, served `backed`) it lies to windward, pressed on the mast.
+- **Aloft in every state.** Its yard is never lowered (Tar-D §5.4 item 7): in its gear it is brailed up under its yard aloft by the settee's rule (festoons down by `IN_GEAR_DEPTH` of its depth square to the yard, the clew in the after festoon); furled, a bundle along its head.
+- **Peaked while it is shifted.** While `change_lateen` is in hand on it (the snapshot's `evolutions_in_progress`, its subject the sail) and it is in its gear, its yard stands up its mast's raked line a mast's half-diameter abaft the mast on the middle line, its car passed round there (the lead's ruling, Willaumez's MUDER), slung where it was and raised only as far as keeps its car `ON_DECK_M` over the deck; the sail a bundle along it; its sheet not drawn (JUDGEMENT on the pose).
+- **Its sheet.** From its clew (brailed in, in its gear) to her drawn rail on the side its cloth lies on, **two metres abaft the clew**, as any single sheet of a sail with no yard below; a standing lug's is a metre (`tests/test_view_geometry.py`'s `lead_x`).
+- **With no cut** (the engine's probes): cut from its yard and its area (JUDGEMENT): the head the whole yard at the lateen yard's old tilt (`LATEEN_TILT`, 0.8 rad, the figure the viewer always gave one, now named), slung a third from the car at the yard's height, the tack at the car, the clew `LOOSE_FOOT_HEIGHT_M` over the deck as far aft as gives the triangle its area and no farther aft than the penne (the probes' areas are too large for their yards at that tilt: the xebec probe's main 129.6 m² drawn against 150).
+- **The frame** takes the yard in the file's plane and reaches its swing about its slings every way (sixteen points) at the heights of its ends and of its sail's tack and clew, and its two ends peaked up (`framePts`), for each whole lateen filed on the yard, bent or not (her bouffette).
+
+The tartane's great lateen (`main.lateen`), her start on the starboard tack, the wind 50° on her bow, sheeted 25°, old beside new (x forward, y to starboard, z above her water, metres):
+
+| State | Old: drawn as a standing lug | New: V1 |
+|---|---|---|
+| set, good hand (yard to larboard, the lee) | yard the head alone, 23.63 m, (9.77, 2.55, 4.40) to (−7.91, −5.69, 17.74); slings (3.88, −0.20, 8.85); sheet to the rail **1 m** abaft the clew, x 2.87 | yard car to penne, **24.36 m** (the file's), (9.94, 2.63, 4.27) to (−8.28, −5.86, 18.02); slings (3.87, −0.20, 8.85); the corners where they were; sheet to the lee rail **2 m** abaft, x 1.87 |
+| set, bad hand (yard to starboard, the weather) | the whole cloth swung **to windward**: peak (−7.91, +5.69, 17.74) | slings (3.87, **+0.20**, 8.85), the cloth **to leeward against the mast**: peak (−7.91, **−5.30**, 17.74) |
+| in the gear | yard and sail **on deck**, 1.14 m over her water | brailed up under its yard **aloft**, the cloth from 4.37 to 17.74 m |
+| furled | yard and sail on deck, 1.14 m | a bundle along its head aloft, 4.40 to 17.74 m |
+| shifted by itself (`change_lateen`) | as in the gear, on deck | peaked up its mast: car (3.67, 0, 1.14), penne (3.67, 0, **25.50**), abaft the mast |
+
+**The frame: the owner's choice, (a) the fixed frame** (at a live look, 2026-11-28; Decisions-Package90-2026-11.md Part F, row T-f; the reason put to them: by her default practice she shifts at every tack and wear, so a view that drew back for the peak would move every time). The frame holds every state's figures, the peak among them. Measured on her file with the key, abeam (x by z, metres):
+
+| Her frame | Width | Height | Top over her water | The page's box (`shipview.js`: the margin and the sea) |
+|---|---|---|---|---|
+| old (93cf624c) | 30.86 | 18.80 | 17.59 | 35.80 × 25.27 |
+| the swing reached every way, the peak left out | 31.80 | 19.23 | 18.02 | 36.89 × 25.77 |
+| as built, the peak held | 31.80 | 26.72 | 25.50 | 36.89 × 33.54 |
+
+Ahead the width goes from 24.36 to 27.74 m by the swing alone. So where the page's width sets her scale she is drawn 3 per cent smaller than before, and where its height does about 25 per cent smaller, the peak's part of it. (The coordinating session's preview with the peak left out showed her scale unchanged: its view was set by its width, which the swing, not the peak, moves.) Leaving the peak out is `framePts` alone. Every committed file's frame is as it was (the smack's and the lugger's measured to the centimetre; every file's held by the view-geometry file's frame cases).
+
+### V2: the pole mast and the yard below that does not stand
+
+**The cause, mended at it.** `squareCut` hung a square sail's clews at the arms of the yard below it (`yardBelowId`, by the file's heights), skipping it only when the spar's own state was `sent_down`. A yard on deck with its flying sail is served `sound` (its sail says it is down; package 57's `yardOnDeck`), drawn on deck, and was still taken as the yard below. The same choice was made in three more places, each now reading one predicate, `standsBelow` (aloft, neither sent down nor on deck with its flying sail): the topsail's **sheets** (`yardBelow`), which led to that yard's arms on deck; a hoisting yard's **reefed height** over the yard below, taken from that yard's place on deck; and, new with the pole, **where a pole's yard is lowered to**. A sail over a yard that does not stand hangs from its own yard, `HEAD_SPREAD` of it broad, head and foot, as deep as its area over that breadth, as every square sail with no yard below does, and its sheets come down to her drawn rail abreast its clews. In every committed file the only square sail over a flying yard is the tartane's topsail, so no committed drawing moves by it.
+
+**The pole.** A pole's upper yards (mirroring `Ship.on_pole`, `is_pole_mast` and `yard_level` from the parts as filed, the engine's arithmetic kept so that the two agree) are drawn down while their sails are not set: onto the yard below where it stands, their slings `YARD_ON_CAP_M` over its own; where none stands, down to the hounds, the height the file gives the highest yard below on the mast of any class (A6's words, "down to the hounds"): the tartane's tréou's yard's, which is her lateen's slings' too; the polacre's mizen lateen's. Halfway while `lower_and_clew_up` is in hand (take_in_pole.yaml's and furl_pole.yaml's step, added to `STEP_HOIST`). A pole is filed as one lower mast with no topmast, and so is already drawn with no doubling (Pol-D §13): a case holds it.
+
+The tartane's topsail (`main.topsail`), her topsail yard 10.39 m on her pole main at 15.78 m over her deck, old beside new:
+
+| Her state | Old | New |
+|---|---|---|
+| her start before the wind (the topsail furled, the tréou sent down) | yard at 16.32 m; foot **90° askew** of its yard, fore and aft from x −2.12 to 9.86 m at 8.85 m | yard down to the hounds, **9.15 m**; foot square with its yard |
+| plain sail before the wind, the tréou taken in | foot **90° askew**, 11.99 m fore and aft; sheets to the arms of the yard on deck, 1.44 m over her water | foot **square with its yard**, 9.35 m broad, its clews 8.09 m over her water; sheets to her rail abreast the clews, at 2.12 m |
+| plain sail by the wind, her topsail yard braced 64° | foot **26° askew**, still fore and aft | foot square with its yard (0.0°), 9.35 m broad, clews at 8.09 m |
+| the tréou set | clews at the tréou's yard's arms, 8.85 m; square | the same, unchanged |
+| the tréou taken in again | 90° askew | square, 9.35 m, 8.09 m |
+| the topsail taken in (`take_in_pole`), the tréou on deck | yard at 16.32 m, in the gear | yard down to the hounds, 9.15 m, in the gear |
+
+Her builder's scratch figures (Report-Package90-Tartane.md §14.2: 9.35 m broad, clews 8.09 m over her water) are met to the centimetre, and her design's check, her loose foot square with its own yard (Decisions-Package90-2026-11.md, Part F row T-v), holds in each state.
+
+**The smack** (`data/ships/smack.yaml`, committed), her topsail yard's slings, metres above her water, old beside new: the plan's one expected move (§6, §10.4), here in every state her topsail is not set, her start and plain sail among them, since A6 furls it on the yard below:
+
+| Her state | Old | New |
+|---|---|---|
+| her start (furled) | 14.35 | **11.15**: on her square-sail yard, 10.85 + 0.30 |
+| plain sail (which sets no topsail) | 14.35 | **11.15** |
+| the topsail set | 14.35 | 14.35, unchanged |
+| `take in the topsail`, 30 s into `lower_and_clew_up` | 14.35 | **12.75**, halfway |
+| taken in, in the gear | 14.35 | **11.15** |
+| furled (`furl_pole`) | 14.35 | **11.15** |
+
+Her topsail's clews stay at her square-sail yard's arms (10.85 m), its sheets to them, as before; nothing else of hers moves. Her frame is as it was (24.42 × 15.65 m abeam), so her view's scale does not move.
+
+### The edge's belly by its own length (the owner's note T-v2, 2026-11-28)
+
+At the live look the owner saw "a small rendering error in the lateens, on the forward end of them, which appears like a pinched section", most plainly on her mizen (Decisions-Package90-2026-11.md Part F, row T-v2; the coordinating session read its cause from the drawn paths, pictures 5 and 6 of `docs/playtests/2026-11-28-tartane-v2-preview/`). **The cause, general:** a sail's belly was reckoned once for the whole sail, BELLY (0.12) of the lesser of its depth and its head (a jib's of its foot and its luff), and laid on every curved edge whatever that edge's own length (`quadSail`, the four-cornered sails: square, gaff, lug, settee and lateen; the jib's path; the goose-winged path). A short edge so bellied out into a thin tongue: a whole lateen's luff, the 0.30 m lashing at its car that her file writes to give the sail four corners, stood 2.56 m off its chord on her great lateen and 1.65 m on her mizen. **Mended where the belly is laid** (`edgeControl`, exported for its case): no edge bellies more than BELLY of its own length, and an edge at least as long as the length the belly is reckoned by is drawn exactly as before. The foot's sag (FOOT_SAG of the depth, by design) is unchanged (until nudge 93, below: by the foot's own length).
+
+Each edge's bulge, its middle's offset off its chord, metres, every bent sail set and her yards braced to their limits, the larger of either tack, old beside new; measured with the sails drawn whole (in the drawing a sail that crosses its mast is cut there for the painter, and moves alike). Her files, read from her branch: the great lateen's luff (0.30 m) 2.56 to **0.04**, its foot (7.28 m) 2.86 to 1.55; the mizen's luff 1.65 to **0.04**, its foot (3.60 m) 1.84 to 0.93; her jib's leech (6.00 m) 1.10 to 0.72; the coastguard's the same.
+
+**The committed files that move, declared** (15 of the 19 so measured, every bent sail set at one wind; the cutter, the smack and the two schooners did not move so. That measure left out the sails unbent as filed, and at 60 degrees a sprit topsail's cloth draws no belly: measured with every sail a file can bend bent and set at four winds, the two schooners move by their ringtails, and the 64's and the 74's sprit topsails and the storm staysails move too; the reader's list of nudge 93, and its table, below). These lie outside the card's named moves; they are built in this hash at the coordinating session's word on the owner's note ("mend it at its cause, in the hash you send now"), and are for the lead's reading:
+
+| File | Sail | Edge | Length | Old | New |
+|---|---|---|---|---|---|
+| `bilander` | fore.topmast_staysail | leech | 5.32 | 0.69 | 0.64 |
+| `bilander` | jib | leech | 5.47 | 1.22 | 0.66 |
+| `bilander` | main.settee | foot | 11.29 | 1.51 | 1.51 (under 0.005 m) |
+| `bilander` | main.settee | luff | 1.81 | 1.35 | 0.22 |
+| `boat-cutter-23` | lug | foot | 3.70 | 0.58 | 0.57 |
+| `boat-cutter-23` | lug | luff | 2.43 | 0.46 | 0.29 |
+| `boat-cutter-28` | lug | foot | 4.40 | 0.72 | 0.69 |
+| `boat-cutter-28` | lug | luff | 3.16 | 0.56 | 0.38 |
+| `boat-launch-25` | lug | foot | 4.20 | 0.66 | 0.65 |
+| `boat-launch-25` | lug | luff | 2.94 | 0.52 | 0.35 |
+| `boat-launch-31` | lug | foot | 4.90 | 0.80 | 0.78 |
+| `boat-launch-31` | lug | luff | 3.67 | 0.61 | 0.44 |
+| `boat-yawl-16` | lug | foot | 3.20 | 0.49 | 0.49 (under 0.005 m) |
+| `boat-yawl-16` | lug | luff | 2.02 | 0.39 | 0.24 |
+| `brig` | jib | leech | 10.56 | 1.30 | 1.27 |
+| `corvette-20` | jib | leech | 12.77 | 1.57 | 1.53 |
+| `corvette-20` | middle_staysail | leech | 10.50 | 1.34 | 1.26 |
+| `frigate-36` | jib | leech | 16.26 | 1.95 | 1.95 (under 0.005 m) |
+| `frigate-36` | middle_staysail | leech | 11.70 | 1.45 | 1.40 |
+| `hermaphrodite-brig` | jib | leech | 14.97 | 2.00 | 1.80 |
+| `hermaphrodite-brig` | main.topmast_staysail | leech | 5.58 | 1.16 | 0.67 |
+| `lugger` | fore.lug | foot | 7.40 | 1.38 | 1.32 |
+| `lugger` | fore.topsail | luff | 4.56 | 0.57 | 0.55 |
+| `lugger` | main.topsail | luff | 4.43 | 0.54 | 0.53 |
+| `lugger` | mizen.lug | foot | 4.71 | 1.02 | 0.85 |
+| `merchant-brig` | jib | leech | 10.56 | 1.30 | 1.27 |
+| `razee-44` | fore.staysail | leech | 10.51 | 1.30 | 1.26 |
+| `razee-44` | main.staysail | leech | 12.80 | 1.92 | 1.54 |
+| `razee-44` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 |
+| `seventy-four` | fore.staysail | leech | 11.89 | 1.51 | 1.43 |
+| `seventy-four` | main.staysail | leech | 14.40 | 2.13 | 1.73 |
+| `seventy-four` | mizzen.course | foot | 9.72 | 1.35 | 1.31 |
+| `sixty-four` | fore.staysail | leech | 10.51 | 1.30 | 1.26 |
+| `sixty-four` | main.staysail | leech | 12.80 | 1.92 | 1.54 |
+| `sixty-four` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 |
+
+The four-cornered sails' foot figures include the sag. The largest moves are the bilander's settee luff (three-quarters of its length off its chord before, the same tongue as the lateen's), her jib, the hermaphrodite brig's main topmast staysail, and the 64's, the razee's and the 74's main staysails; the rest are a few centimetres. No figure but these sails' outlines moves: no corner, no spar, no line, no frame, and no view's bounds (measured on every file at eight facings and four heels, as she starts and dressed on either tack: none moves by a millimetre), so no file's scale moves.
+
+### The reader's list of nudge 93 (2026-11-28)
+
+The reader's measure of 20aca5e found the drawing sound (the skeleton old against new on all nineteen files: no corner, spar, mast, yard, line, hull point, frame point or view bound moved but the smack's topsail yard; every declared row matched; the tartane's file in 28 states with no NaN, no edge crossing itself, the tongue gone, the frame the same throughout) and brought four items. The owner saw the mend live and is content (Part F, T-v3). Built in this hash:
+
+**1. Every outline move, declared.** The table above measured every bent sail set at one wind, 60 degrees. It left out the sails unbent as filed (the ringtails, the storm staysails), and at 60 degrees a sprit topsail's cloth lies along the wind and draws no belly, old or new. Measured again with **every sail a file can bend bent and set**, her yards braced to their limits and square, on either tack, with the wind at **40, 60, 90 and 135 degrees**: each edge's bulge, its middle's offset off its chord, metres (a foot's with its sag beside it), the largest of those states, before the mend (V2, 24d239a), at 20aca5e and in this hash; the sails drawn whole (in the drawing a sail that crosses its mast is cut there and moves alike). A pair of studding sails moves alike and takes one row. "Mended by": *belly*, 20aca5e's mend, each edge bellied by its own length; *sag*, this hash's, item 3. Every move over 5 mm, on every file:
+
+| File | Sail | Edge | Length | Before the mend (V2) | 20aca5e | This hash | Mended by |
+|---|---|---|---|---|---|---|---|
+| `bilander` | fore.topmast_staysail | leech | 5.32 | 0.69 | 0.64 | 0.64 | belly |
+| `bilander` | jib | leech | 5.47 | 1.22 | 0.66 | 0.66 | belly |
+| `bilander` | main.settee | luff | 1.81 | 1.35 | 0.22 | 0.22 | belly |
+| `boat-cutter-23` | lug | foot | 3.70 | 0.58 (sag 0.36) | 0.57 (sag 0.36) | 0.50 (sag 0.22) | belly, sag |
+| `boat-cutter-23` | lug | luff | 2.43 | 0.46 | 0.29 | 0.29 | belly |
+| `boat-cutter-28` | lug | foot | 4.40 | 0.72 (sag 0.45) | 0.69 (sag 0.45) | 0.59 (sag 0.26) | belly, sag |
+| `boat-cutter-28` | lug | luff | 3.16 | 0.56 | 0.38 | 0.38 | belly |
+| `boat-launch-25` | lug | foot | 4.20 | 0.66 (sag 0.42) | 0.65 (sag 0.42) | 0.56 (sag 0.25) | belly, sag |
+| `boat-launch-25` | lug | luff | 2.94 | 0.52 | 0.35 | 0.35 | belly |
+| `boat-launch-31` | lug | foot | 4.90 | 0.80 (sag 0.51) | 0.78 (sag 0.51) | 0.66 (sag 0.29) | belly, sag |
+| `boat-launch-31` | lug | luff | 3.67 | 0.61 | 0.44 | 0.44 | belly |
+| `boat-yawl-16` | lug | foot | 3.20 | 0.49 (sag 0.30) | 0.49 (sag 0.30) | 0.43 (sag 0.19) | sag |
+| `boat-yawl-16` | lug | luff | 2.02 | 0.39 | 0.24 | 0.24 | belly |
+| `brig` | fore.lower.studdingsail (each) | foot | 9.50 | 1.28 (sag 0.58) | 1.28 (sag 0.58) | 1.27 (sag 0.57) | sag |
+| `brig` | fore.topgallant.studdingsail (each) | foot | 3.90 | 0.56 (sag 0.31) | 0.56 (sag 0.31) | 0.52 (sag 0.23) | sag |
+| `brig` | fore.topmast.studdingsail (each) | foot | 6.10 | 0.92 (sag 0.56) | 0.92 (sag 0.56) | 0.82 (sag 0.37) | sag |
+| `brig` | jib | leech | 10.56 | 1.30 | 1.27 | 1.27 | belly |
+| `brig` | main.topgallant.studdingsail (each) | foot | 3.90 | 0.56 (sag 0.30) | 0.56 (sag 0.30) | 0.52 (sag 0.23) | sag |
+| `brig` | main.topmast.studdingsail (each) | foot | 6.10 | 0.95 (sag 0.60) | 0.95 (sag 0.60) | 0.82 (sag 0.37) | sag |
+| `corvette-20` | fore.lower.studdingsail (each) | foot | 8.90 | 1.28 (sag 0.70) | 1.28 (sag 0.70) | 1.19 (sag 0.53) | sag |
+| `corvette-20` | fore.topgallant.studdingsail (each) | foot | 4.30 | 0.59 (sag 0.29) | 0.59 (sag 0.29) | 0.58 (sag 0.26) | sag |
+| `corvette-20` | fore.topmast.studdingsail (each) | foot | 6.70 | 1.02 (sag 0.62) | 1.02 (sag 0.62) | 0.90 (sag 0.40) | sag |
+| `corvette-20` | jib | leech | 12.77 | 1.57 | 1.53 | 1.53 | belly |
+| `corvette-20` | main.topgallant.studdingsail (each) | foot | 4.80 | 0.66 (sag 0.33) | 0.66 (sag 0.33) | 0.64 (sag 0.29) | sag |
+| `corvette-20` | main.topmast.studdingsail (each) | foot | 7.40 | 1.12 (sag 0.69) | 1.12 (sag 0.69) | 0.99 (sag 0.44) | sag |
+| `corvette-20` | middle_staysail | leech | 10.50 | 1.34 | 1.26 | 1.26 | belly |
+| `corvette-20` | ringtail | foot | 0.00 | 0.86 (sag 0.80) | 0.80 (sag 0.80) | 0.00 | belly, sag |
+| `frigate-36` | fore.lower.studdingsail (each) | foot | 10.90 | 1.56 (sag 0.85) | 1.56 (sag 0.85) | 1.46 (sag 0.65) | sag |
+| `frigate-36` | fore.topgallant.studdingsail (each) | foot | 5.30 | 0.73 (sag 0.36) | 0.73 (sag 0.36) | 0.71 (sag 0.32) | sag |
+| `frigate-36` | fore.topmast.studdingsail (each) | foot | 8.20 | 1.24 (sag 0.76) | 1.24 (sag 0.76) | 1.10 (sag 0.49) | sag |
+| `frigate-36` | main.topgallant.studdingsail (each) | foot | 5.90 | 0.81 (sag 0.40) | 0.81 (sag 0.40) | 0.79 (sag 0.35) | sag |
+| `frigate-36` | main.topmast.studdingsail (each) | foot | 9.10 | 1.38 (sag 0.84) | 1.38 (sag 0.84) | 1.22 (sag 0.55) | sag |
+| `frigate-36` | middle_staysail | leech | 11.70 | 1.45 | 1.40 | 1.40 | belly |
+| `frigate-36` | ringtail | foot | 0.00 | 1.09 (sag 1.06) | 1.06 (sag 1.06) | 0.00 | belly, sag |
+| `hermaphrodite-brig` | fore.topgallant.studdingsail (each) | foot | 2.10 | 0.43 (sag 0.35) | 0.43 (sag 0.35) | 0.28 (sag 0.13) | sag |
+| `hermaphrodite-brig` | fore.topmast.studdingsail (each) | foot | 4.91 | 0.82 (sag 0.57) | 0.82 (sag 0.57) | 0.66 (sag 0.29) | sag |
+| `hermaphrodite-brig` | jib | leech | 14.97 | 2.00 | 1.80 | 1.80 | belly |
+| `hermaphrodite-brig` | main.topmast_staysail | leech | 5.58 | 1.16 | 0.67 | 0.67 | belly |
+| `lugger` | fore.lug | foot | 7.40 | 1.38 (sag 0.97) | 1.32 (sag 0.97) | 0.99 (sag 0.44) | belly, sag |
+| `lugger` | fore.topsail | luff | 4.56 | 0.57 | 0.55 | 0.55 | belly |
+| `lugger` | main.lug | foot | 10.40 | 1.75 (sag 1.23) | 1.75 (sag 1.23) | 1.39 (sag 0.62) | sag |
+| `lugger` | mizen.lug | foot | 4.71 | 1.02 (sag 0.64) | 0.85 (sag 0.64) | 0.63 (sag 0.28) | belly, sag |
+| `merchant-brig` | fore.lower.studdingsail (each) | foot | 9.50 | 1.28 (sag 0.58) | 1.28 (sag 0.58) | 1.27 (sag 0.57) | sag |
+| `merchant-brig` | fore.topgallant.studdingsail (each) | foot | 3.90 | 0.56 (sag 0.31) | 0.56 (sag 0.31) | 0.52 (sag 0.23) | sag |
+| `merchant-brig` | fore.topmast.studdingsail (each) | foot | 6.10 | 0.92 (sag 0.56) | 0.92 (sag 0.56) | 0.82 (sag 0.37) | sag |
+| `merchant-brig` | jib | leech | 10.56 | 1.30 | 1.27 | 1.27 | belly |
+| `merchant-brig` | main.topgallant.studdingsail (each) | foot | 3.90 | 0.56 (sag 0.30) | 0.56 (sag 0.30) | 0.52 (sag 0.23) | sag |
+| `merchant-brig` | main.topmast.studdingsail (each) | foot | 6.10 | 0.95 (sag 0.60) | 0.95 (sag 0.60) | 0.82 (sag 0.37) | sag |
+| `privateer-schooner` | fore.sail | foot | 11.76 | 1.21 (sag 0.82) | 1.21 (sag 0.82) | 1.13 (sag 0.71) | sag |
+| `privateer-schooner` | fore.topmast.studdingsail (each) | foot | 5.50 | 0.80 (sag 0.46) | 0.80 (sag 0.46) | 0.74 (sag 0.33) | sag |
+| `privateer-schooner` | ringtail | foot | 0.00 | 1.14 (sag 1.12) | 1.12 (sag 1.12) | 0.00 | belly, sag |
+| `razee-44` | fore.staysail | leech | 10.51 | 1.30 | 1.26 | 1.26 | belly |
+| `razee-44` | fore.storm_staysail | leech | 10.51 | 1.30 | 1.26 | 1.26 | belly |
+| `razee-44` | fore.topmast.studdingsail (each) | foot | 12.10 | 1.71 (sag 0.90) | 1.71 (sag 0.90) | 1.62 (sag 0.73) | sag |
+| `razee-44` | main.staysail | leech | 12.80 | 1.92 | 1.54 | 1.54 | belly |
+| `razee-44` | main.topmast.studdingsail (each) | foot | 13.70 | 1.92 (sag 0.99) | 1.92 (sag 0.99) | 1.84 (sag 0.82) | sag |
+| `razee-44` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 | 1.26 | belly |
+| `razee-44` | mizzen.storm_staysail | leech | 8.07 | 1.02 | 0.97 | 0.97 | belly |
+| `razee-44` | ringtail | foot | 0.00 | 1.05 (sag 1.04) | 1.04 (sag 1.04) | 0.00 | belly, sag |
+| `seventy-four` | fore.staysail | leech | 11.89 | 1.51 | 1.43 | 1.43 | belly |
+| `seventy-four` | fore.storm_staysail | leech | 11.89 | 1.51 | 1.43 | 1.43 | belly |
+| `seventy-four` | fore.topmast.studdingsail (each) | foot | 12.90 | 1.83 (sag 0.98) | 1.83 (sag 0.98) | 1.73 (sag 0.77) | sag |
+| `seventy-four` | main.staysail | leech | 14.40 | 2.13 | 1.73 | 1.73 | belly |
+| `seventy-four` | main.topmast.studdingsail (each) | foot | 14.70 | 2.07 (sag 1.09) | 2.07 (sag 1.09) | 1.97 (sag 0.88) | sag |
+| `seventy-four` | mizzen.course | foot | 9.72 | 1.35 (sag 0.60) | 1.31 (sag 0.60) | 1.30 (sag 0.58) | belly, sag |
+| `seventy-four` | mizzen.storm_staysail | leech | 8.99 | 1.12 | 1.08 | 1.08 | belly |
+| `seventy-four` | sprit_topsail | leech | 8.33 | 1.10 | 1.00 | 1.00 | belly |
+| `sixty-four` | fore.staysail | leech | 10.51 | 1.30 | 1.26 | 1.26 | belly |
+| `sixty-four` | fore.storm_staysail | leech | 10.51 | 1.30 | 1.26 | 1.26 | belly |
+| `sixty-four` | fore.topmast.studdingsail (each) | foot | 12.10 | 1.71 (sag 0.90) | 1.71 (sag 0.90) | 1.62 (sag 0.73) | sag |
+| `sixty-four` | main.staysail | leech | 12.80 | 1.92 | 1.54 | 1.54 | belly |
+| `sixty-four` | main.topmast.studdingsail (each) | foot | 13.70 | 1.92 (sag 0.99) | 1.92 (sag 0.99) | 1.84 (sag 0.82) | sag |
+| `sixty-four` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 | 1.26 | belly |
+| `sixty-four` | mizzen.storm_staysail | leech | 8.06 | 1.02 | 0.97 | 0.97 | belly |
+| `sixty-four` | sprit_topsail | leech | 7.40 | 0.99 | 0.89 | 0.89 | belly |
+| `topsail-schooner` | fore.sail | foot | 11.76 | 1.21 (sag 0.82) | 1.21 (sag 0.82) | 1.13 (sag 0.71) | sag |
+| `topsail-schooner` | fore.topmast.studdingsail (each) | foot | 5.50 | 0.80 (sag 0.46) | 0.80 (sag 0.46) | 0.74 (sag 0.33) | sag |
+| `topsail-schooner` | ringtail | foot | 0.00 | 1.14 (sag 1.12) | 1.12 (sag 1.12) | 0.00 | belly, sag |
+
+- **The sprit topsails.** The reader's "leech and foot" are its two leeches, 0.99 to 0.89 m on the 64 and 1.10 to 1.00 m on the 74 (each a row above); its foot does not move (1.10 m on the 64, 1.23 m on the 74, before and now).
+- **The schooners, as it is.** At 20aca5e they moved by their ringtails alone, unbent as filed (1.14 to 1.12 m, the belly). In this hash they move also by the foot's sag (their ringtails' feet, 1.12 m to none; their fore sails' loose feet, sag 0.82 to 0.71 m; their topmast studding sails' feet, sag 0.46 to 0.33 m) and by the cut's curves (item 4: their jibs and fore staysails, 0.04 m). Of the 19 files only the cutter does not move in this hash; the smack moves only by the cut's curves (her jib, 0.02 m).
+- **Nothing else moves.** Measured V2 beside this hash on every file in all 18 states (the 16 above, and as she starts on either tack), at eight facings and four heels: no corner, spar, mast, yard, line, hull point or frame point moves, no view's bounds, and no point is NaN. A sail cut at its mast is placed along the view axis by the centre of its outline sampled, which moves with that outline: since 20aca5e by the foot's sag alone, up to 0.14 m on the lugger's lugs and 0.03 to 0.05 m on the boats'.
+
+**2. Three pins that could not fail, made to.** Each was run against the code with its rule taken out (the mutants below), and fails.
+
+- **(a) The frame holding the peaked yard.** The probe's masts stood to 25.1 m, over the peak at 21.5 m, so the frame never needed the peak. New: `test_the_frame_holds_the_peaked_yard_over_masts_short_of_it`, on the tartane probe with her main struck to a pole (`_main_a_pole`: its topmast and topgallant mast out, with the topsail, its yard and the jibs, whose stay was set up at the topmast's head), her main's head 17.0 m over her water. The frame's top is the peaked penne, 21.52 m, and the view's bounds are the same in every state; with the peak left out of the frame it falls to 17.0 m and the yard leaves the view.
+- **(b) The peaked yard's car lifted clear of the deck.** On the probe, its great yard slung 10 m over its deck, the car peaked stood 4.69 m over the deck and the lift was never reached (0.41 m on the real tartane). New: `test_a_peaked_yard_slung_low_is_raised_to_keep_its_car_over_the_deck`, the great yard slung at 5 m: peaked where it was slung its car would stand under the deck; it is raised up the mast's line to stand `ON_DECK_M` over it, and no higher.
+- **(c) The every-ship guard.** `test_no_set_sail_of_any_file_bellies_an_edge_past_its_own_length` took one wind and left out every sail cut at its mast. Now: every sail a file can bend bent and set, her yards braced to their limits and square, on either tack at 40, 60, 90 and 135 degrees, every sail drawn, whole or in its pieces (whose curves item 4 keeps); every curved edge across no more than BELLY of its own length (a jib's whole offset), and up or down no more than BELLY and FOOT_SAG of it (the belly lies along the cloth, which a sprit topsail's tilts; the sag is straight down).
+
+| Mutant (the rule taken out) | Cases that fail (of the new pins', the belly's, the sag's and the cut's) |
+|---|---|
+| the peak left out of the frame (`framePts`) | 4: the new frame case at each facing (the old frame case still passes, as the reader found) |
+| the peaked car not lifted | 2: the new lift case on either tack |
+| a four-cornered sail's leech bellied by the whole belly | 2: the guard on the 64 and the 74 (their sprit topsails, at the winds other than 60) |
+| its luff so | 17 |
+| its foot so | 8 |
+| the jib's leech so | 9 |
+| the foot's sag by the depth alone (item 3) | 11 |
+| the cut made on the outline sampled (item 4) | 5: the boats' lugs' luffs |
+
+**3. The foot's sag by its own length** (`footSag`, exported). A drawing four-cornered sail's foot sagged FOOT_SAG (0.06) of the sail's depth whatever the foot's length, as its belly had been laid by the whole sail's. A ringtail's foot has no length, its clew and its tack at one point: once its belly was laid by its own length (20aca5e) only the sag was left, and it hung a spike straight down from its clew, 0.80 m on the corvette's, 1.06 m on the frigate's, 1.04 m on the razee's and 1.12 m on the schooners' (before, with its belly, a slanted loop). **Mended where the sag is laid**, as the belly was: never more than FOOT_SAG of the foot's own length; a foot at least as long as the depth sags as before. The spanker's foot laced to its boom takes back exactly the sag it is given (`footSag` again), as before. The moves are the table's *sag* rows: the ringtails' feet to none; the studding sails' feet, shorter than their depth (the hermaphrodite brig's fore topgallant studding sail's, 2.10 m, sag 0.35 to 0.13 m); the lugs' feet (the lugger's main lug's, sag 1.23 to 0.62 m); the schooners' loose fore sails' feet. New: `test_a_foot_sags_no_more_than_its_own_length_allows` (the rule) and `test_a_ringtail_set_hangs_no_spike_from_its_clew` (the five files with a ringtail, bent and set: no point under its lowest corner).
+
+**4. The launch's lug: the cut at the mast, not the cap.** Its luff stands wholly forward of the mast, 0.23 m at the tack to 0.73 m at the throat; seen from the quarter it lies along the mast. A sail cut at its mast was cut on its outline sampled at six points an edge (`CURVE_SAMPLES`), and each piece drawn as those points joined by straight lines: the luff six straight pieces, cornered 6 to 9 degrees between them seen at 135 and 160 degrees (8 to 13 before the mend, when the luff stood farther out and crossed the mast's line). The cap made the luff lie along the mast, where its corners show against the mast's straight line. **Mended in the cut** (`splitPathAtX`, exported): each curved edge is split where it crosses the mast's plane (de Casteljau) and kept a curve on its side, and each piece ends where it began, its cut a straight edge along the mast; the luff is one curve again, as drawn whole. A curve's control point stands off its curve, and the view's bounds take a path's points: on the yawl's lug seen from ahead heeled 0.3 rad, its abaft piece's foot's control stood at 0.603 m against the frame's 0.590 (the curve itself reaches 0.243), which would have rescaled the view while her lug is set. So a piece holds its share of the bounds, and its place along the view axis, by its outline sampled, as before (`sampled`), and no view's bounds moves. The cut's own move, each cut sail's drawn outline against the same drawn on its samples: at most 0.05 m (the hermaphrodite brig's jib); 0.04 m on the bilander's settee, the corvette's jib and the schooners' jibs and fore staysails; under 0.04 m on the lugger's sails; 0.012 to 0.018 m on the boats' lugs. `test_a_staysail_that_crosses_a_mast_is_drawn_in_two_parts` holds unchanged (its piece's straight edge is now the cut). New: `test_a_path_cut_at_a_mast_keeps_its_curves` (the rule, on a lens) and `test_a_lug_cut_at_its_mast_draws_its_luff_as_one_curve` (the five boats, on either tack at every wind).
+
+### Pins moved, old beside new
+
+None of the base's. No case of `tests/test_view_geometry.py` or `tests/test_pictures.py` from before this package was changed but one docstring's words (`test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward`: its lateen carries neither key, `dipping` nor `cut_at_mast`, and its words now say so; its name and its assertions are kept), and no threshold moved. New: V1's 24 cases, V2's 19 and the edge's belly's 28 in `tests/test_view_geometry.py` (71, none of the base's removed or renamed).
+
+Nudge 93, this package's own cases: `test_no_set_sail_of_any_file_bellies_an_edge_past_its_own_length` is made stricter (old: every bent sail set, braced to the limits, at 60 degrees, the sails drawn whole alone, an edge's offset across; new: item 2 (c) above), its name and its 19 files kept. `test_the_frame_holds_the_whole_lateen_across_states`'s views and assertions are moved unchanged into two helpers it shares with the new frame case (`_great_lateen_in_the_frame`, `_the_frame_holds_the_great_lateen`). `lateen_by_the_wind` takes a document rigged from the probe. New: 18 (the frame over short masts 4, the low-slung lift 2, the ringtails 5, the foot's sag 1, the cut on a lens 1, the boats' luffs 5): 89 in this package, none of the base's removed or renamed.
+
+### Not built, for the lead
+
+- **V3, the towed boat**, stops: the client is served no boat. `/api/ship` (`api/queries.ship_graph`) serves no boats and `/api/state` (`api/queries.snapshot`) no boat in tow; A4 keeps her in `ship.extra["boat_in_tow"]` alone. `freesail/api/queries.py` is neither in the viewer's row of the plan's §7.1 nor named by the card for it. The lead's ruling (nudge 88): the engine serves each towed boat in a step of its own after its fourth pass, and V3 waits for it.
+- **A manoeuvre's change of the lateens is not served**: in a tack, a wear, a fill away, a box-haul or a box off (`LateenChange`), and for the yards a belay hands on beyond the one `change_lateen` names, the snapshot serves only the manoeuvre and the sail `in_the_gear`, as it serves a lateen brailed up before the manoeuvre began. The yards being shifted are drawn brailed up under their yards aloft, not peaked. The settee's mirror, a key served only while true (`yard_lowered`'s), would let the drawing read it with one condition. The lead's ruling (nudge 88): wanted before the tartane's file, served in the engine's same step, and drawn in the viewer's hash with V3 and V4.
+- **Found on the way, the engine's**: `ship/graph._square_foot_m` takes a square sail's foot as twice its centre (`centre_height_m`, above the water) less its yard's height (`height_m`, above the deck), and A5's lateen rule compares it with a lateen yard's height above the deck, so it overstates the foot by twice the deck's height: 1.08 m on the tartane, whose topsail clears her lateen's yard by 0.03 m (8.34 against 8.31 m over her deck), not 1.11 m; 3.0 m on the polacre probe. It moves no classing on her file. The viewer keeps the engine's arithmetic so that the two read every pole alike; the lead's ruling (nudge 88): the engine mends it in its served step, and the viewer follows its arithmetic.
+
+Built by the viewer's session; to be passed by an independent reader (the plan's §10.4).
