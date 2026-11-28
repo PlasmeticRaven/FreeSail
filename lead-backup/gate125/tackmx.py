@@ -20,6 +20,11 @@ ENDS = ("ship.tacked", "ship.missed_stays", "evolution.failed")
 WINDS = (8, 12, 15, 20, 25, 30)
 HEADINGS = (290.0, 292.5, 295.0, "fb")
 SEEDS = (7, 11)
+STEADY = os.environ.get("TMX_STEADY") == "1"
+GUST = {"gustiness": 0.0, "variability": 0.0} if STEADY else {}
+if STEADY:
+    SEEDS = (7,)
+    HEADINGS = (290.0, 292.5, 295.0)
 
 
 def rel(w):
@@ -114,7 +119,7 @@ def group(key):
     try:
         w = make_world(seed, f"data/ships/{ship}.yaml",
                        Scenario(wind_from_deg=0.0, wind_speed_kn=float(kn), ship_heading_deg=292.5,
-                                ship_speed_kn=4.0))
+                                ship_speed_kn=4.0, **GUST))
         w.submit("set plain sail")
         w.submit("brace sharp up on the starboard tack")
         idle(w, 4000)
