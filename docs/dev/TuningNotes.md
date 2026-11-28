@@ -40458,7 +40458,7 @@ tons of brandy from the Havre to Dover", drawn lying three miles inside the Grea
 |---|---|---|
 | her state as drawn | at anchor | in port |
 | layings in her first hours | 179 in three | 1 when her business is done |
-| her course out | anchor at the Havre | the track's next mark, 49 33 N 0 05 W |
+| her course out | anchor at the Havre | never the anchor she lay at; it ends at an anchor in Dover |
 | her voyage (7-793, the wind west, 48 h) | none | in port at Dover at 37 h; wine sold; salt beef bought for the Havre |
 | play's cost, 08:00 to 21:00 of the owner's first day | about 204 s | about 55 s |
 
@@ -40511,4 +40511,11 @@ saved and read by names, 7-797).
 7-799 in the slow tier; 7-792, 7-794, 7-795 and the console's 7-798 (1.3 s) in the fast. Their times
 on Python 3.11: TIMES_PENDING.
 
-**Read by a reader other than the builder**: READER_PENDING
+**Read by a reader other than the builder** (one, on the second build's code and truths against
+this section): no test of the trunk changed, loosened or moved slow; each figure and rule, old and
+new, as said; the truths pin states, counts and bands (a world's digest only compared, saved
+against loaded); the tiers as said; the reader of names loads nothing and its account is its code.
+Two gaps found, both closed: the table's course out said more than 7-790 pins (now as pinned), and
+the Havre's trader's return cargo was pinned only by her intent's origin (7-793 now pins a trade
+from Dover for the Havre). Noted, not this package's: `Ports.in_port_at`'s docstring says "roads or
+mooring" where its spots are the outer road, the anchorage and the mooring.

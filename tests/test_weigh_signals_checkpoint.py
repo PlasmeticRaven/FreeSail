@@ -413,7 +413,10 @@ def test_truth_7_793_the_havres_trader_comes_to_in_dover_and_sells_her_cargo():
     assert v.detail == "far"
     sold = [words for _t, words in v.story if "sold at" in words]
     assert sold[0].startswith("20 tons of wine sold at Dover"), v.story
-    assert brain.intent.origin == "dover" and not v.done, brain.intent
+    # her return cargo is for the Havre, the port she sailed from, and she sails with it
+    assert brain.intent.kind == "trade", brain.intent
+    assert (brain.intent.origin, brain.intent.destination) == ("dover", "le-havre"), brain.intent
+    assert not v.done
 
 
 def _papers(**papers):
