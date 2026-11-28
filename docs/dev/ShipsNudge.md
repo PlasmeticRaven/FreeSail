@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 04:35 UTC (THE TARTANE'S SECTION 17: the helm's lost course before the wind is the carried list's fault 29, not 90's; `yard_lowered` for a whole lateen is wanted seamanship; her first run of the proof has the right shape). Nudge number: 91.
+Latest note: 2026-11-28, 05:50 UTC (THE VIEWER'S HASH IS NOT PASSED though the drawing is sound: outline moves not declared (the sprit topsails off 60 degrees, ringtails and storm staysails once bent), three pins that cannot fail, the foot's sag spike on a ringtail, the launch's lug; one small list, one hash). Nudge number: 93.
