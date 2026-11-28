@@ -3230,7 +3230,7 @@ Git merged `freesail/evolutions/scripts.py`, `world/boats.py` and `world/dealing
 - **e2ae515**, the merge of `…/pkg-90` at **8a27d9b1** (the trunk at 00706af7, the fourth pass merged at d8031973), set out in that section;
 - **7a9ce75**, the one mend its fast tier found (below).
 
-**What it holds**, the last builder's work, its code unchanged by me:
+**What it holds**, the last builder's work, its code unchanged by me but for the one mend below:
 - **162bb5f**: a towed boat cut adrift at home is in tow no longer. Her `BoatState` named no boat, so `keep_in_tow` kept her in tow, her drag on the ship. A state that names none now stands for her errands' boat (`boats.errands_boat`).
 - **f977ad6**: what the client is served (nudge 88).
   - The ship graph's `boats` gives each boat her file tows astern, with her id, name, `towed` and length; the snapshot's `boats` gives each one's `in_tow`.
