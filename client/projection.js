@@ -159,11 +159,20 @@
   var DECK_SHARE = 0.95; // a deck at this share of the rail's half-breadth: inside the bulwark (judgement)
   // A deck lies inside the side, but a strip of the side near the ends is tall, and its middle
   // can sort behind a deck it hides (the 64's counter seen on the quarter, by 3 cm, measured):
-  // each deck strip is sorted this much farther than its middle (judgement).
+  // each deck strip is sorted this much farther than its middle (judgement); a lower mast's foot,
+  // standing on one, sorts nearer than it (package 90, nudge 97: `buildSkeleton`, `sortDepth`).
   var DECK_BEHIND_M = 0.5;
+  var FOOT_ON_DECK_M = 0.05; // a mast's foot within this of a deck strip's height stands on it
+  var FOOT_CLEAR_M = 0.01; // and sorts at least this much nearer than it (judgement)
   // Each deck's strake of ports drawn as a band, from the sill up the port's depth: optional,
   // kept only if the owner's screenshot check keeps it (§6). No port is drawn: they are 81's.
   var PORT_BANDS = true;
+  // package 90 (nudge 97): a band's end follows the drawn side to within this, split in two at most
+  // BAND_SPLITS times between two heights its stations give (`bandOn`; judgement, the test's 2 mm
+  // halved)
+  var BAND_ON_SIDE_M = 0.001;
+  var BAND_SPLITS = 10;
+  var STEP_M = 1e-10; // a step of the side: its two corners this close in height, or closer
   // Package 75 (B5.6; Build-Ships.md §6, the form's drawing): where the graph serves the hull as
   // drawn (`hull.stations`, freesail/ship/form.py's rule), the strips stand on those stations and
   // go down to the drawn depth D(x) = max(0.8 m, the water's half-breadth there x tan 20 deg), no
@@ -2119,10 +2128,19 @@
     });
     var beam = hull.beam_m || 8;
 
-    function mastAftOf(x) {
+    /** The nearest lower mast more than half a metre abaft x, the yard `Y`'s own lower mast not
+     *  among them. Package 90 (the Concepcion's report, §C.2): a yard is slung before its mast
+     *  (YARD_BEFORE_MAST_OF_BEAM), and where its mast stands upright, or nearly, and her beam is
+     *  broad, it hangs more than half a metre forward of that mast's foot, and its braces led to
+     *  its own mast: her nine yards' (her mizzen yards' up her own mizzen, 24.1 to 27.3 m, not to
+     *  her rail), and the fore yards' of the 74, the 64 and the razee, 0.50 to 0.71 m forward of
+     *  their fore mast's foot (to it, not to the main mast). */
+    function mastAftOf(x, Y) {
+      var own = Y;
+      while (own && own.parent) own = own.parent;
       var best = null;
       lowerMasts.forEach(function (m) {
-        if (m.x < x - 0.5 && (best === null || m.x > best.x)) best = m;
+        if (m !== own && m.x < x - 0.5 && (best === null || m.x > best.x)) best = m;
       });
       return best;
     }
@@ -2142,7 +2160,7 @@
         if (!Y || !Y.arm || sentDown(Y) || Y.onDeck) return;
         var ss = sideSign(ln.side);
         var from = ss > 0 ? Y.b : Y.a;
-        var m = mastAftOf(Y.x);
+        var m = mastAftOf(Y.x, Y);
         var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : sideEnd(ss, Y.x - Y.half * 0.8);
         if (underBowsprit(Y.spec) && lowerMasts.length) {
           // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom is braced
@@ -2296,6 +2314,33 @@
     // -- the hull --------------------------------------------------------------------
 
     figures.push.apply(figures, hullFigures(hull));
+
+    // package 90 (nudge 97): a lower mast's foot stands on the deck strips at its foot (two where
+    // two meet), and is sorted FOOT_CLEAR_M nearer than each of them, or nearer (`onDecks`,
+    // `sortDepth`). Sorted at its own middle alone against a strip's, a foot far along a long strip
+    // came behind it: the Concepcion's main mast, 0.8 m forward of her upper deck's strip's middle
+    // (her stations 1.76 m apart at her ports), had the deck drawn over its foot seen on the
+    // quarter, by 0.066 m; and the frigate's mizzen seen from ahead heeled toward the viewer, by
+    // 0.10 m. A foot on no strip of its deck (the lugger's mizen, stepped abaft her deck's end) is
+    // sorted at its own middle alone, as before.
+    var deckStrips = figures.filter(function (f) {
+      return f.kind === "hull" && f.part === "deck";
+    });
+    figures.forEach(function (f) {
+      if (f.kind !== "spar" || f.piece !== "foot") return;
+      var x = f.pts[0][0], z = f.pts[0][2];
+      var under = deckStrips.filter(function (d) {
+        var p = d.pts, xa = p[0][0], xb = p[1][0];
+        if (x < Math.min(xa, xb) - 1e-9 || x > Math.max(xa, xb) + 1e-9) return false;
+        var t = xb !== xa ? (x - xa) / (xb - xa) : 0;
+        return Math.abs(p[0][2] + (p[1][2] - p[0][2]) * t - z) <= FOOT_ON_DECK_M;
+      });
+      if (under.length) {
+        f.onDecks = under.map(function (d) {
+          return { at: centroid(d.pts), bias: d.sortBias || 0 };
+        });
+      }
+    });
 
     // Package 82: a boat's oars, drawn from her thwarts while they are out (the snapshot's
     // `oars` block): one line an oar, the loom inboard of the gunwale, the blade in the water
@@ -3438,7 +3483,14 @@
         .sort(function (p, q) {
           return p - q;
         });
-      /** The heights an end at x runs through, the band's lower to its upper. */
+      /** The heights an end at x runs through, the band's lower to its upper: every height the
+       *  strip's two stations have a point at, between which the side runs straight between
+       *  stations; and, package 90 (nudge 97), more wherever the side at x stands off the straight
+       *  line between two of those (`onTheSide`). Where the side runs to the stern's or the stem's
+       *  line it can step: that line running level (a knuckle, the counter's foot), the side at
+       *  each height below runs to one end of the run and above to the other. The Concepcion's
+       *  lower tier's band, its after end at x -28.775 half a port aft of her aftmost port, crossed
+       *  her knuckle's height, 2.82 m, where her side steps 0.38 m, and stood 0.244 m off it. */
       function heights(x) {
         var z0 = between(H.lowAt(x), H.topAt(x), b.zl(x));
         var z1 = between(H.lowAt(x), H.topAt(x), b.zu(x));
@@ -3447,7 +3499,37 @@
           if (z > zs[zs.length - 1] + 1e-6 && z < z1 - 1e-6) zs.push(z);
         });
         zs.push(z1);
-        return zs;
+        var out = [zs[0]];
+        for (var i = 1; i < zs.length; i++) onTheSide(x, zs[i - 1], zs[i], 0, out);
+        return out;
+      }
+      /** The heights from above `lo` to `hi` at x: split in two while the side stands more than
+       *  BAND_ON_SIDE_M off the straight line between them at an eighth of it; where it still does
+       *  after BAND_SPLITS halvings, the side steps there, and the end steps with it, a corner on
+       *  either side of the height it steps at (found by halving to STEP_M). */
+      function onTheSide(x, lo, hi, depth, out) {
+        var hbLo = H.hbAt(x, lo), hbHi = H.hbAt(x, hi);
+        var off = false;
+        for (var k = 1; k < 8 && !off; k++) {
+          var t = k / 8;
+          off = Math.abs(H.hbAt(x, lo + (hi - lo) * t) - (hbLo + (hbHi - hbLo) * t)) > BAND_ON_SIDE_M;
+        }
+        if (!off) return out.push(hi);
+        if (depth < BAND_SPLITS) {
+          var m = (lo + hi) / 2;
+          onTheSide(x, lo, m, depth + 1, out);
+          onTheSide(x, m, hi, depth + 1, out);
+          return;
+        }
+        var a = lo, b = hi;
+        while (b - a > STEP_M) {
+          var c = (a + b) / 2, hbC = H.hbAt(x, c);
+          if (Math.abs(hbC - H.hbAt(x, a)) < Math.abs(H.hbAt(x, b) - hbC)) a = c;
+          else b = c;
+        }
+        if (a > lo) out.push(a);
+        out.push(b);
+        if (hi > b) out.push(hi);
       }
       function onSide(x, z) {
         return v(x, sign * H.hbAt(x, z), z);
@@ -3902,6 +3984,25 @@
     return points.length ? s / points.length : 0;
   }
 
+  /** The depth a figure is sorted at, seen by `proj` (`project`), from its projected points `all`
+   *  (its path's or its points', when not given): a sail at its centre and a figure with a
+   *  `sortAt` at that point, a figure marked `sortFar` at its farthest point, any other at the mean
+   *  of its points; package 75, a figure inside another (a deck within the side) this much farther
+   *  (`sortBias`); package 90 (nudge 97), a lower mast's foot no farther than FOOT_CLEAR_M short of
+   *  each deck strip it stands on (`onDecks`). One rule, read by `project` and by the tests. */
+  function sortDepth(f, proj, all) {
+    if (!all) all = f.path ? [].concat.apply([], projectPath(f.path, proj)) : f.pts.map(proj);
+    var at = f.sortAt || (f.kind === "sail" ? f.centre : null);
+    var depth = at ? proj(at).depth : f.sortFar ? farDepth(all) : meanDepth(all);
+    if (f.sortBias) depth += f.sortBias;
+    if (f.onDecks) {
+      f.onDecks.forEach(function (d) {
+        depth = Math.min(depth, proj(d.at).depth + d.bias - FOOT_CLEAR_M);
+      });
+    }
+    return depth;
+  }
+
   /** The depth of the farthest of `points` from the viewer. */
   function farDepth(points) {
     return Math.max.apply(
@@ -4044,9 +4145,7 @@
       // not where the mean of its outline's control points happens to fall
       // package 57: a sail or a yard by its point against its mast (`sortAt`)
       var at = f.sortAt || (f.kind === "sail" ? f.centre : null);
-      g.depth = at ? proj(at).depth : f.sortFar ? farDepth(all) : meanDepth(all);
-      // package 75: a figure inside another (a deck within the side) sorts this much farther
-      if (f.sortBias) g.depth += f.sortBias;
+      g.depth = sortDepth(f, proj, all);
       // the hull step's landing (the lead's point 10): the depth of a figure's middle cannot order
       // a closed body's faces, so a face seen from inside goes first and the stern, seen from
       // abaft, last (`sortFigures`, which reads where each figure stands in the ship)
@@ -5086,6 +5185,7 @@
     flattenPath: flattenPath,
     splitAtX: splitAtX,
     splitPathAtX: splitPathAtX,
+    sortDepth: sortDepth,
     footSag: footSag,
     edgeControl: edgeControl,
     sortFigures: sortFigures,

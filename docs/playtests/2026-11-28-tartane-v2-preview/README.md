@@ -92,6 +92,13 @@ pushed):
   and close up `pictures/10-mended-bilander-settee-luff-close-up.png`): by the wind, her main
   settee set. Its 1.81 m luff now stands 0.20 m off its chord, where it stood 1.35 m.
 
+**Which hash the pictures show.** Pictures 7 to 10 were taken on the viewer's first hash for V1
+and V2, 20aca5ec, which mended the belly alone. The hash merged on the trunk is 856dbcc8 (merge
+cfc1032b, the lead's nudge 95). It mends also the foot's sag by its own length (`footSag`), and
+keeps a sail cut at its mast as curves (`splitPathAtX`). So pictures 8 and 10, the close-ups, show
+the first hash: the lateen's short luff and the settee's luff stand as they do on the merged one,
+while a foot's sag or a cut at a mast in those views may differ from it by a few centimetres.
+
 **The owner's word**, verbatim, recorded in Part F, row T-v3:
 
 > "Both fixes look clean to me, very good."
