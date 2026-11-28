@@ -380,3 +380,25 @@ The corvette (`corvette-20`, the Diana) is the ship D was first measured for: a 
 | 25 kn, `set the jib` after | obeyed; 3 of 3, 184 to 189 s, jib 0.68 to 0.78 | obeyed; 3 of 3, 184 to 187 s, jib 0.67 to 0.70 |
 
 The pins moved are in `docs/dev/TuningNotes.md` ("the corvette's pins moved by D"), old beside new. Her rows are added to truths 7-761 and 7-762. Her ship file, her generator, her design note and her report are untouched. When the ships' session sets her `slack_in_stays`, A acts on her plain-sail tacks in 20 and 25 kn (§12's trade). D acts on her shortened sail whatever A does.
+
+## 14. The reader's read of b5ddfa6a (2026-11-28)
+
+**The finding, and the lead's ruling.** On a player's ship nothing took a kept jib in. It stood all hour at up to 1.73 of its rating, and the brig's in 35 kn at seed 7 blew out. The ruling: the order that left it on her sees it through, as the storm canvas is seen through.
+
+**Built.** On a ship whose captain does not command, the hands take the kept jib in at its strain's first dire line: "Taking in the jib before it goes: she will gripe without it." Its lesser lines are the player's warning, with the order named.
+
+Taken in at the second line instead, the jib came in during the matrix's long shortening, and the corvette lost her three tacks in 30 kn. At the dire line no tack is lost.
+
+| an hour in rising wind, a player's ship (62 cells) | trunk e3d50aac | b5ddfa6a | now |
+|---|---|---|---|
+| jibs blown out | 11 | 12 | 11 |
+| kept jibs blown out | 0 | 1 | 0 |
+| kept jibs taken in by the hands | (none kept) | 0 of 8 | 4 of 8; the other 4 under the dire line all hour |
+
+**The tack matrix.**
+- Against b5ddfa6a: the razee's two shortened cells in 30 kn at seed 11 (D's), none lost.
+- Against the trunk: 28 cells, C 16 and D 12, A 0; 838 made against 829.
+
+**The two-fifths figure** is pinned for a ship slack in stays (truth 7-763c; the reader's M02 now dies).
+
+**The corvette's gripe truth** says what is measured (TuningNotes).

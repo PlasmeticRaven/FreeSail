@@ -40417,6 +40417,28 @@ The brief: docs/dev/briefs/Brief-Package125.md; the measure and the rulings: doc
   - Her 7-762 cases are in `SLOW_TESTS`.
 - **Read by:** her pins were pinned by her builder (package 90, the ships' session). The moved ones have been read by no reader of this package's.
 
+**The reader's read of b5ddfa6a (2026-11-28): a kept jib on a player's ship; the two-fifths figure; her words.** The report's §14.
+- **The finding:** on a player's ship (no captain's intent) nothing took the kept jib in. Its line was said every ten minutes, it stood all hour at up to 1.73 of its rating, and the brig's in 35 kn at seed 7 blew out at 1596 s, where the trunk's `shorten sail` had it in.
+- **Built:** `storm.see_kept_jibs_through`, from the world's tick on a ship whose captain does not command. The hands take a kept jib in at its strain's first dire line since it was kept (loaded past `CARRY_AWAY_RATIO`, where it may go). The log says "Taking in the jib before it goes: she will gripe without it." Its lesser lines stay the player's warning. A jib he sets again himself is his own. Under a captain who commands, the hands leave it to him.
+- **The moment measured, two ways:**
+  - At the second strain line (1b6a90a1): the kept jib came in during the tack matrix's long shortening, and the corvette lost her three tacks shortened in 30 kn at seed 11 (refused, where b5ddfa6a made them in 190 to 195 s). Not kept.
+  - At the first dire line (6c298df8): no tack lost.
+- **The hour in rising wind** (ten ships, 25, 30 and 35 kn, seeds 7 and 11, plus the razee in 28 kn and the brig from 290: 62 cells; the wind rising 12 kn over the hour; a player's ship):
+  - jibs blown out: trunk 11, b5ddfa6a 12, now 11; kept jibs blown out: 0, 1, 0;
+  - the jib is kept in 8 cells. The hands take it in in 4: the brig in 35 kn at 1073 s, the hermaphrodite brig in 35 kn at 2159 s, the 36 in 25 kn at 3560 s, the razee in 28 kn at 173 s. In the other 4 it stands under its dire line all hour (the brig and the hermaphrodite brig in 30 kn at 1.19 and 1.2; the two schooners at 1.03), its line said, and none blows out;
+  - the 11 jibs lost on every tree are ones `shorten sail` did not keep, and they are alike on all three.
+- **The tack matrix** (1,596 cells with the default gusts):
+  - against b5ddfa6a, 2 cells move, both D's: the razee shortened in 30 kn at seed 11, from 290 missed stays then refused now, and from 295 refused on both, in other words. No tack lost or gained;
+  - against the trunk e3d50aac, 28 cells move: C 16, D 12 (the brig 4, the hermaphrodite brig 3, the razee 3 by tmxrule, and the corvette 3), A 0. Made 838 against 829, refused 609 against 613, 9 gained, none lost.
+- **The two-fifths figure (the reader's M02, `HAUL_WAY_FRACTION` = 1.0, lived):** new truth 7-763c. The frigate in 15 kn with the habit set in memory keeps 0.53 of her way at the point and hauls there, 8 to 11.25 degrees off. M02 now fails it and no other test.
+- **Her words (`tests/test_diana.py`, the gripe truth):**
+  - Old: "she gripes past what her rudder holds, comes up toward the wind with her way going".
+  - New: from 292.5 she lies 62 degrees off at 4.9 kn, her helm at 18 degrees, and misses stays; from 295 she gripes up to 39 degrees off with a knot of way and is refused.
+  - Her bands are unchanged.
+- **New pins:**
+  - `tests/test_captains.py::test_a_jib_kept_at_its_limit_on_a_players_ship_is_taken_in_by_the_hands_at_its_dire_line` (fast). It fails with the take-in off.
+  - `..._on_a_players_ship_is_taken_in_before_it_goes`, the four hours of `KEPT_JIB_HOURS` as a player's ship, in the slow tier: taken in where it comes to its dire line, standing under it with its line said where it does not.
+
 ## Package 126, part two: the captain and a spar carried away, and lying to (2026-11-27)
 
 **One pin moved, a count:** the primer's chapter 3 grows by the paragraph on the last claimant
