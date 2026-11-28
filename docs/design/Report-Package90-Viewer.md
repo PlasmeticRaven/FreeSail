@@ -476,3 +476,66 @@ deck, side, place, part and state is the same.
 - **If the reader's report on 856dbcc brings a list,** it comes before anything more here.
 
 I stop here and wait for the coordinating session's word.
+
+## 2026-11-28: nudge 95's two points built, held for the hash with V3
+
+The coordinating session's word (nudge 95): 856dbcc is on the trunk at cfc1032b. For the hash that
+carries V3 and V4, it asked three things: a long foot's sag pinned on a ship file, V4's words
+declared, and `claude/pkg-90` merged. **This is a finished step, not a hash for the gate.**
+
+| Commit | What |
+|---|---|
+| 1f69677 | merge of `claude/pkg-90` at 8a95cb6: a174cca2, then the preview's README (docs only) |
+| e5d455c | the course's long foot pinned; V4's words declared figure by figure |
+
+The merge moved no code, test or ship file of this branch. The notes hold both points in full,
+under "Nudge 95: a long foot's sag pinned on a ship file" and "V4: a port's words by the log's
+"-deck" form".
+
+### A long foot's sag, pinned on a ship file
+
+- **New: `test_a_course_whose_foot_is_longer_than_its_depth_sags_by_its_depth`**, 4 cases: the
+  frigate's main course set, square and braced to her limit (64 degrees), on either tack.
+- **What it holds.** Her clews hang straight under her head, so her cloth stands upright and its
+  belly is level. Her foot's control then stands straight under its chord's middle by the sag
+  alone: 2 FOOT_SAG of her depth.
+- **Measured:** her depth 10.197 m, her foot 21.870 m, the sag 1.224 m. The sag is the same
+  before and after nudge 93's mend.
+- **The mutants**, each failing all four cases: the sag by the foot alone; by the greater of the
+  two; not twice over; no sag.
+- **The old rule passes it**, by the depth alone, because a long foot's sag is the old rule's. The
+  ringtails' cases and the unit case fail that one.
+
+### V4's words, declared
+
+The notes' V4 table now gives each word, old beside new, with its count of figures. 440 of the
+1,710 figures move, by their words alone.
+
+| File | Figures | Each of the four words |
+|---|---|---|
+| the 74 | 112 | 28: her 14 lower-deck ports a side |
+| the 64 | 104 | 26: her 13 a side |
+| the three-decker probe | 224 | 28 a deck, on her lower and her middle deck |
+
+The four words are "its lid shut" (her guns secured), "open" and "'s lid, hauled up" (her guns run
+out), and "shut, the sea at its sill" (shut by the sea). Each goes from "a lower port" to "a
+lower-deck port", and on the probe from "a middle port" to "a middle-deck port".
+
+**A correction to my last section:** its "28 figures" and "26" are a count for each word, not for
+each state. With her guns run out, each port is two figures, the port open and its lid.
+
+### Tests
+
+- **Run on e5d455c:** the view geometry whole and the practice tests, 1,239 cases, all passed.
+  Ruff check and ruff format are clean, no Python line is over 100 characters, and there is no CR
+  byte.
+- **Pins moved: none.** There are now 111 cases in the package, none of the base's removed or
+  renamed.
+- **The whole tiers go with the hash**, once V3 is built, on the merged tree, against a base run
+  there.
+
+### Held
+
+- **V3, and the lateen's change in a manoeuvre,** wait for the engine's served step (nudge 88).
+
+I stop here and wait for the coordinating session's word.
