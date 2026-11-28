@@ -73,3 +73,25 @@ Sent to the viewer, to mend at its cause: each edge's belly by its own length.
 
 That was her file as committed, before the engine's steps reach her. Sent to her builder to
 measure with her hash.
+
+## The mend, seen again (the same day, later)
+
+The viewer mended the owner's note at its cause (`edgeControl` in `client/projection.js`: each
+edge of a sail bellied by its own length, capped at `BELLY` of it). The mend is in the viewer's
+hash for V1 and V2, `claude/pkg-90-viewer` at 20aca5ec. It moves the outlines of sails on 15 of
+the 19 committed files, declared in the viewer's report; no corner, spar, line, frame or bound
+moves.
+
+The owner looked at it live, on a scratch tree here (20aca5ec with her files merged locally, never
+pushed):
+- **The tartane** (`pictures/7-mended-tartane-by-the-wind.png`, and close up
+  `pictures/8-mended-mizzen-forward-end-close-up.png`): by the wind with plain sail, the scratch
+  `dipping` key as before. Both lateens' short luffs now stand 0.03 m off their chords, where the
+  tongue stood 0.74 m on the mizen and about 1 m on the great lateen.
+- **The bilander *Hopewell*** (`data/ships/bilander.yaml`; `pictures/9-mended-bilander-settee.png`,
+  and close up `pictures/10-mended-bilander-settee-luff-close-up.png`): by the wind, her main
+  settee set. Its 1.81 m luff now stands 0.20 m off its chord, where it stood 1.35 m.
+
+**The owner's word**, verbatim, recorded in Part F, row T-v3:
+
+> "Both fixes look clean to me, very good."
