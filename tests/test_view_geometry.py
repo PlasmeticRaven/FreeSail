@@ -8521,3 +8521,69 @@ def test_a_bands_end_steps_with_the_side_where_the_side_steps(tmp_path):
         assert st["x"] == pytest.approx(-24.02, abs=1e-9)
         assert st["z"] == pytest.approx(2.10, abs=1e-6)
         assert (st["lo"], st["hi"]) == pytest.approx((4.1955, 4.7272), abs=1e-4)
+
+
+# The third rule (the Concepción's report at b451dea4, §C.2): a brace leads to the nearest lower
+# mast more than half a metre abaft its yard (`mastAftOf`), and a yard is slung before its mast
+# (YARD_BEFORE_MAST_OF_BEAM, of her beam): on a mast upright, or nearly, in a broad ship, the yard
+# hangs more than half a metre forward of its own mast's foot, which the rule found
+BRACE_ENDS = """
+    const sk = P.buildSkeleton(d.graph, null);
+    return {braces: sk.figures.filter(f => f.kind === 'line' && f.cls === 'brace')
+      .map(f => ({id: f.id, of: f.of, to: f.pts[1]}))};
+"""
+MAST_BY_X_M = 0.05
+
+
+def _own_lower_mast(graph: dict, spar_id: str) -> str | None:
+    """The lower mast a spar stands on, by its parents; None for one on no mast."""
+    spars = {s["id"]: s for s in graph["spars"]}
+    sid = spar_id
+    while spars[sid].get("parent"):
+        sid = spars[sid]["parent"]
+    return sid if spars[sid]["class"] == "mast" else None
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_a_brace_leads_aft_to_the_next_mast_and_never_to_its_own(tmp_path, path):
+    """A brace that ends at a mast ends at the next lower mast abaft its yard's own, never at its
+    own (`mastAftOf`); one with none abaft comes to her rail (`test_each_line_that_comes_down_ends_
+    on_her_drawn_rail`). Old beside new: the 74's, the 64's and the razee's fore yards' braces (the
+    fore yard's, the topsail's and the topgallant's, a side each) ended on their own fore mast, at x
+    19.84, 19.23 and 19.22 m, their yards slung 0.71, 0.50 to 0.59 and 0.51 to 0.60 m forward of its
+    foot; now on the main mast, at x -2.81, -2.78 and -2.84, as every other file's fore yards' do.
+    Every other brace of every file as it was, the 74's raked mizzen's on her rail among them."""
+    graph = graph_of(path)
+    got = run_js(tmp_path, {"graph": graph}, BRACE_ENDS)
+    x_of = {s["id"]: s["x_m"] for s in graph["spars"] if s["class"] == "mast"}
+    masts = sorted(x_of, key=lambda m: -x_of[m])  # forward to aft
+    for brace in got["braces"]:
+        own = _own_lower_mast(graph, brace["of"])
+        if own is None:
+            continue
+        # a mast by its x (its foot's, or its file's where its rake carries its foot aft), the
+        # masts metres apart; a brace led to one stands 0.3 m off the middle line
+        at = [m for m in masts if abs(x_of[m] - brace["to"][0]) < MAST_BY_X_M]
+        assert own not in at, brace["id"]
+        if at and abs(abs(brace["to"][1]) - 0.3) < 1e-9:
+            assert masts.index(at[0]) == masts.index(own) + 1, brace["id"]
+
+
+@needs_node
+@pytest.mark.parametrize("rake", ["as filed", "upright"])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_an_upright_mizzens_yards_brace_to_the_rail_as_a_raked_ones_do(tmp_path, rake, tack):
+    """The 74's mizzen as filed, raked 2.91 degrees aft, and stood upright (in memory, as the
+    Concepción's masts stand as measured): her mizzen yards' braces come to her rail either way,
+    her lines on the rail her file's set (`LINES_ON_THE_RAIL`). Old beside new, upright: her
+    mizzen yards hung 0.71 m forward of her mizzen's foot, and their six braces ended up her own
+    mizzen, at x -17.43, 21.1 to 23.9 m up; now on her rail, at x -20.56 to -24.20, as raked."""
+    data = fully_dressed(SEVENTY_FOUR, tack)
+    if rake == "upright":
+        (mizzen,) = [s for s in data["graph"]["spars"] if s["id"] == "mizzen.mast"]
+        assert mizzen["rake"] == pytest.approx(math.radians(2.91), abs=1e-3)
+        mizzen["rake"] = 0.0
+    got = run_js(tmp_path, data, LINE_ENDS)
+    on_the_rail = assert_every_end_is_on_the_rail_or_up_in_the_rig(got, data["graph"], tack)
+    assert on_the_rail == LINES_ON_THE_RAIL[SEVENTY_FOUR]

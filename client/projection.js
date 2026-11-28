@@ -2128,10 +2128,19 @@
     });
     var beam = hull.beam_m || 8;
 
-    function mastAftOf(x) {
+    /** The nearest lower mast more than half a metre abaft x, the yard `Y`'s own lower mast not
+     *  among them. Package 90 (the Concepcion's report, §C.2): a yard is slung before its mast
+     *  (YARD_BEFORE_MAST_OF_BEAM), and where its mast stands upright, or nearly, and her beam is
+     *  broad, it hangs more than half a metre forward of that mast's foot, and its braces led to
+     *  its own mast: her nine yards' (her mizzen yards' up her own mizzen, 24.1 to 27.3 m, not to
+     *  her rail), and the fore yards' of the 74, the 64 and the razee, 0.50 to 0.71 m forward of
+     *  their fore mast's foot (to it, not to the main mast). */
+    function mastAftOf(x, Y) {
+      var own = Y;
+      while (own && own.parent) own = own.parent;
       var best = null;
       lowerMasts.forEach(function (m) {
-        if (m.x < x - 0.5 && (best === null || m.x > best.x)) best = m;
+        if (m !== own && m.x < x - 0.5 && (best === null || m.x > best.x)) best = m;
       });
       return best;
     }
@@ -2151,7 +2160,7 @@
         if (!Y || !Y.arm || sentDown(Y) || Y.onDeck) return;
         var ss = sideSign(ln.side);
         var from = ss > 0 ? Y.b : Y.a;
-        var m = mastAftOf(Y.x);
+        var m = mastAftOf(Y.x, Y);
         var to = m ? v(m.x, ss * 0.3, Math.min(Y.centre[2], m.head[2] - 1)) : sideEnd(ss, Y.x - Y.half * 0.8);
         if (underBowsprit(Y.spec) && lowerMasts.length) {
           // package 75 (B5.3; Ext §6.2): a yard under the bowsprit or the jib-boom is braced
