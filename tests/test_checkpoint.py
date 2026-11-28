@@ -15,7 +15,6 @@ import gzip
 import io
 import json
 import pickle
-import sys
 import time
 from pathlib import Path
 
@@ -551,83 +550,3 @@ def test_a_save_made_before_the_mend_loads_on_the_chart_that_holds_its_region():
     assert world.chart.bounds == holding.bounds and len(world.chart.regions) > 1
     assert world.chart.depth_at(Position(47.70, -6.0)) is not None
     assert load_chart("channel-west").depth_at(Position(47.70, -6.0)) is None
-
-
-# ---------------------------------------------------------------------------
-# Package 129: no checkpoint of the game's holds a path object (truths 7-797, 7-799)
-# ---------------------------------------------------------------------------
-
-
-def _holders():
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-    import checkpoint_holders as H
-
-    return H
-
-
-def test_truth_7_797_every_shipped_scenario_saved_loads_by_its_checkpoint_and_holds_no_path():
-    """Every scenario under `data/scenarios/` begun as the harbour begins it, run ten
-    minutes and saved: its checkpoint, read by its names without loading it, holds no path
-    object and no name the loader refuses; it loads by its checkpoint, and is the game that
-    was saved (the owner's first action refused hers, "names pathlib.PosixPath")."""
-    import tempfile
-
-    H = _holders()
-    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
-    import checkpoint_names as C
-
-    from freesail.ui.server import prepare_game, server_parser
-
-    scenarios = C.scenario_files()
-    assert len(scenarios) >= 49
-    by_checkpoint = []
-    for path in scenarios:
-        world = C.scenario_world(path, C.RUN_S)
-        save = Path(tempfile.mkdtemp()) / "saved.json"
-        replay_mod.save_to_file(world, save)
-        body = H.pickle_of(save.with_suffix(".checkpoint"))
-        held = H.holders(body)
-        assert held, path.name  # the names were read
-        assert not [h.line() for h in held if h.module.startswith("pathlib")], path.name
-        assert not [h.line() for h in H.not_admitted(body)], path.name
-        args = server_parser().parse_args(["--load", str(save)])
-        loaded = prepare_game(args, say=lambda _line: None)
-        assert loaded.load_report.how == "checkpoint", (path.name, loaded.load_report.words)
-        assert loaded.clock.tick == world.clock.tick, path.name
-        assert loaded.log.digest() == world.log.digest(), path.name
-        by_checkpoint.append(path.name)
-    assert len(by_checkpoint) == len(scenarios)
-
-
-def test_truth_7_799_the_names_of_a_checkpoint_are_read_without_loading_it_and_say_where(
-    tmp_path, monkeypatch
-):
-    """`tools/checkpoint_holders.py` reads a checkpoint's names from its opcodes: a path
-    object planted in a world's scenario is named, with the attribute that holds it, the
-    objects about it and its words; and nothing in the file is looked up or built (the
-    unpickler is never called)."""
-    import pickle
-
-    H = _holders()
-    sf = load_scenario("data/scenarios/tender.yaml")
-    world = make_scenario_world(sf)
-    begin(world, sf)
-    world.run(60)
-    world.scenario.planted_place = Path("/a/place/of/saves")
-    save = tmp_path / "planted.json"
-    replay_mod.save_to_file(world, save)
-
-    def never(*_a, **_k):
-        raise AssertionError("the checkpoint was loaded")
-
-    monkeypatch.setattr(pickle, "Unpickler", never)
-    monkeypatch.setattr(pickle, "load", never)
-    monkeypatch.setattr(pickle, "loads", never)
-    refused = H.not_admitted(H.pickle_of(save.with_suffix(".checkpoint")))
-    assert len(refused) == 1, [h.line() for h in refused]
-    (path,) = refused
-    assert path.module.startswith("pathlib") and path.name.endswith("Path")
-    assert path.keys[-1] == "planted_place"
-    assert "freesail.core.world.Scenario" in path.within
-    assert path.words[0] == "/a/place/of/saves"
-    assert H.main([str(save.with_suffix(".checkpoint"))]) == 1

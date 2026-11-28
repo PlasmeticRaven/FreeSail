@@ -45,7 +45,6 @@ plain class default, and `tests/fixtures/saves/` keeps old checkpoints as tests.
 
 from __future__ import annotations
 
-import contextlib
 import gzip
 import io
 import json
@@ -557,21 +556,14 @@ def write_checkpoint(world: World, path: str | Path) -> Path:
     """Write the world's whole state beside its save. The header names the save it
     belongs to: the seed, the end tick, the journal's length and the log's digest."""
     path = Path(path)
-    # the seed, the journal and the inputs as the save writes them, the game's first hull's
-    # (`World.save`): followed aboard another hull (a prisoner in his captor), the world's
-    # per-ship names read hers, and a header of hers was never the save's; the log's digest
-    # is the followed hull's, as the loader reads it again
-    first = world.__dict__.get("_own")
-    with world.as_hull(first) if first is not None else contextlib.nullcontext():
-        seed, journal_len, inputs_len = world.seed, len(world.journal), len(world.inputs)
     header = {
         "format": CHECKPOINT_FORMAT,
         "engine": world.save()["engine"],
         "build": build_stamp(),  # the build that wrote it (package 37d)
-        "seed": seed,
+        "seed": world.seed,
         "end_tick": world.clock.tick,
-        "journal_len": journal_len,
-        "inputs_len": inputs_len,
+        "journal_len": len(world.journal),
+        "inputs_len": len(world.inputs),
         "digest": world.log.digest(),
     }
     body = checkpoint_bytes(world)

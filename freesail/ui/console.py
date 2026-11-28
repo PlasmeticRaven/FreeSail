@@ -904,8 +904,7 @@ class Console:
         }
         if records_dir:
             options["records_dir"] = records_dir
-            # the seat hook reads them (package 43); as words, which a checkpoint may hold
-            self.world.consent_records_dir = str(records_dir)
+            self.world.consent_records_dir = records_dir  # the seat hook reads them (package 43)
         if saves_dir:
             options["saves_dir"] = saves_dir
         router = agent_routes(self.lock, lambda: self.world, **options)

@@ -1552,9 +1552,7 @@ def create_app(
     options: dict[str, Any] = {"game": game, "lockstep": driver.lockstep, "say": say}
     if consent_records is not None:
         options["records_dir"] = consent_records
-        # the seat hook's (package 43), kept as words: a path object in the world is a name
-        # its checkpoint may not hold, and the save would be refused its checkpoint
-        driver.world.consent_records_dir = str(consent_records)
+        driver.world.consent_records_dir = consent_records  # the seat hook's (package 43)
     if saves_dir is not None:
         options["saves_dir"] = saves_dir
     router = agent_routes(
@@ -1576,7 +1574,7 @@ def create_app(
         # the harbour's new game (package 59): the painter and the records go with it
         pictures.set_painter(new, easel)
         if consent_records is not None:
-            new.consent_records_dir = str(consent_records)
+            new.consent_records_dir = consent_records
 
     driver.on_replace(taken_up)
     # the harbour (package 59; spec M7b §21d), at its own path while a game runs
