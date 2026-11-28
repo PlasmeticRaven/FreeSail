@@ -636,11 +636,6 @@ class Runner:
             from freesail.orders.storm import keep_storm_canvas
 
             keep_storm_canvas(ship)
-        if "jibs_kept" in ship.extra:
-            # a jib `shorten sail` left on her, forgotten once it is in (package 125, D)
-            from freesail.orders.storm import forget_kept_jibs
-
-            forget_kept_jibs(ship)
         if "course_pending" in ship.extra:
             # a course across the wind held for want of way, given when she has it (37m)
             from freesail.orders.navigation import keep_course_pending

@@ -769,86 +769,34 @@ def test_truth_7_664_shortened_in_20_knots_she_stays(heading):
     assert 180 <= seconds <= 330, seconds
 
 
-def _shortened_reply(wind_kn: float, heading: float):
-    """`_shortened`, and `shorten sail`'s answer."""
-    from tests.test_known_truths import close_hauled_on_starboard
-
-    world = close_hauled_on_starboard(HER, knots_=wind_kn, heading=heading)
-    _idle(world, 900)
-    reply = world.submit("shorten sail").text
-    world.tick()
-    _idle(world, 1500)
-    return world, reply
-
-
-def _jib_taken_in(wind_kn: float, heading: float):
-    """`_shortened`, then her jib taken in by the order `shorten sail`'s line names, run to its
-    end."""
-    world = _shortened(wind_kn, heading)
-    world.submit("take in the jib")
-    world.tick()
-    _idle(world, 1500)
-    return world
-
-
-@pytest.mark.parametrize("heading", [290.0, 292.5, 295.0])
-def test_truth_7_664_shortened_in_25_knots_her_jib_is_left_on_her_and_she_stays(heading):
-    """Truth E's shortened row, 25 knots, as the game now does it (package 125, rule D):
-    **in a fresh breeze, shortened by the game's own order, she wants her jib, and it is left on
-    her.** `shorten sail` keeps it ("The jib is left on her: she gripes, and her helm will not
-    hold her without it"), loaded to three quarters of its rating (0.75 measured); she holds her
-    course with little helm (0.4 to 2.0 degrees measured), 65 to 70 degrees off at 6.9 to 8.1 kn,
-    and stays from every heading, 3 of 3, within her band (203 to 208 s measured), the jib under
-    its rating through the tack. Old (her builder's, before package 125): "`shorten sail` takes it
-    in there ... and with it in she gripes ... Stayed 1 of 3, from 290" (docs/dev/TuningNotes.md,
-    package 125, the corvette's pins moved by D)."""
-    from tests.test_known_truths import knots, off_wind, run, until
-
-    world, reply = _shortened_reply(25.0, heading)
-    jib = world.ship.sails["jib"]
-    assert jib.state == SailState.SET
-    assert "The jib is left on her" in reply, reply
-    run(world, 60, trim_every=120)
-    off, way = off_wind(world), knots(world)
-    assert 62.0 <= off <= 72.0, (heading, off)
-    assert 6.0 <= way <= 9.0, (heading, way)
-    assert abs(math.degrees(world.ship.dyn.rudder)) <= 5.0, world.ship.dyn.rudder
-    share = jib.load_kn / jib.effective_cloth_rating_kn
-    assert 0.70 <= share < 1.0, share
-    world.submit("tack ship")
-    done, seconds = until(world, TACK_KINDS, 900)
-    assert [e.kind for e in done] == ["ship.tacked"], [e.text for e in done]
-    assert 180 <= seconds <= 330, seconds
-    assert jib.state == SailState.SET
-
-
-# 25 knots shortened and her jib then taken in (`take in the jib`, the order the shortening's
-# line names), as measured: from 290 she keeps her way and stays; from 292.5 and 295 she gripes
-# past what her rudder holds, comes up toward the wind with her way going, and misses stays or the
-# tack is refused for want of way. Her angle off the wind and her way in their bands. Old (with the
-# jib taken in by `shorten sail` itself, before package 125's D): 290 off 65 to 75 at 6 to 9 kn,
-# stayed 235 s; 292.5 and 295 off 30 to 62 at under 2.5 kn, not about.
+# 25 knots shortened and no more, as measured (the lead's nudge 70): from 290 she keeps her way and
+# stays; from 292.5 and 295 the game's shortening takes in her jib and she gripes past what her
+# rudder holds, comes up into the wind and lies there with a knot or two, and the tack is refused
+# for want of way (or missed). Her angle off the wind, her way and her weather helm in their bands.
 NOT_ABOUT = ("evolution.failed", "ship.missed_stays")  # refused for want of way, or missed
 SHORTENED_25 = {
-    290.0: {"off": (65.0, 75.0), "kn": (6.0, 9.0), "tack": ("ship.tacked",)},  # 233 s
-    292.5: {"off": (55.0, 66.0), "kn": (3.0, 6.0), "tack": NOT_ABOUT},  # 62.4 off, 4.9 kn
-    295.0: {"off": (30.0, 50.0), "kn": (0.0, 2.5), "tack": NOT_ABOUT},  # 39.3 off, 1.0 kn
+    290.0: {"off": (65.0, 75.0), "kn": (6.0, 9.0), "tack": ("ship.tacked",)},  # 235 s
+    292.5: {"off": (30.0, 62.0), "kn": (0.0, 2.5), "tack": NOT_ABOUT},
+    295.0: {"off": (30.0, 62.0), "kn": (0.0, 2.5), "tack": NOT_ABOUT},
 }
 
 
 @pytest.mark.parametrize("heading", sorted(SHORTENED_25))
 def test_truth_7_664_shortened_in_25_knots_she_gripes_without_her_jib(heading):
-    """Truth E's shortened row, 25 knots, the jib taken in (the lead's nudge 70; package 125):
-    **without her jib in a fresh breeze she gripes.** Shortened by the game's own order, which
-    leaves the jib on her, and the jib then taken in by `take in the jib`: her weather helm past
-    what her small rudder holds, she comes up toward the wind with her way going, and will not go
-    about. Stayed 1 of 3, from 290, where her way held. Her rudder, traced from her plan and the
-    least of any ship's, is the cause (with the frigate-36's ratio she holds her course)."""
+    """Truth E's shortened row, 25 knots and no more (the lead's nudge 70): **in a fresh breeze,
+    shortened by the game's own order, she wants her jib.** `shorten sail` takes it in there (it
+    is loaded to three quarters of its rating, `orders/storm.py`), and with it in she gripes: her
+    weather helm past what her small rudder holds, she comes up into the wind and lies there with
+    a knot or two of way, and will not go about. Stayed 1 of 3, from 290, where her way held.
+    Measured with the shortening finished (her report's §14): from 292.5 and 295, 35 to 59
+    degrees off at 1.2 kn, the tack refused ("she has not way enough on her to stay"); her rudder,
+    traced from her plan and the least of any ship's, is the cause (with the frigate-36's ratio
+    she holds her course)."""
     from tests.test_known_truths import knots, off_wind, run, until
 
     band = SHORTENED_25[heading]
-    world = _jib_taken_in(25.0, heading)
-    assert world.ship.sails["jib"].state != SailState.SET
+    world = _shortened(25.0, heading)
+    assert world.ship.sails["jib"].state != SailState.SET  # taken in by the game's own order
     run(world, 60, trim_every=120)
     off, way = off_wind(world), knots(world)
     assert band["off"][0] <= off <= band["off"][1], (heading, off)
@@ -863,20 +811,18 @@ def test_truth_7_664_shortened_in_25_knots_she_gripes_without_her_jib(heading):
 @pytest.mark.parametrize("heading", [290.0, 292.5, 295.0])
 def test_truth_7_664_shortened_in_25_knots_with_her_jib_set_again_she_stays(heading):
     """Truth E's shortened row, 25 knots with her jib (the lead's nudges 69 and 70): **set the jib
-    again and she bears away, gathers way and stays.** With it taken in after the shortening
-    (`take in the jib`; since package 125 the game's own `shorten sail` leaves it on her there),
-    `set the jib` is taken, the jib holds under its rating, she comes back to her course with
-    way and stays from every heading, 3 of 3, within her band (184 to 187 s measured; old, the
-    jib taken in by the shortening itself, 184 to 189); the jib loaded through the tack to under
-    its rating (0.67 to 0.70 measured; old 0.68 to 0.78) and not blown out."""
+    again and she bears away, gathers way and stays.** After the game's own shortening has taken it
+    in, `set the jib` is taken, the jib holds under its rating, she comes back to her course with
+    way (6.9 to 8.7 kn measured) and stays from every heading, 3 of 3, within her band (184 to 189
+    s); the jib loaded through the tack to under its rating (0.68 to 0.78 measured) and not blown
+    out."""
     from tests.test_known_truths import knots, off_wind
 
-    world = _jib_taken_in(25.0, heading)
-    jib = world.ship.sails["jib"]
-    assert jib.state != SailState.SET
+    world = _shortened(25.0, heading)
     world.submit("set the jib")
     world.tick()
     _idle(world, 900)
+    jib = world.ship.sails["jib"]
     assert jib.state == SailState.SET
     held = 0
     for _ in range(600):

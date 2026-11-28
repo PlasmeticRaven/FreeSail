@@ -481,11 +481,6 @@ def _warn(
             many = "stretched drum-tight; they will not stand much more."
         else:
             one = many = "straining at the bolt-ropes."
-        kept = ship.extra.get("jibs_kept") if isinstance(ship.extra, dict) else None
-        if isinstance(kept, dict) and part.id in kept:
-            # a jib `shorten sail` left on her for her helm (package 125, D; `orders.storm`):
-            # its line names the order that eases it, and is said alone
-            one, many = one[:-1] + f": take in the {_name(ship, part.id, False)}.", None
     warning = _Warning(part, ratio, one, many)
     if out is None:
         _log_warnings(ship, [warning])

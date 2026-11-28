@@ -3734,18 +3734,12 @@ class Captain(Judgement):
         """A head sail straining at its bolt-ropes in a wind over `shorten_sail_kn` is taken
         in before it blows out (package 58b, item 5; 57's gale trial: the fore topmast
         staysail strained at 08:16 and at 08:26 and split at 08:29, the jib hauled down and
-        it left standing). The storm staysails are the book's storm canvas, and stand. A jib
-        `shorten sail` left on her for her helm, at its limit (package 125, D; `orders.storm`),
-        is taken in at its first strain's line, whatever the wind."""
+        it left standing). The storm staysails are the book's storm canvas, and stand."""
         d = self.doctrine
         th = d.threshold if d is not None else (lambda k, v=None: v)
-        ship = self.world.ship
-        extra = getattr(ship, "extra", None)
-        kept = extra.get("jibs_kept") if isinstance(extra, dict) else None
-        kept = set(kept) if isinstance(kept, dict) else set()
-        low = p.wind_kn < float(th("shorten_sail_kn", 30))
-        if low and not kept:
+        if p.wind_kn < float(th("shorten_sail_kn", 30)):
             return
+        ship = self.world.ship
         try:
             from freesail.evolutions.scripts import head_sails
         except ImportError:  # pragma: no cover
@@ -3756,9 +3750,7 @@ class Captain(Judgement):
         done = self._business.setdefault("head_sails_in", {})
         for e in events:
             sid = getattr(e, "subject", None)
-            if e.kind != "strain.warning" or sid not in heads:
-                continue
-            if sid not in kept and (low or "bolt-ropes" not in e.text):
+            if e.kind != "strain.warning" or sid not in heads or "bolt-ropes" not in e.text:
                 continue
             if p.tick - int(done.get(sid, -(10**9))) < 600:
                 continue
