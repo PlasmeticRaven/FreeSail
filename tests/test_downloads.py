@@ -62,6 +62,19 @@ def _source_of(rel: str) -> str:
     return rel
 
 
+def _forget_what_the_game_has_read() -> None:
+    """Empty every `functools` cache in the game's modules already imported: a file another
+    test in this process has read (the primer's pages, the charts' tiles) is otherwise
+    served from memory, never opened again, and so never seen by the hook."""
+    for name, module in list(sys.modules.items()):
+        if name != "freesail" and not name.startswith("freesail."):
+            continue
+        for value in list(vars(module).values()):
+            clear = getattr(value, "cache_clear", None)
+            if callable(clear) and hasattr(value, "cache_info"):
+                clear()
+
+
 def test_truth_7_800_everything_the_game_opens_lies_in_what_the_downloads_ship(
     tmp_path, monkeypatch
 ):
@@ -73,7 +86,8 @@ def test_truth_7_800_everything_the_game_opens_lies_in_what_the_downloads_ship(
     second game begun on the Channel's chart (*The tender*), a minute of it run and its
     chart asked: every file opened under the repository but the tests' own lies in the
     list the assembling script ships (`bundle.game_files`), and some of the charts' tiles
-    were among them."""
+    and the primer's pages were among them. The game's caches are emptied first, so that
+    what other tests in the same process read is read again here."""
     pytest.importorskip("fastapi")
     from own_page import PageClient
 
@@ -86,6 +100,7 @@ def test_truth_7_800_everything_the_game_opens_lies_in_what_the_downloads_ship(
     monkeypatch.chdir(ROOT)
     saves = tmp_path / "saves"
     sys.addaudithook(_hook)  # once a process; it records only while _opened is a list
+    _forget_what_the_game_has_read()
     _opened = []
     try:
         driver = Driver(World(seed=7, scenario=Scenario()))

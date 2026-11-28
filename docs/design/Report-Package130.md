@@ -20,7 +20,7 @@ The pieces in the repository:
 | `tools/bundle_smoke.py` | the smoke test of a built zip, on the system it is for |
 | `.github/workflows/downloads.yml` | builds both, smoke-tests them on Windows and both Macs, and publishes a pre-release when asked |
 | `.github/workflows/release.yml` | the gate's release, which now calls the above and attaches both downloads beside the project's zip |
-| `tests/test_downloads.py` | truths 7-800 to 7-804, in the ordinary suite |
+| `tests/test_downloads.py` | truths 7-800 to 7-806, in the ordinary suite; a change to it runs the downloads workflow again |
 
 ## What the game opens, and so what ships
 
@@ -121,7 +121,7 @@ Nothing is built for either. **Windows**: an Authenticode code-signing certifica
 
 ## Truths 7-800 to 7-806
 
-- **7-800** everything the game opens lies in what the downloads ship (the audit-hook measurement above, in process, about 14 s).
+- **7-800** everything the game opens lies in what the downloads ship (the audit-hook measurement above, in process, about 14 s). It first empties the game's `functools` caches, so that a file another test in the same worker has read (the primer's pages, the charts' tiles) is opened again and seen: without that, the whole fast tier once found the primer unread.
 - **7-801** the game's files ship by their rule (every ship, scenario and chart; the consent brief and the README), and not the owner's consent records, the tests, the tools, the other documents or any compiled file.
 - **7-802** the libraries are the game's own (its base, `server` and `agents`, none of `dev`'s alone), each lock pinning every library by version with its sha256.
 - **7-803** every interpreter pinned by version and sha256 at its maker's place; every action in both workflows by its commit; no pull request trigger; one job that may write; no outsider's text spliced into a script.

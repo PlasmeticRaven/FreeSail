@@ -46,6 +46,8 @@ on:
       - "tools/bundle/**"
       - "tools/bundle_smoke.py"
       - ".github/workflows/downloads.yml"
+      # the truths of what the downloads ship (7-800 to 7-806)
+      - "tests/test_downloads.py"
       # the dependencies the lock files are resolved from
       - "pyproject.toml"
 
