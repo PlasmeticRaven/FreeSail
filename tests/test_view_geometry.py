@@ -133,6 +133,7 @@ from rig_fixtures import (
     frigate_with_mizen_yard_doc,
     polacre_probe_doc,
     tartane_probe_doc,
+    three_decker_probe,
     write_ship,
     xebec_probe_doc,
 )
@@ -140,6 +141,7 @@ from rig_fixtures import (
 from freesail import orders
 from freesail.api import queries
 from freesail.api.session import attach_systems, make_ship, make_world
+from freesail.combat import ports as lee_ports
 from freesail.core.world import Scenario
 from freesail.evolutions import Runner
 from freesail.evolutions.trim import (
@@ -8270,3 +8272,100 @@ def test_a_foot_sags_no_more_than_its_own_length_allows():
     assert long_ == pytest.approx([0.0, 0.0, -2 * FOOT_SAG_SHARE * 10])
     assert short == pytest.approx([0.0, 0.0, -2 * FOOT_SAG_SHARE * 5])
     assert none == pytest.approx([0.0, 0.0, 0.0])
+
+
+# ---------------------------------------------------------------------------
+# Package 90, V4 (docs/design/Plan-Package90.md §6; Design-Package90-Engine.md §6.2 and §13 item
+# 3): a port's words by the log's "-deck" form. The viewer said "-deck" of the upper deck alone and
+# every other deck by its bare word, where the log says the lower, the middle and the upper deck
+# with "-deck" (`freesail/combat/ports.py`, `_DECKS_SAID_SO`: "The lee lower-deck ports are shut"):
+# so the 74's and the 64's "a lower port", and a three-decker's "a middle port". Mended where the
+# port's words are made (`portFigures`, by `DECKS_SAID_SO`): words alone
+# ---------------------------------------------------------------------------
+
+PORT_WORDS = """
+  return d.states.map(s => P.buildSkeleton(s.graph, s.snap).figures
+    .filter(f => f.part === 'port' || f.part === 'lid')
+    .map(f => [f.deck, f.words]));
+"""
+
+# a port's words in each of its states, after its article and its deck's words
+PORT_STATES = (", its lid shut", ", open", "'s lid, hauled up", ", shut, the sea at its sill")
+
+
+def _guns_three_ways(ship) -> list[dict]:
+    """Her graph and snapshot with every gun secured, run out, and run in shut by the sea."""
+    states = []
+    for state, shut in (("secured", False), ("run out", False), ("run in", True)):
+        data = ship_state(ship)
+        data["snap"]["guns"] = [
+            {"id": g["id"], "state": state, "loaded": False, "shut": shut, "fired": 0}
+            for g in data["graph"]["guns"]
+        ]
+        states.append(data)
+    return states
+
+
+def _port_words(tmp_path: Path, ship) -> dict[str, set[str]]:
+    """Every port's and lid's words, by deck, her guns secured, run out and shut by the sea."""
+    out: dict[str, set[str]] = {}
+    for figs in run_js(tmp_path, {"states": _guns_three_ways(ship)}, PORT_WORDS):
+        for deck, words in figs:
+            out.setdefault(deck, set()).add(words)
+    return out
+
+
+@needs_node
+def test_the_viewer_says_with_deck_the_decks_the_log_says_so():
+    """The one list of the decks said "-deck", the log's (`combat/ports.py`), held by the viewer
+    as the same list (`DECKS_SAID_SO`)."""
+    res = subprocess.run(
+        [
+            NODE,
+            "-e",
+            f"process.stdout.write(JSON.stringify(require({json.dumps(str(PROJECTION))})"
+            ".constants.DECKS_SAID_SO))",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert res.returncode == 0, res.stderr
+    assert json.loads(res.stdout) == list(lee_ports._DECKS_SAID_SO) == ["lower", "middle", "upper"]
+
+
+@needs_node
+@pytest.mark.parametrize("path", PROFILED)
+def test_every_port_is_named_by_its_deck_as_the_log_names_it(tmp_path, path):
+    """On every file, each port and lid says its deck as the log does, "-deck" after the lower,
+    the middle and the upper deck and every other deck its own word, with its article, in each of
+    its states, or "an empty" port; words alone (measured: no figure moves)."""
+    for deck, said in _port_words(tmp_path, make_ship(path)).items():
+        deck_words = f"{deck}-deck" if deck in lee_ports._DECKS_SAID_SO else deck
+        a_port = ("an " if deck_words[0] in "aeiou" else "a ") + deck_words + " port"
+        allowed = {a_port + s for s in PORT_STATES} | {f"an empty {deck_words} port, its lid shut"}
+        assert said <= allowed, (deck, said - allowed)
+
+
+@needs_node
+@pytest.mark.parametrize("path", [SEVENTY_FOUR, SIXTY_FOUR])
+def test_the_74s_and_the_64s_lower_ports_are_lower_deck_ports(tmp_path, path):
+    """V4's move, old beside new: the 74's and the 64's lower ports were "a lower port, its lid
+    shut", "a lower port, open", "a lower port's lid, hauled up" and "a lower port, shut, the sea
+    at its sill"; now "a lower-deck port" in each, as the log's "the lee lower-deck ports". Their
+    upper and quarterdeck ports say what they said."""
+    said = _port_words(tmp_path, make_ship(path))
+    assert said["lower"] == {"a lower-deck port" + s for s in PORT_STATES}
+    assert said["upper"] == {"an upper-deck port" + s for s in PORT_STATES}
+    assert said["quarterdeck"] >= {"a quarterdeck port" + s for s in PORT_STATES}
+
+
+@needs_node
+def test_a_three_deckers_middle_ports_are_middle_deck_ports(tmp_path):
+    """On the three-decker probe (`three_decker_probe`, the 74 with a third gun deck): her middle
+    ports were "a middle port"; now "a middle-deck port", as the log's "the lee middle-deck ports",
+    between her "lower-deck" and her "upper-deck" ports."""
+    said = _port_words(tmp_path, three_decker_probe())
+    for deck in ("lower", "middle"):
+        assert said[deck] == {f"a {deck}-deck port" + s for s in PORT_STATES}
+    assert said["upper"] == {"an upper-deck port" + s for s in PORT_STATES}

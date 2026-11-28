@@ -4203,6 +4203,10 @@
 
   // §2.5, §3.3 (judgement; the questions to the owner's shelf, §11.2)
   var LID_OPEN_DEG = 70; // a lid hauled up from hanging shut, outboard
+  // package 90, V4: a port is named by its deck as the log names it ("the lee lower-deck ports",
+  // `freesail/combat/ports.py`'s `_DECKS_SAID_SO`): these decks with "-deck", every other deck
+  // its own word ("a quarterdeck port"); "a lower-deck port", "a middle-deck port"
+  var DECKS_SAID_SO = ["lower", "middle", "upper"];
   var OUT_SHARE = { long: 0.33, carronade: 0.25, swivel: 0.5 }; // run out: the muzzle outboard
   var RECOIL_SHARE = { long: 0.4, carronade: 0.15, swivel: 0 }; // run in: the muzzle inboard
   var HOUSED_INBOARD_M = 0.1; // secured: the muzzle just inside the side
@@ -4321,7 +4325,7 @@
         var mid = stripMid(hull, side, port.x_m, centroid(pts));
         var open = portOpen(port, side, snapshot);
         var gid = port.guns[side] || port.guns.both;
-        var deckWords = (port.deck === "upper" ? "upper-deck" : port.deck) + " port";
+        var deckWords = (DECKS_SAID_SO.indexOf(port.deck) >= 0 ? port.deck + "-deck" : port.deck) + " port";
         var aPort = (/^[aeiou]/.test(deckWords) ? "an " : "a ") + deckWords;
         var words = open ? aPort + ", open" : !gid ? "an empty " + deckWords + ", its lid shut" : gunState(snapshot, gid).shut ? aPort + ", shut, the sea at its sill" : aPort + ", its lid shut";
         figs.push({ kind: "hull", part: open ? "port" : "lid", side: side, cls: open ? "open" : "shut", pts: pts, sortAt: mid, outward: faceOut(pts, sign), sea: true, words: words, deck: port.deck, at_x: port.x_m });
@@ -5121,6 +5125,7 @@
       HEAD_SIDING_M: HEAD_SIDING_M,
       DECK_END_CLEAR_M: DECK_END_CLEAR_M,
       LID_OPEN_DEG: LID_OPEN_DEG,
+      DECKS_SAID_SO: DECKS_SAID_SO,
       OUT_SHARE: OUT_SHARE,
       RECOIL_SHARE: RECOIL_SHARE,
       HOUSED_INBOARD_M: HOUSED_INBOARD_M,
