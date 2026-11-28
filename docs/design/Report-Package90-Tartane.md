@@ -39,6 +39,13 @@ start, swayed up when set and sent down when taken in, as measured. The askew fo
 viewer's: `squareCut` takes the tréou's yard on deck as the yard below. Its mend is one
 condition in `client/projection.js`, V2's, not mine; nothing in the tree moved.
 
+**The lead's nudge 88: her topsail's foot and her lateen yard (§15).** The foot's mended
+arithmetic gives her topsail 0.03 m over her lateen yard, and by her file's cut it is none: the
+topsail is cut down to the hounds, where the lateen yard is slung. The pole's head (Forfait's 26
+pieds) and the lateen's hoist (Forfait p. 121, as read) stand. The topsail's depth is mine, the
+cutter's rule with no source behind it, and it does not stand. §15.3 gives the re-cut for the
+lead to rule, owed with her hash.
+
 **The branch.** `…/pkg-90-tartane`, cut from f6f26f8a (`git log -1` checked). I merged
 nothing from `…/pkg-90`, so my base and my final run are on the same tree. Nothing was
 rebased or forced.
@@ -334,6 +341,9 @@ file carries a known list, so it goes in two places:
 Both are owed with her hash, beside the other towing items. Also noted there, and not mine: a
 towed boat with no file of her own puts no drag on the ship, and the generator may refuse `towed`
 on such a boat when her files come.
+
+**Owed with her hash, as the lead rules on §15.3** (the lead's nudge 88): her topsail cut clear
+above the lateen yard's slings.
 
 ## 7. The pictures
 
@@ -930,3 +940,78 @@ ran no new tier. When V2's condition is on `…/pkg-90`, her final version's che
 case: her topsail's foot square with its own yard at her start, in plain sail, and with the
 tréou set and taken in. I will write it then, in the viewer's file as widened to me for her rows
 (§10).
+
+## 15. The lead's nudge 88: her topsail's foot and her lateen yard
+
+The lead's nudge 88, point 4, in the note at the end of `docs/dev/M7-WorkPackages.md` on the
+trunk at dc7a1f7c, which I read whole. `ship/graph._square_foot_m` overstates a square sail's
+foot by twice her deck's height, and the engine mends it in the served step. Mended, her
+topsail's foot clears her lateen yard by 0.03 m, not 1.11 m, "no clearance at all by a seaman's
+eye". The lead asks whether her ruled figures stand with that clearance, or what her source
+gives for the topsail's depth, the pole's head and the lateen yard's hoist. Nothing is built
+now. This is the answer, and the mend it asks for is owed with her hash.
+
+**In short: the head and the hoist are her source's, and they stand. The topsail's depth is
+mine, with no source behind it, and it does not stand.** Cut to the hounds, its foot comes down
+to where the lateen yard is slung.
+
+### 15.1 The clearance as her file cuts it: none
+
+Her module's figures, unrounded, above her water:
+- the main's hounds at 8.848 m and her head at 17.293 m;
+- the topsail yard at 16.319 m, 3 pieds under the head;
+- the topsail cut from its yard down to the hounds, 7.470 m deep;
+- the lateen yard slung at the hounds, 8.848 m.
+
+So the foot and the slings are at one height, 0.00 m apart by the cut. The 0.03 m is the file's
+rounding: the topsail's centre, 12.584 m, is written 12.6, and the foot doubles that (2 × 0.016).
+The doubled deck height comes from the datums: the file's yard heights are above her deck datum
+(0.54 m), and the sails' centres are above her water.
+
+**For the engine's step.** A5 classes her topsail as a topsail, not a course, because its foot
+stands above the lateen yard (`foot > lat.height_m`). With the arithmetic mended, that holds by
+the rounding alone. On the unrounded figures the two are equal, and she would read as a course.
+The re-cut in §15.3 takes her off that edge.
+
+### 15.2 What her source gives
+
+| Figure | Her file | Her source |
+|---|---|---|
+| The pole's head | 8.45 m from the hounds to the head: the hounds 8.00 m and the head 16.44 m above her deck at the mast | Forfait 1788 Table II, the *Humble*: the main 59 pieds, its head (*ton*) 26 pieds (8.45 m). Chapman's sheer, measured: the hounds 7.7 to 8.0 m and the head 16.2 to 16.4 m above the deck (Pages §6.4). **Stands** |
+| The lateen yard's hoist | at the hounds, the foot of the head | Forfait p. 121: hoisted until its halyard block touches the one aloft, the halyard through the calcet's sheave. Read as the hounds, below the 26-pied head (Tar §2.1, JUDGEMENT on the reading). **Stands as read** |
+| The topsail's depth | 7.47 m, from its yard to the hounds | **None.** Forfait gives its yard (32 pieds) and the whole sail with a topgallant (2,237½ square pieds), not the topsail apart. The depth is mine: the cutter's topsail rule (Steel 1794 p. 125), for a topsail sheeted to the square-sail yard below it. I cut it so before decision 9's revision took the tréou's yard down in plain sail, and did not cut it again after. **Does not stand** |
+
+The foot's breadth comes from the same rule: 0.9 of the tréou's yard (11.99 m), a foot spread on
+that yard. For a loose foot no source gives it either. V2 draws it 9.35 m, 0.9 of its own yard.
+
+### 15.3 The mend, for the lead to rule (JUDGEMENT)
+
+Cut her loose foot clear above the lateen yard's slings. The table gives her plain sail against
+Forfait's 216.0 m² (his whole sail less the topgallant's 20):
+
+| Clearance above the slings | Depth | Foot 0.9 of the tréou's yard: the topsail; her plain sail | Foot 0.9 of its own yard: the topsail; her plain sail |
+|---|---|---|---|
+| none, as filed | 7.47 m | 76.6 m²; 216.1 m² (+0.0%) | 66.8; 206.3 (-4.5%) |
+| 1 pied (0.32 m) | 7.15 m | 73.3; 212.8 (-1.5%) | 63.9; 203.4 (-5.8%) |
+| 3 pieds (0.97 m), her topsail yard's own place under the head | 6.50 m | 66.6; 206.1 (-4.6%) | 58.1; 197.6 (-8.5%) |
+
+Every one is inside the ±15% band.
+
+**My pick: 3 pieds, with the foot 0.9 of its own yard.**
+- The cut then matches the drawing. V2 takes a loose sail's depth as its area over that foot.
+  Its clews then stand 1.26 m above the slings; as filed they hang 0.76 m below them (8.09 m
+  above her water, §14.2).
+- It keeps her topsail off A5's edge by a margin a seaman would see.
+
+It is built with her hash, through `tools/ships/tartane.py` and the generator:
+- her topsail's area, centre and note, and her plain sail's check;
+- old beside new in `docs/dev/TuningNotes.md`;
+- her figures measured again. She sails on her topsail, so her polar and truth 7-688 may move.
+
+### 15.4 Found by the same question: the tréou's yard at the lateen's slings
+
+The tréou's yard is hoisted to the hounds, the cutter's square-sail yard's place, where the lateen
+yard is slung. Both are at 8.31 m above her deck datum, 0.00 m apart on the mast. In plain sail
+the tréou's yard lies on deck (§14), so nothing meets. Whenever the tréou is set, the two yards
+stand at one height on the mast. Its hoist rests on the same reading of Forfait p. 121 and on
+the cutter's precedent. Recorded for the lead with the depth.
