@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 04:35 UTC (THE TARTANE'S SECTION 17: the helm's lost course before the wind is the carried list's fault 29, not 90's; `yard_lowered` for a whole lateen is wanted seamanship; her first run of the proof has the right shape). Nudge number: 91.
+Latest note: 2026-11-28, 11:55 UTC (THE CONCEPCION'S FILE: her builder adds her table rows, the viewer mends its two drawing rules, her audit entry filed, "a first rate" by (a), her yard levels' row in; her tack band accepted with the gap said and carried as the engine's; no second file; fifteen trimmers accepted and said; the owner's look and word before her hash). Nudge number: 97.
