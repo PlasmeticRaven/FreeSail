@@ -358,8 +358,8 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: a data fault for milestone 7c
-  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading). 17 before the Diana''s file (package 90), whose era notes date her building, her taking and her service'
-  most: 18
+  reason: 'words the classing has as served carry a year later than the day: a source cited inside a line a player or a model is given, or a fact of a later year. The words rewritten without it clear the finding (JUDGEMENT: which keys are served is the classing''s reading). 17 before the Diana''s file (package 90), whose era notes date her building, her taking and her service; 18 before the Concepción''s (package 90), whose era notes date her building, her rebuilding and her two fits'
+  most: 19
 - key: e-year:freesail/api/viewer_flags.py
   what: a year or a date fixed in the code
   years: 1792-1825
@@ -456,8 +456,8 @@ known:
   years: 1792-1825
   basis: mechanical
   owner: an engine fault
-  reason: 'the ship schema has no key for a year and no reader chooses a class or a fit by the day: no change of data clears a count of every ship file. When the schema has such a key the check must count the ship files that lack it, and the days on which a description has no ship afloat; the lead''s ruling C on the ground report. 18 before the Diana''s file (package 90), the nineteenth'
-  most: 19
+  reason: 'the ship schema has no key for a year and no reader chooses a class or a fit by the day: no change of data clears a count of every ship file. When the schema has such a key the check must count the ship files that lack it, and the days on which a description has no ship afloat; the lead''s ruling C on the ground report. 18 before the Diana''s file (package 90), the nineteenth; 19 before the Concepción''s (package 90), the twentieth'
+  most: 20
 - key: u-trade
   what: who trades, in what, as a neutral or not, and at what price is one value for the range
   years: 1792-1825
