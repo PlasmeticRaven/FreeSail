@@ -448,8 +448,12 @@ def _sail_evolution(
                 continue
             if first:
                 p[TAKEN_IN_FIRST] = first
+        # its wait kept from the runner's line only where a sail is taken in first and the wait is
+        # said below; every other sail order begins its work by the call it always made, so that a
+        # runner of the old form (`start(ship, evolution, subject, params)`) still serves it
+        kept = {"say_wait": False} if first_words else {}
         try:
-            line = runner.start(ship, evo, sail.id, p, say_wait=not first_words)
+            line = runner.start(ship, evo, sail.id, p, **kept)
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, sail.id), e))
             failed_ids.append(sail.id)
