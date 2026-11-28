@@ -361,6 +361,19 @@
     ];
   }
 
+  /** Package 90 (the owner's note T-v2 of 2026-11-28, "a pinched section" at a lateen's forward
+   *  end): the control point of one edge of a sail, from `p` to `q`, bellied by `belly`, the
+   *  sail's own belly (BELLY of `ref`, the length it is reckoned by, twice over: a quadratic peaks
+   *  halfway to its control), but never more than BELLY of the edge's own length. The belly was
+   *  reckoned once for the whole sail and laid on every edge whatever its length, so a short edge
+   *  bellied into a thin tongue: a whole lateen's luff at its car, 0.30 m long, 2.56 m out on the
+   *  tartane's great lateen; a settee's, a lug's. An edge at least `ref` long is as it was. */
+  function edgeControl(p, q, belly, ref) {
+    var L = len(sub(q, p));
+    var k = ref > L ? L / ref : 1;
+    return add(lerp(p, q, 0.5), mul(belly, k));
+  }
+
   /**
    * Build the skeleton. `graph` is /api/ship; `snapshot` is /api/state (may be
    * null for a static drawing: then brace angles and states come from the graph).
@@ -1448,13 +1461,15 @@
       var A = corners[0], B = corners[1], C = corners[2], D = corners[3];
       var depth = depthHint || len(sub(D, A));
       var width = len(sub(B, A));
-      // control points sit at twice the offset: a quadratic curve peaks halfway to its control
+      // control points sit at twice the offset: a quadratic curve peaks halfway to its control;
+      // each edge bellied no more than BELLY of its own length (`edgeControl`, package 90)
+      var ref = Math.min(depth, width);
       var belly = [0, 0, 0];
-      if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, width));
+      if (DRAWING[dyn.state]) belly = mul(bellyDirection(normal, wind), 2 * BELLY * ref);
       var sag = mul(v(0, 0, -1), 2 * FOOT_SAG * depth);
-      var midBC = add(lerp(B, C, 0.5), belly);
-      var midCD = add(add(lerp(C, D, 0.5), belly), DRAWING[dyn.state] ? sag : [0, 0, 0]);
-      var midDA = add(lerp(D, A, 0.5), belly);
+      var midBC = edgeControl(B, C, belly, ref);
+      var midCD = add(edgeControl(C, D, belly, ref), DRAWING[dyn.state] ? sag : [0, 0, 0]);
+      var midDA = edgeControl(D, A, belly, ref);
       return [[A], [lerp(A, B, 0.5), B], [midBC, C], [midCD, D], [midDA, A]];
     }
 
@@ -1464,8 +1479,9 @@
     function gooseWingPath(corners, normal, tackSide, depth) {
       var t = gooseWingTriangle(corners, tackSide);
       var lee = t[0], weather = t[1], clew = t[2];
-      var belly = mul(bellyDirection(normal, wind), 2 * BELLY * Math.min(depth, len(sub(weather, lee))));
-      return [[lee], [lerp(lee, weather, 0.5), weather], [add(lerp(weather, clew, 0.5), mul(belly, 0.5)), clew], [add(lerp(clew, lee, 0.5), belly), lee]];
+      var ref = Math.min(depth, len(sub(weather, lee)));
+      var belly = mul(bellyDirection(normal, wind), 2 * BELLY * ref);
+      return [[lee], [lerp(lee, weather, 0.5), weather], [edgeControl(weather, clew, mul(belly, 0.5), ref), clew], [edgeControl(clew, lee, belly, ref), lee]];
     }
 
     /** A bundle along a spar from a to b: a thin lens. */
@@ -1946,12 +1962,16 @@
         } else if (dyn.state === "wrecked") {
           figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), v(0, 0, -2)), add(clewJ, v(0, 0, -1.5))], [lerp(clewJ, tackJ, 0.5), tackJ]];
         } else {
-          var bellyJ = dyn.state === "set" ? mul(bellyDirection(normalJ, wind), 2 * BELLY * Math.min(len(sub(clewJ, tackJ)), len(sub(head, tackJ)))) : [0, 0, 0];
-          figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ]];
+          // its leech and its foot each bellied no more than BELLY of its own length (`edgeControl`)
+          var refJ = Math.min(len(sub(clewJ, tackJ)), len(sub(head, tackJ)));
+          var bellyJ = dyn.state === "set" ? mul(bellyDirection(normalJ, wind), 2 * BELLY * refJ) : [0, 0, 0];
+          var leechJ = edgeControl(head, clewJ, bellyJ, refJ);
+          var footJ = edgeControl(clewJ, tackJ, mul(bellyJ, 0.6), refJ);
+          figJ.path = [[tackJ], [lerp(tackJ, head, 0.5), head], [leechJ, clewJ], [footJ, tackJ]];
           if (nockJ) {
             // four-sided: the head from the nock to the peak along the stay, the bunt from
             // the tack up to the nock
-            figJ.path = [[nockJ], [lerp(nockJ, head, 0.5), head], [add(lerp(head, clewJ, 0.5), bellyJ), clewJ], [add(lerp(clewJ, tackJ, 0.5), mul(bellyJ, 0.6)), tackJ], [lerp(tackJ, nockJ, 0.5), nockJ]];
+            figJ.path = [[nockJ], [lerp(nockJ, head, 0.5), head], [leechJ, clewJ], [footJ, tackJ], [lerp(tackJ, nockJ, 0.5), nockJ]];
             figJ.centre = centroid([tackJ, nockJ, head, clewJ]);
           }
         }
@@ -4974,6 +4994,7 @@
     gooseWingTriangle: gooseWingTriangle,
     flattenPath: flattenPath,
     splitAtX: splitAtX,
+    edgeControl: edgeControl,
     sortFigures: sortFigures,
     actionFigures: actionFigures,
     actionFrame: actionFrame,

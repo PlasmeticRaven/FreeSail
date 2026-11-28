@@ -40477,9 +40477,57 @@ Her builder's scratch figures (Report-Package90-Tartane.md §14.2: 9.35 m broad,
 
 Her topsail's clews stay at her square-sail yard's arms (10.85 m), its sheets to them, as before; nothing else of hers moves. Her frame is as it was (24.42 × 15.65 m abeam), so her view's scale does not move.
 
+### The edge's belly by its own length (the owner's note T-v2, 2026-11-28)
+
+At the live look the owner saw "a small rendering error in the lateens, on the forward end of them, which appears like a pinched section", most plainly on her mizen (Decisions-Package90-2026-11.md Part F, row T-v2; the coordinating session read its cause from the drawn paths, pictures 5 and 6 of `docs/playtests/2026-11-28-tartane-v2-preview/`). **The cause, general:** a sail's belly was reckoned once for the whole sail, BELLY (0.12) of the lesser of its depth and its head (a jib's of its foot and its luff), and laid on every curved edge whatever that edge's own length (`quadSail`, the four-cornered sails: square, gaff, lug, settee and lateen; the jib's path; the goose-winged path). A short edge so bellied out into a thin tongue: a whole lateen's luff, the 0.30 m lashing at its car that her file writes to give the sail four corners, stood 2.56 m off its chord on her great lateen and 1.65 m on her mizen. **Mended where the belly is laid** (`edgeControl`, exported for its case): no edge bellies more than BELLY of its own length, and an edge at least as long as the length the belly is reckoned by is drawn exactly as before. The foot's sag (FOOT_SAG of the depth, by design) is unchanged.
+
+Each edge's bulge, its middle's offset off its chord, metres, every bent sail set and her yards braced to their limits, the larger of either tack, old beside new; measured with the sails drawn whole (in the drawing a sail that crosses its mast is cut there for the painter, and moves alike). Her files, read from her branch: the great lateen's luff (0.30 m) 2.56 to **0.04**, its foot (7.28 m) 2.86 to 1.55; the mizen's luff 1.65 to **0.04**, its foot (3.60 m) 1.84 to 0.93; her jib's leech (6.00 m) 1.10 to 0.72; the coastguard's the same.
+
+**The committed files that move, declared** (15 of the 19; the cutter, the smack and the two schooners do not). These lie outside the card's named moves; they are built in this hash at the coordinating session's word on the owner's note ("mend it at its cause, in the hash you send now"), and are for the lead's reading:
+
+| File | Sail | Edge | Length | Old | New |
+|---|---|---|---|---|---|
+| `bilander` | fore.topmast_staysail | leech | 5.32 | 0.69 | 0.64 |
+| `bilander` | jib | leech | 5.47 | 1.22 | 0.66 |
+| `bilander` | main.settee | foot | 11.29 | 1.51 | 1.51 (under 0.005 m) |
+| `bilander` | main.settee | luff | 1.81 | 1.35 | 0.22 |
+| `boat-cutter-23` | lug | foot | 3.70 | 0.58 | 0.57 |
+| `boat-cutter-23` | lug | luff | 2.43 | 0.46 | 0.29 |
+| `boat-cutter-28` | lug | foot | 4.40 | 0.72 | 0.69 |
+| `boat-cutter-28` | lug | luff | 3.16 | 0.56 | 0.38 |
+| `boat-launch-25` | lug | foot | 4.20 | 0.66 | 0.65 |
+| `boat-launch-25` | lug | luff | 2.94 | 0.52 | 0.35 |
+| `boat-launch-31` | lug | foot | 4.90 | 0.80 | 0.78 |
+| `boat-launch-31` | lug | luff | 3.67 | 0.61 | 0.44 |
+| `boat-yawl-16` | lug | foot | 3.20 | 0.49 | 0.49 (under 0.005 m) |
+| `boat-yawl-16` | lug | luff | 2.02 | 0.39 | 0.24 |
+| `brig` | jib | leech | 10.56 | 1.30 | 1.27 |
+| `corvette-20` | jib | leech | 12.77 | 1.57 | 1.53 |
+| `corvette-20` | middle_staysail | leech | 10.50 | 1.34 | 1.26 |
+| `frigate-36` | jib | leech | 16.26 | 1.95 | 1.95 (under 0.005 m) |
+| `frigate-36` | middle_staysail | leech | 11.70 | 1.45 | 1.40 |
+| `hermaphrodite-brig` | jib | leech | 14.97 | 2.00 | 1.80 |
+| `hermaphrodite-brig` | main.topmast_staysail | leech | 5.58 | 1.16 | 0.67 |
+| `lugger` | fore.lug | foot | 7.40 | 1.38 | 1.32 |
+| `lugger` | fore.topsail | luff | 4.56 | 0.57 | 0.55 |
+| `lugger` | main.topsail | luff | 4.43 | 0.54 | 0.53 |
+| `lugger` | mizen.lug | foot | 4.71 | 1.02 | 0.85 |
+| `merchant-brig` | jib | leech | 10.56 | 1.30 | 1.27 |
+| `razee-44` | fore.staysail | leech | 10.51 | 1.30 | 1.26 |
+| `razee-44` | main.staysail | leech | 12.80 | 1.92 | 1.54 |
+| `razee-44` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 |
+| `seventy-four` | fore.staysail | leech | 11.89 | 1.51 | 1.43 |
+| `seventy-four` | main.staysail | leech | 14.40 | 2.13 | 1.73 |
+| `seventy-four` | mizzen.course | foot | 9.72 | 1.35 | 1.31 |
+| `sixty-four` | fore.staysail | leech | 10.51 | 1.30 | 1.26 |
+| `sixty-four` | main.staysail | leech | 12.80 | 1.92 | 1.54 |
+| `sixty-four` | mizzen.staysail | leech | 10.50 | 1.39 | 1.26 |
+
+The four-cornered sails' foot figures include the sag. The largest moves are the bilander's settee luff (three-quarters of its length off its chord before, the same tongue as the lateen's), her jib, the hermaphrodite brig's main topmast staysail, and the 64's, the razee's and the 74's main staysails; the rest are a few centimetres. No figure but these sails' outlines moves: no corner, no spar, no line, no frame, and no view's bounds (measured on every file at eight facings and four heels, as she starts and dressed on either tack: none moves by a millimetre), so no file's scale moves.
+
 ### Pins moved, old beside new
 
-None. No case of `tests/test_view_geometry.py` or `tests/test_pictures.py` was changed but one docstring's words (`test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward`: its lateen carries neither key, `dipping` nor `cut_at_mast`, and its words now say so; its name and its assertions are kept), and no threshold moved. New: V1's 24 cases and V2's 19 in `tests/test_view_geometry.py` (43, none of the base's removed or renamed).
+None. No case of `tests/test_view_geometry.py` or `tests/test_pictures.py` was changed but one docstring's words (`test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward`: its lateen carries neither key, `dipping` nor `cut_at_mast`, and its words now say so; its name and its assertions are kept), and no threshold moved. New: V1's 24 cases, V2's 19 and the edge's belly's 28 in `tests/test_view_geometry.py` (71, none of the base's removed or renamed).
 
 ### Not built, for the lead
 

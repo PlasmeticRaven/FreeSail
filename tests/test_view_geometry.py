@@ -7876,3 +7876,150 @@ def test_a_pole_topsail_with_no_yard_standing_below_is_lowered_to_the_hounds(tmp
     filed = next(s for s in data["graph"]["spars"] if s["id"] == hounds_of)
     assert got["spars"][yid]["centre"][2] == pytest.approx(deck + filed["height_m"] + YARD_ON_CAP)
     assert got["spars"][yid]["hoist"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Package 90 (the owner's note T-v2 of 2026-11-28 at the live look at V1 and V2: "a small rendering
+# error in the lateens, on the forward end of them, which appears like a pinched section"): each
+# edge of a sail bellied by its own length. A sail's belly was reckoned once for the whole sail
+# (BELLY of the lesser of its depth and its head, a jib's of its foot and luff) and laid on every
+# curved edge whatever that edge's length, so that a short edge bellied out into a thin tongue: a
+# whole lateen's luff at its car, a settee's, a lug's; a jib's short leech. Mended where the belly
+# is laid (`edgeControl`): no edge bellies more than BELLY of its own length, and an edge at least
+# as long as the length the belly is reckoned by is drawn as it was
+# ---------------------------------------------------------------------------
+
+BELLY_SHARE = 0.12  # client/projection.js: BELLY
+
+
+def _curved_edges(path: list) -> list[tuple[list, list, list]]:
+    """The curved edges of a drawn path ([[P], [C, P], ...]): (from, control, to)."""
+    out, prev = [], path[0][0]
+    for seg in path[1:]:
+        if len(seg) == 2:
+            out.append((prev, seg[0], seg[1]))
+        prev = seg[-1]
+    return out
+
+
+def _bulge(p: list, c: list, q: list, level: bool) -> float:
+    """How far a quadratic edge stands off its chord at its middle: half its control's offset from
+    the chord's middle; `level`, its offset across alone, the vertical part (a square sail's foot's
+    sag, by design, FOOT_SAG of its depth) left out."""
+    off = [ci - (pi + qi) / 2.0 for pi, ci, qi in zip(p, c, q, strict=True)]
+    if level:
+        off[2] = 0.0
+    return math.hypot(*off) / 2.0
+
+
+def test_an_edge_bellies_no_more_than_its_own_length_allows():
+    """`edgeControl`: an edge at least as long as the length its sail's belly is reckoned by takes
+    the whole belly, as every edge did before; a shorter one BELLY of its own length."""
+    script = (
+        f"const P = require({json.dumps(str(PROJECTION))});\n"
+        "const belly = [2 * P.constants.BELLY * 10, 0, 0];\n"
+        "process.stdout.write(JSON.stringify([\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 20], belly, 10),\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 10], belly, 10),\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 0.3], belly, 10),\n"
+        "]));\n"
+    )
+    if NODE is None:
+        pytest.skip("Node is not installed")
+    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    assert res.returncode == 0, res.stderr
+    long_, even, short = json.loads(res.stdout)
+    assert long_ == pytest.approx([2 * BELLY_SHARE * 10, 0.0, 10.0])
+    assert even == pytest.approx([2 * BELLY_SHARE * 10, 0.0, 5.0])
+    assert short == pytest.approx([2 * BELLY_SHARE * 0.3, 0.0, 0.15])
+
+
+LUFF_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    return sk.figures.filter(f => f.kind === 'sail' && f.id === d.sail).map(f => ({
+      piece: f.piece || '', corners: f.corners, pts: P.flattenPath(f.path)}));
+"""
+
+
+def _luff_points(pieces: list) -> tuple[list, list, list]:
+    """A four-cornered sail drawn from its cut, [throat, peak, clew, tack], cut at its mast: its
+    tack, its throat and the points of its drawn luff between them, from the piece holding the tack
+    (its outline runs throat, head, leech, foot, tack, luff, throat)."""
+    throat, tack = pieces[0]["corners"][0], pieces[0]["corners"][3]
+    for piece in pieces:
+        pts = piece["pts"]
+        at = [i for i, p in enumerate(pts) if math.dist(p, tack) < 1e-6]
+        if at:
+            return tack, throat, pts[at[-1] + 1 :]
+    raise AssertionError("no piece holds the tack")
+
+
+@needs_node
+@pytest.mark.parametrize("sheet_deg", [8.0, 25.0, 60.0])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateens_short_luff_at_its_car_is_not_drawn_as_a_tongue(tmp_path, tack, sheet_deg):
+    """The owner's note T-v2: a whole lateen's luff, the short lashing at its car (CUT_LUFF_M,
+    0.30 m on the tartane's files), bellies no more than BELLY of its length off its chord, on
+    either tack and at any sheet; its points lie between the tack and the throat. Before the mend
+    it took the whole sail's belly, BELLY of the lesser of its leech and its head, and stood out a
+    thin tongue: 2.56 m off the chord on her great lateen, 1.65 m on her mizen, measured; about a
+    metre forward of the car as she was drawn on the quarter in the live look."""
+    data = {**lateen_by_the_wind(tack, sheet_deg), "sail": LATEEN}
+    pieces = run_js(tmp_path, data, LUFF_FIGURES)
+    tack_at, throat, luff = _luff_points(pieces)
+    assert luff and math.dist(luff[-1], throat) < 1e-6
+    length = math.dist(tack_at, throat)
+    assert length == pytest.approx(CUT_LUFF_M)
+    for p in luff:
+        assert _off_the_segment(p, tack_at, throat) <= BELLY_SHARE * length + 1e-6
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_bilanders_settee_luff_is_bellied_by_its_own_length(tmp_path, tack):
+    """The same cause on a committed file (docs/dev/TuningNotes.md, "Package 90, the viewer"): the
+    bilander's settee's luff, 1.81 m, bellied 1.35 m off its chord, three-quarters of its length,
+    by the settee's whole belly; now no more than BELLY of its length."""
+    ship = make_ship(BILANDER)
+    ship.sails[SETTEE].state = SailState.SET
+    set_sheet_angle(ship, ship.sails[SETTEE], math.radians(25.0))
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = {**ship_state(ship, awa=math.radians(60.0) * sign, tack=tack), "sail": SETTEE}
+    tack_at, throat, luff = _luff_points(run_js(tmp_path, data, LUFF_FIGURES))
+    length = math.dist(tack_at, throat)
+    assert length == pytest.approx(1.81, abs=0.01)
+    for p in luff:
+        assert _off_the_segment(p, tack_at, throat) <= BELLY_SHARE * length + 1e-6
+
+
+EDGES_DRAWN = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    return sk.figures.filter(f => f.kind === 'sail' && f.path && !f.piece && f.state === 'set')
+      .map(f => ({id: f.id, cls: f.cls, path: f.path}));
+"""
+
+
+@needs_node
+@pytest.mark.parametrize("path", EVERY_SHIP)
+def test_no_set_sail_of_any_file_bellies_an_edge_past_its_own_length(tmp_path, path):
+    """Every committed file with every bent sail set and her yards braced to their limits, on either
+    tack: every curved edge of every sail drawn whole stands off its chord no more than BELLY of its
+    own length, the square sails' foot's sag apart (a jib's whole offset, a four-cornered sail's
+    across). Before the mend the jibs' and staysails' short leeches passed it on eight files drawn
+    so, by up to 0.22 of their length (the bilander's jib, 1.22 m off a 5.47 m leech); the sails
+    cut at their masts, the lugs, the settee and the lateens, are held by their luffs' cases."""
+    for tack in ("starboard", "larboard"):
+        ship = make_ship(path)
+        for sail in ship.sails.values():
+            if sail.state is not SailState.UNBENT:
+                sail.state = SailState.SET
+        sign = 1.0 if tack == "starboard" else -1.0
+        for spar in ship.spars.values():
+            if spar.is_yard:
+                spar.brace_angle = sign * spar.brace_limit
+        data = ship_state(ship, awa=math.radians(60.0) * sign, tack=tack)
+        for fig in run_js(tmp_path, data, EDGES_DRAWN):
+            level = fig["cls"] != "jibheaded"
+            for p, c, q in _curved_edges(fig["path"]):
+                allowed = BELLY_SHARE * math.dist(p, q) + 1e-6
+                assert _bulge(p, c, q, level) <= allowed, (tack, fig["id"])
