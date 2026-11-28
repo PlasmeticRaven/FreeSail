@@ -770,3 +770,95 @@ run above.
 - only her file differs from the package's `data/ships` at 157f870;
 - `load_ship` on her file loads 112 guns in her default fit;
 - `tools/check_viewer_guns.py` on her file is clean.
+
+## 2026-11-28: the lead's nudge 97 built, held on the viewer's mend: `e5e56f7`
+
+**In short.** Each of nudge 97's rulings is built on the branch, at `e5e56f7`, over the package's
+branch merged at 8a95cb6 (`d8f6234`, the viewer's V1 and V2; TuningNotes kept whole, the viewer's
+section and then hers). **Her hash waits for the viewer's mend** on the package's branch, as the
+ruling says. **One thing for the viewer, found while filing her rows: a third drawing rule**
+(below). Her fast tier is not run on this commit; it runs on her hash.
+
+### C.1 What each ruling built
+
+1. **The viewer's tables:** her rows, read off her file as committed, old beside new in
+   TuningNotes. Thirteen of the fifteen pass, and the viewer's file passes whole, 1,240 cases,
+   but for six of hers.
+   - **Two wait on the two drawing rules ruled the viewer's:**
+     - the main mast's foot sorting behind her deck strip, by 0.066 m;
+     - her lower tier's band corner, 0.244 m off the closure to her stern.
+
+     Her row of `CHORD_OFF_THE_SIDE_M`, 0.273 m, is that band's chord before the mend. I will
+     measure it again on the mended tree.
+   - **Four wait on the third rule** (C.2).
+2. **The ranges audit:** her entry is filed in the *Diana*'s form. Filing it uncovered the counts
+   her file moves, as the *Diana*'s did (`4dec517`). Each moves by one, old beside new:
+   - the ceiling of `u-ships` 19 to 20, her file the twentieth;
+   - the ceiling of `x-words:ship-words` 18 to 19, her era notes dating her building, her
+     rebuilding and her fits;
+   - `tests/test_range_audit.py`'s data-owned entries 29 to 30;
+   - truth 7-590's mechanical findings 61 to 62.
+
+   The audit's slow run on `e5e56f7` is going, and its result comes with her hash.
+3. **"a first rate":** the four tests take another example, old beside new, the reason in
+   TuningNotes:
+   - `tests/test_ships.py`'s two, "a bomb vessel" and "bomb vessel";
+   - `tests/test_world_orders.py`'s, 'ship: a bomb vessel "Thunder" of Britain ...';
+   - `tests/test_bellerophon.py`'s words of another rate, "a second rate";
+   - and `description_key("a first rate") == "three-decker"` held beside them.
+
+   All pass.
+4. **`COMMITTED_YARD_LEVELS`:** her row, and the table's count of yards 103 to 117. Also the four
+   older tables' rows: `FIT_TRIMMERS`, `FIT_MARINES`, `KEYED_FILES` and `NUMBERED_BY_DECK`. All
+   pass.
+5. **Her tack:** `clr_x_m` 6.3 and the rudder's 25 deg are declared in her notes as tuned figures,
+   each with what failed before it:
+   - at 5.7 m her helm stood under the 74's, 0.13 deg of weather helm on the beam against 0.39;
+   - at 35 deg she stayed in 210 to 223 s, quicker than the 74's 237 to 258.
+
+   Her rudder's note says the gap from Luce's band in a line, "accepted as she is". Truth 7-738 is
+   as it was.
+6. **The 1809 fit:** as it was, the 1,015 a departure in her note.
+7. **Fifteen trimmers, in a player's words:** to work her at quarters she robs her guns, her upper
+   deck's first, by A9's order. The new case of truth 7-736 shows it, at seed 7, close-hauled
+   from 292.5 deg in 15 kn:
+   - **cleared,** she tacks in 276 s;
+   - **at quarters under `sail before guns`,** the tack's watch of 398 is worked first by her 240
+     free hands, her 15 trimmers and her 225 soldiers in their division. The bill lends the other
+     158: "Tacking ship at quarters: 158 hands taken from the upper deck, Nos. 2 to 16, the
+     quarterdeck, Nos. 1 to 6, and the forecastle, Nos. 1 to 3; the guns go on short-handed."
+     Her middle and lower decks keep their crews, and she tacks in 276 s;
+   - **under `guns before sail`,** nothing is lent: "Only 240 hands to tack ship; there are no
+     more on deck." She tacks in 452 s.
+8. **The tackles' eight hands:** as they stand, in her module.
+
+Three comments in her module that said "his" of Steel and Falconer now name them. Her file moves
+in her two notes alone, and the other nineteen files are byte for byte.
+
+### C.2 For the viewer: a third drawing rule, her mizzen yards' braces
+
+Filing her `LINES_ON_THE_RAIL`, I found that her mizzen yards' six braces (the topsail's, the
+topgallant's and the crossjack's) end on her own mizzen mast, 24.1 to 27.3 m up, at x −18.94. The
+74's end on her rail, at x −22.5 to −25.1.
+- The cause is `mastAftOf(Y.x)` in `client/projection.js`. A brace leads to the nearest lower mast
+  more than 0.5 m abaft the yard's x, or else to the side.
+- Her masts stand upright as measured (Pages §5.7, §11.5). Her mizzen yards hang more than 0.5 m
+  forward of her mizzen mast, so the rule finds that mast itself.
+- The 74's mizzen rakes 2.91 deg, so her yards stand within 0.5 m of it, and her braces come to
+  the rail.
+
+No test failed on it before her row was filed: an end up in the rig counts as no end in the air. I
+have filed her row as the drawing should be, the 74's set, which her rig is, x 1.15. So her four
+cases of the lines (both tacks, with and without her profile) fail until the viewer's rule is
+mended. I have not bent her masts, which are as measured.
+
+This is for the coordinating session to pass to the viewer, with the two rules of nudge 97. One
+road would be for `mastAftOf` to skip the yard's own mast. That is the viewer's to choose.
+
+### C.3 Now
+
+- Held on the viewer's mend on the package's branch.
+- Then: merge it, regenerate and `cmp` every ship file, and measure `CHORD_OFF_THE_SIDE_M` again.
+- Then the fast tier whole on that hash, against a base on its merged tree, and the slow tier of
+  my files.
+- Then her report section, pushed last.
