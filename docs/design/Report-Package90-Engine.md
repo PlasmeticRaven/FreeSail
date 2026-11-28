@@ -3208,3 +3208,18 @@ From the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--d
 **The slow tier whole runs next** on both, after the served step's fast tier: the hash's with the reach tracer watching, then the base's. Its result follows in a section of its own, with the slow files the change reaches, named file by file. **By the coordinating session's word, it does not hold the hash:** the cloud's run 189 ran both tiers whole on it. Already run on the hash: `tests/test_mends_126.py --slow`, 45 passed, truth 7-779-b's declared exceptions held exactly (above).
 
 **For the coordinating session:** **the hash is 4e32dec**, reported with its fast tier whole: outcome changed 0, gone 0, and the 21 new all passed. **The served step's hash follows on `…/pkg-90-served`**, after this one, with the reader's question answered there. Its proofs are run already: graph and snapshot byte for byte on the nineteen files; the gales, A2's harness and every sail's `set` byte for byte. Its fast tier whole runs now, before the slow tiers.
+
+## The served step merged with the trunk's fourth pass (nudge 100): `…/pkg-90` at 8a27d9b1 into `…/pkg-90-served`, e2ae515; its tiers and proofs running (2026-11-28, 13:55 UTC)
+
+**The merge: e2ae515** on **`…/pkg-90-served`**, pushed. Its parents are ba7d1cb (the served step with `…/pkg-90` at 8a95cb6) and **8a27d9b1** (`…/pkg-90`, carrying the trunk at 00706af7 with the fourth pass merged at d8031973). The commit after it touches this report alone.
+
+**The lines resolved by hand:** four files, each where both sides added at one place. Each side is kept whole, and each file is now the merge base with both sides' changes and nothing else, checked line by line against both parents.
+- **`freesail/evolutions/runner.py`:** the fourth pass's `COMING_TO` and `BOX_BEHIND_COMING_TO`, then the served step's `TAKEN_IN_FIRST`, after `TURN_WAIT`.
+- **`tests/test_boat_towed.py`** and **`tests/test_lateen_whole.py`:** the package's file whole (the fourth pass's tests, and its changes to the stove test above them), then the served step's one import (`from freesail.api import queries`) and its tests at the end, as they were.
+- **`docs/dev/TuningNotes.md`:** the fourth pass's last section whole, a blank line, then the served step's section whole.
+
+Git merged `freesail/evolutions/scripts.py`, `world/boats.py` and `world/dealings.py` clean. On e2ae515, `ruff check` and `ruff format --check` are clean, and `python tools/gen_ships.py <scratch>` writes 19 of 19 byte for byte.
+
+**The base of every comparison is 8a27d9b1.** Its code, data, tools, client and tests are 4e32dece's to the byte; only its docs differ. So the base's fast tier is 4e32dece's, whole, from the fourth pass's report (9,340 tests).
+
+**Running now on e2ae515:** the fast tier whole, then `tests/test_mends_126.py --slow`, then the slow tier whole with the reach tracer on the served step's own lines. The proofs run old (4e32dece's tree) beside new: the graph and the snapshot, the yards' levels, every sail's `set`, the nineteen in gales, A2's harness and the declaration. **The hash is reported when the fast tier and the proofs are in**, with the reader's question of nudge 99 answered.
