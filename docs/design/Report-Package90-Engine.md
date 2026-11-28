@@ -3170,3 +3170,41 @@ Each runs in shards with their own junits:
 - **Then the slow tier whole** on both. The hash's runs with a reach tracer watching, which observes and changes nothing; it names the slow files the change reaches, file by file.
 
 **For the coordinating session:** the three proofs, the checks and truth 7-779-b are above, on the exact hash. The tiers' section comes next, and in it the hash is reported. One thing is new in the declaration: **the four boats' class words** move ("a brig's cutter" -> "the brig's cutter"), and no reading serves them.
+
+## The fourth pass's hash reported (nudge 99): 4e32dec, its fast tier whole test by test against a174cca2 (2026-11-28, 13:30 UTC)
+
+**The hash to send: 4e32dec** (4e32dece36ff) on **`…/pkg-90-lateen3`**, pushed. Its code is unchanged since the last builder pushed it. **The commits after it touch this report alone:** 050f811, d7c2906, d3b3e9b and this one. Its three proofs, its checks and `tests/test_mends_126.py --slow` are in the section above ("The fourth pass's three proofs (nudge 96)"). The nudge 99 the coordinating session relayed is received: the cloud's run 189 green and the lead's reader's pass.
+
+### The fast tier whole, on 4e32dec and on a174cca2, test by test
+
+From the tree's root, `python -m pytest -n 4 -p no:cacheprovider -o addopts="--dist loadgroup"`, each side in a worktree of its own exact hash. Each tier ran as eight shards of the test files, the same files both ways, each with its own `--junitxml` and each under 25 minutes. The junits were compared test by test by the test's id, with the xdist group's `@...` stripped.
+
+| | 4e32dec | a174cca2 |
+|---|---|---|
+| **Fast tier whole** | 9,340: 9,331 passed, 8 skipped, 1 xfailed, **0 failed** (69 min 42 s, the shards' sum) | 9,319: 9,310 passed, 8 skipped, 1 xfailed, 0 failed (68 min 30 s) |
+
+- **Every test of the base is there with the same outcome; none is gone.**
+- **21 new, all passed**, the pass's own: `tests/test_lateen_whole.py` 12, `tests/test_the_ship_herself.py` 5 and `tests/test_boat_towed.py` 4.They are:
+  - the box's six: belayed where she comes to (the frigate heaving to, the 74 lying a-try), behind a heave-to still waiting, the lugger refused, behind a lie a-try that fails its own check, and begun where her heave-to fails;
+  - the strain's: the dire step within one cause, and a cause come again;
+  - the polacre coming to, not offered the box;
+  - the relief that waits;
+  - "waits its turn";
+  - the bow's list taken as said;
+  - the boats': the kedge and the clearing on a committed ship, two boats towed, and the clearing with no boat out;
+  - the class words: every committed ship's, a class with a name of its own, the Navy's smack under a merchant's papers, and two cases of a class read past her state.
+- The 8 skipped and the 1 xfailed are the same cases both sides.
+- No harbour or browser test failed on either side.
+
+**The guard set of §10.2**, tallied from the junits: every case has the same outcome on both sides.Each set passed whole:
+  - the byte test and the golden classing table (`tests/test_ship_particulars.py`, `tests/test_rig_classing.py`): 95;
+  - `tests/test_schooner_mast.py` 76, `tests/test_probes_90.py` 90, `tests/test_check_viewer_guns.py` 22;
+  - `tests/test_lug.py` 5 and the settee's `tests/test_settee.py` 75;
+  - the going-about set (`test_gale`, `test_rig_geometry`, `test_staying`, `test_lying_to`, `test_evolutions`, `test_captain_trials`, `test_catalogue`) 261, and `tests/test_grammar_book.py` 9;
+  - the pass's own files: `tests/test_lateen_whole.py` 287 (275 at the base), `tests/test_boat_towed.py` 43 (39) and `tests/test_the_ship_herself.py` 19 (14).
+
+### The slow tier
+
+**The slow tier whole runs next** on both, after the served step's fast tier: the hash's with the reach tracer watching, then the base's. Its result follows in a section of its own, with the slow files the change reaches, named file by file. **By the coordinating session's word, it does not hold the hash:** the cloud's run 189 ran both tiers whole on it. Already run on the hash: `tests/test_mends_126.py --slow`, 45 passed, truth 7-779-b's declared exceptions held exactly (above).
+
+**For the coordinating session:** **the hash is 4e32dec**, reported with its fast tier whole: outcome changed 0, gone 0, and the 21 new all passed. **The served step's hash follows on `…/pkg-90-served`**, after this one, with the reader's question answered there. Its proofs are run already: graph and snapshot byte for byte on the nineteen files; the gales, A2's harness and every sail's `set` byte for byte. Its fast tier whole runs now, before the slow tiers.
