@@ -121,6 +121,8 @@ Each was told to him when it was made and is in the records of its package. **On
 
 - Package 90, rulings of 28 November in the lead's notes to the ships' session (nudges 88 to 91): what the client is served of a boat in tow and of a lateen changed inside a manoeuvre is an engine step of its own, owed before the tartane's file (the rule above); the tartane's square topsail is re-cut three pieds clear of her lateen yard's slings, its foot nine tenths of its own yard, 8.5% under Forfait's sail area and declared as judgement (its depth had no source); her tréou and her great lateen do not stand together (Forfait p. 124), each order taking the other in first, and `all sail` keeps the great lateen; the tréou's yard hoists one pied below the slings; her plain sail is set jib and topsail first; lowering a great yard on deck is wanted seamanship, not owed for her file. The viewer's frame holds a lateen's peaked yard, so that the view never rescales: **the owner's word as the ships' session relays it, "(a) Fixed frame (Recommended)"**, and of the mended belly seen live, **"Both fixes look clean to me, very good."**
 
+- Package 130: the game's console resolves its output when a console is made, not when its file is first read (two lines of `freesail/ui/console.py`, the cause of a test failing by the order of the tests), allowed inside the package. **The owner, 28 November: "You may allow it, as recommended ... It is fully allowed as far as I am concerned."**
+
 ## 8. Waiting on a decision of the owner's
 
 - (Settled 24 November: the line between milestone 8's two gates, and the crew's morale and skill; the proposal's decision 79.)
