@@ -40,6 +40,29 @@ stands peaked.
   other way was put to the owner in words.
 - **The owner chose (a), the fixed frame**, recorded verbatim in Part F, row T-f.
 
+## The owner's note (a note, not a ruling)
+
+Verbatim, recorded in `docs/design/Decisions-Package90-2026-11.md` Part F, row T-v2:
+
+> "Only note for me so far is that there appears to be a small rendering error in the lateens, on
+> the forward end of them, which appears like a pinched section. It can be seen on the mizzen in
+> the preview, currently, at a few different angles."
+
+`pictures/5-the-pinch-on-the-mizzen.jpg` shows it as the owner saw it, and
+`pictures/6-the-pinch-close-up.png` close up: the ship view's own box narrowed onto the mizzen's
+forward end while the clock was held.
+
+**What the drawing does there,** read from the ship view's own paths:
+- Each whole lateen is drawn as a four-cornered sail (`quadSail` in `client/projection.js`).
+  Its fourth edge is the short luff at the car, the lashing, about 0.3 m long. Her file writes it
+  so the sail has four corners to draw by (her module's note on the great lateen).
+- `quadSail` gives every edge one belly, `2 × BELLY × min(depth, width)`, whatever that edge's own
+  length.
+- So the 0.3 m luff bellies forward 0.74 m on the mizzen and about 1.05 m on the great lateen: a
+  thin tongue ahead of the car. That is the pinch.
+
+Sent to the viewer, to mend at its cause: each edge's belly by its own length.
+
 ## Found on the way, for her builder
 
 **Started from rest heading WNW 292° with the wind N at 12 kn, she would not bear away or wear.**
