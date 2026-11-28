@@ -24,34 +24,33 @@ The body's own course out of a port (`ships.port_course`) drops the departing po
 
 **Old beside new.** The Little Road's trader: 179 layings in three hours and 0.0 nm off, against 1 laying and 9.74 nm off at 13:00, on passage for Dover by the track's mark 49 33 N 0 05 W.
 
-### The other ports whose track to sea begins with an anchorage
+### The ports whose track to sea begins at an anchorage
 
-Ten other ports' `to_sea` tracks begin with an anchorage that is not the outer road: Favignana, Lampedusa, Palermo, Portsmouth, San Fiorenzo, St Helier, Syracuse, Torbay, Trapani and Weymouth. For each, a trader was drawn lying at its anchorage as the business draws her (`Business._anchored_in`; the probe's ship as 7-790's), bound to a port the business pairs it with, and sailed 48 hours, on the trunk and on this package.
+Every port with a track to sea (67) begins it at its own anchorage. For ten of them the lead asked whether the mend covers a trader drawn lying there: for each, a trader drawn lying at its anchorage as the business draws her (`Business._anchored_in`; the probe's ship as 7-790's), bound to a port the business pairs it with, sailed 48 hours with the player's ship in mid Channel or mid sea, out of the near detail's reach of her (below).
 
-**The ground report was wrong in one thing.** It said a ship drawn *in port* at one of these (the anchorage within reach of the outer road) would loop every twelve hours. It loops every minute, as the Havre's: in port, her business done, she lays her passage, the track's first leg anchors her where she is, and the next minute she lays it again. The mend covers in port as at anchor.
+| port, bound for | trunk | c22aa834 (the first build) | this build: her voyage in 48 h |
+|---|---|---|---|
+| the Havre, for Dover | lay looping, never moved | reached Dover at about 40 h, `done` 0.13 nm off, nothing sold | in port at Dover at 37 h; wine sold; salt beef bought for the Havre; sailing at 46 h |
+| Favignana, for Trapani | 2,341 layings, never moved | in port at Trapani | in port at Trapani at 10 h; wine sold, salt bought; in port at Favignana at 27 h, salt sold; home to Trapani at 37 h |
+| Palermo, for Milazzo | 2,341, never moved | `done` 0.08 nm off Milazzo, never in port | in port at Milazzo at 30 h; wine sold, wine bought for Palermo; sailing at 39 h |
+| Portsmouth, for the Havre | 1,887, never moved | rode at the Havre's anchorage "on passage" | in port at the Havre at 24 h; wine sold, brandy bought for Portsmouth; sailing at 33 h |
+| Trapani, for Favignana | 1,556, never moved | in port at Favignana, home | in port at Favignana at 16 h; wine sold; home to Trapani, in port at 27 h, done |
+| San Fiorenzo, for Bastia | sailed | sailed | in port at Bastia at 17 h, wine sold, cheese bought; in port at San Fiorenzo at 37 h, cheese sold; sailing home at 46 h |
+| Syracuse, for Augusta | 2,341, never moved | `done` 0.11 nm off Augusta | in port at Augusta at 17 h; wine sold; home to Syracuse, in port at 32 h, done |
+| Torbay, for Dartmouth | 1,904, never moved | traded, then rode at Torbay "on passage" | in port at Dartmouth at 16 h; wine sold; home to Torbay, in port at 28 h, done |
+| Weymouth, for Poole | 2,341, never moved | rode at Poole's anchorage "on passage" | in port at Poole at 18 h; wine sold; home to Weymouth, in port at 42 h, done |
+| Lampedusa, St Helier | not drawn | not drawn | not drawn |
 
-| port, bound for | anchorage to outer road | drawn | trunk: layings in 48 h, where | package: layings, where at 48 h |
-|---|---|---|---|---|
-| Favignana, for Trapani | 1.94 nm | in port | 2,341, never moved | 3; sailed, in port at Trapani |
-| Palermo, for Milazzo | 0.56 nm | in port | 2,341, never moved | 2; on passage, 88.7 nm on |
-| Portsmouth, for the Havre | 4.22 nm | at anchor | 1,887, never moved | 2; sailed, in the Havre's road at 18 h, aground going in (below) |
-| Trapani, for Favignana | 0.62 nm | in port | 1,556, never moved | 3; sailed, in port at Favignana, home again |
-| San Fiorenzo, for Bastia | 2.01 nm | at anchor | 5, sailed | 5, sailed: the same, hour by hour |
-| Syracuse, for Augusta | 1.15 nm | in port | 2,341, never moved | 2; sailed, aground 6.2 nm out (below) |
-| Torbay, for Dartmouth | 2.23 nm | at anchor | 1,904, never moved | 2; sailed, in port 4.7 nm on |
-| Weymouth, for Poole | 1.68 nm | in port | 2,341, never moved | 2; on passage, 19.0 nm on |
-| Lampedusa | | | not drawn | not drawn |
-| St Helier | | | not drawn | not drawn |
+Every trader of the table ends her voyage in port with her cargo sold, and none is `done` at sea or rides "on passage" at rest. The causes of the first build's ends:
 
-San Fiorenzo's trader did not loop on the trunk and sails the same on both. Lampedusa and St Helier: the business draws no trader lying there, on the trunk or on this package. Every port tried as her destination (Licata, Valletta, Girgenti, Porto Palo, Pantelleria, Syracuse; St Peter Port, St Malo, Alderney, Weymouth, Poole) gives a plan the land guard refuses ("plan crosses the land on the leg to ..."), and the business passes the pair over (`Business.refused`). That is the planner's track out of those two ports, not this fault, and is not mended here; found, for the lead.
+- `done` off the port (the Havre, Palermo, Syracuse): her track out held the passage's only anchorage, so the planner laid none at the destination (`Planner.legs_for` lays it only when the legs hold none), and the first build then left that one out. Her plan ran out off the port. Mended: the destination's anchorage is laid where it was the only one (`_weighed_from`).
+- riding "on passage" at an anchorage (Portsmouth at the Havre's, Weymouth at Poole's, Torbay home): the anchorage is beyond 2 nm of the outer road (the Havre's Little Road 3.2 nm, Portsmouth's 4.2, Torbay's 2.2), and the far captain read "in port" by the outer road alone; anchored there "on passage", no transition of her doctrine took her from it (`merchant.yaml`: `on passage` goes `in port` only `on anchored in port`). Mended: in port by the world's own rule (`Ports.in_port_at`).
 
-**Found, not mended: ships that now sail and take the ground.** Three of the ships that lay looping on the trunk now sail, and meet what any far ship under way may: the ground.
+**With the player's ship at the destination's road** (as the first table was sailed, the player put at the road the trader is bound for): she passes within two miles of the player's ship, and for those minutes the game's own crewed captain sails her (`ships.NEAR_DETAIL_NM`). Found, not mended (`captains.py`, outside the one check opened to this package): the crewed captain lays her passage with the port she left as the port departing (`Captain._plan`, `departing = p.in_port or self._departing`), so the track out of that port is laid again from mid sea, its anchorage first; the far body takes that plan when she leaves the near detail, and sails back to the port she left. Torbay for Dartmouth, the player at Dartmouth's road: crewed at 12 h, far again at 13 h with the plan "Brixham road, anchor at Torbay", in port at Torbay at 16 h, nothing sold. The Havre's trader, the player off Dover: crewed in Dover's road, in port there and sailing nine hours on with her cargo unsold (the crewed captain's sale is by the boat and the prices, `Captain._sell`, not `business.transact`). It is the crewed captain's own form of this fault; the far captain's is mended.
 
-- Syracuse for Augusta: beating out, aground 6.2 nm from the Great Harbour at 21 h, and there to the end of the 48 h.
-- Portsmouth for the Havre: in the Havre's Great Road at 18 h; going in for the Little Road at 27 h, aground some 2.7 nm on, and there to the end.
-- Trapani for Favignana: aground 0.4 nm out at 6 h, off again by 15 h, and her voyage made.
+Lampedusa and St Helier: the business draws no trader lying there, on the trunk or on this package. Every port tried as her destination (Licata, Valletta, Girgenti, Porto Palo, Pantelleria, Syracuse; St Peter Port, St Malo, Alderney, Weymouth, Poole) gives a plan the land guard refuses, and the business passes the pair over (`Business.refused`). Found, carried by the lead.
 
-Their courses are the planner's tracks and the body's beating, both unchanged by this package (the same legs are laid, 7-792; no route changes). None of the shipped scenarios draws such a ship within thirteen hours (below). A player in sight of one would see a far ship aground where, on the trunk, they saw a ship at anchor that never weighed.
+**Found, not mended: ships that take the ground.** In the first build's table (the player at the road), Syracuse's trader beating out was aground 6.2 nm off at 21 h, Portsmouth's going in at the Havre at 27 h, Trapani's at 6 h and off again. With the player away none of these took the ground in 48 hours; Favignana's, outward again after her round, was in distress at 32 h in the run with the player at the road. Their courses are the planner's tracks and the body's beating, unchanged by this package. Carried by the lead.
 
 ### The tile cache
 
@@ -59,9 +58,12 @@ Their courses are the planner's tracks and the body's beating, both unchanged by
 
 **Memory.** The chart has four levels: two fine, two coarse (one tile each in the owner's sea). In the owner's sea over 24 hours, the game's resident memory at its most was 116 MB on the trunk and 209 MB on this package, the fine levels holding 61 and 64 tiles at the end. The bound is 64 tiles a level, about 64 MB a fine level, so some 230 MB at the most. The same day ran in 293 s against the trunk's 705 s.
 
-### The pace truth
+### The truths of the passage
 
-7-793 counts layings, not seconds: the owner's sea for 24 hours, no far vessel laying her passage more than three times in any hour (JUDGEMENT: a far captain lays it on weighing, his business in port done, a chase or a gale over; measured at most two), and the Havre's trader on passage. It is in the slow tier (`SLOW_TESTS`) and runs some 300 s.
+- 7-790 (slow): the Havre's trader at the Little Road is in port, sails, and her plan ends at an anchor in Dover, never at the Little Road; and a smack twelve miles off Dover, the port she weighed from, runs home and comes to in it (the lead's finding (1): the first build left every anchorage of that port out, and she was `done` at sea).
+- 7-791 (slow): a ship riding at sea, out of any port's reach, whose every weigh anchors her again: the waits run an hour, two, four, then eight through the night; after twenty, a day and once; and come to anew, the hour again.
+- 7-792: the tiles, as before.
+- 7-793 (slow, the lead's finding (4)): the owner's sea a day, no far vessel laying her passage more than three times in any hour, nor, her anchor down, more than three times in the day (measured at most two); and the Havre's trader comes to in Dover within 42 hours (measured 37), sells her wine there, and sails with a return cargo.
 
 ## Fault 18: the harbour's King's ship has no private signals
 
@@ -95,30 +97,75 @@ Their courses are the planner's tracks and the body's beating, both unchanged by
 
 ## What moves
 
-**The shipped scenarios: nothing.** All 49, begun as the harbour begins them, were run 13 hours on the trunk and on this package, compared every ten minutes: every far vessel's position, state, done mark and first leg, and the log's lines. All 49 the same, the business on or off. The business-on ones run faster from the tiles kept (merchant-brig 399 s to 174 s; prize-home 471 to 330; the-channel-observed 202 to 116).
+**The shipped scenarios.** All 49, begun as the harbour begins them, were run 13 hours on the trunk (ae16dc3e) and on this build, compared every ten minutes: every far vessel's position, state, done mark and first leg, and the log's lines. 42 are the same in every row. Seven move, every one with the business on and every one at Brest, and the player's log is the same in all seven:
 
-**Recorded passages.** None with a player's or a model's orders has the business on.
+| scenario | from | what moves |
+|---|---|---|
+| merchant-brig | 9 h | business-17 and business-18, drawn lying in the Bay of Brest, the port's anchorage, are in port and wait out their business there, where on the trunk they weighed at the hour as at anchor; at 13 h in port at Brest, where the trunk had them at sea off the Goulet; business-14, a privateer, chases where she ran on |
+| merchant-cutter | 9 h | the same two; business-14 evades a little east of the trunk's |
+| merchant-schooner-plymouth | 9 h | the same two, in port at 13 h |
+| merchant-ship | 8 h | business-22, the same |
+| smack-falmouth | 9 h | business-23, the same; and three Brest fishermen run home and land their catch at Brest (0.5, 0.6 and 2.1 tons sold), where on the trunk they were still "on passage" off Brest at 40 h, and the business draws three ships more in their place |
+| prize-home | 10 min | business-26 in the Bay of Brest in port; the ships about Brest a little elsewhere, and two cruisers keeping station where on the trunk they were engaging |
+| the-channel-observed | 10 min | business-26, the same; the ships about Brest a little elsewhere, and one ship more drawn |
 
-**Pins.** None moved.
+The Bay of Brest, Brest's anchorage, is 8.1 miles inside the road of Bertheaume, its outer road. The business means such a ship to be in port ("a ship drawn lying in a port, at anchor at its anchorage, her business there part done"); the far captain now reads her so. The business-on scenarios run faster, as in the first build (merchant-brig 576 s to 295 s on this machine, prize-home 439 to 337).
 
-**Far ships that now sail**, a player or seat seeing the difference: a trader drawn lying at the Little Road of the Havre, or lying at the anchorage of Favignana, Palermo, Portsmouth, Trapani, Syracuse, Weymouth or Torbay, weighs and sails her voyage where she lay looping; some take the ground on the way (above). The private signal is read in a ship made a King's ship by her papers. A game begun in the harbour, and a prisoner's game, load by their checkpoints where they replayed.
+**Pins.** No pin of before moved. This package's own truths of the first build were restated for the lead's list (7-790, 7-791 and 7-793; above).
+
+**What a player or seat sees:**
+
+- a far trader drawn lying at an anchorage beyond two miles of its outer road (the Havre's Little Road, the Bay of Brest, Portsmouth's, Torbay's) is in port there, and sails when her business in port is done (up to the twelve hours of `IN_PORT_WAIT_S`, less the hours the draw gives her), where on the trunk she weighed at the hour, or never;
+- the far traders make their voyages: in port at the destination, the cargo sold and the return voyage begun, home and in port;
+- a far ship bound home to a port beyond two miles of its anchorage comes to in it, where on the trunk she rode at it "on passage";
+- a far ship that cannot get away from an anchorage is asked to weigh at an hour, two, four, eight and so to a day, not every hour;
+- the private signal read in a ship made a King's ship by her papers;
+- a game begun in the harbour, and a prisoner's game, load by their checkpoints.
 
 ## Mutants
 
-Each mend taken out in a worktree of the hash, the truths that read it run. All killed:
+Each mend taken out in a worktree of the hash, the truths that read it run. The first build's, all killed:
 
 | mutant | killed by |
 |---|---|
 | no departing-anchorage filter in `_plan` | 7-790; and 7-793 |
 | no `WEIGHED` wait | 7-791 |
 | sixteen tiles kept | 7-792 |
-| first in, first out (64 kept) | 7-792 (its eviction check, added when this one first survived) |
+| first in, first out (64 kept) | 7-792 (its eviction check) |
 | no table by papers | 7-795 |
 | the header from the followed hull | 7-796 |
-| the place a path in the server's first world | 7-798 (its first-world check, added when this one first survived) |
+| the place a path in the server's first world | 7-798 (its first-world check) |
 | the place a path in a world taken up | 7-798 |
 | the names' reader forgets the memo | 7-799 |
+
+The lead's of the first build: the place a path in the console survived (62 tests passed); now killed by 7-798's console truth (`tests/test_console.py`). The second build's, all killed:
+
+| mutant | killed by |
+|---|---|
+| every anchorage of the port she weighed from left out (the first build's) | 7-790, the smack home |
+| no destination's anchorage laid | 7-790, the Little Road |
+| in port by the outer road alone | 7-790, the Little Road |
+| no doubling of the wait | 7-791 |
+| doubling without its bound | 7-791 |
+| the count not begun afresh when she comes to anew | 7-791 (its check added when this one first survived) |
+| a name fetched again from the memo not told | 7-799 |
+| "within" every object on the stack | 7-799 |
+| an object told by its maker (`replay._new`), not its class | 7-799 |
 
 ## The trunk merged
 
 The trunk was merged at 93cf624c (nineteen ship files, the corvette Diana; package 126's second part, its `captains.py`, `runner.py` and `scripts.py`). One conflict, in `docs/dev/TuningNotes.md`, where both sides had added a section at the end: both kept whole, 126's second part first, then this package's. No code conflicted; `captains.py` was not touched here. Nothing of this package counts the ship files: 7-797 takes every scenario the trunk ships, as it finds them. The tiers were run on the merged hash.
+
+The trunk was merged again at 9c6a5c3e (documents only since 93cf624c: the work packages, the carried list, the ships' nudge, the proposal); no conflict.
+
+## The second build: the lead's list of c22aa834
+
+The first build was read by an independent reader and the lead and not passed, on six things; each was taken up here.
+
+1. **A ship bound home to the port she weighed from never anchored there** (a regression of the first build). The first build left out every anchorage of the port in `_departing`, which is never cleared at sea, so a passage home to it lost its own anchorage. Mended at its cause: the one left out is the anchorage she lies at as she weighs, the first leg of the track out, when she is within its reach (`_weighed_from`). The reader's probe (a smack 12 nm off Falmouth, Plymouth and Dover, departing it, running home, 18 h): the trunk in port at all three; the first build `done` 1.7 nm off Falmouth and 0.1 nm off Dover, "on passage"; this build in port at all three, at the same hours as the trunk. smack-falmouth's fishermen: above. Pinned, 7-790's smack.
+2. **The trader sailed and never arrived.** Two causes, both mended (above, the ports' table): the destination's anchorage laid where the track out held the only one; in port by the world's rule. `Planner.legs_for` is untouched: its check would have moved the crewed captain's plans too, so the mend is in `brains.py`. The riding cases' cause, and the crewed captain's form of the fault, are told above.
+3. **7-799 on Python 3.11.** A path pickles as its words whole on 3.13 and as its parts on 3.11; the truth now holds the place by its words on either (`Path(*words)`). The tiers were run on Python 3.11 (below, and in the build's report).
+4. **7-793 could not tell health from a slow loop.** Restated (above). The weigh's wait doubles to a day (`AT_ANCHOR_MOST_S`, JUDGEMENT), pinned by 7-791.
+5. **The console's road.** The console's `serve_agents` keeps the place as words as the server does; a truth of 7-798 in `tests/test_console.py` hosts the agents with a place given as a path, saves, reads the names (no path), and loads by the checkpoint.
+6. **The reader's "within".** It named the last classes pushed before a path, not the objects holding it. Now the reader keeps the loader's stack by each opcode's own account (`pickletools`), and "within" is the objects on the stack whose state is given them after the name (their BUILD later), outermost first, an object made by the game's `replay._new` told by its class. A name fetched again from the memo is told as its own place, where the first build told a class only where it was first named: a second path in the same checkpoint was missed. A planted scenario path is told within `World < Hull < World < Scenario` (the world's façade), a planted `consent_records_dir` within `World`. Its words are the strings it is called with: a path's words on either Python.
+

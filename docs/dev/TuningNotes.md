@@ -40411,39 +40411,80 @@ cleared, the hull gripes up and goes astern (the bilander's 12 knots on seed 3: 
 against none). Most of the nineteen cell-seeds the report declares (§9) are this windage's: the
 wreck's sails lowered to the deck by its clearing, begun in settled weather, take it off.
 
-## Package 129: the trader at the Little Road, the harbour's King's ship, the prisoner's checkpoint (2026-11-27)
+## Package 129: the trader at the Little Road, the harbour's King's ship, the prisoner's checkpoint (2026-11-27 to 2026-11-28)
 
-**No pin moved.** Every truth that stood before stands as it was; the new ones are 7-790 to 7-799.
-The new figures, each JUDGEMENT and defined with its ground where it stands:
+**No pin of before moved.** Every truth that stood before the package stands as it was; the new
+ones are 7-790 to 7-799. The first build (c22aa834) was not passed; its own truths 7-790, 7-791
+and 7-793 were restated in the second for the lead's list (below), and 7-799 made to hold on
+Python 3.11. The new figures, each JUDGEMENT and defined with its ground where it stands:
 
-- `brains.WEIGHED`: not a figure but a mark, the tick of a far captain's last fresh laying from an
-  anchorage. A weigh that leaves her riding at her anchor still is tried again only when
-  `AT_ANCHOR_LEAST_S` (an hour, as before) has passed since it. OLD, every minute of daylight.
+- `brains.WEIGHED` and `WEIGH_TRIES`: marks, not figures: the tick of a far captain's last fresh
+  laying from an anchorage, and how many in a row have left her riding there.
+- `brains.AT_ANCHOR_MOST_S` a day: each weigh that leaves her riding at her anchor doubles the
+  wait before the next, from `AT_ANCHOR_LEAST_S` (an hour, as before) to a day; by day and in
+  clear weather as before; the count begun afresh when she comes to anew. A master who cannot get
+  away waits on a change of wind or tide. OLD, every minute of daylight (the trunk); every hour
+  (c22aa834). Measured (7-791, a ship riding off Rye from 06:00): weighs at 1, 3, 7 and 21.75
+  hours, the eight-hour wait run into the night and taken at daylight.
 - `chart.TILE_CACHE` 64 tiles a level, the least lately read let go first. OLD, 16, the first in
   let go first. Measured: the Havre's passage to Dover reads 33 tiles of one level and 31 of
   another, so with 16 every laying loaded them all again (37 loads), with 64 none. A tile is about
   a megabyte. No answer changes: the same legs are laid with 16 kept and with 64 (7-792).
-- 7-793's `LAYINGS_AN_HOUR_MOST` 3: a far captain lays his passage on weighing, on his business in
-  port done, on a chase or a gale over; three in an hour is more than any asks. Measured at most
-  two over the owner's day. OLD, the Havre trader sixty an hour by day.
+- 7-793's `LAYINGS_AN_HOUR_MOST` 3 and `LAYINGS_LYING_A_DAY_MOST` 3: a far captain lays his
+  passage on weighing, on his business in port done, on a chase or a gale over; three in an hour
+  is more than any asks, and three in a day lying in one place more than his business and the
+  doubled wait ask. Measured over the owner's day: at most two of each. OLD, the Havre trader
+  sixty an hour by day; c22aa834, a ship who could not get away one an hour of daylight for ever.
+- 7-793's `DOVER_WITHIN_H` 42: the Havre's trader, the Little Road to Dover some 110 miles with
+  the wind in the west, comes to in Dover at 37 hours; the bound allows a tide's turn.
+
+**In port by the world's rule** (`brains.perceive_vessel`): a far ship with her anchor down is in
+port within the port's reach of its outer road, its anchorage or its mooring (`Ports.in_port_at`).
+OLD, the outer road alone: at an anchorage beyond two miles of it (the Havre's Little Road 3.2 nm,
+Portsmouth's 4.2, Torbay's 2.2, the Bay of Brest 8.1) she was "at anchor" if drawn there, and
+rode "on passage" if she came to there, no transition of her doctrine taking her from it.
+
+**The passage out and home** (`brains.FarCaptain._weighed_from`): of the track out, the anchorage
+she lies at as she weighs is left out, it alone; where it was the passage's only anchorage the
+destination's is laid at the end. OLD (the trunk): her plan began with an anchor where she lay,
+and she lay looping; c22aa834: every anchorage of that port left out of every passage, so a ship
+bound home to it never anchored, and a trader whose track out held the only anchorage ended her
+voyage off her destination, `done` at sea.
 
 **The far trader at the Little Road, old beside new** (the owner's ship, business-16, "trade 33
-tons of brandy from the Havre to Dover", drawn at anchor three miles inside the Great Road):
+tons of brandy from the Havre to Dover", drawn lying three miles inside the Great Road):
 
-| | old | new |
+| | trunk | this package |
 |---|---|---|
-| layings, 10:00 to 13:00 | 179 | 1 |
-| off her anchorage at 13:00 | 0.0 nm, at anchor | 9.74 nm, on passage |
-| her first leg out | anchor at the Havre | 49 33 N 0 05 W, the track's next mark |
-| play's cost, 08:00 to 21:00 of the first day | about 204 s | about 55 s |
+| her state as drawn | at anchor | in port |
+| layings in her first hours | 179 in three | 1 when her business is done |
+| her course out | anchor at the Havre | the track's next mark, 49 33 N 0 05 W |
+| her voyage (7-793, the wind west, 48 h) | none | in port at Dover at 37 h; wine sold; salt beef bought for the Havre |
+| play's cost, 08:00 to 21:00 of the owner's first day | about 204 s | about 55 s |
 
-**The shipped scenarios: nothing moves.** All 49, begun as the harbour begins them, were run 13
-hours on the trunk (66d2db30) and on this package. Every ten minutes, every far vessel's position,
-state, done mark and first leg, and the log's lines, were the same: business on or off. None of
-them draws in thirteen hours a ship that lay looping. The business-on ones run faster, from the
-tiles kept (merchant-brig 399 s to 174 s, merchant-cutter 392 to 184, merchant-ship 392 to 222,
-prize-home 471 to 330, the-channel-observed 202 to 116, smack-falmouth 292 to 200,
-merchant-schooner-plymouth 402 to 254, lugger-roscoff 294 to 224).
+**The ten ports** (a trader drawn lying at each as the business draws her, 48 hours, the player's
+ship out of the near detail's reach): on the trunk every one but San Fiorenzo's never moved
+(1,556 to 2,341 layings); on this package every one ends her voyage in port with her cargo sold,
+and is home, or sailing with a return cargo (the table: `docs/design/Report-Package129.md`).
+Lampedusa and St Helier: no trader is drawn there, on either (the land guard refuses every pair).
+
+**The smack home** (the reader's probe, a smack twelve miles off and bound home to the port she
+weighed from, 18 h): in port at Falmouth, Plymouth and Dover on the trunk and on this package, at
+the same hours; c22aa834, `done` at sea, "on passage".
+
+**The shipped scenarios** (all 49 begun as the harbour begins them, 13 hours, the trunk ae16dc3e
+beside this package, every ten minutes): 42 the same. Seven move, each with the business on, each
+at Brest, the player's log the same in all: merchant-brig, merchant-cutter,
+merchant-schooner-plymouth and merchant-ship (a ship or two drawn lying in the Bay of Brest wait out
+their business in port, where on the trunk they weighed at the hour), smack-falmouth (the same;
+and three Brest fishermen run home and land their catch, 0.5, 0.6 and 2.1 tons, where on the trunk
+they were still "on passage" off Brest at 40 h), prize-home and the-channel-observed (the same,
+from the first minutes; the ships about Brest a little elsewhere by 13 h). Faster from the tiles
+kept and the loops gone: merchant-brig 576 s to 295 s, prize-home 439 to 337.
+
+**Memory** (the owner's sea, 24 hours; the chart has four levels, two fine): resident at its most
+116 MB old, 209 MB new; the fine levels hold 61 and 64 tiles at the end, so some 230 MB at most.
+The day ran in 293 s against 705 s.
 
 **The private table by her papers** (7-794, 7-795): a ship whose papers say `service: kings`
 carries her nation's table, her captain's place given none. OLD, none: the harbour's King's ship
@@ -40457,39 +40498,17 @@ against the save's 7) and its journal, and the load passed it over as "not this 
 replayed. NEW, headed with the first hull's, it loads by its checkpoint and goes on as the game
 saved.
 
-**The ten ports whose way to sea begins at an anchorage inside the outer road** (a trader drawn
-lying there as the business draws her, 48 hours; layings, and where she is at the end):
+**The seat hook's place kept as words** (`consent_records_dir`, set by the server, in its first
+world and every world taken up, and by the console): OLD, a path object in the world, a name a
+checkpoint may not hold, so a game begun with a records place given as a path saved no checkpoint
+and loaded by replay. NEW, the same place as words: the seat hook reads it through `Path(...)` as
+before, and the save loads by its checkpoint (7-798, the harbour's road and the console's). On the
+owner's own road (`py -m freesail`) the place is already words or none, so this may not be the
+owner's cause; no other holder was found (`tools/checkpoint_holders.py`, every shipped scenario
+saved and read by names, 7-797).
 
-| port, bound for | drawn | old | new |
-|---|---|---|---|
-| Favignana, Trapani | in port | 2,341, never moved | 3, in port at Trapani |
-| Palermo, Milazzo | in port | 2,341, never moved | 2, on passage 88.7 nm on |
-| Portsmouth, the Havre | at anchor | 1,887, never moved | 2, aground going in to the Little Road |
-| Trapani, Favignana | in port | 1,556, never moved | 3, voyage made, home again |
-| San Fiorenzo, Bastia | at anchor | 5, sailed | the same, hour by hour |
-| Syracuse, Augusta | in port | 2,341, never moved | 2, aground 6.2 nm out |
-| Torbay, Dartmouth | at anchor | 1,904, never moved | 2, in port 4.7 nm on |
-| Weymouth, Poole | in port | 2,341, never moved | 2, on passage 19.0 nm on |
-| Lampedusa, St Helier | | not drawn | not drawn (every destination's plan refused by the land guard) |
+**The new truths' tier:** 7-790 (both), 7-791, 7-793 (both), 7-796, 7-797, 7-798 (the harbour's) and
+7-799 in the slow tier; 7-792, 7-794, 7-795 and the console's 7-798 (1.3 s) in the fast. Their times
+on Python 3.11: TIMES_PENDING.
 
-In port loops every minute, as at anchor (the ground report said twelve hours; it was wrong).
-
-**Memory** (the owner's sea, 24 hours; the chart has four levels, two fine): resident at its most
-116 MB old, 209 MB new; the fine levels hold 61 and 64 tiles at the end, so some 230 MB at most.
-The day ran in 293 s against 705 s.
-
-**The seat hook's place kept as words** (`consent_records_dir`, set by the server and the console):
-OLD, a path object in the world, a name a checkpoint may not hold, so a game begun in the harbour
-with a records place given (as `tests/test_harbour.py` begins them) saved no checkpoint and loaded
-by replay. NEW, the same place as words: the seat hook reads it through `Path(...)` as before, and
-the save loads by its checkpoint (7-798). On the owner's own road (`py -m freesail`) the place is
-already words or none, so this may not be the owner's cause; no other holder was found
-(`tools/checkpoint_holders.py`, every shipped scenario saved and read by names, 7-797).
-
-**The new truths' time:** 7-793 302 s, 7-797 248 s, 7-798 23 s, 7-799 6.5 s and 7-796, in the slow
-tier; 7-790, 7-791, 7-792, 7-794 and 7-795 in the fast.
-
-**Read by a reader other than the builder** (one, on the code and the truths against this section):
-no old assertion changed, loosened or moved slow; each named figure, old and new, as said; the
-truths pin states, counts and bands (a world's digest only compared, saved against loaded); the
-tiers as said. One slip found, the new test file's opening naming 7-790 to 7-797; mended.
+**Read by a reader other than the builder**: READER_PENDING
