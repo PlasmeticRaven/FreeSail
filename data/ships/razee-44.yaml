@@ -13,13 +13,13 @@
 ship:
   name: Indefatigable
   rig: ship
-  era_notes: 'HMS Indefatigable as razeed, 1795: the Ardent-class 64 of 1784 cut down to a frigate by
-    the Navy Office''s draught of September 1794 (ZAZ2371), her quarterdeck, forecastle and their sides
-    taken off and her lower masts shortened, rated a 44 (Winfield 1793-1817 pp. 99-100; James vol. 1 p.
-    454, vol. 5 p. 428). Derived from the 64''s file as data: her hull and lines the 64''s measured on
-    her draughts (ZAZ1407, ZAZ1280) at her own line (ZAZ2371), her spars the 64''s by Steel 1794 vol.
-    I p. 49 with her lower masts cut at the heel and a gaff and driver boom by Steel''s rule; see tools/ships/indefatigable.py
-    for every figure and judgement.'
+  era_notes: 'HMS Indefatigable as razeed, 1795, a razee of 44 guns, cut down from a 64-gun ship of the
+    Ardent class: the 64 of 1784, razeed by the Navy Office''s draught of September 1794 (ZAZ2371), her
+    quarterdeck, forecastle and their sides taken off and her lower masts shortened, rated a 44 (Winfield
+    1793-1817 pp. 99-100; James vol. 1 p. 454, vol. 5 p. 428). Derived from the 64''s file as data: her
+    hull and lines the 64''s measured on her draughts (ZAZ1407, ZAZ1280) at her own line (ZAZ2371), her
+    spars the 64''s by Steel 1794 vol. I p. 49 with her lower masts cut at the heel and a gaff and driver
+    boom by Steel''s rule; see tools/ships/indefatigable.py for every figure and judgement.'
   descriptions:
     razee:
       rig: a ship

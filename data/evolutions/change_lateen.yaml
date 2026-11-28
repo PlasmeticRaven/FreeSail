@@ -1,0 +1,58 @@
+# Shift a whole lateen round its mast: its yard peaked up by its halyard, the car passed round
+# abaft the mast and the tack shifted to the new weather side, the sail drawing nothing the
+# while, and its sheet drawn on the new lee. A whole lateen's yard is slung on one side of its
+# mast, as a dipping lug's is, so after going about with it left, or a gybe by the helm, or a
+# shift of wind, the sail lies against its mast on the weather side and draws the less until it
+# is shifted (Lescallier 1791 pp. 378-379). The yard is never lowered, as a lug's and a settee's
+# are: it is peaked up and its car passed round (Willaumez 1831, MUDER; O'Scanlan 1831, CIMAR,
+# passes it forward of the mast). This is the order by itself, standing on her course;
+# going about shifts the lateens as a part of the manoeuvre, or leaves them, by the order's words
+# or the ship's practice. Said `shift`, `change` or `dip` of a whole lateen; `shift the mainsail
+# for a new one` (or for a spare, for the heavy one, for a sail by its name) replaces the sail
+# from the sail room as it does any sail's.
+#
+# Its time is by the yard's length, the lugger's dip by itself for her ten-metre yard taken as a
+# rate (judgement): about fifteen seconds a metre of yard, so four minutes for a sixteen-metre
+# yard. All hands are called for it, as for any of her great sail's work, and its party is one
+# able hand for each two metres and a half of yard, never fewer than four (judgement).
+
+# Build notes (not served by the library's catalogue):
+# Package 90, A1a: docs/design/Design-Package90-Engine.md §2.3 items 2, 3 and 3a, §2.4.4; the
+# lead's rulings of 2026-11-18 (nudge 18), docs/design/Plan-Package90.md §13.1: the car abaft,
+# one able hand for 2½ m and at least four. Its rate by itself was not ruled: dip_lug.yaml's
+# 150 s for the lugger's 10.3-m main lug yard, 14.6 s a metre
+# (`scripts.LATEEN_SHIFT_ALONE_S_PER_M`), the lean the note put to the lead.
+# `hands: all` with no party named: all hands, as the tack's, so that a small company has the
+# hands at any hour without the settee's `too_few` (which would move `tests/test_settee.py`'s
+# list of the files that call all hands, the settee's guard set, held from A2 to A1d), and no
+# post holds it. Its party by the yard, and that party's numbers term over the hands her
+# company can give, are the script's (`scripts.lateen_party`, `scripts.party_term`): a party
+# named here would join `tests/test_catalogue.py`'s list of the sail work that names one. Its
+# yard and mast are read as it begins (here) and as it is taken up again
+# (`ChangeLateenScript.standing`), not as `requires`, whose scripted files the library counts.
+# Routed by `verbs.evolution_key`'s `whole_lateen` (a lateen with `dipping`); its class
+# `lateen`, so that the library's sweeps find the 74's mizzen course a subject (measured at
+# stage 0L).
+id: change_lateen
+verb: shift
+applies_to: {class: lateen}
+script: change_lateen
+preconditions:
+  - {check: sail.dipping, reason: "The {sail} is cut at the mast and is not shifted round it; 'shift the {sail} for a new one' replaces it from the sail room."}
+  - {check: sail.state != blown_out, reason: "The {sail} is blown out; there is no yard to shift round. Shift it for a new one."}
+  - {check: sail.state != unbent, reason: "The {sail} is unbent; there is no sail on its yard to shift round. Bend one, or shift it for a new one."}
+  - {check: sail.state == set, reason: "The {sail} is {state}; only a lateen that is set is shifted round its mast. Set it, and it lies where its yard hangs."}
+  - {check: "against_the_mast(sail)", reason: "The {sail} lies to leeward of its mast already.", done: true}
+  - {check: "not wrecked(halyard_of(sail))", reason: "{parted}"}
+  - {check: not sail.wrecked, reason: "The {sail} is wrecked."}
+  - {check: not wrecked(spar_chain(sail)), reason: "The {sail}'s yard or mast is wrecked."}
+on_start: {log: "Shift the {sail}: ease the parrel, cast off the runners, peak up the yard and pass the car round."}
+on_complete: {log: "Shifted the {sail}; {it_stands}.", kind: sail.dipped, severity: notable}
+on_fail: {log: "Could not shift the {sail}: {reason}.", kind: evolution.failed, severity: notable}
+# crew: all hands, the forecastlemen and the afterguard first, able hands, as dip_settee's
+crew: {hands: all, rating: able, stations: [forecastle, afterguard, all hands]}
+# its seconds a metre of yard: by itself, the lugger's dip by itself (not ruled); and as a part of
+# going about, the lugger's own rate in a manoeuvre (ruled), which the tack, the wear and their kin
+# read here (`scripts.lateen_change_s_per_m`), their own files' timings untouched
+timing: {shift_s_per_m: 14.6, in_a_manoeuvre_s_per_m: 8.7}
+source: "Willaumez 1831, MUDER (the yard peaked, the car passed abaft the mast); Lescallier 1791 pp. 378-379; O'Scanlan 1831, CIMAR; dip_lug's time as a rate (judgement)"

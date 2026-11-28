@@ -726,6 +726,7 @@ HULL_FIGURES = {
     "hull_speed_kn": 12.9,
     "deck_height_m": DATUM_M,
     "rudder": {"area_m2": 2.61, "max_angle_deg": 35, "rate_deg_s": 4.0, "span_m": 3.58},
+    "helm": "tiller",
 }
 
 HULL_NOTES = {
@@ -772,6 +773,12 @@ HULL_NOTES = {
     "rudder": "The blade below her line, 28.1 sq ft, its span 11.7 ft to the heel (measured, Neuf "
     "§2.6; ZAZ6179's dashed blade 11.9 ft); the angle and the rate the topsail schooner's "
     "(judgement: no source gives them).",
+    # package 90, A3 (the ground report's §3 and §8 item 6: kept by judgement, as filed)
+    "helm": "JUDGEMENT: she steers by a tiller on deck, as the privateer schooner, no source read "
+    "for her helm. Against it, Chapelle 1930 p. 136: the slave brig Diligente of 1839, 100 ft "
+    "between perpendiculars, whose plan he says does not show her helm but reads as probably a "
+    "wheel. Her own draughts would settle it, read at her rudder head: RMG ZAZ6177 (her lines) and "
+    "ZAZ6179 (her sail plan).",
 }
 
 PROFILE_NOTES = {

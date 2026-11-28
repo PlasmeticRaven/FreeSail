@@ -94,6 +94,14 @@ fields the projection reads always run.
   wale's chord, her three bulkheads as the 64's, her lower gallery's foot cut to her stern's line,
   her lines on the rail as the 64's, her driver's boom (a lateen cut's, as the 64's) the one that
   goes rigged in and the one topped up over her taffrail, and no gaff sail on a boom.
+- Package 90 (V1; docs/design/Plan-Package90.md §6, Design-Package90-Engine.md §2 and §11), on the
+  engine's probes with the key its step A1a reads (`dipping`): the whole lateen three-cornered on
+  its cut, its yard from car to penne slung a third of its length from the car on its mast's raked
+  line, on the side the game serves it hanging (`lug_side`); its cloth to leeward on either hand,
+  so against its mast on the bad, and to windward held aback; brailed up and furled aloft under its
+  yard, never lowered; peaked up its mast abaft it while it is shifted round by itself, as the game
+  serves the shift; its sheet to the side its cloth lies on; the frame across states; one filed
+  with no cut cut from its yard and its area.
 """
 
 from __future__ import annotations
@@ -123,7 +131,10 @@ from rig_fixtures import (
     frigate_with_driver_doc,
     frigate_with_mizen_yard,
     frigate_with_mizen_yard_doc,
+    polacre_probe_doc,
+    tartane_probe_doc,
     write_ship,
+    xebec_probe_doc,
 )
 
 from freesail import orders
@@ -164,6 +175,7 @@ SEVENTY_FOUR = "data/ships/seventy-four.yaml"  # package 75, B7: the Bellerophon
 TARTANE = "data/ships/tartane.yaml"
 COASTGUARD_TARTANE = "data/ships/coastguard-tartane.yaml"
 TARTANES = (TARTANE, COASTGUARD_TARTANE)
+DIANA = "data/ships/corvette-20.yaml"  # package 90: the corvette Diana
 # The files whose driver is Steel's boomsail on a lateen cut at the mast, her boom named by the cut
 # (Ext §17): the 64's since her stage B, and the 74's (package 75, B7)
 LATEEN_DRIVEN = {SIXTY_FOUR, SEVENTY_FOUR}
@@ -1305,7 +1317,11 @@ def test_a_lower_masts_foot_stands_on_the_drawn_deck_and_its_head_where_it_was(t
 # where her file has her steeved about 29 (Chapman 1768 Pl. LXII No. 5, measured: Bil-D §4.2). The
 # 74's measured at her step 4 (package 75, B7): her heel on her stem head, 4.87 m above her water at
 # x +26.25, her end 12.66 m, 31.76 degrees where her file has her steeved 31.6 (task 7: measured on
-# ZAZ1357 and ZAZ1359, Bel-D §4.7).
+# ZAZ1357 and ZAZ1359, Bel-D §4.7). The *Diana*'s measured at her landing (package 90): her heel
+# on her rail at her stem, 3.59 m above her water at x +17.31, under her stem head's 5.09 (the
+# lower of the two), her end 8.43 m, 32.13 degrees where her file has her steeved 21.5 from her
+# stem head's top (Dia-D §4.2): the root 1.50 m under that top steeves the drawn spar 10.6 degrees
+# more (for the lead, with `TACK_UP_HER_STAY`).
 BOWSPRIT_DRAWN = {
     SIXTY_FOUR: (1.004, 27.05),
     RAZEE: (0.941, 27.77),
@@ -1320,6 +1336,7 @@ BOWSPRIT_DRAWN = {
     NEUFCHATEL: (0.555, 19.50),
     BILANDER: (1.270, 28.99),
     SEVENTY_FOUR: (1.235, 31.76),
+    DIANA: (2.014, 32.13),
     # package 90, the tartane: her éperon, level, rooted at her rail at the stem (`LEVEL_ROOT_M`),
     # measured on her files (2026-11-20)
     TARTANE: (0.902, 0.0),
@@ -1639,8 +1656,23 @@ CLOSED = """
 # *Neufchatel* (package 75, B2), a privateer of her build, has neither gallery nor light: her lines
 # draw a raked transom with no counter and no quarter gallery, and the two squares at its top on
 # both her body plans are read as stern ports with no gun in them, not lights (Neuf-D §3.3, §3.5:
-# "no galleries, no lights").
-NO_GALLERY_OR_LIGHT = {BRIG, MERCHANT_BRIG, CUTTER, LUGGER, SMACK, SCHOONER, PRIVATEER, NEUFCHATEL}
+# "no galleries, no lights"). The corvette *Diana* (package 90), flush-decked, files neither: her
+# plan draws no quarter gallery and no stern lights (Dia-D §3.1), and a band of lights over her
+# knuckle would stand partly above her bulwark rail with no cabin under a quarterdeck behind it,
+# the flush-decked brig's case (the lead's ruling of nudge 32: none filed, JUDGEMENT, until the
+# owner's sheets show them). Old beside new: her first five commits filed a judged band of four,
+# no gallery, and she was in no set, so this case raised on her gallery.
+NO_GALLERY_OR_LIGHT = {
+    BRIG,
+    MERCHANT_BRIG,
+    CUTTER,
+    LUGGER,
+    SMACK,
+    SCHOONER,
+    PRIVATEER,
+    NEUFCHATEL,
+    DIANA,
+}
 # A recorded departure, not a reading: her main wale is not yet read on her lines (Neuf-D §3.2,
 # `wales_m` "not written until read"; §3.7 task 6, not taken at B2), so her file files none and
 # none is drawn. She leaves the set when the wale is read, or the lead rules her plate without one.
@@ -1650,6 +1682,17 @@ WALE_UNREAD = {NEUFCHATEL}
 # scrollwork, not a gallery (Bil-D §3.2, "Carving and paint in words"), so that she files
 # `lights_m` and no `galleries_m`. Her round stern, as the lugger's, has no transom.
 LIT_WITH_NO_GALLERY = {BILANDER}
+# A recorded departure, not a reading (package 90, for the lead): the *Diana*'s eleven ports a side
+# are cut in her side, each one's middle 0.56 to 0.68 m under her rail, but her one tier, `upper`,
+# also holds the 1817 fit's place over the rail by the mizen (x -12.09, its triple 5 cm under the
+# rail, the 64's convention), whose middle stands 0.28 m over it. The viewer reads a tier's ports
+# as cut in the side only when every one of them is (`portsInSide`, PORT_BANDS), so no band is
+# drawn for her (measured at her landing: no band face). The 64's and the 74's places over the
+# rail stand in tiers of their own (forecastle, roundhouse); a flush-decked ship has no other deck
+# word for hers. She leaves the set when the viewer reads a tier's band by its ports alone (the
+# gun placer's own test, `viewer_guns.is_port`), or the lead rules her place over the rail filed
+# otherwise.
+BAND_UNDRAWN = {DIANA}
 # The tartane (package 90): Chapman's Pl. LVII No. 16, her lines, draws a sharp stern, the planking
 # closing on a raked post with no transom, no counter, no gallery and no light (pages-tartane.md
 # §5.5, read), so that her files file a round stern with no `lights_m` and no `galleries_m`, as the
@@ -1664,7 +1707,7 @@ RIGHTLY_WITHOUT = {
     "head": {CUTTER, LUGGER, SMACK} | set(BOATS),
     "transom": {LUGGER, BILANDER} | SHARP_STERNED,
     "wale": {SCHOONER, PRIVATEER} | WALE_UNREAD,
-    "band": {LUGGER, SMACK, TARTANE} | set(BOATS),
+    "band": {LUGGER, SMACK, TARTANE} | set(BOATS) | BAND_UNDRAWN,
 }
 # The *Neufchatel*'s stem meets her water at her rabbet's x, 16.35 m, where her `breadth_m` gives
 # the stem's siding at the water, 0.14 m (Neuf-D §3.2), so that her last station stands on her
@@ -1900,6 +1943,14 @@ def test_the_strips_lie_on_the_served_stations_within_a_millimetre(tmp_path, pat
 # knuckle at 4.65 ft (`transom_hb_m` [2.46, 2.41]); re-read at the knuckle's height, 16.6 ft
 # across, her transom tumbles home above it as every other does ([2.46, 2.53]; Neuf-D §3.5).
 FLARED_TRANSOM: set[str] = set()
+# The square sterns that file no round-up, each named with its reason (the lead's ruling of nudge
+# 32: a stern that merely forgets the key still raises here). The corvette *Diana* (package 90):
+# her stern is read on her body plan's aftermost upright line, its knuckle the sheer's (Pages §5.5,
+# JUDGEMENT, the stern's reading not closing), and no round-up of the wing transom is read on it,
+# so her file files none and the viewer draws her transom's foot straight across at the knuckle,
+# with no arch and no tuck under it (`round_up_m` absent is the viewer's 0). She leaves the set
+# when a round-up is read on her plan or on the owner's sheets.
+ROUND_UP_UNREAD = {DIANA}
 
 
 @needs_node
@@ -1914,14 +1965,20 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
     ends); the tuck under the arch closes the stern down to the knuckle; every point of it on the
     stern's line at its height. The face is widest at its knuckle, or at its top on a transom that
     flares above the knuckle (`FLARED_TRANSOM`, empty since package 75's B2b: the *Neufchatel*'s
-    alone at B2, before her knuckle's breadth was read at its height)."""
+    alone at B2, before her knuckle's breadth was read at its height). A stern that files no
+    round-up is named with its reason (`ROUND_UP_UNREAD`, the *Diana*'s since package 90): its
+    foot straight across at the knuckle, no tuck; every other must file one."""
     hull = graph_of(path)["hull"]
     profile = hull["profile"]
     stern = profile["form"]["stern"]
     assert stern["type"] in ("square", "raked")
     zk, (hb_top, hb_knuckle) = stern["knuckle_z_m"], stern["transom_hb_m"]
-    rise = stern["round_up_m"]
-    assert rise > 0.05  # the 64's 4 in, the cutter's 0.07 m
+    unread = path in ROUND_UP_UNREAD
+    assert (stern.get("round_up_m") is None) == unread, (
+        f"{path}: a square stern files its round-up, or is named with its reason in ROUND_UP_UNREAD"
+    )
+    rise = 0.0 if unread else stern["round_up_m"]
+    assert unread or rise > 0.05  # the 64's 4 in, the cutter's 0.07 m
     xt, zt = profile["stern_m"][-1]
     got = run_js(
         tmp_path,
@@ -1946,8 +2003,18 @@ def test_the_transom_stands_at_the_taffrail_and_transom_hb_m_its_foot_rounded_up
     assert (hb_top > hb_knuckle) == (path in FLARED_TRANSOM)
     widest = hb_top if path in FLARED_TRANSOM else hb_knuckle
     assert max(abs(p[1]) for p in pts) == pytest.approx(widest, abs=0.001)
-    # the foot an arch, its crown the knuckle and the round-up at the middle line
+    # the foot an arch, its crown the knuckle and the round-up at the middle line; or, with no
+    # round-up read, straight across at the knuckle with no tuck under it
     tucks = [face for cls, face in got if "tuck" in cls.split()]
+    if unread:
+        assert tucks == []
+        lowest = [face for _cls, face in got if min(q[2] for q in face) < zk + 1e-6]
+        assert len(lowest) == 1
+        foot = [q for q in lowest[0] if abs(q[2] - zk) < 1e-6]
+        assert sorted(round(q[1], 3) for q in foot) == [-round(hb_knuckle, 3), round(hb_knuckle, 3)]
+        for x, _y, z in pts:
+            assert x == pytest.approx(x_at_height(profile["stern_m"], z), abs=0.01), (x, z)
+        return
     assert len(tucks) == 1
     (tuck,) = tucks
     crown = max(tuck, key=lambda p: p[2])
@@ -2550,7 +2617,9 @@ def test_wales_and_bands_are_drawn_only_on_the_outside_of_the_side(tmp_path, pat
 # bilander's one tier, the armed fit's ports cut in her waist bulwark, her highest port's middle
 # 0.17 m under her rail (measured at her landing, B4); the 74's three, as the 64's, her
 # quarterdeck's highest port's middle 0.30 m under her rail, her forecastle's and her poop's places
-# 0.31 m over it (measured at her step 4, B7)
+# 0.31 m over it (measured at her step 4, B7); the *Diana*'s none drawn, her one tier holding her
+# eleven ports cut in the side and the 1817 fit's place over the rail, its middle 0.28 m over it
+# (measured at her landing, package 90: `BAND_UNDRAWN`, a recorded departure)
 TIERS_IN_THE_SIDE = {
     SIXTY_FOUR: {"lower", "upper", "quarterdeck"},
     RAZEE: {"upper", "quarterdeck", "forecastle"},
@@ -2565,6 +2634,7 @@ TIERS_IN_THE_SIDE = {
     NEUFCHATEL: {"upper"},
     BILANDER: {"upper"},
     SEVENTY_FOUR: {"lower", "upper", "quarterdeck"},
+    DIANA: set(),  # BAND_UNDRAWN
     # package 90 (measured on her files, 2026-11-20): the trader files no ports; the guarda-costa's
     # four a side are cut in her waist bulwark, each port's middle under her rail
     TARTANE: set(),
@@ -2614,6 +2684,7 @@ CHORD_OFF_THE_SIDE_M = {
     NEUFCHATEL: 0.001,
     BILANDER: 0.103,
     SEVENTY_FOUR: 0.089,
+    DIANA: 0.004,
     # package 90, the tartane, her wale and (the guarda-costa's) her port band: measured on her
     # files (2026-11-20)
     TARTANE: 0.032,
@@ -3202,9 +3273,10 @@ def test_a_reef_raises_the_courses_foot_up_the_mast(tmp_path, rig):
 
 @needs_node
 def test_a_whole_lateen_with_its_cut_is_drawn_as_a_standing_lug_to_leeward(tmp_path):
-    """Ext §6.1: a lateen with four corners and no key (a later package's tartane) is drawn by
-    the lug's cut as a standing sail on the lee side of its tack, its yard from the cut's throat
-    to its peak, not at the fixed tilt a lateen yard with no cut keeps."""
+    """Ext §6.1: a lateen with four corners and no key, neither cut at the mast nor `dipping` (no
+    file's), is drawn by the lug's cut as a standing sail on the lee side of its tack, its yard from
+    the cut's throat to its peak, not at the fixed tilt a lateen yard with no cut keeps. A whole
+    lateen, with `dipping`, is drawn as its own since package 90 (V1, the cases at the end)."""
     doc = frigate_with_mizen_yard_doc()
     next(s for s in doc["sails"] if s["id"] == MIZEN_COURSE).pop("cut_at_mast")
     ship = ship_from_dict(doc, "whole.yaml")
@@ -4494,6 +4566,7 @@ BOOM_SAIL = {
     SCHOONER: "main.sail",
     PRIVATEER: "main.sail",
     NEUFCHATEL: "main.sail",
+    DIANA: "mizzen.spanker",
 }
 # The files with no boom, so no gaff sail on one: the lugger's lugs, and the bilander's settee on
 # her main and her square sails and staysails (package 75, B4), each sheeted to the rail, a block
@@ -4520,6 +4593,7 @@ FRAME_MOVED_OLD_M = {
     SCHOONER: 6.97,
     PRIVATEER: 6.97,
     NEUFCHATEL: 5.73,  # measured at her landing (B2)
+    DIANA: 4.86,
 }
 # Old, the sheet's end abaft her taffrail in the air by that sail's clew two metres aft, by the
 # sheet at 18 degrees on the larboard tack: x (old, new) metres. New, the taffrail on the
@@ -4534,6 +4608,7 @@ SHEET_END_X_M = {
     SCHOONER: (-22.11, -15.32),
     PRIVATEER: (-22.11, -15.32),
     NEUFCHATEL: (-24.72, -17.96),  # measured at her landing (B2)
+    DIANA: (-24.05, -18.63),  # measured at her landing (package 90)
 }
 
 
@@ -4990,6 +5065,7 @@ BOOM_OVER_TAFFRAIL_M = {
     FRIGATE: (-1.83, -1.33),
     NEUFCHATEL: (0.29, 1.05),
     SEVENTY_FOUR: (3.16, 3.80),
+    DIANA: (0.20, 0.58),
 }
 # The frigate-36's boom still stands under her taffrail, topped up: her file hangs its jaws 2.4 m
 # over her datum, 4.20 m above her water-line against her taffrail's 6.03 m, a file figure for a
@@ -5908,6 +5984,7 @@ STEM_TACK_Z_M = {
     PRIVATEER: 2.69,
     NEUFCHATEL: 2.80,
     BILANDER: 2.67,  # her stem head's 2.65 (package 75, B4)
+    DIANA: 5.11,  # her stem head's 5.09, 1.50 m over her rail's end (package 90)
 }
 
 
@@ -5997,6 +6074,7 @@ LINES_ON_THE_RAIL[BILANDER] = both_sides(
     "fore.topmast_staysail.sheet",
     "jib.sheet",
 )
+LINES_ON_THE_RAIL[DIANA] = LINES_ON_THE_RAIL[FRIGATE]
 # a ship's boat, drawn from her own profile since package 82: her lug's one sheet, to her gunwale
 LINES_ON_THE_RAIL.update({boat: {"lug.sheet"} for boat in BOATS})
 # package 90, the tartane (measured on her files, 2026-11-20): her jib's sheets and her two whole
@@ -6023,6 +6101,7 @@ STEM_TACKED = {
     NEUFCHATEL: {"fore.staysail", "fore.storm_staysail"},  # her storm jib on the jib stay
     BILANDER: {"fore.storm_staysail"},  # her two head sails' stays to the bowsprit and jib-boom
     SEVENTY_FOUR: set(),  # cut from her file's corners, as the 64's (package 75, B7)
+    DIANA: {"fore.storm_staysail"},
     # package 90, the tartane: her jib and her storm jib cut from her file's corners, their tacks at
     # the berthelot's end (Design-Ship-Tartane.md §4.3), as the 64's
     TARTANE: set(),
@@ -6037,6 +6116,19 @@ STEM_TACKED = {
 # above her water; the bowsprit's heel and the stem head's height are Neuf-D §3.7 task 7's, not
 # taken.
 TACK_OFF_HER_SIDE_M = {NEUFCHATEL: 0.202}
+# A recorded departure (package 90, for the lead): how far up a stay to the stem the rule raises a
+# head sail's tack, as a fraction of the stay's rise, where it is JIB_TACK_FRACTION or more. The
+# *Diana*'s stem head, measured on her plan at (17.30, 5.09) and filed at x 17.31 (Pages §5.4),
+# stands 1.50 m over her rail's fore end (3.59 m at 17.30), where every other file's stands within
+# 0.14 m of its rail or under it. Her fore stay lands on the rail there (the lower of the two), and
+# the least tack that keeps her storm staysail's foot over the drawn side, its stem head's top
+# among it, stands 2 cm over that top, 10.6% up the stay (measured at her landing), so that it
+# stands 0.53 m abaft her stem head's top, off the top of her side in the air (her row of
+# `TACK_OFF_HER_SIDE_M`). Her bowsprit crosses the stem head on her plan; where the stay should
+# land on so tall a stem head is the viewer's (the root `min(stem head, rail)`), not taken: the
+# same root draws her bowsprit 32.13 degrees steeved, her file's 21.5 (`BOWSPRIT_DRAWN`).
+TACK_UP_HER_STAY = {DIANA: 0.106}
+TACK_OFF_HER_SIDE_M[DIANA] = 0.526
 # The sheets each file leads to a block on her deck (B5.4's rule for a settee's one sheet: Ext §5.9
 # with the lead's ruling on the bilander's §17 lead item 4, `settee_block`): the bilander's settee's
 # (package 75, B4)
@@ -6283,7 +6375,10 @@ def test_a_stay_to_the_stem_lands_on_the_stem_head_and_its_sails_foot_stands_ove
         stay = got["stays"][got["sails"][sid]["stay"]]
         up = [p - q for p, q in zip(stay["head"], stay["foot"], strict=True)]
         fraction = (tack_at[2] - head[2]) / up[2]
-        assert 0.0 <= fraction < JIB_TACK_FRACTION, sid
+        if path in TACK_UP_HER_STAY:
+            assert fraction == pytest.approx(TACK_UP_HER_STAY[path], abs=0.0005), sid
+        else:
+            assert 0.0 <= fraction < JIB_TACK_FRACTION, sid
         assert tack_at == pytest.approx([f + fraction * u for f, u in zip(head, up, strict=True)])
         assert tack_at[2] == pytest.approx(STEM_TACK_Z_M[path], abs=0.005), sid
         off = off_her_side(tack_at, rail)
@@ -7100,3 +7195,1124 @@ def test_the_settee_dipped_in_stays_as_the_game_serves_it(tmp_path):
     assert hoisted["corners"][2][1] > 0.5 and hoisted["peak"][1] > 0.5
     (sheet,) = [ln["pts"] for ln in hoisted["lines"] if ln["cls"] == "sheet"]
     assert sheet[1] == pytest.approx(settee_block(graph, "larboard"))
+
+
+# ---------------------------------------------------------------------------
+# Package 90 (V1; docs/design/Plan-Package90.md §6, Design-Package90-Engine.md §2 and §11): the
+# whole lateen drawn, keyed as the engine's step A1a keys it (a lateen with `dipping`, not cut at
+# the mast; no committed file carries one), on the engine's probes (tests/rig_fixtures.py): the
+# tartane probe's great lateen given a cut as the shared cut writes one (tools/ships/lateen.py's
+# contract), and the xebec probe's three as filed, with none
+# ---------------------------------------------------------------------------
+
+LATEEN = "main.lateen"
+LATEEN_YARD = "main.lateen_yard"
+CUT_DEG = 30.0  # the test cut's yard to the horizontal, its penne aft and up
+CUT_LUFF_M = 0.3  # and its tack's drop under the throat
+LATEEN_TILT = 0.8  # client/projection.js: a lateen yard with no cut, radians
+LOOSE_FOOT_M = 1.5  # client/projection.js: LOOSE_FOOT_HEIGHT_M
+ON_DECK = 0.6  # client/projection.js: ON_DECK_M
+
+
+def _dipping(doc: dict) -> dict:
+    """The document with `dipping: true` on each of its whole lateens (stage 0L's key, which the
+    engine's A1a reads), as tests/test_lateen_whole.py gives it."""
+    for s in doc["sails"]:
+        if s.get("class") == "lateen" and not s.get("cut_at_mast"):
+            s["dipping"] = True
+    return doc
+
+
+def _mast_x_of(doc: dict, mast_id: str, z: float) -> float:
+    """A mast's raked line's x at `z` above the deck, from the document."""
+    mast = next(s for s in doc["spars"] if s["id"] == mast_id)
+    return mast["x_m"] - math.tan(math.radians(mast.get("rake_deg", 0.0))) * z
+
+
+def _with_a_cut(doc: dict, sid: str = LATEEN) -> dict:
+    """The probe's whole lateen `sid` given its cut as tools/ships/lateen.py writes one, four
+    corners [tack, throat, peak, clew] above the deck: its head the whole yard at CUT_DEG, slung a
+    third of it from the car on its mast's raked line at the yard's height, the tack CUT_LUFF_M
+    under the throat, the clew a metre over the deck a third of the yard abaft the slings."""
+    sail = next(s for s in doc["sails"] if s["id"] == sid)
+    yard = next(s for s in doc["spars"] if s["id"] == sail["yard"])
+    length, height = yard["length_m"], yard["height_m"]
+    sx = _mast_x_of(doc, yard["on"], height)
+    run, rise = math.cos(math.radians(CUT_DEG)), math.sin(math.radians(CUT_DEG))
+    car = [sx + length / 3.0 * run, height - length / 3.0 * rise]
+    penne = [sx - 2.0 * length / 3.0 * run, height + 2.0 * length / 3.0 * rise]
+    sail["corners_m"] = [[car[0], car[1] - CUT_LUFF_M], car, penne, [sx - length / 3.0, 1.0]]
+    return doc
+
+
+def lateen_by_the_wind(
+    tack: str,
+    sheet_deg: float = 25.0,
+    state: SailState = SailState.SET,
+    side: str | None = None,
+    backed: bool = False,
+    doc: dict | None = None,
+) -> dict:
+    """The tartane probe (or `doc`, rigged from it) with its great lateen's cut (`_with_a_cut`) and
+    the key, on `tack`, its great lateen in `state` sheeted `sheet_deg` off the centreline, its yard
+    on `side` of the mast (the lee of `tack` unless named), held aback where `backed`: the graph
+    and the snapshot."""
+    doc = doc if doc is not None else tartane_probe_doc()
+    ship = ship_from_dict(_with_a_cut(_dipping(doc)), "tartane.yaml")
+    sail = ship.sails[LATEEN]
+    set_sheet_angle(ship, sail, math.radians(sheet_deg))
+    sail.state = state
+    sail.lug_side = side or ("larboard" if tack == "starboard" else "starboard")
+    sail.backed = backed
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = ship_state(ship, awa=math.radians(50.0) * sign, tack=tack)
+    if sheet_deg == 0.0:  # unswung, below the trim's floor, as the settee's case serves it
+        next(s for s in data["snap"]["sails"] if s["id"] == LATEEN)["sheet_angle"] = 0.0
+    return data
+
+
+LATEEN_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const id = d.lateen || 'main.lateen';
+    const yid = (d.graph.sails.find(s => s.id === id).roles || {}).yard;
+    const y = sk.spars[yid], m = y.parent;
+    const pieces = sk.figures.filter(f => f.kind === 'sail' && f.id === id);
+    return {
+      car: y.a, penne: y.b, sling: y.centre, hoist: y.hoist, onDeck: !!y.onDeck,
+      peaked: !!y.peaked, mx: m.xAt(y.centre[2]),
+      axis: [m.xAt(y.centre[2] + 1) - m.xAt(y.centre[2]), 0, 1],
+      yardFig: sk.figures.filter(f => f.kind === 'spar' && f.id === yid).map(f => f.pts)[0],
+      pieces: pieces.map(f => f.piece || ''), state: pieces.length ? pieces[0].state : null,
+      corners: pieces.length ? pieces[0].corners : null,
+      path: [].concat(...pieces.map(f => P.flattenPath(f.path))),
+      lines: sk.figures.filter(f => f.kind === 'line' && (f.of === id || f.of === yid))
+        .map(f => ({id: f.id, cls: f.cls, pts: f.pts})),
+    };
+"""
+
+
+def _cut_of(graph: dict, sid: str = LATEEN) -> tuple[list, float, float, float, float]:
+    """The served cut [tack, throat, peak, clew] of `sid`, the deck, the lug's lee of its mast
+    (LUG_LEE_OF_BEAM of the beam), its yard's length and its yard's height above the deck."""
+    sail = next(s for s in graph["sails"] if s["id"] == sid)
+    yard = next(s for s in graph["spars"] if s["id"] == sail["roles"]["yard"])
+    hull = graph["hull"]
+    across = LUG_LEE_OF_BEAM * hull["beam_m"]
+    return sail["corners_m"], hull["deck_height_m"], across, yard["length_m"], yard["height_m"]
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateen_lies_on_its_cut_slung_a_third_of_its_yard_from_the_car_on_its_mast(
+    tmp_path, tack
+):
+    """V1: with its sheet at no angle a whole lateen lies on its file's cut, every corner where the
+    file has it fore and aft and in height, a mast's half-diameter to the side its yard hangs on
+    (`lug_side`, to leeward here); its yard drawn whole from its car to its penne along the head,
+    slung a third of its length from the car where the head crosses the yard's height, on the
+    mast's raked line; three-cornered, the tack a short luff under the throat; aloft, at its
+    hoist. Before V1 it was drawn as a standing lug: its yard the head alone, slung a third along
+    the head."""
+    data = lateen_by_the_wind(tack, sheet_deg=0.0)
+    got = run_js(tmp_path, data, LATEEN_FIGURES)
+    cut, deck, across, length, height = _cut_of(data["graph"])
+    lee = _lee(tack)
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    for p, (x, z) in zip(drawn, cut, strict=True):
+        assert p == pytest.approx([x, lee * across, deck + z], abs=1e-6)
+    assert math.dist(drawn[0], drawn[1]) == pytest.approx(CUT_LUFF_M)
+    sling = got["sling"]
+    assert sling[0] == pytest.approx(got["mx"]) and sling[2] == pytest.approx(deck + height)
+    assert sling[1] == pytest.approx(lee * across)
+    assert math.dist(got["car"], sling) == pytest.approx(length / 3.0)
+    assert math.dist(got["car"], got["penne"]) == pytest.approx(length)
+    assert got["car"] == pytest.approx(drawn[1]) and got["penne"] == pytest.approx(drawn[2])
+    assert got["yardFig"] == [pytest.approx(got["car"]), pytest.approx(got["penne"])]
+    assert got["hoist"] == 1 and not got["onDeck"] and not got["peaked"]
+
+
+@needs_node
+@pytest.mark.parametrize("hand", ["good", "bad"])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateen_lies_to_leeward_on_either_hand_and_against_its_mast_on_the_bad(
+    tmp_path, tack, hand
+):
+    """V1 (Design-Package90-Engine.md §2.3 item 1, A1a; Design-Ship-Tartane.md §10 item 1): set,
+    the cut swung whole about its slings by its sheet's angle to the lee of the tack, each corner
+    as high as the file has it and as far from the slings' upright as the file has it fore and
+    aft; on the good hand its slings to leeward of the mast; on the bad hand, its yard on the
+    weather side (`lug_side`), its slings a mast's half-diameter to windward and its cloth still to
+    leeward, so that it lies against the mast: the same cut, moved across by the mast's diameter."""
+    lee = _lee(tack)
+    weather_name = tack
+    data = lateen_by_the_wind(tack, side=weather_name if hand == "bad" else None)
+    got = run_js(tmp_path, data, LATEEN_FIGURES)
+    good = run_js(tmp_path, lateen_by_the_wind(tack), LATEEN_FIGURES)
+    cut, deck, across, _length, _height = _cut_of(data["graph"])
+    sling = got["sling"]
+    assert sling[1] == pytest.approx((lee if hand == "good" else -lee) * across)
+    drawn = [got["corners"][i] for i in (3, 0, 1, 2)]  # tack, throat, peak, clew
+    sx = good["sling"][0]
+    for p, (x, z) in zip(drawn, cut, strict=True):
+        assert p[2] == pytest.approx(deck + z)
+        assert math.hypot(p[0] - sling[0], p[1] - sling[1]) == pytest.approx(abs(x - sx), abs=1e-6)
+    peak, clew = drawn[2], drawn[3]
+    swung = math.degrees(math.atan2(abs(peak[1] - sling[1]), sling[0] - peak[0]))
+    assert swung == pytest.approx(25.0, abs=1e-6)
+    assert peak[1] * lee > 0.5 and clew[1] * lee > 0.5  # the cloth to leeward of the tack
+    assert drawn[0][1] * lee < 0.0  # the tack to windward, before the mast
+    if hand == "bad":
+        for p, q in zip(got["corners"], good["corners"], strict=True):
+            assert [p[0], p[1] - q[1], p[2]] == pytest.approx([q[0], -2.0 * lee * across, q[2]])
+    assert sorted(got["pieces"]) == ["abaft", "forward"]  # cut at its mast for the painter
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateen_held_aback_lies_to_windward_pressed_on_its_mast(tmp_path, tack):
+    """V1, with A1d (Design-Package90-Engine.md §2.4.3): the wind come round ahead onto the side its
+    cloth lies on holds a whole lateen aback there, against its mast; the game serves it `backed`,
+    and it is drawn with its cloth to windward, its slings where its yard hangs; its sheet to its
+    own side."""
+    lee = _lee(tack)
+    got = run_js(tmp_path, lateen_by_the_wind(tack, side=tack, backed=True), LATEEN_FIGURES)
+    _cut, _deck, across, _length, _height = _cut_of(lateen_by_the_wind(tack)["graph"])
+    assert got["sling"][1] == pytest.approx(-lee * across)
+    peak, clew = got["corners"][1], got["corners"][2]
+    assert peak[1] * lee < -0.5 and clew[1] * lee < -0.5
+    (sheet,) = [ln["pts"] for ln in got["lines"] if ln["cls"] == "sheet"]
+    assert sheet[1][1] * lee < 0.0
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateen_is_brailed_and_furled_aloft_under_its_yard(tmp_path, tack):
+    """V1 (Design-Ship-Tartane.md §5.4 item 7): a whole lateen's yard is never lowered, as a lug's
+    is: in its gear the sail is brailed up under its yard aloft, its festoons straight down by the
+    gear's share of its depth square to the yard, its sheet from the clew in the after festoon;
+    furled, a bundle along its head aloft, no sheet drawn; the yard where it stands set. Before V1
+    it lay on deck with its yard in either, as a lowered lug."""
+    set_ = run_js(tmp_path, lateen_by_the_wind(tack), LATEEN_FIGURES)
+    gear = run_js(tmp_path, lateen_by_the_wind(tack, state=SailState.IN_THE_GEAR), LATEEN_FIGURES)
+    furled = run_js(tmp_path, lateen_by_the_wind(tack, state=SailState.FURLED), LATEEN_FIGURES)
+    for got in (gear, furled):
+        assert got["car"] == pytest.approx(set_["car"])
+        assert got["penne"] == pytest.approx(set_["penne"])
+        assert got["hoist"] == 1 and not got["onDeck"]
+    throat, peak, clew = set_["corners"][0], set_["corners"][1], set_["corners"][2]
+    head = [b - a for a, b in zip(throat, peak, strict=True)]
+    cl = [b - a for a, b in zip(throat, clew, strict=True)]
+    cross = [
+        head[1] * cl[2] - head[2] * cl[1],
+        head[2] * cl[0] - head[0] * cl[2],
+        head[0] * cl[1] - head[1] * cl[0],
+    ]
+    deep = math.hypot(*cross) / math.hypot(*head)
+    hang = GEAR_DEPTH * deep
+    for p in gear["path"]:
+        assert _off_the_segment(p, throat, peak) <= hang * 1.6 + 1e-6
+        assert p[2] >= min(throat[2], peak[2]) - hang * 1.6 - 1e-6
+    (sheet,) = [ln["pts"] for ln in gear["lines"] if ln["cls"] == "sheet"]
+    along = [a + 2.0 / 3.0 * (b - a) for a, b in zip(throat, peak, strict=True)]
+    assert sheet[0] == pytest.approx([along[0], along[1], along[2] - hang])
+    assert max(_off_the_segment(p, throat, peak) for p in furled["path"]) <= 0.3 + 1e-6
+    assert not [ln for ln in furled["lines"] if ln["cls"] == "sheet"]
+
+
+@needs_node
+@pytest.mark.parametrize("state", [SailState.SET, SailState.IN_THE_GEAR])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateens_sheet_comes_down_to_the_side_its_cloth_lies_on(tmp_path, tack, state):
+    """V1: a whole lateen's one sheet, hauled aft and to leeward (Lescallier 1791 p. 379), from its
+    clew to her drawn rail on the side its cloth lies on, two metres abaft the clew, as any single
+    sheet of a sail with no yard below (`lead_x`'s rule); a standing lug's comes down a metre
+    abaft, as the whole lateen's did before V1 (Report-Package90-Tartane.md §10 (c), her four
+    cases on the rail)."""
+    data = lateen_by_the_wind(tack, state=state)
+    got = run_js(tmp_path, data, LATEEN_FIGURES)
+    (sheet,) = [ln["pts"] for ln in got["lines"] if ln["cls"] == "sheet"]
+    clew, end = sheet
+    assert end == pytest.approx(rail_end(data["graph"]["hull"], clew[0] - 2.0, _lee(tack)))
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 45.0, 90.0, 150.0, 225.0, 270.0])
+def test_the_frame_holds_the_whole_lateen_across_states(tmp_path, facing_deg):
+    """The fixed scale (spec M3 §9 item 14): every point of the whole lateen, its yard and its lines
+    lies within the frame alone, upright or heeled, on either tack, at any sheet, on either hand,
+    held aback, set, brailed up, furled or peaked up its mast to be shifted; and the view's bounds
+    are the same in each. Before V1 the frame took a lateen yard braced as a square yard at the
+    fixed tilt, and the tartane's great yard's penne stood 0.15 m over it, dressed
+    (Report-Package90-Tartane.md §10 (c))."""
+    states = {
+        f"{tack}-{sheet}-{state.value}": lateen_by_the_wind(tack, sheet, state)
+        for tack in ("starboard", "larboard")
+        for sheet in (8.0, 45.0, 85.0)
+        for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED)
+    }
+    for tack in ("starboard", "larboard"):
+        states[f"{tack}-bad"] = lateen_by_the_wind(tack, side=tack)
+        states[f"{tack}-aback"] = lateen_by_the_wind(tack, side=tack, backed=True)
+        shifting = lateen_by_the_wind(tack, state=SailState.IN_THE_GEAR, side=tack)
+        shifting["snap"]["evolutions_in_progress"] = [
+            {"id": "change_lateen", "subject": LATEEN, "step": "shift", "waiting": False}
+        ]
+        states[f"{tack}-shifting"] = shifting
+    _the_frame_holds_the_great_lateen(_great_lateen_in_the_frame(tmp_path, states, facing_deg))
+
+
+def _great_lateen_in_the_frame(tmp_path, states: dict, facing_deg: float) -> dict:
+    """Each state's views at `facing_deg` and HEELS: the frame's box, how far the great lateen's
+    points (its sail, its yard and its lines) stand outside it at most and how many there are, the
+    view's bounds, and the great yard's penne projected."""
+    body = f"""
+        const f = {math.radians(facing_deg)};
+        const ours = g => [g.id, g.of].some(i => i === 'main.lateen_yard' || i === 'main.lateen');
+        const out = {{}};
+        Object.keys(d).forEach(k => {{
+          const sk = P.buildSkeleton(d[k].graph, d[k].snap);
+          out[k] = {json.dumps(HEELS)}.map(h => {{
+            const proj = P.makeProjector(f, h);
+            const fr = sk.frame.map(proj);
+            const xs = fr.map(p => p.x), ys = fr.map(p => p.y);
+            const box = {{minX: Math.min(...xs), maxX: Math.max(...xs),
+                          minY: Math.min(...ys), maxY: Math.max(...ys)}};
+            let over = -1e9, n = 0;
+            sk.figures.filter(ours).forEach(g => {{
+              (g.path ? P.flattenPath(g.path) : g.pts).map(proj).forEach(q => {{
+                over = Math.max(over, box.minX - q.x, q.x - box.maxX, box.minY - q.y,
+                                q.y - box.maxY);
+                n += 1;
+              }});
+            }});
+            return {{frame: box, over: over, n: n, bounds: P.project(sk, f, h).bounds,
+                     penne: proj(sk.spars['main.lateen_yard'].b),
+                     peaked: !!sk.spars['main.lateen_yard'].peaked}};
+          }});
+        }});
+        return out;
+    """
+    return run_js(tmp_path, states, body)
+
+
+def _the_frame_holds_the_great_lateen(got: dict) -> None:
+    """In every state and view the great lateen lies within the frame alone, and the frame and the
+    view's bounds are the first state's."""
+    first = got[next(iter(got))]
+    for name, views in got.items():
+        for heel, view, same in zip(HEELS, views, first, strict=True):
+            assert view["n"] > 4 and view["over"] <= 1e-6, (name, heel, view["over"])
+            for k in ("minX", "maxX", "minY", "maxY"):
+                assert view["frame"][k] == pytest.approx(same["frame"][k], abs=1e-6), (name, k)
+                assert view["bounds"][k] == pytest.approx(same["bounds"][k], abs=1e-6), (name, k)
+
+
+def _main_a_pole(doc: dict) -> dict:
+    """The tartane probe's main struck to its lower mast, a pole short of her great yard peaked,
+    as on her own files: its topmast and topgallant mast taken out with the topsail and its yard,
+    and the jibs, whose stay is set up at the topmast's head; with every line of them and their
+    places in the groups, the aliases and the sail room. Her main's head stands 17.0 m over her
+    water, her great yard's penne peaked 21.52 m; as rigged her masts stand to 25.1 m."""
+    struck = {"main.topmast", "main.topgallant_mast", "topsail.yard", "topsail", "jib", "storm_jib"}
+    doc["spars"] = [s for s in doc["spars"] if s["id"] not in struck]
+    doc["sails"] = [s for s in doc["sails"] if s["id"] not in struck]
+    gone = struck | {ln["id"] for ln in doc["lines"] if ln["of"] in struck}
+    doc["lines"] = [ln for ln in doc["lines"] if ln["id"] not in gone]
+    groups = {name: [m for m in held if m not in gone] for name, held in doc["groups"].items()}
+    gone |= {name for name, kept in groups.items() if not kept}
+    doc["groups"] = {name: kept for name, kept in groups.items() if kept}
+    doc["aliases"] = {alias: to for alias, to in doc["aliases"].items() if to not in gone}
+    room = doc["crew"]["stores"]["sails"]
+    doc["crew"]["stores"]["sails"] = [s for s in room if s["kind"] not in gone]
+    return doc
+
+
+def _shifting(data: dict) -> dict:
+    """The state with the great lateen's shift by itself in hand (`change_lateen`)."""
+    data["snap"]["evolutions_in_progress"] = [
+        {"id": "change_lateen", "subject": LATEEN, "step": "shift", "waiting": False}
+    ]
+    return data
+
+
+@needs_node
+@pytest.mark.parametrize("facing_deg", [0.0, 90.0, 150.0, 270.0])
+def test_the_frame_holds_the_peaked_yard_over_masts_short_of_it(tmp_path, facing_deg):
+    """The fixed scale with her masts short of her great yard peaked, as on the tartane's own
+    files, whose frame's top abeam is 26.72 m with the yard peaked in it and 19.23 m without (the
+    reader's measure, nudge 93): the frame takes the yard peaked up its mast (`framePts`), so the
+    peak lies within it, it sets the frame's top, and the view's bounds are the same while the yard
+    is shifted as in every other state. On the probe as rigged her topgallant mast's head stood
+    over the peak and hid the need: with the peak left out of the frame every case passed. Her main
+    struck to a pole (`_main_a_pole`), the frame's top is 21.52 m with the peak and 17.0 m
+    without."""
+    states = {
+        f"{tack}-{state.value}": lateen_by_the_wind(
+            tack, state=state, doc=_main_a_pole(tartane_probe_doc())
+        )
+        for tack in ("starboard", "larboard")
+        for state in (SailState.SET, SailState.IN_THE_GEAR, SailState.FURLED)
+    }
+    for tack in ("starboard", "larboard"):
+        states[f"{tack}-shifting"] = _shifting(
+            lateen_by_the_wind(
+                tack, state=SailState.IN_THE_GEAR, side=tack, doc=_main_a_pole(tartane_probe_doc())
+            )
+        )
+    got = _great_lateen_in_the_frame(tmp_path, states, facing_deg)
+    _the_frame_holds_the_great_lateen(got)
+    for tack in ("starboard", "larboard"):
+        upright = got[f"{tack}-shifting"][0]
+        assert upright["peaked"]
+        assert upright["penne"]["y"] == pytest.approx(upright["frame"]["minY"], abs=1e-6)
+        assert -upright["frame"]["minY"] == pytest.approx(21.52, abs=0.01)
+
+
+SLUNG_LOW_M = 5.0  # the probe's great yard slung lower, so that peaked its car would be under deck
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_peaked_yard_slung_low_is_raised_to_keep_its_car_over_the_deck(tmp_path, tack):
+    """V1's peaked pose (judgement): the great yard peaked up its mast to be shifted is slung where
+    it was and raised up the mast's raked line only as far as keeps its car ON_DECK over the deck.
+    On the tartane's own files her great yard is raised 0.41 m so (the reader's measure, nudge 93);
+    on the probe as rigged, slung 10 m over its deck, its car stood 4.69 m over the deck and the
+    raising was never reached. Slung at SLUNG_LOW_M, peaked where it was slung its car would stand
+    under the deck: it is raised to stand ON_DECK over it, and no higher."""
+    doc = tartane_probe_doc()
+    next(s for s in doc["spars"] if s["id"] == LATEEN_YARD)["height_m"] = SLUNG_LOW_M
+    data = _shifting(lateen_by_the_wind(tack, state=SailState.IN_THE_GEAR, side=tack, doc=doc))
+    _cut, deck, across, length, height = _cut_of(data["graph"])
+    assert height == SLUNG_LOW_M
+    got = run_js(tmp_path, data, LATEEN_FIGURES)
+    assert got["peaked"]
+    axis = got["axis"]
+    up = axis[2] / math.hypot(*axis)
+    assert height - up * length / 3.0 < 0.0  # slung where it was, its car under the deck
+    _peaked_up_its_mast(got, deck, across, length)
+    assert got["car"][2] == pytest.approx(deck + ON_DECK)
+
+
+def _peaked_up_its_mast(got: dict, deck: float, across: float, length: float) -> None:
+    """The yard peaked up to be shifted round its mast: its whole length up the mast's raked line,
+    a mast's half-diameter abaft the mast on the middle line, its car at least ON_DECK over the
+    deck; the sail a bundle along it; its sheet not drawn."""
+    car, penne = got["car"], got["penne"]
+    assert math.dist(car, penne) == pytest.approx(length)
+    axis = got["axis"]
+    up = [b - a for a, b in zip(car, penne, strict=True)]
+    assert up[0] / up[2] == pytest.approx(axis[0] / axis[2]) and up[1] == pytest.approx(0.0)
+    assert got["sling"][0] == pytest.approx(got["mx"] - across) and got["sling"][1] == 0.0
+    assert car[2] >= deck + ON_DECK - 1e-6
+    assert max(_off_the_segment(p, car, penne) for p in got["path"]) <= 0.35 + 1e-6
+    assert got["pieces"] == [""]
+    assert not [ln for ln in got["lines"] if ln["cls"] == "sheet"]
+
+
+@needs_node
+def test_a_whole_lateen_shifted_by_itself_is_peaked_up_its_mast_as_the_game_serves_it(tmp_path):
+    """V1 (Design-Package90-Engine.md §2.3 item 2; A1a's `shift the mainsail`): the game serves the
+    shift by itself as `change_lateen` in hand on the sail, the sail in its gear, the yard on its
+    old side until it is done. While it is in hand the yard is drawn peaked up its mast, its car
+    passed round abaft it (the lead's ruling); the other lateens as they lie; done, the yard set on
+    the new lee. On the xebec probe as filed, whose lateens have no cut (`lateenCorners`)."""
+    path = write_ship(_dipping(xebec_probe_doc()), tmp_path, "xebec")
+    scenario = Scenario(
+        wind_from_deg=0.0,
+        wind_speed_kn=15.0,
+        gustiness=0.0,
+        variability=0.0,
+        ship_heading_deg=292.5,
+        ship_speed_kn=5.0,
+    )
+    world = make_world(7, str(path), scenario)
+    world.submit("set plain sail")
+    world.run(240)
+    main = world.ship.sails[LATEEN]
+    assert main.is_set and main.lug_side == "larboard" and world.ship.dyn.tack == "starboard"
+    main.lug_side = "starboard"  # on the weather side, as a tack that leaves the lateens leaves it
+    reply = world.submit("shift the mainsail")
+    assert reply.kind == "order.accepted", reply.text
+    world.run(2)
+
+    def served() -> dict:
+        return {
+            "graph": queries.ship_graph(world.ship),
+            "snap": queries.snapshot(world),
+            "lateen": LATEEN,
+        }
+
+    during = served()
+    assert [e["id"] for e in during["snap"]["evolutions_in_progress"]] == ["change_lateen"]
+    _cut, deck, across, length, _height = _cut_of_yard(during["graph"])
+    got = run_js(tmp_path, during, LATEEN_FIGURES)
+    assert got["peaked"] and got["state"] == "in_the_gear"
+    _peaked_up_its_mast(got, deck, across, length)
+    fore = run_js(tmp_path, {**during, "lateen": "fore.lateen"}, LATEEN_FIGURES)
+    assert not fore["peaked"] and fore["state"] == "set"
+    for _ in range(900):
+        world.tick()
+        if main.is_set:
+            break
+    assert main.is_set and main.lug_side == "larboard"
+    after = run_js(tmp_path, served(), LATEEN_FIGURES)
+    assert not after["peaked"] and after["sling"][1] == pytest.approx(-across)
+    assert after["corners"][1][1] < -0.5  # the peak to leeward, to larboard
+
+
+def _cut_of_yard(graph: dict, sid: str = LATEEN) -> tuple[None, float, float, float, float]:
+    """`_cut_of` for a whole lateen filed with no cut: the deck, the lug's lee of its mast, its
+    yard's length and height."""
+    sail = next(s for s in graph["sails"] if s["id"] == sid)
+    yard = next(s for s in graph["spars"] if s["id"] == sail["roles"]["yard"])
+    hull = graph["hull"]
+    across = LUG_LEE_OF_BEAM * hull["beam_m"]
+    return None, hull["deck_height_m"], across, yard["length_m"], yard["height_m"]
+
+
+@needs_node
+@pytest.mark.parametrize("sid", ["fore.lateen", "main.lateen", "mizzen.lateen"])
+def test_a_whole_lateen_with_no_cut_is_cut_from_its_yard_and_its_area(tmp_path, sid):
+    """V1 (`lateenCorners`, judgement): a whole lateen whose file gives no cut, as the engine's
+    probes', is cut from its yard: the head the whole yard at the lateen yard's tilt, its penne aft
+    and up, slung a third of it from the car on its mast's raked line at the yard's height; the
+    tack at the car; the clew a loose foot's height over the deck, as far aft as gives it its area
+    and no farther than the penne. Before V1 its yard was braced as a square yard at that tilt and
+    the sail hung four-sided under it."""
+    ship = ship_from_dict(_dipping(xebec_probe_doc()), "xebec.yaml")
+    ship.sails[sid].state = SailState.SET
+    ship.sails[sid].lug_side = "larboard"
+    data = {**ship_state(ship, awa=math.radians(50.0), tack="starboard"), "lateen": sid}
+    next(s for s in data["snap"]["sails"] if s["id"] == sid)["sheet_angle"] = 0.0  # unswung
+    got = run_js(tmp_path, data, LATEEN_FIGURES)
+    _none, deck, across, length, height = _cut_of_yard(data["graph"], sid)
+    car, penne, sling = got["car"], got["penne"], got["sling"]
+    assert sling == pytest.approx([got["mx"], -across, deck + height])
+    assert math.dist(car, sling) == pytest.approx(length / 3.0)
+    assert math.dist(car, penne) == pytest.approx(length)
+    assert math.atan2(penne[2] - car[2], car[0] - penne[0]) == pytest.approx(LATEEN_TILT)
+    throat, peak, clew, tack_at = got["corners"]
+    assert tack_at == pytest.approx(car) and throat == pytest.approx(car)
+    assert peak == pytest.approx(penne)
+    assert clew[2] == pytest.approx(deck + LOOSE_FOOT_M)
+    sail = next(s for s in data["graph"]["sails"] if s["id"] == sid)
+    run, rise = penne[0] - car[0], penne[2] - car[2]
+    area = 0.5 * abs(run * (clew[2] - car[2]) - rise * (clew[0] - car[0]))
+    assert clew[0] == pytest.approx(penne[0]) or area == pytest.approx(sail["area_m2"])
+    assert penne[0] - 1e-6 <= clew[0] <= car[0] + 1e-6
+
+
+# ---------------------------------------------------------------------------
+# Package 90 (V2; docs/design/Plan-Package90.md §6, Design-Ship-Polacre.md §13, Design-Ship-
+# Tartane.md §10 item 3): the pole mast drawn as the one stick it is filed, its upper yards drawn
+# down on the yard below while their sails are lowered (A6's `take_in_pole` and `furl_pole`), and a
+# square sail over a yard that does not stand (on deck with its flying sail: the tartane's topsail
+# over her tréou's yard in her plain sail, Report-Package90-Tartane.md §14.2) hung from its own
+# yard, loose-footed along it. On the smack, the one committed pole; the smack with her square sail
+# set flying, the tartane's case on a committed file's figures; and the polacre probe with a small
+# square topsail over her lateen mizen (her design's, carried by the owner's word of 2026-11-19)
+# ---------------------------------------------------------------------------
+
+POLE_TOPSAIL = "topsail"
+POLE_TOPSAIL_YARD = "topsail.yard"
+YARD_BELOW = "square_sail.yard"
+YARD_ON_CAP = 0.3  # client/projection.js: YARD_ON_CAP_M
+SPREAD_OF_YARD = 0.9  # client/projection.js: HEAD_SPREAD, a sail with no yard below
+MIZEN_TOPSAIL = "mizzen.topsail"
+MIZEN_TOPSAIL_YARD = "mizzen.topsail.yard"
+MIZEN_TOPSAIL_M2 = 15.0
+
+
+def smack_flying_doc() -> dict:
+    """The smack's file with her square sail set flying (its reef band taken out, as a flying sail
+    has none): her topsail then stands over a yard sent down on deck with its sail while that sail
+    is furled, the tartane's topsail over her tréou's yard."""
+    doc = yaml.safe_load((ROOT / SMACK).read_text())
+    sail = next(s for s in doc["sails"] if s["id"] == "square_sail")
+    sail["flying"], sail["reef_bands"] = True, 0
+    return doc
+
+
+def polacre_with_mizen_topsail_doc() -> dict:
+    """The polacre probe with the key and a small square topsail over her lateen mizen, its yard
+    crossed on the mizen's own head with no topmast stepped (Design-Ship-Polacre.md §4.4a, the
+    owner's "Carry it"): a pole by the parts, the sail's foot clear above the lateen's yard, no
+    braced yard below it; its lines as the smack's topsail's."""
+    doc = _dipping(polacre_probe_doc())
+    deck = doc["hull"]["deck_height_m"]
+    yard = {
+        "id": MIZEN_TOPSAIL_YARD,
+        "class": "yard",
+        "on": "mizzen.mast",
+        "length_m": 6.0,
+        "height_m": 10.5,
+        "brace_limit_deg": 60,
+        "rating_kn": 10.0,
+    }
+    depth = MIZEN_TOPSAIL_M2 / (SPREAD_OF_YARD * yard["length_m"])
+    sail = {
+        "id": MIZEN_TOPSAIL,
+        "class": "square",
+        "yard": MIZEN_TOPSAIL_YARD,
+        "area_m2": MIZEN_TOPSAIL_M2,
+        "reef_bands": 0,
+        "x_m": -11.0,
+        "centre_height_m": deck + yard["height_m"] - depth / 2.0,
+        "canvas_no": 8,
+    }
+    smack = yaml.safe_load((ROOT / SMACK).read_text())
+    lines = []
+    for ln in smack["lines"]:
+        if ln.get("of") in (POLE_TOPSAIL, POLE_TOPSAIL_YARD):
+            new = dict(ln)
+            new["of"] = MIZEN_TOPSAIL if ln["of"] == POLE_TOPSAIL else MIZEN_TOPSAIL_YARD
+            new["id"] = "mizzen." + ln["id"]
+            lines.append(new)
+    doc["spars"].append(yard)
+    doc["sails"].append(sail)
+    doc["lines"] += lines
+    return doc
+
+
+POLE_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    const out = {spars: {}, sails: {}, lines: {}, poles: []};
+    Object.keys(sk.spars).forEach(id => {
+      const r = sk.spars[id];
+      if (r.onPole) out.poles.push(id);
+      out.spars[id] = {a: r.a, b: r.b, centre: r.centre || null, hoist: r.hoist,
+                       onDeck: !!r.onDeck, half: r.half || null, arm: r.arm || null,
+                       cls: r.cls, parent: r.parent ? r.parent.id : null};
+    });
+    sk.figures.filter(f => f.kind === 'sail').forEach(f => {
+      out.sails[f.id] = {corners: f.corners, state: f.state};
+    });
+    sk.figures.filter(f => f.kind === 'line').forEach(f => {
+      (out.lines[f.of] = out.lines[f.of] || []).push({id: f.id, cls: f.cls, pts: f.pts});
+    });
+    out.masts = sk.figures.filter(f => f.kind === 'spar' && f.cls === 'mast')
+      .map(f => ({id: f.id, pts: f.pts, piece: f.piece || ''}));
+    return out;
+"""
+
+
+def _pole_state(ship, states: dict, tack: str = "larboard", steps: dict | None = None) -> dict:
+    """`ship` with each sail of `states` in its state, its yards square, by the wind on `tack`;
+    each sail of `steps` at that step of its work in hand, as the snapshot serves it."""
+    for sid, state in states.items():
+        ship.sails[sid].state = state
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = ship_state(ship, awa=math.radians(60.0) * sign, tack=tack)
+    data["snap"]["evolutions_in_progress"] = [
+        {"id": "take_in_pole", "subject": sid, "step": step, "waiting": False}
+        for sid, step in (steps or {}).items()
+    ]
+    return data
+
+
+def ship_poles(ship) -> list[str]:
+    """The yards the engine takes on a pole (`Ship.on_pole`), by the file's order."""
+    return [sp.id for sp in ship.spars.values() if ship.on_pole(sp)]
+
+
+@needs_node
+@pytest.mark.parametrize(
+    "case", ["file", "smack-flying", "polacre-mizen-topsail"], ids=["files", "flying", "mizen"]
+)
+def test_the_yards_drawn_on_a_pole_are_those_the_engine_hands_from_the_yard_below(tmp_path, case):
+    """V2 keyed as A6 (`Ship.on_pole`, read from the parts as filed with no key): on every committed
+    file and on the two rigs of this section, the yards the drawing takes on a pole are exactly
+    those the engine takes in and furls from the yard below. The smack's topsail yard is the one
+    committed; the polacre's mizen topsail's, over a lateen with no braced yard below, by A5's
+    reading of the lateen's yard as its level below."""
+    if case == "file":
+        ships = [(path, make_ship(path)) for path in EVERY_SHIP]
+    elif case == "smack-flying":
+        ships = [(case, ship_from_dict(smack_flying_doc(), "smack-flying.yaml"))]
+    else:
+        ships = [(case, ship_from_dict(polacre_with_mizen_topsail_doc(), "polacre.yaml"))]
+    for name, ship in ships:
+        got = run_js(tmp_path, ship_state(ship), POLE_FIGURES)
+        assert sorted(got["poles"]) == sorted(ship_poles(ship)), name
+    if case == "file":
+        assert [name for name, ship in ships if ship_poles(ship)] == [SMACK]
+
+
+@needs_node
+def test_a_pole_is_drawn_as_one_stick_with_no_doubling(tmp_path):
+    """V2 (Design-Ship-Polacre.md §13: "her pole masts as single sticks"): the smack's main, a pole
+    (no topmast to strike: the topsail yard crosses the mast's own head), is drawn from its foot on
+    her deck to its head as its file has it, with no upper mast overlapping it by the doubling
+    (DOUBLING), and her topsail yard hangs on it below its head."""
+    data = ship_state(make_ship(SMACK))
+    got = run_js(tmp_path, data, POLE_FIGURES)
+    deck = data["graph"]["hull"]["deck_height_m"]
+    mast = next(s for s in data["graph"]["spars"] if s["id"] == "main.mast")
+    assert not [
+        s
+        for s in data["graph"]["spars"]
+        if s.get("parent") == "main.mast"
+        and s["class"] in ("topmast", "topgallant_mast", "royal_mast")
+    ]
+    pieces = [f["pts"] for f in got["masts"] if f["id"] == "main.mast"]
+    top = max(p[1][2] for p in pieces)
+    assert top == pytest.approx(deck + mast["height_m"])
+    assert got["spars"]["main.mast"]["b"][2] == pytest.approx(top)
+    assert got["spars"][POLE_TOPSAIL_YARD]["parent"] == "main.mast"
+    assert got["spars"][POLE_TOPSAIL_YARD]["centre"][2] < top
+
+
+@needs_node
+@pytest.mark.parametrize(
+    "state",
+    [SailState.SET, SailState.SHEETED, SailState.LOOSED, SailState.IN_THE_GEAR, SailState.FURLED],
+)
+def test_a_poles_topsail_yard_is_drawn_down_on_the_yard_below_while_its_sail_is_not_set(
+    tmp_path, state
+):
+    """V2 (A6, "amener en paquet", Lescallier 1791 p. 371): the smack's topsail yard stands at its
+    file's height while its sail is set, and lies on the yard below, its square sail's, its slings
+    YARD_ON_CAP over that yard's, while its sail is not set: sheeted home and not hoisted, loosed,
+    in the gear or furled, her start among them. The yard below does not move; the topsail's clews
+    stay at its arms. Before V2 the topsail yard stood at its file's height in every state (14.35
+    m above her water against 11.15 m lowered: docs/dev/TuningNotes.md, "Package 90, the
+    viewer")."""
+    ship = make_ship(SMACK)
+    data = _pole_state(ship, {POLE_TOPSAIL: state})
+    got = run_js(tmp_path, data, POLE_FIGURES)
+    deck = data["graph"]["hull"]["deck_height_m"]
+    filed = {s["id"]: s for s in data["graph"]["spars"]}
+    yard, below = got["spars"][POLE_TOPSAIL_YARD], got["spars"][YARD_BELOW]
+    assert below["centre"][2] == pytest.approx(deck + filed[YARD_BELOW]["height_m"])
+    if state is SailState.SET:
+        assert yard["centre"][2] == pytest.approx(deck + filed[POLE_TOPSAIL_YARD]["height_m"])
+        assert yard["hoist"] == 1
+    else:
+        assert yard["centre"][2] == pytest.approx(below["centre"][2] + YARD_ON_CAP)
+        assert yard["hoist"] == 0
+    corners = got["sails"][POLE_TOPSAIL]["corners"]
+    lead = [corners[3], corners[2]]  # larboard and starboard clews
+    arms = [below["a"], below["b"]]
+    for clew, arm in zip(lead, arms, strict=True):
+        mid = below["centre"]
+        assert clew == pytest.approx([m + 0.9 * (a - m) for m, a in zip(mid, arm, strict=True)])
+
+
+@needs_node
+def test_the_smacks_topsail_drawn_lowered_as_the_game_serves_it(tmp_path):
+    """V2 through the game's own routes (`take in the topsail`, A6's `take_in_pole`; `furl the
+    topsail`, `furl_pole`): set, the yard at its file's height; while the halyards are let go and
+    the sail clewed up (the served step, `lower_and_clew_up`) the yard halfway down; in its gear and
+    furled, on the yard below; set again, aloft."""
+    scenario = Scenario(wind_from_deg=0.0, wind_speed_kn=12.0, ship_heading_deg=292.5)
+    world = make_world(7, SMACK, scenario)
+    world.submit("all hands")
+    topsail = world.ship.sails[POLE_TOPSAIL]
+
+    def run_until(state: SailState, limit: int = 1500) -> None:
+        for _ in range(limit):
+            world.tick()
+            if topsail.state is state and not world.ship.extra["evolutions"].instances:
+                return
+        raise AssertionError(f"the topsail never came to {state.value}")
+
+    def drawn() -> dict:
+        data = {"graph": queries.ship_graph(world.ship), "snap": queries.snapshot(world)}
+        return run_js(tmp_path, data, POLE_FIGURES)["spars"]
+
+    world.submit("set the topsail")
+    run_until(SailState.SET)
+    aloft = drawn()
+    filed = world.ship.hull.spec.deck_height_m + world.ship.spars[POLE_TOPSAIL_YARD].height_m
+    assert aloft[POLE_TOPSAIL_YARD]["centre"][2] == pytest.approx(filed)
+    world.submit("take in the topsail")
+    for _ in range(5):
+        world.tick()
+    (inst,) = world.ship.extra["evolutions"].instances
+    assert inst.evo.id == "take_in_pole" and inst.step_name == "lower_and_clew_up"
+    halfway = drawn()
+    run_until(SailState.IN_THE_GEAR)
+    lowered = drawn()
+    on_below = lowered[YARD_BELOW]["centre"][2] + YARD_ON_CAP
+    assert lowered[POLE_TOPSAIL_YARD]["centre"][2] == pytest.approx(on_below)
+    assert halfway[POLE_TOPSAIL_YARD]["centre"][2] == pytest.approx(
+        (on_below + aloft[POLE_TOPSAIL_YARD]["centre"][2]) / 2.0
+    )
+    world.submit("furl the topsail")
+    run_until(SailState.FURLED)
+    assert drawn()[POLE_TOPSAIL_YARD]["centre"][2] == pytest.approx(on_below)
+
+
+@needs_node
+@pytest.mark.parametrize("brace_deg", [0.0, 30.0, 60.0])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_square_sail_over_a_yard_on_deck_with_its_flying_sail_hangs_from_its_own_yard(
+    tmp_path, tack, brace_deg
+):
+    """V2, at the cause (Report-Package90-Tartane.md §14.2; the owner's note T-v of 2026-11-21: "the
+    sheets on the loose foot should try to align with the topsail yard"): a yard on deck with its
+    flying sail is no yard below. The smack's topsail over her square sail set flying and furled,
+    that yard on deck with it, hangs from its own yard, loose-footed along it, as every square sail
+    with no yard below does: head and foot SPREAD_OF_YARD of its yard, the foot square with the
+    yard in plan however it is braced, as deep as its area over that breadth; its sheets come down
+    to her drawn rail abreast its clews. Before V2 its clews went to the arms of the yard on deck,
+    fore and aft, the foot 90 degrees askew of its yard square, and 26 degrees braced 64 (the
+    tartane's, measured by her builder and here: docs/dev/TuningNotes.md)."""
+    ship = ship_from_dict(smack_flying_doc(), "smack-flying.yaml")
+    sign = 1.0 if tack == "starboard" else -1.0
+    ship.spars[POLE_TOPSAIL_YARD].brace_angle = sign * math.radians(brace_deg)
+    data = _pole_state(ship, {POLE_TOPSAIL: SailState.SET, "square_sail": SailState.FURLED}, tack)
+    got = run_js(tmp_path, data, POLE_FIGURES)
+    assert got["spars"][YARD_BELOW]["onDeck"]
+    yard = got["spars"][POLE_TOPSAIL_YARD]
+    length = 2.0 * yard["half"]
+    head_l, head_r, clew_r, clew_l = got["sails"][POLE_TOPSAIL]["corners"]
+    spread = SPREAD_OF_YARD * length
+    assert math.dist(head_l, head_r) == pytest.approx(spread)
+    assert math.dist(clew_l, clew_r) == pytest.approx(spread)
+    foot = [b - a for a, b in zip(clew_l, clew_r, strict=True)]
+    arm = yard["arm"]
+    assert abs(foot[0] * arm[1] - foot[1] * arm[0]) == pytest.approx(0.0, abs=1e-9)  # in plan
+    sail = next(s for s in data["graph"]["sails"] if s["id"] == POLE_TOPSAIL)
+    assert head_l[2] - clew_l[2] == pytest.approx(sail["area_m2"] / spread)
+    hull = data["graph"]["hull"]
+    sheets = {ln["id"]: ln["pts"] for ln in got["lines"][POLE_TOPSAIL] if ln["cls"] == "sheet"}
+    for side, clew in (("starboard", clew_r), ("larboard", clew_l)):
+        start, end = sheets[f"topsail.sheet.{side}"]
+        assert start == pytest.approx(clew)
+        assert end == pytest.approx(rail_end(hull, clew[0], 1.0 if side == "starboard" else -1.0))
+
+
+@needs_node
+def test_with_its_flying_sail_set_the_yard_below_takes_the_clews_as_before(tmp_path):
+    """V2: the square sail set flying set, its yard aloft, the topsail's clews at its arms and its
+    sheets to them, as every topsail's to the yard below (the tartane's with her tréou set: her
+    builder's table, unchanged)."""
+    ship = ship_from_dict(smack_flying_doc(), "smack-flying.yaml")
+    data = _pole_state(ship, {POLE_TOPSAIL: SailState.SET, "square_sail": SailState.SET})
+    got = run_js(tmp_path, data, POLE_FIGURES)
+    below = got["spars"][YARD_BELOW]
+    assert not below["onDeck"]
+    _hl, _hr, clew_r, clew_l = got["sails"][POLE_TOPSAIL]["corners"]
+    mid = below["centre"]
+    for clew, arm in ((clew_l, below["a"]), (clew_r, below["b"])):
+        assert clew == pytest.approx([m + 0.9 * (a - m) for m, a in zip(mid, arm, strict=True)])
+    for ln in got["lines"][POLE_TOPSAIL]:
+        if ln["cls"] == "sheet":
+            assert ln["pts"][1] in (pytest.approx(below["a"]), pytest.approx(below["b"]))
+
+
+@needs_node
+@pytest.mark.parametrize("rig", ["smack-flying", "polacre-mizen-topsail"])
+def test_a_pole_topsail_with_no_yard_standing_below_is_lowered_to_the_hounds(tmp_path, rig):
+    """V2 (A6's words, "down to the hounds", where no square yard is crossed below): with no yard
+    standing below it, a pole's topsail yard is lowered while its sail is not set to the hounds, the
+    height the file gives the highest yard below it on its mast, of any class: the smack's square
+    sail's yard's, its flying sail sent down on deck with it (the tartane's tréou's); the polacre's
+    mizen lateen's slings."""
+    if rig == "smack-flying":
+        ship = ship_from_dict(smack_flying_doc(), "smack-flying.yaml")
+        states = {POLE_TOPSAIL: SailState.FURLED, "square_sail": SailState.FURLED}
+        yid, hounds_of = POLE_TOPSAIL_YARD, YARD_BELOW
+    else:
+        ship = ship_from_dict(polacre_with_mizen_topsail_doc(), "polacre.yaml")
+        states = {MIZEN_TOPSAIL: SailState.IN_THE_GEAR}
+        yid, hounds_of = MIZEN_TOPSAIL_YARD, "mizzen.lateen_yard"
+    assert ship.on_pole(yid)
+    data = _pole_state(ship, states)
+    got = run_js(tmp_path, data, POLE_FIGURES)
+    deck = data["graph"]["hull"]["deck_height_m"]
+    filed = next(s for s in data["graph"]["spars"] if s["id"] == hounds_of)
+    assert got["spars"][yid]["centre"][2] == pytest.approx(deck + filed["height_m"] + YARD_ON_CAP)
+    assert got["spars"][yid]["hoist"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Package 90 (the owner's note T-v2 of 2026-11-28 at the live look at V1 and V2: "a small rendering
+# error in the lateens, on the forward end of them, which appears like a pinched section"): each
+# edge of a sail bellied by its own length. A sail's belly was reckoned once for the whole sail
+# (BELLY of the lesser of its depth and its head, a jib's of its foot and luff) and laid on every
+# curved edge whatever that edge's length, so that a short edge bellied out into a thin tongue: a
+# whole lateen's luff at its car, a settee's, a lug's; a jib's short leech. Mended where the belly
+# is laid (`edgeControl`): no edge bellies more than BELLY of its own length, and an edge at least
+# as long as the length the belly is reckoned by is drawn as it was
+# ---------------------------------------------------------------------------
+
+BELLY_SHARE = 0.12  # client/projection.js: BELLY
+
+
+def _curved_edges(path: list) -> list[tuple[list, list, list]]:
+    """The curved edges of a drawn path ([[P], [C, P], ...]): (from, control, to)."""
+    out, prev = [], path[0][0]
+    for seg in path[1:]:
+        if len(seg) == 2:
+            out.append((prev, seg[0], seg[1]))
+        prev = seg[-1]
+    return out
+
+
+def _bulge(p: list, c: list, q: list, level: bool) -> float:
+    """How far a quadratic edge stands off its chord at its middle: half its control's offset from
+    the chord's middle; `level`, its offset across alone, the vertical part (a square sail's foot's
+    sag, by design, FOOT_SAG of its depth) left out."""
+    off = [ci - (pi + qi) / 2.0 for pi, ci, qi in zip(p, c, q, strict=True)]
+    if level:
+        off[2] = 0.0
+    return math.hypot(*off) / 2.0
+
+
+def test_an_edge_bellies_no_more_than_its_own_length_allows():
+    """`edgeControl`: an edge at least as long as the length its sail's belly is reckoned by takes
+    the whole belly, as every edge did before; a shorter one BELLY of its own length."""
+    script = (
+        f"const P = require({json.dumps(str(PROJECTION))});\n"
+        "const belly = [2 * P.constants.BELLY * 10, 0, 0];\n"
+        "process.stdout.write(JSON.stringify([\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 20], belly, 10),\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 10], belly, 10),\n"
+        "  P.edgeControl([0, 0, 0], [0, 0, 0.3], belly, 10),\n"
+        "]));\n"
+    )
+    if NODE is None:
+        pytest.skip("Node is not installed")
+    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    assert res.returncode == 0, res.stderr
+    long_, even, short = json.loads(res.stdout)
+    assert long_ == pytest.approx([2 * BELLY_SHARE * 10, 0.0, 10.0])
+    assert even == pytest.approx([2 * BELLY_SHARE * 10, 0.0, 5.0])
+    assert short == pytest.approx([2 * BELLY_SHARE * 0.3, 0.0, 0.15])
+
+
+LUFF_FIGURES = """
+    const sk = P.buildSkeleton(d.graph, d.snap);
+    return sk.figures.filter(f => f.kind === 'sail' && f.id === d.sail).map(f => ({
+      piece: f.piece || '', corners: f.corners, pts: P.flattenPath(f.path)}));
+"""
+
+
+def _luff_points(pieces: list) -> tuple[list, list, list]:
+    """A four-cornered sail drawn from its cut, [throat, peak, clew, tack], cut at its mast: its
+    tack, its throat and the points of its drawn luff between them, from the piece holding the tack
+    (its outline runs throat, head, leech, foot, tack, luff, throat)."""
+    throat, tack = pieces[0]["corners"][0], pieces[0]["corners"][3]
+    for piece in pieces:
+        pts = piece["pts"]
+        at = [i for i, p in enumerate(pts) if math.dist(p, tack) < 1e-6]
+        if at:
+            return tack, throat, pts[at[-1] + 1 :]
+    raise AssertionError("no piece holds the tack")
+
+
+@needs_node
+@pytest.mark.parametrize("sheet_deg", [8.0, 25.0, 60.0])
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_a_whole_lateens_short_luff_at_its_car_is_not_drawn_as_a_tongue(tmp_path, tack, sheet_deg):
+    """The owner's note T-v2: a whole lateen's luff, the short lashing at its car (CUT_LUFF_M,
+    0.30 m on the tartane's files), bellies no more than BELLY of its length off its chord, on
+    either tack and at any sheet; its points lie between the tack and the throat. Before the mend
+    it took the whole sail's belly, BELLY of the lesser of its leech and its head, and stood out a
+    thin tongue: 2.56 m off the chord on her great lateen, 1.65 m on her mizen, measured; about a
+    metre forward of the car as she was drawn on the quarter in the live look."""
+    data = {**lateen_by_the_wind(tack, sheet_deg), "sail": LATEEN}
+    pieces = run_js(tmp_path, data, LUFF_FIGURES)
+    tack_at, throat, luff = _luff_points(pieces)
+    assert luff and math.dist(luff[-1], throat) < 1e-6
+    length = math.dist(tack_at, throat)
+    assert length == pytest.approx(CUT_LUFF_M)
+    for p in luff:
+        assert _off_the_segment(p, tack_at, throat) <= BELLY_SHARE * length + 1e-6
+
+
+@needs_node
+@pytest.mark.parametrize("tack", ["starboard", "larboard"])
+def test_the_bilanders_settee_luff_is_bellied_by_its_own_length(tmp_path, tack):
+    """The same cause on a committed file (docs/dev/TuningNotes.md, "Package 90, the viewer"): the
+    bilander's settee's luff, 1.81 m, bellied 1.35 m off its chord, three-quarters of its length,
+    by the settee's whole belly; now no more than BELLY of its length."""
+    ship = make_ship(BILANDER)
+    ship.sails[SETTEE].state = SailState.SET
+    set_sheet_angle(ship, ship.sails[SETTEE], math.radians(25.0))
+    sign = 1.0 if tack == "starboard" else -1.0
+    data = {**ship_state(ship, awa=math.radians(60.0) * sign, tack=tack), "sail": SETTEE}
+    tack_at, throat, luff = _luff_points(run_js(tmp_path, data, LUFF_FIGURES))
+    length = math.dist(tack_at, throat)
+    assert length == pytest.approx(1.81, abs=0.01)
+    for p in luff:
+        assert _off_the_segment(p, tack_at, throat) <= BELLY_SHARE * length + 1e-6
+
+
+EDGES_DRAWN = """
+    return d.states.map(s => P.buildSkeleton(s.graph, s.snap).figures
+      .filter(f => f.kind === 'sail' && f.path && f.state === 'set')
+      .map(f => ({id: f.id, cls: f.cls, piece: f.piece || '', path: f.path})));
+"""
+FOOT_SAG_SHARE = 0.06  # client/projection.js: FOOT_SAG
+WINDS_DEG = (40.0, 60.0, 90.0, 135.0)
+
+
+def _every_sail_set(path: str) -> list[dict]:
+    """`path` with every sail she can bend bent and set, the unbent among them, her yards braced
+    to their limits and square, on either tack with the wind at each of WINDS_DEG: the states."""
+    states = []
+    for tack in ("starboard", "larboard"):
+        sign = 1.0 if tack == "starboard" else -1.0
+        for wind in WINDS_DEG:
+            for braced in (True, False):
+                ship = make_ship(path)
+                for sail in ship.sails.values():
+                    sail.state = SailState.SET
+                for spar in ship.spars.values():
+                    if spar.is_yard:
+                        spar.brace_angle = sign * spar.brace_limit if braced else 0.0
+                states.append(ship_state(ship, awa=math.radians(wind) * sign, tack=tack))
+    return states
+
+
+def _sag(p: list, c: list, q: list) -> float:
+    """How far a quadratic edge stands up or down off its chord at its middle."""
+    return abs(c[2] - (p[2] + q[2]) / 2.0) / 2.0
+
+
+@needs_node
+@pytest.mark.parametrize("path", EVERY_SHIP)
+def test_no_set_sail_of_any_file_bellies_an_edge_past_its_own_length(tmp_path, path):
+    """Every committed file with every sail she can bend bent and set (the unbent as filed among
+    them: the ringtails, the storm staysails), her yards braced to their limits and square, on
+    either tack with the wind at 40, 60, 90 and 135 degrees: every curved edge of every sail drawn,
+    whole or in its pieces cut at its mast, stands off its chord across no more than BELLY of its
+    own length (a jib's whole offset), and up or down no more than BELLY and FOOT_SAG of it (the
+    belly lies along the sail's cloth, which a sprit topsail's tilts; the foot's sag is straight
+    down). Before the mend the jibs' and staysails' short leeches passed it on eight files, by up
+    to 0.22 of their length (the bilander's jib, 1.22 m off a 5.47 m leech), and the lugs', the
+    settee's and the lateens' luffs; a ringtail's foot, of no length, sagged by the depth.
+    The guard took a single wind and left the sails cut at their masts out (the reader, nudge 93):
+    at 60 degrees a sprit topsail's cloth lies along the wind and draws no belly."""
+    states = _every_sail_set(path)
+    for k, figs in enumerate(run_js(tmp_path, {"states": states}, EDGES_DRAWN)):
+        assert figs, k
+        for fig in figs:
+            jib = fig["cls"] == "jibheaded"
+            for p, c, q in _curved_edges(fig["path"]):
+                length = math.dist(p, q)
+                where = (k, fig["id"], fig["piece"], round(length, 3))
+                assert _bulge(p, c, q, not jib) <= BELLY_SHARE * length + 1e-6, where
+                if not jib:
+                    allowed = (BELLY_SHARE + FOOT_SAG_SHARE) * length + 1e-6
+                    assert _sag(p, c, q) <= allowed, where
+
+
+RINGTAILED = [
+    f"data/ships/{name}.yaml"
+    for name in ("corvette-20", "frigate-36", "privateer-schooner", "razee-44", "topsail-schooner")
+]
+
+
+@needs_node
+@pytest.mark.parametrize("path", RINGTAILED)
+def test_a_ringtail_set_hangs_no_spike_from_its_clew(tmp_path, path):
+    """Nudge 93 (the reader): a ringtail's foot has no length, its clew and its tack at one point,
+    and a drawing sail's foot sags no more than FOOT_SAG of its own length (`footSag`), so none is
+    drawn: no point of the ringtail set lies under its lowest corner. Its foot sagged by the sail's
+    depth, FOOT_SAG of it twice over, and once the belly was laid by each edge's own length it hung
+    a spike straight down from its clew (0.80 m on the corvette's to 1.12 m on the schooners');
+    before, a slanted loop. In the sail room on every file, bent and set here on either tack at
+    every wind."""
+    states = _every_sail_set(path)
+    body = """
+        return d.states.map(s => P.buildSkeleton(s.graph, s.snap).figures
+          .filter(f => f.kind === 'sail' && f.id === 'ringtail')
+          .map(f => ({state: f.state, corners: f.corners, pts: P.flattenPath(f.path)})));
+    """
+    for k, figs in enumerate(run_js(tmp_path, {"states": states}, body)):
+        (fig,) = figs
+        assert fig["state"] == "set", k
+        lowest = min(c[2] for c in fig["corners"])
+        assert min(p[2] for p in fig["pts"]) >= lowest - 1e-6, k
+
+
+def test_a_path_cut_at_a_mast_keeps_its_curves():
+    """`splitPathAtX` (nudge 93, the launch's lug): a closed path cut by the plane x = x0 into the
+    part forward of it and the part abaft it, each quadratic edge split where it crosses the plane
+    (de Casteljau) and kept a curve on its side, each part ending where it began, its cut a
+    straight edge along the plane. A lens, its upper edge from (0, 0) to (2, 0) by the control
+    (1, 1), its lower edge back by (1, -1), cut at x = 0.5: each edge crosses at a quarter of its
+    run, 0.375 off the middle line."""
+    script = (
+        f"const P = require({json.dumps(str(PROJECTION))});\n"
+        "const lens = [[[0, 0, 0]], [[1, 1, 0], [2, 0, 0]], [[1, -1, 0], [0, 0, 0]]];\n"
+        "process.stdout.write(JSON.stringify(P.splitPathAtX(lens, 0.5)));\n"
+    )
+    if NODE is None:
+        pytest.skip("Node is not installed")
+    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    assert res.returncode == 0, res.stderr
+    forward, abaft = json.loads(res.stdout)
+    up, down = [0.5, 0.375, 0.0], [0.5, -0.375, 0.0]
+    assert forward == [
+        [pytest.approx(up)],
+        [pytest.approx([1.25, 0.75, 0.0]), pytest.approx([2.0, 0.0, 0.0])],
+        [pytest.approx([1.25, -0.75, 0.0]), pytest.approx(down)],
+        [pytest.approx(up)],
+    ]
+    assert abaft == [
+        [pytest.approx([0.0, 0.0, 0.0])],
+        [pytest.approx([0.25, 0.25, 0.0]), pytest.approx(up)],
+        [pytest.approx(down)],
+        [pytest.approx([0.25, -0.25, 0.0]), pytest.approx([0.0, 0.0, 0.0])],
+    ]
+
+
+LUGGED_BOATS = [
+    f"data/ships/boat-{name}.yaml"
+    for name in ("cutter-23", "cutter-28", "launch-25", "launch-31", "yawl-16")
+]
+
+
+@needs_node
+@pytest.mark.parametrize("path", LUGGED_BOATS)
+def test_a_lug_cut_at_its_mast_draws_its_luff_as_one_curve(tmp_path, path):
+    """Nudge 93 (the reader, the launch's lug: "its luff now lies along the mast with a slight kink
+    where it meets it"): a sail cut at its mast is drawn in its pieces with its curves
+    (`splitPathAtX`). The cut was made on its outline sampled at six points an edge, so each piece
+    drew a curved edge as six straight ones, cornered between them; seen from the quarter a boat's
+    lug's luff lies along its mast and its corners, 6 to 9 degrees on the launch's, showed against
+    it. Each boat's lug stands forward of its mast from its tack to its throat: in the piece forward
+    of the mast its luff is one curve, from the tack to the throat, on either tack at every wind."""
+    body = """
+        return d.states.map(s => P.buildSkeleton(s.graph, s.snap).figures
+          .filter(f => f.kind === 'sail' && f.id === 'lug' && f.piece === 'forward')
+          .map(f => ({corners: f.corners, path: f.path})));
+    """
+    for k, figs in enumerate(run_js(tmp_path, {"states": _every_sail_set(path)}, body)):
+        (fig,) = figs
+        throat, tack = fig["corners"][0], fig["corners"][3]
+        luffs = [
+            seg
+            for before, seg in zip(fig["path"], fig["path"][1:], strict=False)
+            if math.dist(before[-1], tack) < 1e-9 and math.dist(seg[-1], throat) < 1e-9
+        ]
+        assert len(luffs) == 1 and len(luffs[0]) == 2, k
+        assert _bulge(tack, luffs[0][0], throat, True) > 0.1, k  # a curve, bellied
+
+
+def test_a_foot_sags_no_more_than_its_own_length_allows():
+    """`footSag`: a foot at least as long as the sail's depth sags FOOT_SAG of the depth, twice
+    over (the quadratic peaks halfway to its control), straight down, as every foot did; a shorter
+    one FOOT_SAG of its own length; one of no length, none."""
+    script = (
+        f"const P = require({json.dumps(str(PROJECTION))});\n"
+        "process.stdout.write(JSON.stringify([\n"
+        "  P.footSag([0, 0, 0], [20, 0, 0], 10),\n"
+        "  P.footSag([0, 0, 0], [0, 3, 4], 10),\n"
+        "  P.footSag([1, 2, 3], [1, 2, 3], 10),\n"
+        "]));\n"
+    )
+    if NODE is None:
+        pytest.skip("Node is not installed")
+    res = subprocess.run([NODE, "-e", script], capture_output=True, text=True, timeout=60)
+    assert res.returncode == 0, res.stderr
+    long_, short, none = json.loads(res.stdout)
+    assert long_ == pytest.approx([0.0, 0.0, -2 * FOOT_SAG_SHARE * 10])
+    assert short == pytest.approx([0.0, 0.0, -2 * FOOT_SAG_SHARE * 5])
+    assert none == pytest.approx([0.0, 0.0, 0.0])

@@ -192,16 +192,17 @@ def test_only_the_neufchatel_has_a_yard_or_a_square_sail_on_a_schooners_mast(pat
     assert [pid for pid in ship.parts if ship.on_schooner_mast(pid)] == named
 
 
-def test_the_guard_reads_twenty_files_her_three_parts_and_the_brigs_main_yards_among_them():
-    """The guard is not empty: the twenty files of the tree (the *Neufchatel*'s the sixteenth,
+def test_the_guard_reads_twenty_one_files_her_three_parts_and_the_brigs_main_yards_among_them():
+    """The guard is not empty: the twenty-one files of the tree (the *Neufchatel*'s the sixteenth,
     package 75, B2; the bilander's the seventeenth, B4, her main crossing her dry yard on its lower
     mast, so that the rule names none of hers; the 74's the eighteenth, B7, a ship's three masts;
-    package 90's tartane and coastguard tartane the nineteenth and twentieth, her main her one mast
-    with yards, its topsail and tréou yards on its lower mast, so that the rule names none of
-    hers, as the tartane's probe classes as the cutter), her three parts named, and the brig's
-    main topsail, topgallant and royal yards, which a rule without its lower-yard test would name.
-    Old: eighteen files (the name said eighteen); seventeen before them."""
-    assert len(SHIP_FILES) == 20
+    package 90's Diana, a ship's three masts, her mizen crossing its dry crossjack, and its tartane
+    and coastguard tartane, her main her one mast with yards, its topsail and tréou yards on its
+    lower mast, so that the rule names none of hers, as the tartane's probe classes as the
+    cutter), her three parts named, and the brig's main topsail, topgallant and royal yards, which
+    a rule without its lower-yard test would name. Old: nineteen with the Diana's file, twenty
+    with the tartane's two; eighteen files (the name said eighteen); seventeen before them."""
+    assert len(SHIP_FILES) == 21
     assert set(ON_A_SCHOONERS_MAST) <= {p.stem for p in SHIP_FILES}
     bilander = load_ship(ROOT / "data" / "ships" / "bilander.yaml")
     assert bilander.spars["main.crossjack.yard"].parent == "main.mast"

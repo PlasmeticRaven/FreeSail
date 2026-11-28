@@ -20,9 +20,17 @@
 #   hoist_in    hoisted in; what she brings comes aboard
 # The errand and the port are the order's (freesail/world/ports.py).
 #
+# A boat towed astern on her painter is not hoisted out: she is hauled up alongside by it and
+# her crew go down into her at the gangway, and back alongside her people come aboard and she
+# is veered astern on her painter again, a minute each.
+#
 # Where the hands on deck are too few to man her, as a small vessel's watch of two by night,
 # all hands are called to man her and piped down once her crew is told off, the rest going
 # below while she is away (judgement).
+#
+# In its words the game fills {boat_out} with "Hoist out {boat}" and {boat_back} with "hoisted
+# in"; for a boat towed astern, with "Haul {boat} up alongside" and "veered astern on her
+# painter again".
 
 # Build notes (not served by the library's catalogue):
 # Package 109, step 2 (the owner's play of 2026-11-12, note 1), made one road with package 75's
@@ -39,9 +47,11 @@ preconditions: []
 timing:
   hoist_out_s: 300     # ports.BOAT_HOIST_OUT_S: judgement
   hoist_in_s: 300      # ports.BOAT_HOIST_IN_S: judgement
+  haul_alongside_s: 60 # a towed boat: ports.BOAT_HAUL_ALONGSIDE_S: judgement
+  veer_astern_s: 60    # a towed boat: ports.BOAT_VEER_ASTERN_S: judgement
   boat_pace_kn: 4.0    # ports.BOAT_PACE_KN: judgement
-on_start: {log: "Away {boat}'s crew! Hoist out {boat}."}
-on_complete: {log: "{boat_cap} hoisted in.", kind: boat.in, severity: routine}
+on_start: {log: "Away {boat}'s crew! {boat_out}."}
+on_complete: {log: "{boat_cap} {boat_back}.", kind: boat.in, severity: routine}
 on_fail: {log: "{boat_cap}'s errand is not done: {reason}.", kind: evolution.failed, severity: notable}
 crew: {hands: 11, rating: ordinary, stations: [forecastle, afterguard, waisters], too_few: all hands until manned}
 source: "Luce 1866, 'Boats' (lowering and hoisting, the launch and the water); Falconer 1780, BOAT, LONG-BOAT, YAWL; the Regulations of 1806, the Captain, art. XVI (purchases ashore)"

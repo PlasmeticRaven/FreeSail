@@ -307,6 +307,26 @@ BOAT_PACE_KN = 4.0
 # 'Hoisting out boats' gives the sequence; the time is judgement).
 BOAT_HOIST_OUT_S = 300
 BOAT_HOIST_IN_S = 300
+# A boat towed astern on her painter (package 90, A4; a boat's `towed`): not hoisted out, but
+# hauled up alongside by her painter and manned at the gangway, and after veered astern on it
+# again. JUDGEMENT on both, no period time found: a minute each, the painter hand over hand and
+# the crew down into her, against the five minutes of the yard and stay tackles.
+BOAT_HAUL_ALONGSIDE_S = 60
+BOAT_VEER_ASTERN_S = 60
+
+
+def boat_out_s(boat: Any) -> int:
+    """The seconds to get this boat into the water and manned: hoisted out, or a towed boat
+    hauled alongside (package 90, A4)."""
+    return BOAT_HAUL_ALONGSIDE_S if getattr(boat, "towed", False) else BOAT_HOIST_OUT_S
+
+
+def boat_in_s(boat: Any) -> int:
+    """The seconds to have this boat back at her ship: hoisted in, or a towed boat veered
+    astern on her painter again (package 90, A4)."""
+    return BOAT_VEER_ASTERN_S if getattr(boat, "towed", False) else BOAT_HOIST_IN_S
+
+
 # The business ashore by errand, seconds: a letter left or fetched, the purser's turn
 # round the market for the prices, a passenger landed, a purchase weighed and carted to
 # the quay, a draft of recruits brought down (judgement).
@@ -1094,10 +1114,20 @@ class BoatState:
                 state.pop(key, None)
         return state
 
-    def words(self) -> str:
+    def words(self, towed: bool = False, too_fast: bool = False) -> str:
+        """Her state in words; `towed`, a boat towed astern on her painter (package 90, A4),
+        is not at the booms when she is not away; `too_fast`, towed faster than her hull speed
+        (`world.boats.TOWED_TOO_FAST`; the lead's nudge 60, item 8)."""
         if self.lost:
             return f"{self.boat_name} lost: {self.lost_words or self.lost}; a new one is the yard's"
         if not self.away:
+            if towed and too_fast:
+                return (
+                    f"{self.boat_name} towing astern on her painter, sheering about and shipping "
+                    "water"
+                )
+            if towed:
+                return f"{self.boat_name} towing astern on her painter"
             return f"{self.boat_name} at the booms"
         if self.hull and self.errand == "towing":
             return f"{self.boat_name} ahead on the tow-line, {self.phase}"

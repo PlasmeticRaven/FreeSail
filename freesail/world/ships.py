@@ -301,6 +301,16 @@ DESCRIPTIONS: dict[str, dict[str, str]] = {
         "rig": "a tartane",
         "what": "a King's tartane, armed, a guarda-costa",
     },
+    # package 90 (docs/design/Design-Ship-Diana.md §8): the corvette Diana, the Danish light
+    # frigate of 1804 in the Spanish navy to 1832. The tops make out a ship at her rig's distance,
+    # a frigate's class until made out (JUDGEMENT, held as designed by the lead's nudge 32: her
+    # design's §17.2 item 1);
+    # the glass her one tier of eleven ports in a flush side, the brig-sloop's class
+    "corvette": {
+        "file": "data/ships/corvette-20.yaml",
+        "rig": "a ship",
+        "what": "a corvette, flush-decked, eleven ports a side",
+    },
 }
 # Her rig's word (`DESCRIPTIONS`' `rig`, a vessel's `kind`) is what the tops make out of her at the
 # rig's distance, and for a two-decker that is her class, "a ship of the line" (the lead's ruling 17
@@ -410,6 +420,15 @@ _DESCRIPTION_WORDS = {
     "garda-costa": "guarda-costa tartane",
     "a guarda-costa tartane": "guarda-costa tartane",
     "guarda-costa tartane": "guarda-costa tartane",
+    # package 90 (Design-Ship-Diana.md §8.2): the corvette's words and the ship-sloop's; never "a
+    # sloop of war" (the brig-sloop's), "a light frigate" or "a frigate", which would rank her a
+    # frigate made out
+    "a corvette": "corvette",
+    "corvette": "corvette",
+    "a ship-sloop": "corvette",
+    "ship-sloop": "corvette",
+    "a ship sloop": "corvette",
+    "ship sloop": "corvette",
 }
 
 
@@ -2052,7 +2071,7 @@ class Vessels:
         brought up to her truth every tick of the followed hull's (`World._tick_vessels`)
         and at every asking; None on the endless plane. The name is the shadow's, which
         every reader of hers asked by it; she is the one vessel the sea never moves."""
-        from freesail.world.captains import _is_kings_ship
+        from freesail.world.service import MERCHANT, service_of
 
         with first_hull_current(world) as world:
             pos = getattr(world, "position", None)
@@ -2072,7 +2091,9 @@ class Vessels:
                 # officer and a merchant brig under a master, as before
                 rows = [k for k, d in DESCRIPTIONS.items() if d["file"].split("/")[-1] == name]
                 key = rows[0] if source and rows else ""
-                if key == "brig-sloop" and not _is_kings_ship(world):
+                # a merchant by her papers, her role or her wardroom reads as the merchant
+                # brig; a privateer keeps the brig-sloop's armed look (package 121)
+                if key == "brig-sloop" and service_of(world) == MERCHANT:
                     key = "merchant brig"
                 d = description(key) if key else {"file": source, "rig": "a ship", "what": "a ship"}
                 ports = getattr(world, "dealings", None)

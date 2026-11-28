@@ -403,6 +403,9 @@ class Harbour:
         self.doors: dict[str, Door] = {}
         self._ids = itertools.count(1)
         self.game: dict[str, Any] = {}  # what the harbour started, in words
+        # the games begun and ended from this harbour, counted: a page tells one game from
+        # the next by it (the stations' table keeps a row's choice of door within a game)
+        self.games = 0
         self._ports: list[dict[str, Any]] | None = None
         self._charts: dict[str, dict[str, Any]] = {}
         self._lock = threading.RLock()
@@ -982,11 +985,21 @@ class Harbour:
         from freesail.ui.console import PACE_FREE, PACE_LOCKSTEP, PACE_RULE
 
         rule = {"rule": PACE_RULE, "lockstep": PACE_LOCKSTEP, "free": PACE_FREE}[pace]
-        with self._lock:
+        # who the scenario says holds each station (step 9: the page offers the doors of those
+        # it gives to a model), read before the game is taken up
+        plan = self.plan(scenario)
+        # the driver's lock held from the world's replacing to the game's words: `game_state`
+        # reads under it, not under the harbour's, and a page that asks between must find one
+        # whole game. Without it a first start could be found started with its plan not yet
+        # said (the stations' table then showed the officer with no model asked for, and the
+        # browser's test of it failed once in many runs beside other workers; found by package
+        # 90's engine builder at A1d's tiers), and a second start the new world beside the
+        # last game's words and plan (the lead's checker). The harbour's lock first, then the
+        # driver's, as everywhere; nothing takes them the other way round.
+        with self._lock, self.driver.lock:
             self.driver.replace_world(
                 world, compression=args.time, pace=rule, ease_on_station=args.ease_on_station
             )
-            self.started = True
             self.game = {
                 "scenario": scenario,
                 "ship": ship,
@@ -996,10 +1009,81 @@ class Harbour:
                 "pace": pace,
                 "director_brief": args.director_brief or "",
                 "lines": lines,
-                # who the scenario says holds each station (step 9): the page offers the
-                # doors of those it gives to a model
-                "plan": self.plan(scenario),
+                "plan": plan,
             }
+            if load:
+                self.driver.taken_up_from_a_save()
+            self.started = True
+            self.games += 1
+        return {"lines": lines, "game": self.game_state()}
+
+    def end(self, lose_unsaved: bool = False) -> dict[str, Any]:
+        """The game in play ended, the harbour kept (the owner's note 2 of gate M7): the
+        doors of the models' stations closed as the harbour closes one (`stop_door`), the
+        clock stopped and the World let go for one with no game in it, as the harbour
+        begins with none; nothing saved is touched. Refused in words while what was played
+        since the last save would be lost, until the player says so (`lose_unsaved`)."""
+        from freesail.core.world import Scenario, World
+        from freesail.ui.console import DEFAULT_SEED
+
+        # the harbour's lock held throughout, so that no start or door begun from another
+        # page comes between the asking and the end; the driver's only for the World's
+        # replacing (the start's order: the harbour's first, then the driver's), so that a
+        # page that asks while a game ends finds the whole game or none
+        with self._lock:
+            if not self.started:
+                raise HarbourError("No game is in play to end.", 409)
+            lost = self.driver.unsaved()
+            seated = [d for d in self.doors.values() if d.running]
+            if lost and not lose_unsaved:
+                words = lost + " End it all the same, or save it first."
+                if seated:
+                    # the stand-down of a seated station saves the game as it stands then,
+                    # among the player's own saves: said before, and named after
+                    words += (
+                        " The models' stations are stood down first, and each stand-down saves "
+                        "the game as it stands then, among your saves."
+                    )
+                raise HarbourError(words, 409)
+            desk = self.driver.desk
+            seats = list(getattr(desk, "seats", {}).values()) if desk is not None else []
+            before = {id(seat): len(getattr(seat, "saves", []) or []) for seat in seats}
+            # the doors first, the driver's lock not held: a door stopping asks the game to
+            # release its station, and the release saves the station's record as it always has
+            for door in list(self.doors.values()):
+                if door.running:
+                    with contextlib.suppress(Exception):
+                        self.stop_door(door.id)
+            with self.driver.lock:
+                self.driver.replace_world(
+                    World(seed=DEFAULT_SEED, scenario=Scenario()),
+                    compression=self.driver.compression,
+                    pace=self.driver.pace.rule,
+                )
+                self.game = {}
+                self.started = False
+                self.games += 1
+                self.seat_doors, self._seat_world = {}, None
+            # a door begun from a page while the doors stopped (`start_door` takes no lock:
+            # the clock's tending starts the director's under the driver's) is stopped too;
+            # with no game in play none can begin after
+            for door in list(self.doors.values()):
+                if door.running:
+                    with contextlib.suppress(Exception):
+                        self.stop_door(door.id)
+            # the saves the stand-downs wrote, by the seats' own record of them (not by the
+            # saves place's names, which a save of the same name would hide)
+            written = [
+                Path(path).stem
+                for seat in seats
+                for path in (getattr(seat, "saves", []) or [])[before.get(id(seat), 0) :]
+            ]
+        lines = ["The game is ended."]
+        if written:
+            lines.append(
+                "The models' stations were stood down, and the game as it stood then was saved "
+                f"as {', '.join(written)}, among your saves."
+            )
         return {"lines": lines, "game": self.game_state()}
 
     def game_state(self) -> dict[str, Any]:
@@ -1029,6 +1113,7 @@ class Harbour:
                 ),
                 "director": brief.name if brief is not None else "",
                 "chosen": dict(self.game),
+                "games": self.games,
                 # the stations' table (package 96b, step 9): the other ships with a captain
                 # of their own, whose captain's station a door may ask for
                 "captains": self._captains(w) if self.started else [],
@@ -1874,6 +1959,10 @@ def harbour_routes(h: Harbour) -> APIRouter:
     @router.post("/api/harbour/start")
     def api_start(body: dict[str, Any]) -> JSONResponse:
         return call(h.start, body)
+
+    @router.post("/api/harbour/end")
+    def api_end(body: dict[str, Any]) -> JSONResponse:
+        return call(h.end, bool(body.get("lose_unsaved")))
 
     @router.get("/api/harbour/settings")
     def api_settings() -> JSONResponse:

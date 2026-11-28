@@ -27,7 +27,7 @@ Three kinds of verb live here:
 - **Helm verbs** (`steer`, `come up`, `bear away`, `keep her full`) set the
   helm targets in `ship.dyn` for the helmsman in the physics to follow; the
   **conning words** (`steady`, `meet her`, `right the helm`, `helm a-lee`,
-  `helm a-weather`) speak to the wheel itself.
+  `helm a-weather`) speak to the helm itself, her wheel or her tiller.
 
 Each returns `(kind, log_text, data)` for the World to log, or raises
 `OrderError` with a sentence saying why the order was not carried out.
@@ -46,7 +46,8 @@ from freesail.evolutions.runner import PartyTooSmall, part_name
 from freesail.orders import crew as crew_orders
 from freesail.orders import errors, resolve, storm, work
 from freesail.orders.errors import OrderError
-from freesail.orders.grammar import Order
+from freesail.orders.grammar import LATEEN_CLAUSE, LATEEN_OCCASION, LATEENS, Order
+from freesail.orders.grammar import SAIL_ROOM_MARK as _GRAMMAR_SAIL_ROOM_MARK
 from freesail.orders.vocabulary import Vocabulary, load_vocabulary
 from freesail.physics.sails import BOWLINE_SLACK_ANGLE_DEG
 from freesail.ship.graph import Ship
@@ -127,6 +128,8 @@ def execute(
         # "clear away the larboard studdingsail boom": a spar or a sail is cleared away as
         # a wreck; a line is let go, as "clear away the bowlines" always was (package 30b)
         return _clear_wreck(ship, order, vocab)
+    if order.verb == "leave" or LATEEN_OCCASION in order.modifiers:
+        return _lateen_practice(ship, order)  # package 90, A1b
     if order.verb == "shift" and _names_spars(ship, order):
         return _shift_spar(ship, order, vocab)
     if order.verb == "draw":
@@ -196,6 +199,10 @@ BOOM_FOUL_BRACE_DEG = 45.0
 SAIL_SCRIPT_VERBS = ("bend", "unbend", "shift")
 # The grammar's words for which sail the sail room gives (spec 3b §6.3), passed to the script.
 CANVAS_PARAMS = ("canvas_no", "heavy", "for")
+# The grammar's mark that "for" was said after a canvas verb (package 90, A1a: `shift the
+# mainsail for a new one` is the sail room's on a hull with a whole lateen, whose `shift the
+# mainsail` shifts its yard round the mast). Read by the routing alone, never passed to a script.
+SAIL_ROOM_MARK = _GRAMMAR_SAIL_ROOM_MARK
 # The helm verbs with no heading or points after them: the conning words.
 HELM_VERBS = (
     "keep her full",
@@ -210,6 +217,15 @@ HELM_VERBS = (
 # ---------------------------------------------------------------------------
 # The runner
 # ---------------------------------------------------------------------------
+
+
+def unsaid(runner: Any, text: str) -> str:
+    """The runner's words for work an order started, for the order's own line: nothing where
+    the runner said them in the log itself, as it says work queued behind other work
+    (`Runner.start`, its `WAIT_SAID` mark), so that the wait is said once."""
+    from freesail.evolutions.runner import WAIT_SAID
+
+    return "" if getattr(runner, "__dict__", {}).get(WAIT_SAID) else text
 
 
 def runner_of(ship: Ship) -> Any:
@@ -315,6 +331,7 @@ def _sail_evolution(
     allowed.add("hands_from")
     if verb in SAIL_SCRIPT_VERBS:
         allowed |= set(CANVAS_PARAMS)  # which sail from the sail room (spec 3b §6.3)
+        allowed.add(SAIL_ROOM_MARK)  # "for" said (package 90, A1a)
     _no_stray_modifiers(order, allowed)
     res = resolve.resolve(ship, order.object or "", order.side_word, verb)
     mapping: dict[str, str] = vocab.evolutions.get(verb, {})
@@ -327,6 +344,8 @@ def _sail_evolution(
         handed = {c: take_in[c] for c in FURLED_AS_TAKEN_IN if c in take_in}
         mapping = {**handed, **mapping}
     params = _sail_params(order)
+    # "for" a sail said (the grammar's mark): the sail room's, never a whole lateen's shift
+    sail_room = bool(order.modifiers.get(SAIL_ROOM_MARK))
 
     sails: list[Sail] = []
     for pid in res.ids:
@@ -353,7 +372,36 @@ def _sail_evolution(
     texts: list[str] = []
     failed: list[str] = []
     failed_ids: list[str] = []
+    # a take-in or a furl countermands the setting of its sail in hand or waiting: belayed first,
+    # said once; a sail it leaves furled is done, one half set is taken in from where it is
+    countermanded = _countermand_the_set(ship, sails, verb, vocab)
     checks = {sail.id: _sail_check(ship, sail, verb, order, mapping, vocab) for sail in sails}
+    belayed_words = ""
+    if countermanded:
+        from freesail.orders.work import _line as belay_line
+
+        belayed_words = belay_line("belay", countermanded)
+        done_ids = {
+            b["subject"]
+            for b in countermanded
+            if ship.sails[b["subject"]].state is SailState.FURLED
+        }
+        sails = [sl for sl in sails if sl.id not in done_ids]
+        if not sails or all(checks[sl.id] for sl in sails):
+            # nothing left to take in (the rest furled already): the countermand is the order's
+            # whole work and its line
+            data = {
+                "verb": verb,
+                "level": 1,
+                "object": res.name,
+                "side": res.side,
+                "subjects": sorted(done_ids),
+                "belayed": countermanded,
+                "failed": [],
+            }
+            return _countermand_said(ship, group, belayed_words, countermanded, data)
+        ship.note("notable", "work.belayed", belayed_words, None, {"belayed": countermanded})
+        checks = {sail.id: checks[sail.id] for sail in sails}
     if all(checks.values()):
         # Nothing to start: refuse on the merits before asking for the runner.
         reasons = [r for r in checks.values() if r]
@@ -365,7 +413,7 @@ def _sail_evolution(
     extra, call = _hands_params(
         ship,
         order,
-        [mapping[evolution_key(sail, mapping)] for sail in to_start],
+        [mapping[evolution_key(sail, mapping, sail_room, ship)] for sail in to_start],
         _group_label(verb, res.name, group) if len(to_start) > 1 else None,
     )
     params.update(extra)
@@ -375,7 +423,7 @@ def _sail_evolution(
             failed.append(reason)
             failed_ids.append(sail.id)
             continue
-        evo = mapping[evolution_key(sail, mapping)]
+        evo = mapping[evolution_key(sail, mapping, sail_room, ship)]
         p = dict(params)
         if verb in SAIL_SCRIPT_VERBS:
             p["sail"] = sail.id
@@ -384,7 +432,7 @@ def _sail_evolution(
         if verb == "reef" and order.modifiers.get("close"):
             p["reefs"] = sail.reef_bands - sail.reefs  # every band still out: close reefed
         try:
-            texts.append(runner.start(ship, evo, sail.id, p))
+            texts.append(unsaid(runner, runner.start(ship, evo, sail.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, sail.id), e))
             failed_ids.append(sail.id)
@@ -392,6 +440,28 @@ def _sail_evolution(
         started.append({"evolution": evo, "subject": sail.id, "params": p})
     _settle_call(ship, call, bool(started))
 
+    if not started and countermanded:
+        # the setting belayed and nothing begun: the belay is the order's line, with what was not
+        # done, and its note (made when work was still to begin) is not said again
+        notes = getattr(ship, "notes", None)
+        if isinstance(notes, list):
+            notes[:] = [n for n in notes if not (n[1] == "work.belayed" and n[2] == belayed_words)]
+        not_done = " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "." if failed else ""
+        data = {
+            "verb": verb,
+            "level": 1,
+            "object": res.name,
+            "side": res.side,
+            "subjects": [b["subject"] for b in countermanded],
+            "belayed": countermanded,
+            "failed": failed,
+        }
+        if group is not None:
+            # within a group's order, the belay is said by its own line (`_countermand_said`)
+            # and what was not done by the group's
+            data["failed"] = failed
+            return _countermand_said(ship, group, belayed_words, countermanded, data, not_done)
+        return "work.belayed", belayed_words + not_done, data
     if not started:
         if len(failed) == 1:
             raise OrderError(failed[0][0].upper() + failed[0][1:].rstrip(".") + ".")
@@ -417,16 +487,33 @@ def _sail_evolution(
 FURLED_AS_TAKEN_IN = ("jibheaded", "studding", "lug", "flying")
 
 
-def evolution_key(sail: Sail, mapping: dict[str, Any]) -> str:
+def evolution_key(
+    sail: Sail, mapping: dict[str, Any], sail_room: bool = False, ship: Ship | None = None
+) -> str:
     """The key a sail verb's evolution is found by: 'settee' for a settee where the verb has
     an evolution of its own for it (set, take in, furl, dip: package 75,
     docs/design/Design-ShipsEngineExtensions.md §5.2), 'flying' for a sail set flying where
     the verb has one for it (set, take in: package 57), else the sail's class. So a settee is
     reefed, its reef shaken out, its sheet trimmed, and it is bent, unbent and shifted as the
     lug it is (D42(a), D45(a)); and `furl`, whose mapping takes a lug in, finds its own row
-    first (furled aloft on its yard)."""
+    first (furled aloft on its yard).
+
+    Package 90, A1a (Design-Package90-Engine.md §2.3 item 3a; the lead's ruling of 2026-11-18):
+    'whole_lateen' for a whole lateen (a lateen with `dipping`, `scripts.is_whole_lateen`) where
+    the verb has that row, `shift` and `dip`, which shift its yard round its mast
+    (`change_lateen`); unless the order said "for" a sail (`sail_room`, the grammar's mark:
+    `shift the mainsail for a new one`), which replaces it from the sail room by its class as
+    before. Every other lateen, the 64's and the 74's mizzen course among them, by its class.
+
+    Package 90, A6: 'pole' for a square sail above a pole mast's lower yard (`Ship.on_pole`,
+    read where the ship is given) where the verb has that row, `take in` and `furl`: lowered
+    onto the yard below and furled from it."""
     if sail.settee and "settee" in mapping:
         return "settee"
+    if ship is not None and "pole" in mapping and ship.on_pole(sail):
+        return "pole"
+    if not sail_room and "whole_lateen" in mapping and scripts.is_whole_lateen(sail):
+        return "whole_lateen"
     return "flying" if sail.flying and "flying" in mapping else sail.cls
 
 
@@ -439,6 +526,51 @@ def _sail_params(order: Order) -> dict[str, Any]:
         if order.modifiers.get("close"):
             params["close"] = True
     return params
+
+
+def _countermand_said(
+    ship: Ship,
+    group: str | None,
+    words: str,
+    belayed: list[dict[str, Any]],
+    data: dict[str, Any],
+    not_done: str = "",
+) -> Result:
+    """The countermand is said once, notable, by whatever order made it: given alone, it is the
+    order's own line (`work.belayed`, its reply); within a group's order (`shorten sail`, `take in
+    all sail`), a line of its own, since the group's line is routine and is not written at all
+    when nothing in it failed (the World leaves a started order's line to the runner), and its
+    part of the group's line is nothing. Before, within a group it was folded into the group's
+    routine line, or said nowhere: the bilander's `shorten sail`, her sails ending otherwise with
+    no line to say why."""
+    if group is None:
+        return "work.belayed", words + not_done, data
+    ship.note("notable", "work.belayed", words, None, {"belayed": belayed})
+    return "evolution.started", not_done.strip(), data
+
+
+def _countermand_the_set(
+    ship: Ship, sails: list[Sail], verb: str, vocab: Vocabulary
+) -> list[dict[str, Any]]:
+    """A take-in or a furl given while the setting of its sail is in hand or waiting belays that
+    setting (`Runner.belay`, the captain's own belay): the later order countermands the earlier,
+    and returns what was belayed and how it was left, for one line ("Belayed setting the main
+    topsail; nothing done, it was waiting for hands."). Before, a furled sail whose set was
+    waiting was refused as "already furled" and its set then went on, and one being loosed was
+    taken in only after it was set: the brig in a gale, `take in all sail` given while `set
+    plain sail` was going up, stood under her main topsail, topgallants and spanker."""
+    if verb not in ("take in", "furl"):
+        return []
+    runner = ship.extra.get("evolutions")
+    instances = list(getattr(runner, "instances", None) or [])
+    if not instances:
+        return []
+    sets = set(vocab.evolutions.get("set", {}).values())
+    ids = {sl.id for sl in sails}
+    setting = [i for i in instances if i.evo.id in sets and i.subject_id in ids]
+    if not setting:
+        return []
+    return runner.belay(ship, setting)
 
 
 def _sail_check(
@@ -470,7 +602,7 @@ def _sail_check(
         if sail.cls != "gaff":
             return f"{name} is a {sail.cls} sail; it has no peak to drop"
         return vocab.refusals["scandalise"].format(name=name[4:]).rstrip(".")
-    if evolution_key(sail, mapping) not in mapping:
+    if evolution_key(sail, mapping, bool(order.modifiers.get(SAIL_ROOM_MARK)), ship) not in mapping:
         template = vocab.refusals.get(verb, "'{verb}' has no meaning for a {class} sail")
         return template.format(name=name[4:], **{"class": sail.cls, "verb": verb}).rstrip(".")
     if verb == "set" and sail.state is SailState.SET:
@@ -531,9 +663,10 @@ def _take_in_kind(ship: Ship, sail: Sail) -> str:
         return "settee"
     if sail.cls == "square":
         yard = ship.yard_of(sail)
-        parent = ship.parent_of(yard) if yard is not None else None
-        if parent is not None and parent.cls == "mast":
+        if yard is not None and ship.yard_level(yard) == 0:  # package 90, A5: by its level
             return "course"
+        if ship.on_pole(sail):
+            return "pole"  # package 90, A6: lowered onto the yard below
     return sail.cls
 
 
@@ -558,7 +691,11 @@ def _take_in_word_check(ship: Ship, sail: Sail, phrase: str, vocab: Vocabulary) 
         return None
     name = resolve.the(ship, sail.id)
     proper = suits[0] if suits else "take in"
-    what = {"course": "course", "square": "topsail or light sail"}.get(kind, f"{kind} sail")
+    what = {
+        "course": "course",
+        "square": "topsail or light sail",
+        "pole": "topsail or light sail on a pole mast",  # package 90, A6
+    }.get(kind, f"{kind} sail")
     return (
         f"a {what} is {_PAST.get(proper, proper)}, not {_PAST.get(phrase, phrase)}; "
         f"say '{proper} {name}' or 'take in {name}'"
@@ -608,7 +745,7 @@ def _summarise(
         body = body.replace(" and 1 more", " and one more")
     if failed:
         body += " Not done: " + "; ".join(f.rstrip(".") for f in failed) + "."
-    return body
+    return body.strip()  # the runner's words alone said in the log already (`unsaid`): none
 
 
 # ---------------------------------------------------------------------------
@@ -782,7 +919,9 @@ def _brace(
             **extra,
         }
         try:
-            texts.append(runner.start(ship, vocab.evolutions["brace"], yard.id, params))
+            texts.append(
+                unsaid(runner, runner.start(ship, vocab.evolutions["brace"], yard.id, params))
+            )
         except OrderError as e:
             failed.append(_refused(name, e))
             failed_ids.append(yard.id)
@@ -1371,10 +1510,9 @@ def _every_yard(ship: Ship, yards: list[Spar]) -> bool:
 
 
 def _level_rank(ship: Ship, yard: Spar) -> int:
-    """A yard's level, 0 for a course yard up to 3 for a royal's (`trim.by_level`)."""
-    parent = ship.parent_of(yard)
-    levels = ("mast", "topmast", "topgallant_mast", "royal_mast")
-    return levels.index(parent.cls) if parent is not None and parent.cls in levels else 0
+    """A yard's level, 0 for a course yard up to 3 for a royal's (`trim.by_level`), read from
+    its order on its lower mast (`Ship.yard_level`; package 90, A5)."""
+    return max(ship.yard_level(yard), 0)
 
 
 def _trim_targets(ship: Ship, res: resolve.Resolution) -> tuple[list[Spar], list[Sail]]:
@@ -2249,7 +2387,7 @@ def _haul_bowlines(
     texts: list[str] = []
     for ln in to_haul:
         try:
-            texts.append(runner.start(ship, evo, ln.id, dict(extra)))
+            texts.append(unsaid(runner, runner.start(ship, evo, ln.id, dict(extra))))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, ln.id), e))
             failed_ids.append(ln.id)
@@ -2335,7 +2473,7 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     for mast, gain in todo:
         params = {"gain": gain, **extra}
         try:
-            texts.append(runner.start(ship, evo, mast.id, params))
+            texts.append(unsaid(runner, runner.start(ship, evo, mast.id, params)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, mast.id), e))
             failed_ids.append(mast.id)
@@ -2346,7 +2484,7 @@ def _catharpins(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         raise OrderError(f"Nothing done: {errors.sentence_list(failed)}.")
     text = " ".join(t.strip() for t in texts if t)
     if failed:
-        text += " Not done: " + "; ".join(failed) + "."
+        text = (text + " Not done: " + "; ".join(failed) + ".").strip()
     data = {
         "verb": order.verb,
         "level": 1,
@@ -2415,10 +2553,11 @@ def _helm(ship: Ship, order: Order, judge: bool = True) -> Result:
             f"'{order.verb_phrase}' takes no heading or points; it is the whole order."
         )
     if scripts.helm_lost(ship):
-        # the wheel shot away and no relieving tackles rove (package 116, card 5): a course,
+        # the helm shot away and no relieving tackles rove (package 116, card 5): a course,
         # full and by and the conning words are refused in the world's words, which say why
-        # and what to order; before, each was logged as carried out and she did not answer
-        raise OrderError(scripts.HELM_LOST_WORDS)
+        # and what to order; before, each was logged as carried out and she did not answer.
+        # In the words of her helm, the wheel or the tiller (package 90, A3)
+        raise OrderError(scripts.helm_words(ship)["refusal"])
     if lying_to(ship) and (
         verb in ("keep her full", "steer") or ("points" in mods and verb not in HELM_VERBS)
     ):
@@ -2722,7 +2861,7 @@ def _boom_evolution(
             failed_ids.append(boom.id)
             continue
         try:
-            texts.append(runner.start(ship, evo, boom.id, dict(extra)))
+            texts.append(unsaid(runner, runner.start(ship, evo, boom.id, dict(extra))))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, boom.id), e))
             failed_ids.append(boom.id)
@@ -2861,7 +3000,7 @@ def _reeve(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
             continue
         params = {"line": line.id, "splice": splice, **extra}
         try:
-            texts.append(runner.start(ship, evo, line.id, params))
+            texts.append(unsaid(runner, runner.start(ship, evo, line.id, params)))
         except OrderError as e:
             failed.append(_refused(name, e))
             failed_ids.append(line.id)
@@ -2927,7 +3066,10 @@ def reeve_every_parted_line(ship: Ship, order: Order) -> Result:
             continue
         try:
             texts.append(
-                runner.start(ship, "reeve_line", line.id, {"line": line.id, "splice": False})
+                unsaid(
+                    runner,
+                    runner.start(ship, "reeve_line", line.id, {"line": line.id, "splice": False}),
+                )
             )
         except OrderError as e:
             failed.append(_refused(name, e))
@@ -3016,7 +3158,7 @@ def _clear_wreck(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
         if send_down:
             p["send_down"] = True
         try:
-            texts.append(runner.start(ship, CLEAR_WRECK, subject.id, p))
+            texts.append(unsaid(runner, runner.start(ship, CLEAR_WRECK, subject.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, subject.id), e))
             failed_ids.append(subject.id)
@@ -3105,7 +3247,7 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     """'Shift the <spar>' ('... for a spare'): a spar carried away, its wreck cleared,
     replaced by a spare of its class from the booms (shift_spar.yaml). With none aboard,
     or with the wreck still hanging, the runner's check refuses it in words."""
-    _no_stray_modifiers(order, {"manner", "hands_from"} | set(CANVAS_PARAMS))
+    _no_stray_modifiers(order, {"manner", "hands_from", SAIL_ROOM_MARK} | set(CANVAS_PARAMS))
     if "canvas_no" in order.modifiers or "heavy" in order.modifiers:
         raise OrderError("A spar has no canvas; say 'shift the <spar>', or '... for a spare'.")
     if "for" in order.modifiers:
@@ -3140,7 +3282,7 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
     for spar in spars:
         p = dict(extra, part=spar.id)
         try:
-            texts.append(runner.start(ship, SHIFT_SPAR, spar.id, p))
+            texts.append(unsaid(runner, runner.start(ship, SHIFT_SPAR, spar.id, p)))
         except OrderError as e:
             failed.append(_refused(resolve.the(ship, spar.id), e))
             failed_ids.append(spar.id)
@@ -3172,15 +3314,78 @@ def _shift_spar(ship: Ship, order: Order, vocab: Vocabulary) -> Result:
 # ---------------------------------------------------------------------------
 
 
+def _warn_lateen_in_stays(ship: Ship) -> None:
+    """An ordered `tack ship` with a whole lateen set in a strong wind (over
+    `navigation.LATEEN_TACK_KN`, the mean true wind `put her about` reads): obeyed, never turned
+    into a wear, and warned once, in words only (package 90, A1c; the lead's ruling; Forfait 1788
+    p. 119). A note of the ship's, after the manoeuvre's first line, as `put her about` says its
+    choice in a note; `put her about` and the course's judgement wear her there, or say why they
+    tack."""
+    from freesail.orders import navigation
+
+    kn = navigation.lateen_strong_wind_kn(ship)
+    note = getattr(ship, "note", None)
+    if kn is None or not callable(note):
+        return
+    note(
+        "notable",
+        "ship.tack_warned",
+        f"The wind {kn:.0f} knots{navigation.LATEEN_STAYS_WORDS}; she is put in stays as ordered.",
+        data={"wind_kn": round(kn, 1), "lateen_tack_kn": navigation.LATEEN_TACK_KN},
+    )
+
+
+# The occasions of the lateens' practice, as the grammar reads them ("in going about": both).
+_PRACTICE_OCCASIONS = {"stays": ("stays",), "wearing": ("wearing",), "both": ("stays", "wearing")}
+
+
+def _lateen_practice(ship: Ship, order: Order) -> Result:
+    """`leave the lateens in stays`, `shift the lateens in wearing`, "in going about" for both
+    (package 90, A1b; Design-Package90-Engine.md §2.3 item 3): the ship's practice for her whole
+    lateens' yards in going about, kept on her (`scripts.set_lateen_practice`) and read by the
+    next tack or wear, or by one in hand whose change has not begun. Answered with the practice
+    whole: "Her practice: the lateens left on the mast in stays, shifted in wearing." """
+    _no_stray_modifiers(order, {LATEEN_OCCASION, LATEENS})
+    if not scripts.has_whole_lateen(ship):
+        raise OrderError(
+            "She carries no whole lateen; 'leave' is said of a lateen's yard in going about, "
+            "left on the mast."
+        )
+    occasion = order.modifiers.get(LATEEN_OCCASION)
+    if not order.modifiers.get(LATEENS):
+        name = f"the {order.object}" if order.object else "a sail"
+        raise OrderError(
+            f"The practice is the lateens' together, not {name}'s: 'leave the lateens in stays', "
+            f"'shift the lateens in wearing'. To leave one in a single going about, say it after "
+            f"the order: 'tack ship and leave the mizen'."
+        )
+    if occasion is None:
+        raise OrderError(
+            "Leave the lateens when? Say 'leave the lateens in stays', 'in wearing' or 'in going "
+            "about'; or, for one going about, 'tack ship and leave the lateens'."
+        )
+    how = "leave" if order.verb == "leave" else "shift"
+    practice = scripts.set_lateen_practice(ship, how, _PRACTICE_OCCASIONS[occasion])
+    text = f"Her practice: {scripts.lateen_practice_words(ship, practice)}."
+    data = {"verb": order.verb, "level": 1, "lateen_practice": practice}
+    return "ship.lateen_practice", text, data
+
+
 def _ship_evolution(
     ship: Ship, order: Order, vocab: Vocabulary, course: dict[str, Any] | None = None
 ) -> Result:
     allowed = {"tack", "manner", "hands_from"}
     if order.verb == "fill away":
         allowed.add("heading")  # "fill away and steer SW by W" (package 37f)
+    if order.verb in ("tack ship", "wear ship"):
+        allowed.add(LATEEN_CLAUSE)  # "and leave the lateens" (package 90, A1b)
     _no_stray_modifiers(order, allowed)
     evo = vocab.evolutions[order.verb]
     params: dict[str, Any] = {}
+    if order.modifiers.get(LATEEN_CLAUSE):
+        # which whole lateens the going about shifts round their masts and which it leaves on
+        # them, over the ship's practice (`scripts.lateen_plan`): a plain dict of strings
+        params["lateens"] = dict(order.modifiers[LATEEN_CLAUSE])
     if order.verb == "fill away":
         if "heading" in order.modifiers:
             # she is filled on the tack she is on, and the helm then has the course
@@ -3244,6 +3449,8 @@ def _ship_evolution(
         raise
     _settle_call(ship, call, True)
     _drop_course_pending(ship)  # a manoeuvre ordered gives up a course held for want of way
+    if evo == "tack" and not course:
+        _warn_lateen_in_stays(ship)  # package 90, A1c
     if order.verb_phrase.split()[0] in ("gybe", "jibe"):
         # The later word for wearing a fore-and-aft vessel: the boom comes
         # over as the wind crosses the stern. The period word is wear.

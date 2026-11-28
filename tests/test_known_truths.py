@@ -2546,11 +2546,14 @@ GATE_5A_SEA_TICKS = {
 # the fore topmast staysail taken in at once as loaded near its rating, the gale over the
 # storm line); the topgallants again two seconds later; nothing lost.
 # the well's order gone from the starter book, and its two held lines with it (2026-10-21)
-GATE_5A_DAY_LINES = 623  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
+# package 127: one dire warning added (623 before), the states unmoved
+GATE_5A_DAY_LINES = 624  # 625 at package 57 (620 at 45c, 621 at 45, 616 before 37p)
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 1680cb1391720dd8; TuningNotes)
-GATE_5A_DAY_DIGEST = "0325e18ce782b58b"  # the trim's words (1680cb1391720dd8 before)
+# package 127, words alone, the states unmoved: was 0325e18ce782b58b
+# (the trim's words (1680cb1391720dd8 before))
+GATE_5A_DAY_DIGEST = "b08d96950c77baac"
 
 
 def the_gate_day_under_systems(until: int = GATE_5A_DAY_TICKS, saves=GATE_5A_DAY_SAVES):
@@ -2997,13 +3000,15 @@ GATE_5B_BROUGHT_UP_TICK = 59603  # brought up, the sails furled (package 57; 596
 GATE_5B_SAIL_SIGHTED_TICK = 55620  # "Sail ho! A sail right ahead" (package 57; 55500)
 GATE_5B_PILOT_HAIL_TICK = 57240  # the cutter hails within four cables (package 57; 57120)
 GATE_5B_PILOT_ABOARD_TICK = 57300  # the pilot aboard, a minute after (package 57; 57180)
-GATE_5B_LINES = 731  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
+# package 127: 15 turn-waits (731 before), the states unmoved
+GATE_5B_LINES = 746  # the well's order gone, its two held lines (2026-10-21; 733 at 56, 729 at 57)
 # decision 45, the pilot's news: 750b3c658d6973c3 before; package 37p (9a0c4168d6987405 before)
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 9a1f2802ba7c6533; TuningNotes)
+# package 127, words alone, the states unmoved: was 2c38f76132521e4e
 GATE_5B_DIGEST = (
-    "2c38f76132521e4e"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
+    "ab9ef3aa02c65cbc"  # the trim's words (9a1f2802ba7c6533 before, the well, 2026-10-21)
 )
 # The schooner, package 37e (old beside new): the landfall 43920 → 44400, the Beast, the
 # Lizard and its lights at one look, the account a cable and a half out after the
@@ -3061,7 +3066,9 @@ GATE_5B_SCHOONER_BROUGHT_UP_TICK = 58224  # brought up (58213 before package 37p
 # package 115 D3 and D4 (c): the book fitted, the master works the noon on deck (766 before);
 # the lead's reading at 60af48e, item 6: the night routine fitted down to the studdingsails
 # left out, its two entering lines and its sunset refusal gone (769 at 60af48e)
-GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
+GATE_5B_SCHOONER_LINES = (
+    788  # 127: 21 turn-waits, 1 fill-away (766 before); the well (768 at 56, 763 at package 45)
+)
 # decision 45, the pilot's news: 70018ada5004a81e before; package 37p (d6031efa9808a2b1 before)
 # package 58a, the recurring lines: a trim waiting for hands or the lead's cast said again in
 # the same words is routine, not notable; every tick and line the same (TuningNotes, 58a)
@@ -3075,13 +3082,22 @@ GATE_5B_SCHOONER_LINES = 766  # the well (768 at 56, 763 at package 45)
 # 75's words, passed by the lead by its lines (3a1698037811b753 before); 75's ruled build (3)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (b5f35676ef8183d0 with 75 alone; 3bcbaeccd01fc4e5 on 115 D's own tree)
-GATE_5B_SCHOONER_DIGEST = "be166d89d06a1992"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (28741, 30178 and 56925: "Hands to the after braces; heave to." and "Fill away; man the after
+# braces." before); three lines' words, the 766 lines, every tick and every kind the same
+# (be166d89d06a1992 before; TuningNotes, "Package 90, A2")
+GATE_5B_SCHOONER_DIGEST = (
+    # package 127, words alone, the states unmoved: was 0fef1c52128ce9b2
+    "636d72442bc90ccf"
+)
 GATE_5B_THICK_LANDFALL_TICK = 53880  # package 57 (53820 before; 54420 before package 37j)
 # Package 37m (2026-10-09): every tick to the landfall stands; at it the book's `steer S`
 # puts her about for the starboard tack and keeps her full and by (37j's grounding on
 # Black Head at 56081 gone), 475 → 478 lines (docs/dev/TuningNotes.md, package 37m).
 GATE_5B_THICK_TACKED_TICK = 54115  # put about off Black Head, full and by (54063 before 57)
-GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 at 45, 495 at 37p)
+# package 127: 6 turn-waits (469 before), the states unmoved
+GATE_5B_THICK_LINES = 475  # the well's order gone (2026-10-21; 471 at 57, 472 at 45, 495 at 37p)
 # package 75, B3.4, the lead's ruling 2 (the word by Luce 1884 p. 417): put about off Black Head
 # with both courses hauled up in the gear, the frigate hauls her after yards by "Main-topsail
 # haul." where she said "Rise tacks and sheets. Mainsail haul."; every tick and line the same,
@@ -3090,7 +3106,9 @@ GATE_5B_THICK_LINES = 469  # the well's order gone (2026-10-21; 471 at 57, 472 a
 # package 75, the trim's words by the alias: the trim's reply names each sail by its file's
 # first plain alias, as the done line does ("the spanker" for "the mizzen spanker"); every line
 # the same, proved by bisection (the base head 93a15ee5 gives 9ce8174ebc6948c6; TuningNotes)
-GATE_5B_THICK_DIGEST = "f119ec763d2b442e"  # the trim's words (9ce8174ebc6948c6 at ruling 2)
+# package 127, words alone, the states unmoved: was f119ec763d2b442e
+# (the trim's words (9ce8174ebc6948c6 at ruling 2))
+GATE_5B_THICK_DIGEST = "9bb89611336bcc3c"
 
 
 def the_landfall(log):
@@ -4155,7 +4173,9 @@ GATE_5C_CRUISE_WEARS_AT_LEAST = 8  # wore ship on the station, and once for the 
 # re-measured at 37j's merge, the tuning notes saying both.)
 # (37j merged after 37h and 37k, 2026-10-09: the figures below are 37j's as measured on
 # its branch; the six passages are re-measured on the merged tree by the lead, below.)
-GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
+GATE_5C_CRUISE_LINES = (
+    2268  # 127: 26 turn-waits (2242 before); package 56, the glass (2225 at package 57)
+)
 # the judgement a sentence of its own after a shaped course's line (the lead, after 37m;
 # 348b07dd901580a7 at package 37m, 15e7f10b2ca8eb9a on the merged tree before it)
 # decision 45, the pilot's news: f603c2724a58fef1 before; package 37p (24428443ec6992f9 before)
@@ -4171,7 +4191,10 @@ GATE_5C_CRUISE_LINES = 2242  # package 56, the glass (2225 at package 57)
 # words (1e7f8ab24b84e6f7 at SW-4)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (81b0b08a63bf068e with 75 alone; 46300a9a567b80d7 on 115 D's own tree)
-GATE_5C_CRUISE_DIGEST = "bdd6ce8a97a33140"
+GATE_5C_CRUISE_DIGEST = (
+    # package 127, words alone, the states unmoved: was bdd6ce8a97a33140
+    "96ed44410bfc8e9c"
+)
 # the merchant passage's ticks at seed 7
 GATE_5C_MERCHANT_TIN_ABOARD_TICK = 14249  # forty tons by the lighter, the boat alongside, 08:57
 GATE_5C_MERCHANT_UNDER_WAY_TICK = 16007  # under way on the ebb, starboard tack, S by E
@@ -4300,7 +4323,8 @@ GATE_5C_MERCHANT_TIN_SOLD_TICK = 124710  # package 98, step 5 (123272 at 45c, 12
 # thing): seven lines more, every tick the same (the lines are said and nothing moves)
 # package 115 D4 (c): the master works the noon on deck, no reports or calls sent below to him (3103
 # before)
-GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
+# package 127: 36 turn-waits, 2 fill-away (3096 before), the states unmoved
+GATE_5C_MERCHANT_LINES = 3134  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099 at 68)
 # decision 45, the pilot's news: 59ed46c3625c766d before; package 37p (54713e8e579fd527 before)
 # package 56, the glass: 05f0f4aba2eddbc0 (06b14a75a5eaae8b at 57)
 # the lead at the merge of 58a and 58b (2026-10-23): 58a's figure was "36c17b76e1735975"
@@ -4312,7 +4336,16 @@ GATE_5C_MERCHANT_LINES = 3096  # 98 step 5 (3107 at 65 step 3, 3100 at 58b, 3099
 # (6436eb06a665f379 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (ad35e60bf5d3737d with 75 alone; 82a1447152be8b82 on 115 D's own tree)
-GATE_5C_MERCHANT_DIGEST = "16272dee77120779"
+# package 90, A2 (the words of a rig with no yards, at their cause): the schooner, whose yards
+# are head yards alone, mans her head braces to heave to and fill away (17461, 18301, 89192 and
+# 90359: "Hands to the after braces; heave to.", "Fill away; man the after braces." before) and
+# is not told to brace in after yards she has not as she wears (90475: "Stand by to wear ship.
+# Up helm; brace in the after yards." before); five lines' words, the 3,096 lines, every tick
+# and every kind the same (16272dee77120779 before; TuningNotes, "Package 90, A2")
+GATE_5C_MERCHANT_DIGEST = (
+    # package 127, words alone, the states unmoved: was 8259996fb122428e
+    "e8f0311b30fa8cb2"
+)
 
 
 def _people(world) -> list[dict]:
@@ -4763,7 +4796,8 @@ GATE_6A_INTENT_BOAT_FOR_PRICES_TICK = 111300
 GATE_6A_INTENT_SOLD_TICK = None
 # package 65, step 3: the boat away for the prices at 111619 is reported to the master below
 # a minute later (one line more, every tick the same)
-GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
+# package 127: 27 turn-waits, 2 fill-away (2079 before), the states unmoved
+GATE_6A_INTENT_LINES = 2108  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698 at 56, 1684 at 43b)
 # measured on the merged tree: the judgement a sentence of its own after a shaped course's
 # line, as the cruise (4b5a6f997d80eb52 on the package's branch, every tick the same)
 # decision 45, the pilot's news: 71b1cddbd0e4ec9f before; package 37p (09afd9c2697c7c33 before)
@@ -4774,7 +4808,17 @@ GATE_6A_INTENT_LINES = 2079  # package 65, step 3 (2078 at 58b, 2160 at 68, 1698
 # severity, and 58a's recurring lines are routine in this passage too
 # 75's words, passed by the lead by its lines (9d9efe6b21c17060 before); package 98, step 5
 # (8744d3e56cfc9508 at 65)
-GATE_6A_INTENT_DIGEST = "5d3cbbc5f4d33b84"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# schooner, whose yards are head yards alone, mans her head braces to heave to and fill away
+# (19081, 19921, 30721, 32090, 64861, 66054, 83341, 84524, 97741 and 99087: "Hands to the after
+# braces; heave to." and "Fill away; man the after braces." before) and is not told to brace in
+# after yards she has not as she wears (88141: "... Up helm; brace in the after yards." before);
+# eleven lines' words, the 2,079 lines, every tick and every kind the same (5d3cbbc5f4d33b84
+# before; TuningNotes, "Package 90, A2")
+GATE_6A_INTENT_DIGEST = (
+    # package 127, words alone, the states unmoved: was 7239b1a1ed45736f
+    "75517a6246a755f4"
+)
 
 
 @pytest.fixture(scope="module")
@@ -4794,11 +4838,26 @@ def test_truth_77_the_two_scenarios_sail_under_their_books_with_the_captain_name
     floor is the game as it was)." Each has its captain named (the master of the
     schooner, the captain of the frigate, by the wardroom file's binding), with no intent,
     so that he stands aside and the book sails her: not one judgement under his actor,
-    and the digests package 37m pinned (the constants' tests above)."""
-    for (world, _moments, _saved), digest in (
-        (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST),
-        (gate_5c_cruise, GATE_5C_CRUISE_DIGEST),
+    and the digests package 37m pinned (the constants' tests above).
+
+    Package 127, at the lead's ruling: beside each digest her line count and her end state
+    (the tick, her position to a millionth of a degree, her heading and her way), so that a
+    change of words alone is read as words: the digests moved with 36 and 26 lines of waits
+    said (3096 to 3134 and 2242 to 2268 lines), her end state the same to the bit."""
+    ends = {
+        "merchant": (GATE_5C_MERCHANT_LINES, 129600, (48.328859, -4.496049), (5.833137, -0.088528)),
+        "cruise": (GATE_5C_CRUISE_LINES, 172800, (48.687572, -5.580345), (6.238577, 1.281860)),
+    }
+    for (world, _moments, _saved), digest, which in (
+        (gate_5c_merchant, GATE_5C_MERCHANT_DIGEST, "merchant"),
+        (gate_5c_cruise, GATE_5C_CRUISE_DIGEST, "cruise"),
     ):
+        lines, tick, (lat, lon), (heading, way) = ends[which]
+        assert len(world.log) == lines and world.clock.tick == tick, which
+        assert world.ship.dyn.heading == pytest.approx(heading, abs=1e-6), which
+        assert world.ship.dyn.u == pytest.approx(way, abs=1e-6), which  # her way, m/s
+        assert world.position.lat_deg == pytest.approx(lat, abs=1e-6), which
+        assert world.position.lon_deg == pytest.approx(lon, abs=1e-6), which
         cap = world.captain
         assert cap is not None and cap.name and cap.intent is None
         assert not cap.active and not cap.commands and cap.books
@@ -4963,7 +5022,14 @@ GATE_6A_FAKE_CAPTAIN_LINES = GATE_5C_MERCHANT_LINES + 12  # his 7, the harness's
 # (7076e667c2bc41e3 at 65)
 # with package 115 D's mends on top, passed by the lead by their lines on the joined tree
 # (2cc02c95ad794bc8 with 75 alone; de0f8c03bd2663df on 115 D's own tree)
-GATE_6A_FAKE_CAPTAIN_DIGEST = "f47f7bc0daabc950"
+# package 90, A2 (the words of a rig with no yards, at their cause, its wider reach): the
+# merchant passage's five lines as GATE_5C_MERCHANT_DIGEST's (17461, 18301, 89192, 90359 and
+# 90475), the 3,108 lines, every tick and every kind the same (f47f7bc0daabc950 before;
+# TuningNotes, "Package 90, A2")
+GATE_6A_FAKE_CAPTAIN_DIGEST = (
+    # package 127, words alone, the states unmoved: was 50529f09d4de955e
+    "bdb0c738930bd644"
+)
 
 
 def the_passage_under_the_fake_captain(path: str, hours: int, orders: list[str]):
@@ -9146,7 +9212,16 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     no answer; on the one clock she bluffs a reply, is judged an enemy, and the commodore
     closes the convoy round him first); at 7200 and after, every ship
     within 165 m of her station (the far station leg holds at the tolerance's edge, half a
-    cable, and the lookout's rounding adds the rest)."""
+    cable, and the lookout's rounding adds the rest).
+
+    Package 127, at the lead's rulings: a take-in now countermands the setting of its sail
+    (truth 7-787), so the commodore no longer lies aback eight minutes after her tack with her
+    topgallants half set, and from her old place the privateer stood off at two miles and more:
+    no exchange and no straggler. The scenario as shipped places her a cable nearer
+    (data/scenarios/convoy-six.yaml), and she comes down: the private signal, her false reply,
+    the convoy closed round the commodore (No. 8) and, as the convoy closes, the Friendship a
+    straggler. Old (2040, 2182, 2340, 6060), from the commodore's stall; new (3360, 3442, 3540,
+    5880). Every ship within the 165 m from 7800, as before (152 m at the most, measured)"""
     w = _scenario_world(CONVOY_SIX)
     sq = w.squadrons.find("the Falmouth trade")
     assert sq is not None and sq.kind == "convoy" and sq.commander == "the ship"
@@ -9171,7 +9246,8 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     when = (ordered[0].tick, made[0].tick, answered[0].tick, back[0].tick)
     # package 88 (the recovery when aback, `captains.ABACK_RECOVER`): (2760, 2866, 3000, 6420)
     # before and with the switch off; 5280 for the last before 84's step 6 (the one clock)
-    assert when == (2040, 2182, 2340, 6060), when
+    # package 127: (2040, 2182, 2340, 6060) from the commodore's stall, before (4)
+    assert when == (3360, 3442, 3540, 5880), when
     worst = 0.0
     for _ in range(6):
         w.run(600)
@@ -9180,13 +9256,47 @@ def test_truth_7_152_a_convoy_of_six_keeps_its_order_and_the_book_signals_the_st
     assert not sq.stragglers and not sq.prizes
 
 
+def test_truth_7_153_the_scenario_as_shipped_shows_the_privateers_exchange_with_the_escort():
+    """The owner's convoy as a player opens it (data/scenarios/convoy-six.yaml, seed 7): the
+    schooner comes down within signal distance under British colours, the commodore shows the
+    private signal (shown 2940, up 3011), she answers it wrong and is judged an enemy under false
+    colours (urgent, 3240), and the convoy is closed round the commodore (No. 8 ordered 3300, up
+    3371). Old, the trunk before package 127: shown 3600, up 3707, judged 3960, No. 8 ordered
+    4020, up 4966, from the commodore's eight minutes aback; package 127's first build, the
+    privateer where she lay: none of it (she looked on from 2.13 miles and more). The scenario
+    places her a cable nearer, its own cause for the day (the lead's ruling E1)."""
+    w = _scenario_world(CONVOY_SIX)
+    w.run(3600)
+    shown = [e.tick for e in w.log if e.kind == "order.accepted" and "private signal" in e.text]
+    up = [e.tick for e in w.log if e.kind == "signal.made" and "private signal" in e.text]
+    judged = [e for e in w.log if e.kind == "signal.private_judged"]
+    close = [e.tick for e in w.log if e.kind == "signal.made" and "No. 8" in e.text]
+    assert shown[:1] == [2940] and up[:1] == [3011], (shown, up)
+    assert [e.tick for e in judged] == [3240] and judged[0].severity.value == "urgent"
+    assert "false colours, an enemy" in judged[0].text
+    assert close[:1] == [3371], close
+
+
 def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort_at_two_miles():
     """Spec M7 §22's privateer doctrine in the owner's scenario: the French schooner five
     miles to windward of the convoy makes it out, works down to investigate, and finding a
     man of war of the King's within her doctrine's distance (data/captains/privateer.yaml,
     `man_of_war_nm`) she evades and stands away; no merchantman is cut out, since none is
     uncovered. At seed 7 she is investigating at 600, evading by 3600 at two miles from the
-    commodore, and twenty miles off by 10800."""
+    commodore, and twenty miles off by 10800.
+
+    Package 127, at the lead's rulings: a take-in now countermands the setting of its sail
+    (truth 7-787), so the commodore stalls less after her tack, and from her old place the
+    schooner's path closed only to 2.13 miles, short of where she makes out the escort (from
+    investigating she evades on being overmatched, measured: with the overmatched transitions
+    taken out she evades later and outside the band). The scenario as shipped places her a
+    cable nearer (data/scenarios/convoy-six.yaml). Old: evading by 3600 at 1.98 miles, 21 miles
+    off at 10800. New: evading from 2940 at 1.98 miles, 1.98 at 3600, 17.9 miles off at 10800.
+    The window is narrow and is a fault carried (docs/dev/TuningNotes.md, package 127): a
+    promoted privateer's near lookout makes out colours at two miles without the glass her far
+    brain read them by at three, and her near investigating does not close the stranger, so
+    0.05 to 0.15 mile nearer passes, 0.2 and 0.25 end outside the band at 3600, and 0.35 and 0.5
+    never evade."""
     w = _scenario_world(CONVOY_SIX)
     from freesail.world.geo import bearing_and_distance
 
@@ -9194,7 +9304,12 @@ def test_truth_7_153_the_privateer_investigates_the_convoy_and_evades_the_escort
     assert pv is not None and pv.nation == "france" and pv.brain is not None
     w.run(600)
     assert pv.brain.state == "investigating a stranger", pv.brain.state
-    w.run(3000)
+    took_up = None
+    for _ in range(50):
+        w.run(60)
+        if took_up is None and pv.brain.state == "evading":
+            took_up = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
+    assert took_up is not None and took_up <= 2.0, took_up  # she makes out the escort at two miles
     d_at_1h = bearing_and_distance(w.position, pv.position)[1] / units.NAUTICAL_MILE
     assert pv.brain.state == "evading" and 1.5 <= d_at_1h <= 3.0, (pv.brain.state, d_at_1h)
     w.run(7200)
@@ -11159,10 +11274,10 @@ def test_truth_7_190_every_armed_files_lowest_lee_port_shuts_at_its_heel_and_a_r
     `world.motion`) and read through `action._firer`, the rule run on her battery: no tick, no
     digest. Her lowest port with a gun in it, on her drawn hull: the brig's 17.5, the cutter's
     14.7, the frigate's 19.7, the merchant brig's 18.2, the long tom's 13.5, the razee's 14.5,
-    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18, the 74's lower deck's 10.35 and the
-    guarda-costa tartane's 14.53 degrees (±0.05). With no roll, no port of that deck shut half a
-    degree below that heel, and that port shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3, 6
-    and 1 of the deck's lee ports; with a
+    the 64's lower deck's 10.55, the *Neufchatel*'s 18.18, the 74's lower deck's 10.35, the
+    guarda-costa tartane's 14.53 and the Diana's 18.50 degrees (±0.05; hers since package 90's
+    file). With no roll, no port of that deck shut half a degree below that heel, and that port
+    shut a degree above it, with 4, 2, 5, 2, 1, 6, 6, 3, 6, 1 and 4 of the deck's lee ports; with a
     roll of 4 degrees on the World's motion, the same four degrees of heel sooner, a roll's
     amplitude, by the same counts. Her weather side open throughout; upright with no roll, every
     port open again once the minute's hold has run (the lead's ruling of 2026-11-06; at once
@@ -11239,11 +11354,12 @@ def test_truth_7_190_covers_every_armed_file():
     """7-190 is of every armed file: each file of `data/ships` whose default fit carries a gun
     in a port (`ports.PORT_PLACES`) is a row of `LOWEST_LEE_PORT`, and no row is of a file that
     carries none, so that a ship file added or rearmed is not passed by in silence. Today the
-    ten: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
+    eleven: the brig, the cutter, the frigate-36, the merchant brig, the privateer schooner, the
     razee and the 64 (since L3's review), the *Neufchatel* (package 75, B2), the 74 (package 75,
-    B7; old: eight files) and the guarda-costa tartane (package 90; old: nine files); the
-    bilander's guns are her armed fit's, not her default (unarmed), and the tartane trader has
-    none. Drafted in `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
+    B7; old: eight files), the guarda-costa tartane (package 90, the tartane's builder) and the
+    Diana (package 90, her builder; old: nine files, then ten with either); the bilander's guns
+    are her armed fit's, not her default (unarmed), and the tartane trader has none. Drafted in
+    `tests/test_lee_ports.py` and moved here at Phase 5, as above."""
     from freesail.combat import ports
     from freesail.ship.loader import load_ship
     from tests.test_lee_ports import LOWEST_LEE_PORT
@@ -11254,7 +11370,7 @@ def test_truth_7_190_covers_every_armed_file():
         if any(g.place in ports.PORT_PLACES for g in load_ship(path.as_posix()).guns.values())
     }
     assert armed == {row[0] for row in LOWEST_LEE_PORT}
-    assert len(armed) == 10
+    assert len(armed) == 11  # old: 9; 10 with the guarda-costa tartane's or the Diana's file
 
 
 def test_truth_7_191_an_indiaman_holds_her_colours_through_a_merchantmans_striking_broadside():
@@ -15023,32 +15139,84 @@ def test_truth_7b_114_the_players_boat_pulls_ashore_at_falmouth_and_sails_back_u
 # ---------------------------------------------------------------------------
 
 
-def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_boxes_her_off(
+def test_truth_7_340_aback_with_no_way_the_captain_eases_the_after_sail_and_she_pays_off(
     monkeypatch,
 ):
     """Package 88, item 1 (package 86's finding, the convoy's stall): the commodore's brig in
-    the owner's convoy comes out of a short-handed tack at 1594 with no way on while her book
+    the owner's convoy comes out of a short-handed tack with no way on while her book
     shortens sail, her head forty degrees off the wind, every square sail shaking and the
     spanker drawing. With no headway, square sail set and none drawing, no manoeuvre in
     hand, for the doctrine's three minutes (`aback_recover_minutes`, judgement), her rules
     captain recovers her as Luce 1866 ch. XXV has it: the work waiting for hands avasted and
-    the spanker taken in at 1800, boxed off at 1980 and boxed off by 2110, the spanker set
-    again and the leg shaped when she has way (2160); at 2400 she makes four knots. With
-    the law's switch off (`captains.ABACK_RECOVER`) she lies so until the book's second
-    shortening takes in her spanker at 2671 (86's record): at 2400 still no way, no box-off."""
+    the spanker taken in, and boxed off if she does not pay off by that; the spanker set
+    again and the leg shaped when she has way. With the law's switch off
+    (`captains.ABACK_RECOVER`) she lies so until the book's second shortening takes in her
+    spanker at 2671 (86's record): at 2400 still no way, no box-off.
+
+    Package 127, its truth 7-787, at the lead's ruling: the book's first `shorten sail`, a
+    minute after `set plain sail`, now belays the topgallants still being set, where before
+    its take-in of them was refused as already furled and they were set, worn for and taken in
+    again; she tacks at 1567 (was 1594) with less in hand. Old beside new: aback with no way
+    1810 (the same), the work avasted and the spanker taken in at 1800 -> 1860, in at 1959 ->
+    2019; then, before, boxing her off at 1980, boxed off at 2110, the spanker set and the leg
+    shaped at 2160, four knots at 2400; now she pays off on the spanker alone, way again and the
+    spanker set at 2040, three knots at 2400. Where the spanker alone does not pay her off, the
+    box-off is truth 7-788's case (this truth's name said "and boxes her off" before)."""
     from freesail.world import captains as C
 
     w = _scenario_world(CONVOY_SIX)
     w.run(2400)
     said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
-    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1800], said
-    assert [e.tick for e in said if "boxing her off" in e.text] == [1980], said
-    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2110]
-    assert any(e.tick == 2160 and "setting the spanker" in e.text for e in w.log)
+    assert [e.tick for e in w.log if e.kind == "ship.aback" and "no way" in e.text][:1] == [1810]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1860], said
+    assert [e.tick for e in said if "belaying" in e.text] == [1860] * 3, said
+    assert [e.tick for e in w.log if e.kind == "sail.taken_in" and "spanker" in e.text] == [2019]
+    assert any(
+        e.tick == 2040 and "setting the spanker (she has way again)" in e.text for e in w.log
+    )
     assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
     monkeypatch.setattr(C, "ABACK_RECOVER", False)
     old = _scenario_world(CONVOY_SIX)
     old.run(2400)
+    assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
+    assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
+
+
+def test_truth_7_788_aback_with_no_way_and_headed_the_spanker_in_she_is_boxed_off(monkeypatch):
+    """Package 88's recovery, its second half (the doctrine boxes her off where the driver in has
+    not paid her off; `captains._aback_with_no_way`): the owner's convoy at seed 7, the
+    commodore's brig aback with no way at 1810, the work avasted and the spanker taken in at 1860
+    (in at 2019); a header of one point at 2000, the wind drawing from 45 to 56 degrees with her
+    head at 90, holds her there, and the captain boxes her off at 2040, boxed off at 2208, the
+    spanker set again and the leg shaped with way again at 2220, three knots by 2400.
+
+    Package 127, at the lead's ruling: old, truth 7-340 held the box-off in the scenario's own day
+    (boxing her off at 1980, boxed off 2110), where she lay aback eight minutes with her
+    topgallants half set; a take-in now countermands the setting of its sail (truth 7-787), she
+    stalls less, and pays off on the spanker alone (7-340 as it now stands). The header, a cause a
+    ship meets, made as the tests shift a wind, gives the box-off its cause back; a free of one to
+    three points does not (she pays off on the spanker), a header of one to three points does
+    (boxed off 2147 to 2208). With the law's switch off she lies with sternway till the book's
+    second shortening takes in her spanker at 2671."""
+    from freesail.world import captains as C
+
+    def day():
+        w = _scenario_world(CONVOY_SIX)
+        w.run(2000)
+        wind = w.wind
+        wind.follow(units.wrap_2pi(wind.base_direction + units.POINT), wind.base_speed)
+        w.run(400)
+        return w
+
+    w = day()
+    said = [e for e in w.log if e.kind == "order.accepted" and "aback with no way on" in e.text]
+    assert [e.tick for e in said if "taking in the spanker" in e.text] == [1860], said
+    assert [e.tick for e in said if "boxing her off" in e.text] == [2040], said
+    assert [e.tick for e in w.log if e.kind == "ship.boxed_off"] == [2208]
+    assert any(e.tick == 2220 and "setting the spanker" in e.text for e in w.log)
+    assert units.ms_to_knots(w.ship.dyn.u) >= 3.0, w.ship.dyn.u
+    monkeypatch.setattr(C, "ABACK_RECOVER", False)
+    old = day()
     assert not [e for e in old.log if e.kind == "ship.boxed_off" or "aback with no way" in e.text]
     assert units.ms_to_knots(old.ship.dyn.u) < 0.5, old.ship.dyn.u
 
@@ -19704,9 +19872,10 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     """Package 103a, the ratchet: the tree seeded through the game's own readers on a day
     in every year from 1792 to 1825 and on the days either side of every date the data
     names makes the findings of the known list (`tools/range/audit-known.yaml`) and no
-    other: 60 mechanical (61 until package 116 moved the cruiser's prize keys under
-    `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the code's own
-    years and the one finding only a whole world
+    other: 61 mechanical (60 before the Diana's file, package 90, whose default fit of 1810 is
+    `v-fit-ahead:corvette-20` as the other hulls' are; 61 until package 116 moved the cruiser's
+    prize keys under `thresholds:` and `v-nation-unknown:cruiser.stations` left the list; the
+    code's own years and the one finding only a whole world
     makes left to the audit's own test), among them the three wars of June 1805 in force
     before their own beginnings and before the prize court at peace, and 38 that rest on
     the reference of the wars and the nations' lifetimes
@@ -19720,7 +19889,8 @@ def test_truth_7_590_the_ranges_audit_by_the_readers_road_is_its_known_list():
     assert not A.unlisted(audit, known)
     cheap = {k for k, e in known.items() if e.get("sweep") != "full" and k[0] in letters}
     assert audit.keys() == cheap - {"w-block-unread"}
-    assert len(audit.keys(A.MECHANICAL)) == 60  # 61 before package 116 (the cruiser's keys)
+    # 60 before the Diana's file (package 90); 61 before package 116 (the cruiser's keys)
+    assert len(audit.keys(A.MECHANICAL)) == 61
     assert len(audit.keys(A.REFERENCE)) == 38
     for foe in ("france", "spain", "batavian-republic"):
         pair = "+".join(sorted(("britain", foe)))
@@ -20779,6 +20949,14 @@ def test_truth_7_631_strike_the_colours_strikes_her_colours_with_the_fighting_bo
     assert e.kind == "standing.belayed", (e.kind, e.text)
 
 
+# Package 90, A3: the refusal in the words of a helm steered by a tiller, the first action's
+# cutter's (truth 7-632; `evolutions.scripts.HELM_WORDS`), beside the wheel's `HELM_LOST_WORDS`
+TILLER_LOST = (
+    "The tiller is shot away and the helm does not answer: rig the relieving tackles ('rig the "
+    "relieving tackles') to steer her by them, or ship the spare tiller ('ship the spare tiller')."
+)
+
+
 def _wheel_lost_at_seed_6():
     """The first action at seed 6 as the harbour starts it, run to the shot that takes her
     wheel (truth 7-626's own passage)."""
@@ -20801,12 +20979,19 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     to` stands (tried with the helm dead, she comes to by her sails), its line saying that
     the helm does not answer. With the tackles rove every one is taken again.
 
-    The first action at seed 6, the player at the prompt on the minute the wheel goes."""
+    The first action at seed 6, the player at the prompt on the minute the wheel goes.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick the same: the first action's ship is the cutter, who steers by a tiller, so her
+    refusals and her aside are the tiller's (`TILLER_LOST`, "the tiller shot away"), where they
+    were the wheel's (`HELM_LOST_WORDS`, "the wheel shot away"), which every ship steered by a
+    wheel keeps."""
     from freesail.evolutions.scripts import HELM_LOST_WORDS
 
     assert "'rig the relieving tackles'" in HELM_LOST_WORDS
     assert "'repair the wheel'" in HELM_LOST_WORDS
     w = _wheel_lost_at_seed_6()
+    assert w.ship.hull.spec.helm == "tiller"
     held = float(w.ship.dyn.rudder)
     refused = (
         "steer north-west",
@@ -20822,13 +21007,13 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     )
     for order in refused:
         e = _said(w, order)
-        assert e.kind == "order.rejected" and e.text.endswith(HELM_LOST_WORDS), (order, e.text)
+        assert e.kind == "order.rejected" and e.text.endswith(TILLER_LOST), (order, e.text)
     e = _said(w, 'standing order "by the wind": every 1 minute then steer north-west')
     assert e.kind != "order.rejected", e.text
     at = w.clock.tick
     w.run(130)
     fired = [x for x in w.log if x.tick > at and x.kind == "order.rejected"]
-    assert fired and all(x.text.endswith(HELM_LOST_WORDS) for x in fired), [x.text for x in fired]
+    assert fired and all(x.text.endswith(TILLER_LOST) for x in fired), [x.text for x in fired]
     assert not [x for x in w.log if x.tick > at and x.kind == "helm.order"]
     assert _said(w, 'strike standing order "by the wind"').kind == "standing.struck"
     assert abs(float(w.ship.dyn.rudder) - held) < 1e-9, "the rudder moved with the wheel gone"
@@ -20838,7 +21023,7 @@ def test_truth_7_632_the_wheel_shot_away_stops_the_helm_until_the_tackles_are_ro
     assert e.kind != "order.rejected", e.text
     w.run(5)
     said = [x.text for x in w.log if x.kind == "evolution.step" and x.tick >= e.tick]
-    assert any("the helm not answering, the wheel shot away" in s for s in said), said
+    assert any("the helm not answering, the tiller shot away" in s for s in said), said
     assert not any("helm a-lee" in s for s in said), said
 
 
@@ -20855,7 +21040,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     over, read twice: by the tackles, half the wheel's; the wheel repaired,
     the wheel's own (her file's five degrees a second). `repair the wheel` given twice is
     said once; with the wheel whole it is refused in words; the wheel made good, the
-    relieving tackles are no longer wanted."""
+    relieving tackles are no longer wanted.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"), words only,
+    every tick and every rate the same: the first action's cutter steers by a tiller, so her
+    tackles are hooked to its stump, "more slowly than by the tiller", and `repair the wheel` is
+    answered as the spare tiller shipped, given twice, done and with the tiller whole in the
+    tiller's words; the wheel's ("by the wheel", "repairing the wheel", "The wheel is repaired
+    and new wheel-ropes rove", "the wheel is whole") are every wheel ship's still."""
     import yaml
 
     spec = yaml.safe_load(open("data/evolutions/relieving_tackles.yaml", encoding="utf-8"))
@@ -20889,7 +21081,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
             break
     assert ship.extra.get("helm_by_tackles") and ship.extra.get("helm_rate_share") == 0.5
     relieved = [x.text for x in w.log if x.kind == "helm.relieved"]
-    assert relieved and relieved[-1].endswith("more slowly than by the wheel."), relieved
+    assert relieved and relieved[-1].endswith("more slowly than by the tiller."), relieved
     assert _said(w, "right the helm").kind == "helm.order"
     w.run(30)
     by_tackles = travel()
@@ -20899,14 +21091,14 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert e.kind != "order.rejected", e.text
     w.run(5)
     twice = _said(w, "repair the wheel")
-    assert twice.text.endswith("The hands are repairing the wheel already."), twice.text
+    assert twice.text.endswith("The hands are shipping the spare tiller already."), twice.text
     for _ in range(200):
         w.run(30)
         if not ship.extra.get("helm_by_tackles"):
             break
     done = [x.text for x in w.log if x.kind == "helm.repaired"]
     assert done == [
-        "The wheel is repaired and new wheel-ropes rove: she steers by the wheel again; "
+        "The spare tiller is shipped in the rudder head: she steers by the tiller again; "
         "the relieving tackles are cast off."
     ], done
     assert not ship.extra.get("helm_lost") and not ship.extra.get("helm_by_tackles")
@@ -20917,7 +21109,7 @@ def test_truth_7_633_by_the_tackles_she_answers_at_half_the_wheels_rate_until_it
     assert by_wheel == pytest.approx(rate * 5, rel=0.02), (by_wheel, rate)
     assert by_tackles == pytest.approx(0.5 * by_wheel, rel=0.03)
     whole = _said(w, "repair the wheel")
-    assert whole.kind == "order.rejected" and "the wheel is whole" in whole.text, whole.text
+    assert whole.kind == "order.rejected" and "the tiller is whole" in whole.text, whole.text
     none = _said(w, "rig the relieving tackles")
     assert none.kind == "order.rejected" and "no need of the relieving tackles" in none.text
 
@@ -20937,7 +21129,12 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     steers again by them; and the action over he orders the wheel repaired. And the gale
     trial of the station (`trial-station-gale`, an hour in, the wind over thirty knots),
     her wheel lost as the hit leaves it (no shot is to be had in a gale: the hit's own
-    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too."""
+    state, `helm_lost`, is written as `combat.hits` writes it): he rigs them there too.
+
+    Package 90, A3 (old beside new: docs/dev/TuningNotes.md, "Package 90, A3"; the lead's word
+    of nudge 31), words only, every tick the same: the first action's cutter steers by a tiller,
+    so his mend order is her helm's, "shipping the spare tiller", where it was "repairing the
+    wheel", which every ship steered by a wheel keeps."""
     w = _wheel_lost_at_seed_6()
     lost = w.clock.tick
     for _ in range(40):
@@ -20955,7 +21152,7 @@ def test_truth_7_634_the_games_own_captain_answers_a_lost_wheel_as_a_seaman_woul
     w.run(3600)
     after = [x for x in w.log if x.tick > rove[0] and str(x.actor).startswith("captain")]
     assert [x for x in after if x.kind == "helm.order"], "he never steered by the tackles"
-    assert [x for x in after if "repairing the wheel" in x.text], [x.text for x in after][-8:]
+    assert [x for x in after if "shipping the spare tiller" in x.text], [x.text for x in after][-8:]
 
     from freesail import units as U
     from tests.test_captain_trials import trial
@@ -22593,9 +22790,6 @@ def test_truth_7_469_the_one_table_of_the_forms_is_the_channels_and_every_form_i
 # Each ship file mustered at seed 7 on the trunk before package 119 (at de62ed74, the old rule):
 # the hands on her books, the name of the last of them and the muster stream's next draw after
 # the muster. The rule draws nothing, so each is the same under the new.
-# Package 90's files, added after package 119, mustered by its rule alone: no muster before it
-# (truth 7-700 holds each to the rule's purpose; 7-701 reads the eighteen of the table below).
-_MUSTERED_SINCE_119 = ("coastguard-tartane.yaml", "tartane.yaml")
 _MUSTERED_BEFORE_119 = {
     "bilander.yaml": (9, "Edmund Hawkins", 0.5816001636624663),
     "boat-cutter-23.yaml": (7, "Dennis Thompson", 0.8584684590486795),
@@ -22615,6 +22809,17 @@ _MUSTERED_BEFORE_119 = {
     "sixty-four.yaml": (491, "Gilbert Pritchard", 0.7511335761053086),
     "smack.yaml": (8, "Isaac Matthews", 0.5709136896467344),
     "topsail-schooner.yaml": (40, "Aaron Chew", 0.6140689877884787),
+}
+# The ship files made after package 119, which have no muster before the rule to be held to:
+# their watches at seed 7, starboard and larboard, held by truth 7-700 beside the eighteen. The
+# Diana's (package 90, her builder): 71 and 70, her odd main top, mizzen top and afterguard
+# watched by turns. The tartane's (package 90, the tartane's builder): the trader 4 and 3, the
+# boy to the starboard (her bill mended at the lead's nudge 41), the guarda-costa 15 and 14.
+# Old: none.
+_MUSTERED_AFTER_119 = {
+    "coastguard-tartane.yaml": (15, 14),
+    "corvette-20.yaml": (71, 70),
+    "tartane.yaml": (4, 3),
 }
 
 
@@ -22648,13 +22853,16 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
     watches are equal or one apart, and so is each station's share of them; the merchant brig's
     ten are five and five (old seven and three), the razee's 288 are 144 and 144 (old 146 and
     142), the seventy-four's 530 are 265 and 265 (old 268 and 262). The other files are as they
-    were: no other one had more than one odd station."""
+    were: no other one had more than one odd station. And every file made after the rule
+    (`_MUSTERED_AFTER_119`), the Diana's 141 seamen and soldiers 71 and 70, the tartane trader's
+    seven 4 and 3 and the guarda-costa's 29 15 and 14 (package 90; old: the eighteen files alone,
+    every file of the tree)."""
     import glob
 
     from freesail.crew.model import Watch
 
     files = sorted(glob.glob("data/ships/*.yaml"))
-    assert [Path(p).name for p in files] == sorted([*_MUSTERED_BEFORE_119, *_MUSTERED_SINCE_119])
+    assert [Path(p).name for p in files] == sorted({*_MUSTERED_BEFORE_119, *_MUSTERED_AFTER_119})
     split = {}
     for path in files:
         for seed in (7, 1805):
@@ -22668,10 +22876,9 @@ def test_truth_7_700_every_ship_files_two_watches_are_equal_or_one_apart():
             split[Path(path).name] = (st, lar)
     assert split["merchant-brig.yaml"] == (5, 5)
     assert split["razee-44.yaml"] == (144, 144)
+    assert {k: split[k] for k in _MUSTERED_AFTER_119} == _MUSTERED_AFTER_119
     assert split["seventy-four.yaml"] == (265, 265)
     assert split["topsail-schooner.yaml"] == (17, 16) and split["smack.yaml"] == (3, 2)
-    # package 90's files, mustered by the rule alone (`_MUSTERED_SINCE_119`)
-    assert split["tartane.yaml"] == (4, 3) and split["coastguard-tartane.yaml"] == (15, 14)
 
 
 def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
@@ -22683,19 +22890,15 @@ def test_truth_7_701_the_eighteen_musters_are_otherwise_as_they_were():
     first) but for the odd last hands of the second, fourth, ... odd stations, which go to the
     larboard: two of the merchant brig's (her fore top's and her afterguard's, the boy), two of
     the razee's (fore top, waisters), three of the seventy-four's (fore top, afterguard, the
-    marines); none of any other file's."""
-    import glob
-
+    marines); none of any other file's. The eighteen are the files of before the rule
+    (`_MUSTERED_BEFORE_119`): a file made after it has no before, and truth 7-700 holds its
+    watches (the Diana's and the tartane's two, package 90; old: every file of the tree, then the
+    eighteen)."""
     from freesail.crew.model import WATCHES
 
     moved_by_file = {}
-    # the eighteen files of package 119, by its table; a file added since has no muster before
-    # the rule to be as (`_MUSTERED_SINCE_119`: 7-700 holds it to the rule's purpose)
-    assert set(_MUSTERED_BEFORE_119) | set(_MUSTERED_SINCE_119) == {
-        Path(p).name for p in glob.glob("data/ships/*.yaml")
-    }
-    for path in sorted(f"data/ships/{name}" for name in _MUSTERED_BEFORE_119):
-        name = Path(path).name
+    for name in sorted(_MUSTERED_BEFORE_119):
+        path = f"data/ships/{name}"
         crew, after = _mustered(path)
         assert (len(crew.sailors), crew.sailors[-1].name, after) == _MUSTERED_BEFORE_119[name]
         moved = []
@@ -23349,3 +23552,457 @@ def test_truth_7_659_an_act_given_again_is_counted_only_where_it_was_done():
         {"text": 'person: make "Mr Fox", a pilot, ashore at Falmouth', "source": D.SOURCE},
     )
     assert D.budget_of(w).acts == before + 1
+
+
+# ---------------------------------------------------------------------------
+# Package 90, A1d: a whole lateen aback, and on the bad hand, in a breeze (truths 7-670 to 7-672)
+# ---------------------------------------------------------------------------
+# The owner's decision of 2026-11-18: "A lateen taken aback should increase the strain on the
+# mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may
+# strain the mast and, in high enough wind, risk damage." The lead's figures, ruled (nudge 18 and
+# 22): aback a great yard strains from about 28 kn and may carry away from about 35; on the bad
+# hand from about 40 and 49; the rules captain's board under 12 kn under a fifth of the rating.
+# docs/design/Design-Package90-Engine.md §2.4.3 and §2.2b. On the probes of `tests/rig_fixtures.py`
+# with `dipping` on each whole lateen (no committed file carries one), their lateen yards and masts
+# rated by the generator's rule (`tools/gen_ships.py`, `design_kn` in `DESIGN_WIND_KN["lower"]`:
+# a lower yard for its own sail, a lower mast for every sail on it), as the design measured them.
+# Seed 7, a steady northerly, the starboard tack 67.5 degrees off under plain sail trimmed,
+# settled 600 s. "Strains" is a load over the rating (`physics/strain.py`: wear over 1.0), "may
+# carry away" over one and a half times it (a chance at every substep over `CARRY_AWAY_RATIO`).
+
+
+def _a1d_probe(doc_fn, knots: float, tmp_path: Path):
+    """A lateen probe settled in `knots`, its lateen yards and masts rated by the generator's
+    rule; the World and those spars."""
+    from rig_fixtures import write_ship
+
+    from tools.gen_ships import DESIGN_WIND_KN, design_kn
+
+    doc = doc_fn()
+    for s in doc["sails"]:
+        if s.get("class") == "lateen" and not s.get("cut_at_mast"):
+            s["dipping"] = True
+    path = write_ship(doc, tmp_path, f"{doc_fn.__name__}-{knots:g}")
+    world = make_world(
+        7,
+        path,
+        Scenario(
+            wind_from_deg=0.0,
+            wind_speed_kn=knots,
+            gustiness=0.0,
+            variability=0.0,
+            ship_heading_deg=292.5,
+            ship_speed_kn=5.0,
+        ),
+    )
+    ship = world.ship
+    spars = []
+    for sl in ship.sails.values():
+        if sl.cls != "lateen":
+            continue
+        yard, mast = ship.yard_of(sl), ship.mast_of(sl)
+        on_mast = [s for s in ship.sails.values() if ship.mast_of(s) is mast]
+        lower = DESIGN_WIND_KN["lower"]
+        yard.rating_kn = float(design_kn([(sl.area_m2, sl.centre_height_m, sl.curve_class)], lower))
+        mast.rating_kn = float(
+            design_kn([(s.area_m2, s.centre_height_m, s.curve_class) for s in on_mast], lower)
+        )
+        spars += [yard, mast]
+    world.submit("set plain sail")
+    for i in range(600):
+        if i % 120 == 0 and i > 240:
+            world.submit("trim sails")
+        world.tick()
+    return world, spars
+
+
+def _a1d_peaks(world, spars, seconds: int) -> tuple[dict[str, float], int]:
+    """Each spar's peak load over its rating, and the seconds a lateen stood aback."""
+    peak = {sp.id: 0.0 for sp in spars}
+    aback = 0
+    for _ in range(seconds):
+        world.tick()
+        for sp in spars:
+            peak[sp.id] = max(peak[sp.id], sp.load_kn / sp.rating_kn)
+        aback += any(sl.backed for sl in world.ship.sails.values() if sl.cls == "lateen")
+    return peak, aback
+
+
+def _a1d_on_the_bad_hand(world) -> None:
+    """Every lateen's yard on the weather side of its mast, its cloth drawn round to leeward."""
+    from freesail.evolutions import trim as yard_trim
+
+    ship = world.ship
+    for sl in ship.sails.values():
+        if sl.cls == "lateen":
+            sl.lug_side = "starboard"  # the starboard tack: the weather side
+            yard_trim.set_sheet_angle(ship, sl, sl.sheet_angle, "larboard")
+
+
+def test_truth_7_670_a_great_lateen_taken_aback_strains_from_about_28_kn_and_risks_it_from_35(
+    tmp_path,
+):
+    """The tartane probe's great lateen taken aback by a shift with her way on (the wind come 20
+    degrees on her other bow, 120 s, nobody shifting it): under its yard's rating in 26 kn,
+    strained in 31 and not at risk, over one and a half times it in 38 (measured: 0.94 in 28,
+    1.26 in 31, 1.46 in 34, 1.71 in 37); its mast, carrying her topsail and head sails too, rated
+    higher and under its rating in 31. Her mizen's mast carries only its lateen and strains with
+    its yard, by the owner's words."""
+    from rig_fixtures import tartane_probe_doc
+
+    peaks = {}
+    for knots in (26.0, 31.0, 38.0):
+        world, spars = _a1d_probe(tartane_probe_doc, knots, tmp_path)
+        wind = world.wind
+        wind.follow(units.wrap_2pi(wind.base_direction - math.radians(87.5)), wind.base_speed)
+        world.scenario.wind_from_deg = math.degrees(wind.base_direction)
+        peaks[knots], aback = _a1d_peaks(world, spars, 120)
+        assert aback >= 10  # held aback, its cloth on the mast ("taken aback" after 10 s)
+    yard = [peaks[k]["main.lateen_yard"] for k in (26.0, 31.0, 38.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+    assert peaks[31.0]["main.mast"] < 1.0, peaks
+    for k in peaks:
+        assert peaks[k]["mizzen.mast"] == pytest.approx(peaks[k]["mizzen.lateen_yard"])
+
+
+def test_truth_7_671_a_lateen_on_the_bad_hand_strains_from_about_40_kn_and_risks_it_from_49(
+    tmp_path,
+):
+    """The polacre probe close-hauled with both lateens on the bad hand, each yard on the weather
+    side of its mast and its cloth drawn round to leeward (300 s): her fore lateen yard under its
+    rating in 38 kn, strained in 45 and not at risk, over one and a half times it in 52 (measured:
+    0.95 in 42, 1.37 in 46, 1.59 in 50), and never aback."""
+    from rig_fixtures import polacre_probe_doc
+
+    peaks = {}
+    for knots in (38.0, 45.0, 52.0):
+        world, spars = _a1d_probe(polacre_probe_doc, knots, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks[knots], aback = _a1d_peaks(world, spars, 300)
+        assert aback == 0
+    yard = [peaks[k]["fore.lateen_yard"] for k in (38.0, 45.0, 52.0)]
+    assert yard[0] < 1.0 < yard[1] < 1.5 < yard[2], peaks
+
+
+def test_truth_7_672_the_rules_captains_board_on_the_bad_hand_under_12_kn_is_under_a_fifth(
+    tmp_path,
+):
+    """The rules captain lies on the bad hand only by choice under 12 kn, for no more than a board
+    of 1,800 s (truth of A1c's keys): so lying, each lateen yard and mast of the tartane and the
+    polacre probes stays well under a fifth of its rating, under 0.15 (measured: 0.12 and 0.10
+    the tartane's, 0.08 and 0.10 the polacre's), and under its rating a part loses nothing.
+    The upper band holds `LATEEN_BAD_HAND_LOAD` (the lead's nudge 60, item 7): at 4.0 the
+    tartane's great yard reaches 0.19 and fails it, where under a fifth alone passed it; at 3.0
+    it reaches 0.145."""
+    from rig_fixtures import polacre_probe_doc, tartane_probe_doc
+
+    for doc_fn in (tartane_probe_doc, polacre_probe_doc):
+        world, spars = _a1d_probe(doc_fn, 12.0, tmp_path)
+        _a1d_on_the_bad_hand(world)
+        peaks, aback = _a1d_peaks(world, spars, 1800)
+        assert max(peaks.values()) < 0.15 and aback == 0, (doc_fn.__name__, peaks)
+        assert all(sp.condition == 100.0 for sp in spars)  # no wear under the rating
+
+
+# -- package 121 (the owner's word of 2026-11-20): her service is her papers' -----------------
+# A frigate under a privateer's papers (`papers: {service: privateer}`, the harbour's "Her
+# service") read "a King's ship" to the officer of the watch and to the director: the reading
+# and the readers beside it asked her captain's role or her wardroom, never her papers. Each
+# reader now asks `service.service_of` (her papers first, then her captain's role, then her
+# wardroom); a prize-master is said by his role. Truths 7-710 to 7-714, each through the
+# scenario door.
+
+
+_ROOT_121 = Path(__file__).resolve().parents[1]
+
+
+def _papered(service=None, *, ship=None, position=None, intent=None, nation=None, **papers):
+    """The naval cruise's frigate (data/scenarios/naval-cruise.yaml) through the scenario door,
+    as the harbour's maker writes it: her papers' service given, or none; another ship file,
+    another position, an intent where named."""
+    import copy
+    import tempfile
+
+    from freesail.world.scenarios import (
+        load_scenario,
+        make_scenario_world,
+        read_scenario_text,
+        write_scenario,
+    )
+
+    text, raw = read_scenario_text(_ROOT_121 / "data" / "scenarios" / "naval-cruise.yaml")
+    raw = copy.deepcopy(raw)
+    raw["papers"] = dict(raw.get("papers") or {}, **papers)
+    if service is not None:
+        raw["papers"]["service"] = service
+    if ship is not None:
+        raw["ship"] = dict(raw["ship"], file=ship)
+    if position is not None:
+        raw["position"] = position
+        for key in ("ships", "world_orders", "orders", "standing_orders"):
+            raw.pop(key, None)
+    if intent is not None:
+        raw["intent"] = intent
+    if nation is not None:
+        raw["nation"] = nation
+    path = Path(tempfile.mkdtemp()) / "papered.yaml"
+    write_scenario(raw, path, text)
+    return make_scenario_world(load_scenario(path), seed=7)
+
+
+def _put_on_sea(w, description, name, nation, where, intent):
+    from freesail.world import ships as S
+
+    w.vessels.serial += 1
+    spec = {
+        "description": description,
+        "name": name,
+        "nation": nation,
+        "position": where.to_dict(),
+        "goal": intent,
+        "intent": intent,
+    }
+    return w.vessels.add(S.vessel_from_spec(w, spec, w.vessels.serial))
+
+
+def test_truth_7_710_her_papers_name_her_service_to_every_station_and_the_director():
+    """The owner's frigate under a privateer's papers is told as a privateer, under a merchant's
+    as a merchantman, and with none as the King's ship her wardroom makes her: at the player's
+    prompt ('the ship'), at the officer's door and at the director's alike, said once (the
+    answer had been headed twice, "The ship: The ship:"). The shipped merchant ship on the
+    frigate's file (data/scenarios/merchant-ship.yaml) is a merchantman of the United States.
+    OLD: all three "a King's ship of Britain"; the merchant ship "a ship of the American
+    navy"."""
+    from freesail.agents import tools
+    from freesail.world.scenarios import load_scenario, make_scenario_world
+
+    head = "The ship: Amazon, "
+    said = {
+        None: "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a King's ship of "
+        "Britain.",
+        "privateer": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a privateer "
+        "of Britain.",
+        "merchant": "a 36-gun 18-pounder frigate of the Amazon class, ship-rigged; a merchantman "
+        "of Britain.",
+    }
+    for service, words in said.items():
+        w = _papered(service)
+        prompt = w.submit("the ship").text
+        assert prompt.startswith(head + words), (service, prompt[:160])
+        assert "The ship: The ship:" not in prompt
+        for station in ("officer", "director"):
+            door = tools.submit_order(w, station, "the ship")
+            assert (head + words) in door and "The ship: The ship:" not in door, (station, door)
+        if service is not None:
+            assert "King's ship" not in prompt and "navy" not in prompt
+    m = make_scenario_world(
+        load_scenario(_ROOT_121 / "data" / "scenarios" / "merchant-ship.yaml"), 7
+    )
+    assert "; a merchantman of the United States." in m.submit("the ship").text
+    # the scenario door refuses a service it does not know, in words (package 121's
+    # follow-up; old: passed by in silence, her wardroom answering in its place)
+    import pytest
+
+    from freesail.world.scenarios import ScenarioError
+
+    with pytest.raises(ScenarioError) as refused:
+        _papered("a pirate")
+    said = str(refused.value)
+    assert "papers: service 'a pirate' is no service; say kings" in said, said
+    assert "privateer (a letter of marque) or merchant (a merchantman)" in said, said
+
+
+def test_truth_7_711_a_blockade_and_the_cover_of_the_trade_are_a_king_s_ships_alone():
+    """A blockade is a public force's, and the King's ships protect the trade: the frigate under
+    French colours in Plymouth Sound, France at war with Britain, is an enemy man of war in the
+    port's offing (which keeps a squadron in ordinary there from slipping out) only as a King's
+    ship, by her wardroom (no papers) or her papers; under a privateer's or a merchant's papers
+    she is none, and a British merchant brig half a mile off her at sea is covered only by the
+    King's ship; nor does a prize under her prize-master (the follow-up: no captor's King's
+    ship, as her reading says). OLD: her wardroom answered, and all four blockaded and
+    covered; the prize-master's ship by her hull's word or her service."""
+    from freesail.world import regimes as REG
+    from freesail.world import squadrons as Q
+    from freesail.world.geo import destination
+
+    for service, kings in (
+        (None, True),
+        ("kings", True),
+        ("privateer", False),
+        ("merchant", False),
+    ):
+        w = _papered(service, nation="france")
+        plymouth = w.dealings.ports["plymouth"]
+        assert REG._enemy_men_of_war_near(w, plymouth, "britain", 10.0) is kings, service
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+        nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+        assert Q._covered(w, nancy) is kings, service
+    # a prize under her prize-master is not her captor's King's ship (package 121's
+    # follow-up: as `ship_words` says): she neither blockades nor covers
+    w = _papered(None, nation="france")
+    w.captain.role = "prize-master"
+    assert REG._enemy_men_of_war_near(w, w.dealings.ports["plymouth"], "britain", 10.0) is False
+    w = _papered(None, position={"lat_deg": 49.6, "lon_deg": -5.6})
+    w.captain.role = "prize-master"
+    north = destination(w.position, 0.0, 0.5 * units.NAUTICAL_MILE)
+    nancy = _put_on_sea(w, "merchant brig", "Nancy", "britain", north, "bound for 49 0 N 8 0 W")
+    assert Q._covered(w, nancy) is False
+
+
+def test_truth_7_712_a_free_intent_takes_her_papers_role_before_her_wardrooms():
+    """Her captain given a passage and no role sails by her papers' service: a privateer's book
+    under a privateer's papers, a merchant's under a merchant's, the King's ship's with none
+    (her wardroom, package 86). OLD: the King's ship's book under all three."""
+    roles = {None: "kings-ship", "kings": "kings-ship", "privateer": "privateer"}
+    roles["merchant"] = "merchant"
+    for service, role in roles.items():
+        w = _papered(service, intent="bound for Falmouth")
+        assert w.captain.role == role, (service, w.captain.role)
+
+
+def test_truth_7_713_she_hails_answers_and_is_obeyed_as_her_papers_say():
+    """The hail by her service: with no words, a merchantman by her papers hails 'What ship is
+    that, and whither bound?' and the rest 'What ship is that?'; hailed herself, her captain
+    with no role, she answers as her service (a privateer 'The privateer Amazon of ...'; old, as
+    a merchantman by default; a merchantman by her papers as she did, pinned whole); and a
+    neutral merchantman told to heave to obeys a King's ship or a privateer (her letter of
+    marque carried the right to bring to and examine in war), and makes sail from a
+    merchantman by her papers. OLD: the King's ship's hail under all; the
+    neutral obeyed her whatever her service."""
+    from freesail.world import hail as H
+    from freesail.world.geo import destination
+
+    for service, hail, obeys in (
+        (None, "What ship is that?", True),
+        ("privateer", "What ship is that?", True),
+        ("merchant", "What ship is that, and whither bound?", False),
+    ):
+        w = _papered(service, position={"lat_deg": 49.6, "lon_deg": -5.6})
+        near = destination(w.position, 90.0, 0.2 * units.NAUTICAL_MILE)
+        dane = _put_on_sea(w, "merchant brig", "Fortuna", "denmark", near, "bound for 49 0 N 8 0 W")
+        assert dane.nation == "denmark"
+        hailed = w.submit("hail the Fortuna").text
+        assert f"by the trumpet: '{hail}'" in hailed, (service, hailed)
+        demand = w.submit("say to the Fortuna: heave to").text
+        assert ("Aye aye: heaving to." in demand) is obeys, (service, demand)
+        assert ("She makes no answer but sail." in demand) is not obeys, (service, demand)
+        shadow = w.vessels.player_shadow(w)
+        own = H.answer_by_table(w, shadow, "What ship is that?", other_world=w)
+        if service == "privateer":
+            assert own.startswith("The privateer Amazon of "), own
+        elif service is None:
+            assert "His Majesty's" in own and "on the King's service" not in own, own
+        else:
+            assert own == "The Amazon of Guernsey, from Guernsey, in ballast.", own
+
+
+def test_truth_7_714_the_regulations_bind_only_whom_they_bind_and_the_brig_keeps_her_look():
+    """No station of a ship the Regulations do not bind is told they do: the officer of the
+    watch of the frigate under a privateer's or a merchant's papers is told to report to the
+    captain 'what the officer of the watch reports to him', and with none 'what the Regulations
+    gave the lieutenant to report', and so is the notice when the captain goes below; the
+    wardroom's outlines, her people's duties from the
+    frigate's file, cite the Regulations only where they bind her. And another ship's lookout
+    sees the brig under a merchant's papers as the merchant brig, and under a privateer's as
+    the brig-sloop she looks (armed, full of men). OLD: the Regulations' words under all
+    three papers, in the brief and in the outlines; the brig under either papers the
+    brig-sloop."""
+    from freesail.agents import agent
+
+    for service, bound in ((None, True), ("privateer", False), ("merchant", False)):
+        w = _papered(service)
+        brief = agent.officer(world=w).brief
+        assert (agent.REGULATIONS_REPORT in brief) is bound, service
+        assert (agent.PLAIN_REPORT in brief) is not bound, service
+        assert "Regulations" not in brief or bound, service
+        # her people stay the frigate's file's: their duties said, the Regulations cited
+        # only where they bind her
+        captain = agent.station_outline(w, agent.CAPTAIN)
+        assert "her people and her orders are his" in captain, (service, captain)
+        assert ("the Regulations" in captain) is bound, (service, captain)
+        lines = " ".join(w.people.wardroom_lines())
+        assert ("the Regulations" in lines) is bound, service
+        # the officer seated (the scripted fake), the deck his, the captain gone below: the
+        # duty to report is said by the Regulations only where they bind her
+        from tests.test_officer import data_turns, seated
+
+        h, fake, _ = seated(w, [""] * 30)
+        assert w.submit("go below").kind == "captain.below"
+        w.run(600)
+        told = [n for d in data_turns(fake) for n in d.get("notices") or [] if "is below" in n]
+        assert len(told) == 1, (service, told)
+        plain = "The captain is below; his strange sails and his shifts of wind are yours to report"
+        regs = "The captain is below; the Regulations give you his strange sails"
+        assert told[0].startswith(regs if bound else plain), (service, told)
+
+    looks = {None: "brig-sloop", "privateer": "brig-sloop", "merchant": "merchant brig"}
+    for service, look in looks.items():
+        w = _papered(
+            service, ship="data/ships/brig.yaml", position={"lat_deg": 49.6, "lon_deg": -5.6}
+        )
+        assert w.vessels.player_shadow(w).description == look, service
+
+
+def test_truth_7_715_a_kings_ship_by_papers_or_wardroom_wears_her_pendant_and_the_others_not():
+    """Package 121's follow-up: she wears her flags by her service, her papers first. The naval
+    cruise's frigate, her captain with no role: with no papers (a King's ship by her wardroom)
+    or a King's papers she flies the red pendant at the main truck, at `the flags` and to
+    another ship's lookout ("she wears a pendant at the main: a man-of-war"); under a
+    privateer's or a merchant's papers her ensign alone. A merchant brig's file (no wardroom)
+    under a King's papers wears the pendant; under none, a privateer's or a merchant's, her
+    ensign alone, as before. OLD: every one of them her ensign alone (`world_role` read her
+    captain's role and the private signals, and a role-less King's ship wore the
+    merchantman's)."""
+    from freesail.world import flags as F
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    man_of_war = "she wears a pendant at the main: a man-of-war"
+    for ship, pendant, kings in (
+        (None, "the red pendant at the main truck", (None, "kings")),
+        ("data/ships/merchant-brig.yaml", "the long pendant at the main truck", ("kings",)),
+    ):
+        for service in (None, "kings", "privateer", "merchant"):
+            w = _papered(service, ship=ship, position=at)
+            assert w.captain.role == "", (ship, service)
+            w.run(60)
+            said = w.submit("the flags").text
+            seen = F.vessel_flies_words(w, w.vessels.player_shadow(w))
+            if service in kings:
+                assert said.endswith(f" at the peak; {pendant}."), (ship, service, said)
+                assert seen == man_of_war, (ship, service, seen)
+            else:
+                assert said.startswith("The flags: ") and said.endswith(" at the peak."), (
+                    ship,
+                    service,
+                    said,
+                )
+                assert "pendant" not in said and seen == "", (ship, service, said, seen)
+
+
+def test_truth_7_716_a_ship_whose_captains_role_answers_flies_what_she_flew():
+    """Package 121's follow-up: a ship whose captain's role answered her flags before flies
+    what she flew: with no papers every role wears its own, and under papers of the role's own
+    service (a commodore under a King's papers, a packet or a revenue cutter under a
+    merchant's) so does she; a prize-master keeps his under any papers. Only papers of another
+    service than her role's change her flags (her papers first)."""
+    from freesail.world import flags as F
+    from freesail.world.service import ROLE_SERVICE, SERVICE_ROLE
+
+    at = {"lat_deg": 49.6, "lon_deg": -5.6}
+    for role, service in ROLE_SERVICE.items():
+        plain = _papered(None, position=at)
+        plain.captain.role = role
+        assert F.world_role(plain) == role, role
+        plain.run(60)
+        flown = plain.submit("the flags").text
+        own = _papered(service, position=at)
+        own.captain.role = role
+        assert F.world_role(own) == role, (role, service)
+        own.run(60)
+        assert own.submit("the flags").text == flown, (role, service)
+        for other in ("kings", "privateer", "merchant"):
+            w = _papered(other, position=at)
+            w.captain.role = role
+            kept = role == "prize-master" or ROLE_SERVICE[role] == other
+            assert F.world_role(w) == (role if kept else SERVICE_ROLE[other]), (role, other)

@@ -1,5 +1,11 @@
 # Decisions: package 90, the Spanish and Mediterranean ships (the owner's round, November 2026)
 
+**Revised 2026-11-20 on the owner's three answers of that day.** The owner answered three
+questions put to them that day, verbatim: the three-decker's source, "Use PB-039 (Recommended)";
+the tartane's main's rake, "Use the rake which provides the better sailing characteristic, upright,
+or slightly forward raked."; the tartane's builder, "Start it (Recommended)". This revision records
+them in Part F and adds a dated line under questions 4 and 10. Nothing else is re-opened.
+
 **Revised 2026-11-19 on Winfield's passages sent by the owner, and the owner's answers of that
 day.** The owner sent the passages of Part D they found, with their readings of Monleón's tartane
 and polacre prints, and said, verbatim: "I went through Winfield for some of the requested
@@ -290,6 +296,11 @@ gives her **one headsail** and **a loose-footed square topsail with no lower yar
 VR-Sp §9). The one jib stands, now on their reading; the tréou stays carried, its yard sent up with
 it and not crossed in plain sail (Tar-D decision 9).
 
+*2026-11-20:* Chapman's Pl. LXII No. 16 draws a tartane's main upright (Tar-D §4.1). Asked whether to
+revisit the 3° forward, the owner answered: "Use the rake which provides the better sailing
+characteristic, upright, or slightly forward raked." (Part F). And for her builder: "Start it
+(Recommended)".
+
 ![The Roux-school watercolour of a tartane under sail, held in the tree](../references/images/tartane-roux-school-watercolour.webp)
 
 *Your watercolour, held in the tree: the reference for her rig.*
@@ -483,6 +494,13 @@ cost of a new key in the engine.
 
 **Settled 2026-11-18, as picked:** yes, yes, yes once vetted, and not now. "I agree with the
 proposals" (the owner; Part F).
+
+*2026-11-20:* the second (the three-decker's hull) answered again by the owner, in place of their
+choice of the *San Josef*'s sheets: put as "Draw her hull from PB-039 instead?", their answer "Use
+PB-039 (Recommended)" (Part F). The three-decker's hull is drawn from PB-039, her own plan as built;
+ZAZ0100 to ZAZ0103 stay as the comparison, and settle her sixteenth lower port pair, the aftmost
+(Con-D, revised 2026-11-20). Greenwich served the sheets at 1,280 px only, too small for her lines
+(`ships-design/pages-concepcion.md` §1.2, §11).
 
 **My pick:**
 1. **Yes: hold PB-039**, the *Concepción*'s own plan of 1779, in `docs/references/images/` with
@@ -792,6 +810,15 @@ facts sent are set down by page in VR-Sp §7 to §17, cited "Winfield et al. 202
 
 ## Part F. The answers (recorded verbatim when given)
 
+**The owner, 2026-11-20**, on three questions put to them that day, verbatim:
+- **The three-decker's source** (put as "Draw her hull from PB-039 instead?", in place of their
+  choice of 2026-11-18 under question 10, her sister the *San Josef*'s sheets at Greenwich): "Use
+  PB-039 (Recommended)"
+- **The tartane's main's rake** (whether to revisit the 3° forward of question 4, Chapman's Pl.
+  LXII No. 16 drawing a tartane's main upright): "Use the rake which provides the better sailing
+  characteristic, upright, or slightly forward raked."
+- **The tartane's builder** (whether it starts): "Start it (Recommended)"
+
 **The owner, 2026-11-19**, sending Winfield's passages (Part D), in full: "I went through Winfield
 for some of the requested passages, I was not able to find everything requested, so you shall have
 to fill in some things from other research or judgement".
@@ -846,5 +873,18 @@ addition, but we can include it in the planning."
 | GR | The ground report's count over twenty | "Go ahead" (built: the card's "Expected to move" names the moves, A6 drafted without its own two faults: Plan §14) | 2026-11-19 |
 | A3 | The tiller step's seven files the card does not name | "Widen the card" (named in the card's "May change": Plan §14, §6, §7.1) | 2026-11-19 |
 | A0-p | The primer's chapter 3 passage item 37 makes untrue (the frigate's booms in 13 knots) | "Widen it (Recommended)" (re-recorded at 15 knots from a run, with its size pins: Plan §14; TuningNotes, "Package 90, A0") | 2026-11-19 |
+| C-s | The three-decker's source: her hull from PB-039, her own plan as built, in place of question 10's *San Josef* sheets | "Use PB-039 (Recommended)" (her hull drawn from PB-039; ZAZ0100 to ZAZ0103 the comparison, settling her sixteenth lower pair: Con-D, revised 2026-11-20) | 2026-11-20 |
+| T-r | The tartane's main's rake: the 3° forward of question 4, or upright as Chapman's Pl. LXII draws it | "Use the rake which provides the better sailing characteristic, upright, or slightly forward raked." (the better of the two by her sailing, for her build: Tar-D §4.1) | 2026-11-20 |
+| T-b | The tartane's builder | "Start it (Recommended)" | 2026-11-20 |
+| T-v | The tartane seen in the browser preview (her branch at b9ebd761, before A5, A6 and V1 to V3), a note and not a ruling | "Definitely a solid start, though I notice that the topsail doesn't quite trim right. The sheets on  the loose foot should try to align with the topsail yard, I would think, whereas now they seem to trim directly to the wind and askew from square with the yard. I'll save any judgement until the final version." (measured, her builder's report §14 at 5a9c582a: her tréou is set flying, so in plain sail it is on deck with its yard, as her design's decision 9 has it; but the game serves that yard `sound` and braced (42.2° there, the topsail yard 50.7°), and the viewer's `squareCut` still takes it as the yard below and hangs her topsail's clews at its arms, on deck: the foot 90° askew of its yard at her start, 26° by the wind. The mend is V2's, one condition: a yard on deck with its flying sail read as no yard below. The check for her final version: her loose foot square with its own yard) | 2026-11-21 |
+| D-s | The Diana's spanker: filed at 111 m2, her own rule cuts 95 m2 on her boom of 10.9 m (Luce's chain, half the main mast), and with 95 no `clr_x_m` holds both truths D and E (her builder's report section 10). Steel's 20-gun ship of 429 tons, her measuring note's near comparator, lists a driver boom of 45 ft 6 in (13.9 m), on which her rule would cut a sail near 111 m2. Put with the lead's recommendation (a) of nudge 61, made before the boom's ground was known | "Steel's boom, then measure (Recommended)" (her boom to Steel's 13.9 m, the spanker cut on it by her own rule, her helm and tacks measured across winds and seeds; filed if she holds D and E, else (a)) | 2026-11-23 |
+| D-s2 | The same, asked again here because the owner had also answered the lead directly (nudge 62: "Agreed, let's go with (a)."), and the two answers differed | "My apologies, I answered the lead but wasn't aware you had an open question here with a different (a). Let's go with (a), as told to the lead." (supersedes D-s: the 95 m2 sail her spars carry by her note's rule, her tacks kept, truth D restated as measured; chosen knowing her boom is Luce's chain and Steel's comparator's is 13.9 m) | 2026-11-23 |
+| D-j | The Diana slack in stays in a breeze under all plain sail: the tack script calls the after yards' haul a point on the bow for every ship, and with the wind ahead (Luce's other reading) she stays in 20 and 25 kn; booked as package 125, the moment of the haul (the lead's nudge 67, which recommended joining). Put in the lead's own two labels | "Join now (Recommended)" (she joins as her plan makes her and the engine sails her today, slack in stays in a breeze under all plain sail and tacking under the game's own shorten sail, her truths saying so; measured again when package 125 lands) | 2026-11-23 |
+| D-j2 | The same, given to the lead directly (its nudge 68) | "Agreed on joining her now." (one answer with D-j) | 2026-11-24 |
+| D-j3 | The same choice put again (the lead's nudge 70), the ground moved: shortened by the game's own order in 25 kn she gripes and lies near the wind with little way until her captain sets the jib again, then she stays from every heading; the engine's part (the haul's moment; a jib taken in where a ship cannot be held without it) booked as package 125; one measure more under the game's own captain in a rising wind may still stop her | "Join now (Recommended)" | 2026-11-24 |
+| D-v | The Diana seen in a live preview of her branch (8ce21bdc: the 95 m2 spanker of (a), her bow port on her drawn side), a note and not a ruling | "She's looking very well in the preview, I quite like the mixed rake of her masts, especially so if that comes from the source directly. Well done." (it does: her lower masts' places and rakes are measured off her own plan, the fore near upright, the main about 5 deg and the mizen about 5.5 deg aft, each 0.5 deg added for the line's slope on the sheet: pages-diana.md section 6.2, `tools/ships/diana.py` MASTS) | 2026-11-24 |
+| T-f | The tartane's frame while her great yard is peaked in its shift (the viewer's V1; the lead's nudge 88: the owner's eye), seen in a live preview of the viewer's V1 and V2 with her files (docs/playtests/2026-11-28-tartane-v2-preview/): (a) the frame holds the peak, so she is drawn about 30% smaller always and the view never moves; (b) today's scale, the view drawing back while the yard stands peaked | "(a) Fixed frame (Recommended)" (kept as built: the viewer's frame holding every state's figures) | 2026-11-28 |
+| T-v2 | The tartane seen in a live preview of the viewer's V1 and V2 with her files (docs/playtests/2026-11-28-tartane-v2-preview/), a note and not a ruling | "Only note for me so far is that there appears to be a small rendering error in the lateens, on the forward end of them, which appears like a pinched section. It can be seen on the mizzen in the preview, currently, at a few different angles." (its cause, read in the drawing: the lateen is drawn as a four-cornered sail whose fourth edge is the short luff at the car, about 0.3 m; `quadSail` gives every edge one belly whatever its length, so that edge bellies 0.74 m forward on the mizzen and about 1 m on the great lateen; sent to the viewer) | 2026-11-28 |
+| T-v3 | The mend of T-v2 seen live (the viewer's hash 20aca5ec: each edge of a sail bellied by its own length, 15 of the 19 committed files' sail outlines moved, declared): the tartane's lateens' short luffs 0.03 m off their chords, and the bilander's settee luff 0.20 m off a 1.81 m luff, was 1.35 m (docs/playtests/2026-11-28-tartane-v2-preview/, pictures 7 to 10), a note and not a ruling | "Both fixes look clean to me, very good." | 2026-11-28 |
 | E | Anything in Part E changed | No word given against it, so it stands as recommended, as this sheet's rule has it | 2026-11-18 |
 | A1d | The strain of a lateen taken aback (put with the scope card, nudge 18) | "A lateen taken aback should increase the strain on the mast, as a backed square sail does, so that on the worse tack and not dipped, the sail may strain the mast and, in high enough wind, risk damage." (built: question 3, "Decided by you") | 2026-11-18 |

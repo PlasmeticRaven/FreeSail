@@ -16,9 +16,9 @@ params: {}
 preconditions: []
 timing:
   mend_s: 1800   # new wheel-ropes rove and the wheel made good: half an hour (JUDGEMENT; no figure found in Luce, Steel or Falconer)
-on_start: {log: "Repair the wheel! The carpenter's crew to the wheel; new wheel-ropes to be rove."}
+on_start: {log: "{begin}"}
 on_complete: {log: "{done}", kind: helm.repaired, severity: notable}
-on_fail: {log: "Could not repair the wheel: {reason}.", kind: evolution.failed, severity: notable}
+on_fail: {log: "Could not {work}: {reason}.", kind: evolution.failed, severity: notable}
 # crew: the carpenter's crew and a quartermaster's hands at the ropes: four hands (JUDGEMENT)
 crew: {hands: 4, rating: able, stations: [idlers, afterguard]}
 source: "Luce 1884, the wheel-ropes parting (the relieving tackles hooked and new wheel-ropes rove); Falconer 1780, HELM (the wheel, the tiller-rope and the barrel); the minutes and the hands JUDGEMENT"

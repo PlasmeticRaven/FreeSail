@@ -454,7 +454,9 @@ def _group_evolution(
     if not done:
         detail = errors.sentence_list(failed) or "there is nothing in this ship it applies to"
         raise OrderError(f"Could not {order.verb}: {detail}.")
-    text = f"{order.verb[0].upper()}{order.verb[1:]}: " + " ".join(texts)
+    # a line's words the runner said itself are none here (`verbs.unsaid`)
+    text = f"{order.verb[0].upper()}{order.verb[1:]}: " + " ".join(t for t in texts if t)
+    text = text.rstrip()
     if failed:
         text += " Not done: " + errors.sentence_list(failed) + "."
     data = {

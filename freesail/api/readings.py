@@ -1744,6 +1744,54 @@ REGISTRY.add(
     )
 )
 
+# The ship's practice for her whole lateens in going about (package 90, A1b;
+# Design-Package90-Engine.md §2.3 item 3), so that a model at the conn knows what `tack ship`
+# will do with the yards: in stays and in wearing, each shifted round the mast or left on it
+# (`scripts.lateen_practice`, "shifted" in both by default), set by `leave the lateens in stays`
+# and its kin. A hull with no whole lateen has none: the row's words say so.
+NO_LATEEN_WORDS = "no whole lateen aboard"
+
+
+def _no_lateen_words(_world: Any) -> str:
+    return NO_LATEEN_WORDS
+
+
+def _lateen_practice(world: Any, _: str | None) -> dict[str, Any] | None:
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = world.ship
+    if not scripts.has_whole_lateen(ship):
+        return None
+    practice = scripts.lateen_practice(ship)
+    return {"words": scripts.lateen_practice_words(ship, practice), **practice}
+
+
+REGISTRY.add(
+    Reading(
+        "lateen_practice",
+        ("the lateen practice",),
+        "query",
+        "",
+        _lateen_practice,
+        description="the ship's practice for her whole lateens in going about: each yard "
+        "shifted round its mast or left on it, in stays and in wearing",
+        none_words=_no_lateen_words,
+    )
+)
+
+
+def idle_lateen_rows(world: Any) -> set[str]:
+    """The practice's row, left out of a sample where she carries no whole lateen (package 90;
+    the lead's nudge 46, item 6: "no whole lateen aboard" was in every station's sample on all
+    eighteen ships, a seat paying for it on every reading and learning nothing). Read by
+    `action_readings.idle_rows`, as the practice and resupply's own rows are. The readings tool
+    keeps it on every ship: every reading is named in the primer (`tests/test_grammar_book.py`)
+    and the tool's own tests read every registry row."""
+    from freesail.evolutions import scripts  # local import, as the getters above read the runner
+
+    ship = getattr(world, "ship", None)
+    return set() if ship is not None and scripts.has_whole_lateen(ship) else {"lateen_practice"}
+
 
 # ---------------------------------------------------------------------------
 # Package 33b: the chronometer, the moon, the lunar, the variation, and the chart in the
@@ -2407,23 +2455,37 @@ def ship_class_words(spec: Any, name: str = "") -> str:
     taken out of it where the note names her, and the rig by the file's word where the
     clause does not say it. A hull sailing under another name than her file's (a far
     ship made from the frigate's or the brig's lines) keeps the file's class and loses
-    the file's ship's name."""
+    the file's ship's name. Her name goes with the prefix that is hers ('HMS Bellerophon,
+    a 74-gun ship ...'); a first clause that names her and her state, and no class ('HMS
+    Indefatigable as built, a 64-gun ship ...', '... as razeed, 1795: the Ardent-class
+    64 ...'), gives its class after its comma or else the next clause's; only a leading
+    article is made small, and 'the' before a possessive ('The Navy's smack') is kept
+    (carried fault 24: "hMS as razeed, 1795", "hMS a 74-gun ship", "a Navy's smack")."""
     note = str(getattr(spec, "era_notes", "") or "").strip()
-    head = re.split(r"[(:]", note, maxsplit=1)[0].strip().rstrip(",;") if note else ""
+    clauses = re.split(r"([(:])", note, maxsplit=1) if note else [""]
+    head = clauses[0].strip().rstrip(",;")
     file_name = str(getattr(spec, "name", "") or "")
     if head and file_name:
         # 'H.M. brig-sloop Harpy of the Diligence class' -> 'H.M. brig-sloop of the
         # Diligence class'; 'A 36-gun ... frigate of the Amazon class' keeps the class
-        head = re.sub(rf"(?<!the ){re.escape(file_name)}\b,?\s*", "", head)
+        head = re.sub(rf"(?<!the )(?:H\.?M\.?S\.?\s+)?{re.escape(file_name)}\b,?\s*", "", head)
         head = re.sub(r"^L'\s*,?\s*", "", head).strip(" ,")
         head = re.sub(r"\s+", " ", head)
+    if head and not re.match(r"(?i:a|an|the)\b|H\.M\.", head):
+        appositive = re.search(r",\s*((?i:a|an|the)\s.*)$", head)
+        nxt = clauses[2] if len(clauses) > 2 and clauses[1] == ":" else ""
+        nxt = re.split(r"[(;:]", nxt, maxsplit=1)[0].strip(" ,")
+        head = appositive.group(1) if appositive else (nxt or head)
     rig = str(getattr(spec, "rig", "") or "").replace("-", " ")
     if not head:
         return f"a {rig}" if rig else "a ship"
-    if head[:1].isupper() and not head.startswith("H.M."):
+    if re.match(r"(A|An|The)\b", head):
         head = head[:1].lower() + head[1:]
-    if head.startswith("the "):
-        head = "a " + head[4:]
+    elif head[:1].isupper() and not head.startswith("H.M."):
+        # 'Spanish xebec of the Mahón station': her class with its article, the word kept
+        head = ("an " if head[:1] in "AEIOU" else "a ") + head
+    if head.startswith("the ") and not re.match(r"the \S+'s\b", head):
+        head = ("an " if re.match(r"[aeiouAEIOU8]|1[18]\b", head[4:]) else "a ") + head[4:]
     rigged = f", {rig}-rigged" if rig and rig.split()[-1] not in head.lower() else ""
     return f"{head}{rigged}"
 
@@ -2455,15 +2517,24 @@ def ship_words(world: Any) -> str:
             nation = nation_id.replace("-", " ")
     captain = getattr(world, "captain", None)
     role = str(getattr(captain, "role", "") or "")
-    from freesail.world.captains import _is_kings_ship
+    # her service by her papers first, then her captain's role, then her wardroom
+    # (`service.service_of`; package 121, the owner's word of 2026-11-20: a frigate under a
+    # privateer's papers read "a King's ship" to the officer and the director); a prize under
+    # her prize crew is said by the role (a prize is not her captor's King's ship)
+    from freesail.world.service import KINGS, MERCHANT, PRIVATEER, service_of
 
-    kings = role in ("kings-ship", "commodore", "cruiser") or (not role and _is_kings_ship(world))
-    escort = ", the convoy's escort" if role == "commodore" else ""
+    service_is = "" if role == "prize-master" else service_of(world)
+    kings = service_is == KINGS
+    if service_is == PRIVATEER:
+        role = "privateer"
+    elif service_is == MERCHANT and role not in ("packet", "fisherman", "revenue", "indiaman"):
+        role = "merchant"
+    escort = ", the convoy's escort" if kings and role == "commodore" else ""
     # package 75, SW-4's words step: a revenue cutter is the Customs' cruiser, armed and of the
     # Crown and not the Navy's, as Sherbourne served the Board of Customs against the smugglers
     # from 1763 to 1779 (docs/design/VesselCandidates.md; the kit's manual); an Indiaman a
     # merchantman that is armed, named by her book's word (data/captains/indiaman.yaml)
-    duty = ", in the service of the Customs" if role == "revenue" else ""
+    duty = ", in the service of the Customs" if role == "revenue" and not kings else ""
     if kings:
         # a navy by its nation's adjective (package 75, B2b, the lead's ruling of 2026-11-07):
         # "a ship of the French navy", where the name read "the France navy" and "the the
@@ -2478,9 +2549,11 @@ def ship_words(world: Any) -> str:
             "revenue": "a revenue cutter",
             "indiaman": "an Indiaman",
         }.get(role, "a merchantman")
-        if cls.startswith("H.M. "):
-            # the hull's lines are a King's vessel's (the file's history); she is not
-            cls = cls[5:]
+        mark = next((m for m in ("H.M. ", "the Navy's ") if cls.startswith(m)), "")
+        if mark:
+            # the hull's lines are a King's vessel's (the file's history); she is not (the
+            # smack out of Falmouth, "the Navy's smack; a merchantman": carried fault 24)
+            cls = cls[len(mark) :]
             cls = ("an " if cls[:1].lower() in "aeiou" else "a ") + cls
     of = f" of {nation}" if nation and not service.startswith("a ship of the") else ""
     parts = [f"The ship: {name}, {cls}; {service}{of}{escort}{duty}."]
@@ -2602,16 +2675,23 @@ def _where_is(world: Any, param: str | None) -> dict[str, Any] | None:
 def _places(world: Any, _: str | None) -> dict[str, Any] | None:
     """`the places`: the names in the words (every sample carries them, so the static
     descriptions ride in `items`, where the prompt's answer and the pane find them)."""
+    from freesail.evolutions.scripts import helm_words
     from freesail.world import things as TH
     from freesail.world.places import PLACES
 
     places = getattr(world, "places", None)
     if places is None:
         return None
+    # the quarterdeck "where ... the wheel is", by her helm, from the one table (package 90,
+    # A3; the lead's nudge 47): "the tiller is" where she steers by one, a wheel ship's as it was
+    by_helm = f"{helm_words(getattr(world, 'ship', None))['helm']} is"
     out = {
         "words": ", ".join(p.name for p in PLACES.values()),
-        "items": {p.id: {"name": p.name, "description": p.description} for p in PLACES.values()},
-        "described": places.describe(),
+        "items": {
+            p.id: {"name": p.name, "description": p.description.replace("the wheel is", by_helm)}
+            for p in PLACES.values()
+        },
+        "described": [d.replace("the wheel is", by_helm) for d in places.describe()],
     }
     lying = TH.lying_aboard(world)
     if lying:

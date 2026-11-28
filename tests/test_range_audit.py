@@ -171,8 +171,10 @@ def test_the_known_list_holds_each_finding_owned():
     assert {k.split(":")[0] for k in data} <= set(DATA_CLEARS), sorted(
         {k.split(":")[0] for k in data} - set(DATA_CLEARS)
     )
-    # 28 the data's: 29 until package 116 mended `v-nation-unknown:cruiser.stations` (card 5)
-    assert len(data) == 28 and len(engine) == 38
+    # 29 the data's: 28 before the Diana's file (package 90), whose default fit is
+    # `v-fit-ahead:corvette-20`'s; 29 until package 116 mended `v-nation-unknown:cruiser.stations`
+    # (card 5)
+    assert len(data) == 29 and len(engine) == 38
     engines = [k for k in by_owner if k[0] in "ue" or k.startswith(("f-colours:", "c-"))]
     engines += ["w-no-end", "l-by-year", "x-as-of", "w-block-unread"]
     engines += [k for k in by_owner if k.startswith(("w-before-since:", "w-court:"))]
