@@ -5,4 +5,4 @@ session may compare this file's contents on the trunk with what it last saw, and
 differ, fetch the trunk and read the newest dated notes at the end of
 `docs/dev/M7-WorkPackages.md` ("### Notes from the lead to the ships session").
 
-Latest note: 2026-11-28, 11:55 UTC (THE CONCEPCION'S FILE: her builder adds her table rows, the viewer mends its two drawing rules, her audit entry filed, "a first rate" by (a), her yard levels' row in; her tack band accepted with the gap said and carried as the engine's; no second file; fifteen trimmers accepted and said; the owner's look and word before her hash). Nudge number: 97.
+Latest note: 2026-11-28, 12:00 UTC (YES to a small hash of the viewer's own for the three drawing rules, ahead of V3 and V4; the nineteen proven unmoved or declared; a pin a rule). Nudge number: 98.
