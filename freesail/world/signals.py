@@ -1467,9 +1467,10 @@ def root_seed(world: Any) -> int:
 
 def table_of(world: Any) -> PrivateTable | None:
     """The private table this World's ship carries this month: her nation's, when the
-    scenario's papers give it (`papers: {private_signals: true}`; `false` takes it away)
-    or her captain's role is one the table is issued to (the root's `carried_by`: a King's
-    ship, a cruiser, a commodore); None in a merchantman, a packet, a privateer, a
+    scenario's papers give it (`papers: {private_signals: true}`; `false` takes it away),
+    her captain's role is one the table is issued to (the root's `carried_by`: a King's
+    ship, a cruiser, a commodore), or her papers make her a King's ship (`papers: {service:
+    kings}`, the harbour's King's ship); None in a merchantman, a packet, a privateer, a
     fisherman or a prize."""
     books = books_for(world)
     nation = own_nation(world)
@@ -1486,6 +1487,13 @@ def table_of(world: Any) -> PrivateTable | None:
             brain = getattr(vessel, "brain", None)
             role = str(getattr(brain, "role", "") or "")
         carried = books.table_carried_by(role)
+    if not carried:
+        # a King's ship by her papers (`papers: {service: kings}`, as the harbour writes her
+        # made one), her captain given no place of his own: the table is issued to her as to
+        # any King's ship (`service.papers_service`)
+        from freesail.world.service import KINGS, papers_service
+
+        carried = papers_service(world) == KINGS
     if not carried:
         return None
     now = world.clock.ship_time

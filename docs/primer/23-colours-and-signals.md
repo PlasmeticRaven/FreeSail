@@ -84,7 +84,7 @@ the private signal
 # rejected: answer the private signal
 ```
 
-The hired cutter of this book carries no table, and the orders are refused with the reason ("there is no private signal aboard: the month's table is issued to the King's ships under seal"); in a ship whose captain's place is a King's ship's, a cruiser's or a commodore's (and in any ship whose scenario gives `papers: {private_signals: true}`) they read; a King's ship by her papers or her wardroom alone, her captain given no such place, carries none:
+The hired cutter of this book carries no table, and the orders are refused with the reason ("there is no private signal aboard: the month's table is issued to the King's ships under seal"); in a ship whose captain's place is a King's ship's, a cruiser's or a commodore's, in a King's ship by her papers (`papers: {service: kings}`, as the harbour writes a ship made a King's ship there), and in any ship whose scenario gives `papers: {private_signals: true}`, they read (`papers: {private_signals: false}` takes the table from any ship); a King's ship by her wardroom alone, her captain given no such place and her papers no service, carries none:
 
 ```
 The private signal: by day, a blue flag at the mizen topmast head; the reply, a chequered flag at the mizen topmast head, with the ensign at the ensign staff.
